@@ -1,0 +1,45 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Id:"
+            android:id="@+id/idTextView"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:textIsSelectable="true"
+            android:textSize="20dp"
+            android:textColorHighlight="@color/blue"
+            android:textColor="@color/brightblue" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Tasks:"
+            android:id="@+id/myTaskTextView"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="20dp"
+            android:textSize="20dp" />
+
+        <ListView
+            android:id="@+id/task_list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        </ListView>
+
+    </LinearLayout>
+
+
+
+
+</FrameLayout>

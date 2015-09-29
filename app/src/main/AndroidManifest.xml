@@ -2,12 +2,32 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.umich.si.inteco.minuku" >
 
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -18,6 +38,94 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="edu.umich.si.inteco.minuku.activities.QuestionnaireActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:excludeFromRecents="true" >
+        </activity>
+
+        <activity android:name=".activities.AnnotateActivity"
+            android:label="CaptureProbe"
+            android:launchMode="singleTask"
+            ></activity>
+
+        <activity android:name=".activities.ListRecordingActivity"
+            android:label="CaptureProbe"
+            android:launchMode="singleTask">
+
+        </activity>
+
+        <service android:name="edu.umich.si.inteco.minuku.services.CaptureProbeService"
+            android:enabled="true"
+            >
+        </service>
+
+        <!-- Activity Recognition -->
+        <service android:name="edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService"
+            android:enabled="true"
+            android:exported="true"
+            >
+        </service>
+
+        <!--  Geofence  -->
+        <service  android:name="edu.umich.si.inteco.minuku.contextmanager.GeofenceTransitionService"
+            android:enabled="true"
+            android:exported="true"
+            >
+        </service>
+
+        <!-- Boot Complete Receiver -->
+
+        <receiver
+            android:name=".receivers.BootCompleteReceiver"
+            android:enabled="true"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receivers.ConnectivityChangeReceiver"
+            android:enabled="true"
+            >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
+
+        <receiver
+            android:name=".receivers.MobilityChangeReceiver"
+            android:enabled="true"
+            >
+
+            <intent-filter>
+                <action android:name="edu.umich.si.inteco.captureprobe.mobility"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receivers.RefreshServiceReceiver"
+            android:enabled="true"
+            >
+
+            <intent-filter>
+                <action android:name="edu.umich.si.inteco.captureprobe.updateScheduleAlarm"/>
+                <action android:name="edu.umich.si.inteco.captureprobe.stopServiceAlarm"/>
+                <action android:name="edu.umich.si.inteco.captureprobe.startServiceAlarm"/>
+            </intent-filter>
+        </receiver>
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBPfc1MFLhCnDLG6vB3a1M-xVD2Go9zlSE"/>
+
     </application>
 
 </manifest>
