@@ -7,18 +7,19 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.ActivityRecognitionClient;
+import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
-import edu.umich.si.inteco.tansuo.app.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.CaptureProbeService;
 
 
 public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConnectionFailedListener{
 
 	/** Tag for logging. */
-    private static final String LOG_TAG = "ActivityRecognitionRequester";
+    private static final String LOG_TAG = "ActRcgnRequester";
 
 	private Context mContext;   
     
@@ -26,7 +27,7 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
     private PendingIntent mActivityRecognitionPendingIntent;
     
     // Store the current activity recognition client
-    private ActivityRecognitionClient mActivityRecognitionClient;
+    private GoogleApiClient mGoogleApiClient;
     
     // Flag that indicates if a request is underway.
     private boolean mActivityRecognitionRequestInProgress;
@@ -34,9 +35,8 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
 	public  ActivityRecognitionRequester(Context context){
     	
 		 mContext= context;
-
 		 mActivityRecognitionPendingIntent = null;
-	     mActivityRecognitionClient = null;
+         mGoogleApiClient = null;
 
     }
 	
@@ -63,13 +63,18 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
      * Get the current activity recognition client, or create a new one if necessary.
      * @return An ActivityRecognitionClient object
      */
-    private ActivityRecognitionClient getActivityRecognitionClient() {
-        if (mActivityRecognitionClient == null) {
+    private GoogleApiClient getGoogleApiClient() {
 
-            mActivityRecognitionClient =
-                    new ActivityRecognitionClient(mContext, this, this);
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient =
+                    new GoogleApiClient.Builder(mContext)
+                            .addApi(ActivityRecognition.API)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .build();
         }
-        return mActivityRecognitionClient;
+        return mGoogleApiClient;
+
     }
 	
 	/**
@@ -84,33 +89,40 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
      * Request a connection to Location Services. 
      */
     private void requestConnection() {
-        getActivityRecognitionClient().connect();
+        getGoogleApiClient().connect();
     }
     
     /**
      * Request a disconnection to Location Services. 
      */
     private void requestDisconnection() {
-        getActivityRecognitionClient().disconnect();
+        getGoogleApiClient().disconnect();
     }
 	
 
     //this function handles the actual activity request
     private void continueRequestActivityUpdates() {
     	
-    	Log.d(LOG_TAG,"the Google Play servce is connected, now start to request activity");
+    	Log.d(LOG_TAG, "the Google Play servce is connected, now start to request activity");
 		
     	/*
          * Request updates, using the default detection interval.
          * The PendingIntent sends updates to ActivityRecognitionIntentService
          */
-    	getActivityRecognitionClient().requestActivityUpdates(
-                CaptureProbeService.ACTIVITY_RECOGNITION_UPDATE_INTERVAL,
-                createRequestPendingIntent());
+
+        //create a pendingIntent to request activity update.
+        PendingIntent activityRecognitionPendingIntent = createRequestPendingIntent();
+
+        //request activity recognition update
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
+                mGoogleApiClient,                                       //GoogleApiClient client
+                CaptureProbeService.ACTIVITY_RECOGNITION_UPDATE_INTERVAL,//detectionIntervalMillis
+                activityRecognitionPendingIntent);                      //callbackIntent
 		
 		Log.d(LOG_TAG,"requesting activity update!");
 		
 		// after request the update, disconnect the client
+
         requestDisconnection();
 
     }
@@ -126,6 +138,7 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
 
         // If no PendingIntent exists
         } else {
+
             // Create an Intent pointing to the IntentService
         	Intent intent = new Intent(
                     mContext, ActivityRecognitionService.class);
@@ -199,16 +212,21 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
 
 	}
 
-	@Override
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+/*
+    @Override
 	public void onDisconnected() {
 
 		Log.d(LOG_TAG,"[onConnected] Google Play services is disconnected for requesting the update, ");
 		
 		// Delete the client
-        mActivityRecognitionClient = null;
+        mGoogleApiClient = null;
 	}
 
-
+*/
 	
 
 }

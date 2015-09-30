@@ -6,22 +6,26 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.*;
 import com.google.android.gms.location.ActivityRecognition;
+
+import edu.umich.si.inteco.minuku.services.CaptureProbeService;
 
 public class ActivityRecognitionRemover implements ConnectionCallbacks,
 		OnConnectionFailedListener {
 
 	/** Tag for logging. */
-    private static final String LOG_TAG = "ActivityRecognitionRemover";
+    private static final String LOG_TAG = "ActRcgnRemover";
     private Context mContext;
-    private ActivityRecognitionClient mActivityRecognitionClient;
+    // Store the current activity recognition client
+    private GoogleApiClient mGoogleApiClient;
     private PendingIntent mCurrentIntent;
-    
+
+    //intiation
     public ActivityRecognitionRemover(Context context) {
-    	
         mContext = context;
-        mActivityRecognitionClient = null;
+        mGoogleApiClient = null;
     }
     
     
@@ -34,37 +38,38 @@ public class ActivityRecognitionRemover implements ConnectionCallbacks,
     public void removeUpdates(PendingIntent requestIntent) {
 
         Log.d(LOG_TAG,"[removeUpdates] going to remove activity recognition ");
-        /*
-         * Set the request type, store the List, and request a activity recognition client
-         * connection.
-         */
         mCurrentIntent = requestIntent;
 
         // Requesting a connection and then remove the update
         requestConnection();
     }
 
-    
+
     /**
      * Get the current activity recognition client, or create a new one if necessary.
+     * @return An ActivityRecognitionClient object
      */
-    public ActivityRecognitionClient getActivityRecognitionClient() {
+    private GoogleApiClient getGoogleApiClient() {
 
-         //If a client doesn't already exist, create a new one
-        if (mActivityRecognitionClient == null) {
-            // Create a new one
-            setActivityRecognitionClient(new ActivityRecognitionClient(mContext, this, this));
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient =
+                    new GoogleApiClient.Builder(mContext)
+                            .addApi(ActivityRecognition.API)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .build();
         }
-        return mActivityRecognitionClient;
+        return mGoogleApiClient;
+
     }
 
-    
+
     /**
      * Request a connection to Location Services. This call returns immediately,
      * but the request is not complete until onConnected() or onConnectionFailure() is called.
      */
     private void requestConnection() {
-        getActivityRecognitionClient().connect();
+        getGoogleApiClient().connect();
     }
     
     
@@ -74,19 +79,29 @@ public class ActivityRecognitionRemover implements ConnectionCallbacks,
     private void requestDisconnection() {
 
         // Disconnect the client
-        getActivityRecognitionClient().disconnect();
+        getGoogleApiClient().disconnect();
 
         // Set the client to null
         setActivityRecognitionClient(null);
     }
-    
+
+
     /**
      * Send a request to remove activity recognition updates after the connection is built, s
      */
     private void continueRemoveUpdates() {
-        
-        // Remove the updates
-        mActivityRecognitionClient.removeActivityUpdates(mCurrentIntent);     
+
+        Log.d(LOG_TAG, "the Google Play servce is connected, now start to request removing activity");
+
+    	/*
+         * Request updates, using the default detection interval.
+         * The PendingIntent sends updates to ActivityRecognitionIntentService
+         */
+
+        //request activity recognition update
+        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(
+                mGoogleApiClient,                     //GoogleApiClient client
+                mCurrentIntent);                      //callbackIntent
 
         //Cancel the PendingIntent. 
         mCurrentIntent.cancel();
@@ -95,44 +110,36 @@ public class ActivityRecognitionRemover implements ConnectionCallbacks,
         requestDisconnection();
     }
 
-    //set activity client
-    public void setActivityRecognitionClient(ActivityRecognitionClient client) {
-        mActivityRecognitionClient = client;
 
+
+    //set activity client
+    public void setActivityRecognitionClient(GoogleApiClient client) {
+        mGoogleApiClient = client;
     }
-    
+
+
+
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
-		/*
-         * Google Play services can resolve some errors it detects.
-         * If the error has a resolution, try sending an Intent to
-         * start a Google Play services activity that can resolve
-         * error.
-         */
-
         if (connectionResult.hasResolution()) {
         	Log.d(LOG_TAG,"Conntection to Google Play services is failed");
         } else {
         	Log.d(LOG_TAG,"No Google Play services is available");
         }
-
 	}
+
 
 	@Override
 	public void onConnected(Bundle arg0) {
 		Log.d(LOG_TAG,"[onConnected] Google Play services is connected for removing the update, ");
-
 		//send a request to remove the update
 		continueRemoveUpdates();
 	}
 
-	@Override
-	public void onDisconnected() {
-		
-		Log.d(LOG_TAG,"[onDisConnected]  Google Play services is disconnected for removing the update,");
 
-		 // Destroy the current activity recognition client
-        mActivityRecognitionClient = null;
-	}
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
 
 }

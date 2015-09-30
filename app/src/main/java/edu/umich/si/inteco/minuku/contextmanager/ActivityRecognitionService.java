@@ -16,14 +16,14 @@ import com.google.android.gms.location.DetectedActivity;
 
 import java.util.List;
 
-import edu.umich.si.inteco.tansuo.app.GlobalNames;
-import edu.umich.si.inteco.tansuo.app.util.GooglePlayServiceUtil;
-import edu.umich.si.inteco.tansuo.app.util.LogManager;
+import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
+import edu.umich.si.inteco.minuku.util.LogManager;
 
 public class ActivityRecognitionService extends IntentService {
 
 	/** Tag for logging. */
-    private static final String LOG_TAG = "ActivityRecognitionService";
+    private static final String LOG_TAG = "ActRecgService";
     
 	private static DetectedActivity mMostProbableActivity;
 	
@@ -38,32 +38,35 @@ public class ActivityRecognitionService extends IntentService {
 		mMostProbableActivity = null;
 	}
 
+    /*
+    receive detected activities from the Google Play Service
+     */
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		// TODO Auto-generated method stub
-
-		Log.d(LOG_TAG, "onHandleIntent" );
 		
 		// If the activity recognition intent contains an activity update, get the update
 		if (ActivityRecognitionResult.hasResult(intent)) {
 
 			try{
-				
+                //get the result
 				ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 
 
+                //examing the detected activities
+                /*
                 for (int i=0; i<result.getProbableActivities().size();i++){
                 	Log.d(LOG_TAG, "ActivityRecognitionResult: " +  result.getProbableActivities().get(i).toString());
                 }
-                
+                */
+
                 mProbableActivities = result.getProbableActivities();        
                 
                 //store the activity and confidence into memory
                 mMostProbableActivity = result.getMostProbableActivity();
 
-                long detectionTime = result.getTime();
-                //save the updated activity to ContextExtractor
-
+                //TODO: remove this if we don't need to test
+                //save the updated activity to ContextExtractor (for testing puporse
        //         ContextExtractor.setProbableActivities(mProbableActivities, detectionTime);
        //         ContextExtractor.setMostProbableActivity(mMostProbableActivity, detectionTime);
                 
@@ -84,8 +87,6 @@ public class ActivityRecognitionService extends IntentService {
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             message);
-
-                    //sendNotification();
 
                 	//Toast.makeText(this , "the detected activity is "  + mMostProbableActivity + ": " +  mProbableActivities , Toast.LENGTH_LONG).show();
                 }
@@ -169,6 +170,8 @@ public class ActivityRecognitionService extends IntentService {
                 return "on_foot";
             case DetectedActivity.STILL:
                 return "still";
+            case DetectedActivity.RUNNING:
+                return "running";
             case DetectedActivity.UNKNOWN:
                 return "unknown";
             case DetectedActivity.TILTING:
@@ -190,6 +193,8 @@ public class ActivityRecognitionService extends IntentService {
             return DetectedActivity.STILL;
         }else if(activityName.equals("unknown")) {
             return DetectedActivity.UNKNOWN ;
+        }else if(activityName.equals("running")) {
+            return DetectedActivity.RUNNING ;
         }else if(activityName.equals("tilting")) {
             return DetectedActivity.TILTING;
         }else
