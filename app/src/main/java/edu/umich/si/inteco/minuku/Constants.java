@@ -49,7 +49,7 @@ public class Constants {
     public static final String WEB_SERVICE_URL_POST_FILES = "https://inteco.cloudapp.net:5001/postlog";
 
 
-    public static String CURRENT_STUDY_CONDITION = PARTICIPATORY_LABELING_CONDITION;
+    public static String CURRENT_STUDY_CONDITION = IN_STIU_LABELING_CONDITION;
 
 	//this is the id for the labling study.
 	public static final int LABELING_STUDY_ID = 1;

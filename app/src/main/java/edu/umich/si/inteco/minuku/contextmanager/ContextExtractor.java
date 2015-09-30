@@ -232,9 +232,8 @@ public class ContextExtractor implements SensorEventListener {
 
         mLocationRequestType = GooglePlayServiceUtil.LOCATION_REQUEST_TYPE.ADD;
 
-        //check Google Place first
+        //check Google Play first
         if (!servicesConnected()) {
-
             return;
         }
 
@@ -901,11 +900,9 @@ public class ContextExtractor implements SensorEventListener {
 	
     /**
      * Verify that Google Play services is available before making a request.
-     *
      * @return true if Google Play services is available, otherwise false
      */
     private boolean servicesConnected() {
-
         // Check that Google Play services is available
         int resultCode =
                 GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext);

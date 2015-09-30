@@ -1,0 +1,146 @@
+[	
+	{	
+		"Id":1,
+		"Name":"CrowdBased Labeling Study",
+		"Task":
+			[
+		        {
+		            "Id": 1,
+		            "Name": "Participatory Labeling",
+		            "Description": "Use Probe to record trips and label transportation mode",
+		            "Timestamp_string": "2014-07-06 7:00:00 UTC",
+		            "Created_time":"1394106097000",
+		            "Start_time":"1394106097000",
+		            "End_time":"1404259199"
+		        },
+
+		        {
+		            "Id": 2,
+		            "Name": "Daily Report",
+		            "Description": "Respond to a daily report every day",
+		            "Timestamp_string": "2014-03-06 11:41:37 UTC",
+		            "Created_time":"1394106097000",
+		            "Start_time":"1394106097000",
+		            "End_time":"1404259199"
+		        }
+			
+			
+			], 
+
+		"Configuration":
+		{	
+			"Id": 1,
+			"Version": 1,
+			"Name": "Configuration1",
+
+			"Content":
+			{
+
+			    "StopServiceDuringMidNight":false,
+				"Action":
+				[
+					{	
+						"Id": 1,
+						"Execution_style":"one-time",
+						"Type": "email_questionnaire",
+						"Name": "triggering daily journal",
+						"Questionnaire_id":1,		
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "schedule",
+									"Schedule":
+									{
+										"Sample_method":"fixed_time_of_day",
+										"Time_of_day": "21:45"
+									}
+								}	
+							
+							]				
+						},						
+						"Notification":
+						[
+							{
+								"Launch":"when_start",
+								"Type":"normal",
+								"Title": "Daily report",
+								"Message": "Please tap to fill daily report"
+							}
+
+						]
+						
+					}  
+				],
+
+
+
+				"Questionnaire":
+				[
+					{
+						"Id": 1,
+						"Title": "Transportation Mode Labeling Daily Report",
+						"Description":"Please answer the following questions.",
+						"Type":"email",
+						"Email":{
+							"Recipients":["mr.armuro@gmail.com", "yuchang@umich.edu"],
+							"Subject":"Daily Report on $date"
+						},
+						
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"description",
+								"Question_text": "Here are your recorded trips today:",
+								"Data": {
+
+									"Data":"Session",
+									"Format":"$startTime - $endTime :  $label"
+
+								}					
+							},
+
+							{
+								"Index": 2,
+								"Type":"text",
+								"Question_text": "Is any of the trip listed above not correct in time or in transportation mode? If yes, please correct the trip using the similar format (e.g.. hh:mm - hh:mm: activity)."	
+							},
+
+							{
+								"Index": 3,
+								"Type":"multichoice_multiple_answer",
+								"Question_text": "Is there any trip we missed today? If yes, please list them below. In addition, for each missed trip please choose any option(s) below that applies to the trip and provide us with more context.",
+								"Option":
+								[
+									{
+										"Option_text":"a. I wanted to, but I forgot to record."
+									},
+									{
+										"Option_text": "b. I wanted to but It was not safe at the time to record.."
+									},
+									{
+										"Option_text": "c. I wanted to but It was troublesome at the time to record."
+									},
+									{
+										"Option_text": "d. I wanted to but it was not convenient at the time to record."
+									},
+									{
+										"Option_text": "e. This trip was not in part of my plan. I will record others."
+									}
+								]					
+							}
+
+						]
+
+					}
+
+				]
+
+			}
+			
+
+		}
+		
+	}
+]

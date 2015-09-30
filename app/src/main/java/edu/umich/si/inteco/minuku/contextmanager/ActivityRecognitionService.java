@@ -10,11 +10,14 @@ import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
@@ -54,21 +57,23 @@ public class ActivityRecognitionService extends IntentService {
 
 
                 //examing the detected activities
-                /*
+
                 for (int i=0; i<result.getProbableActivities().size();i++){
                 	Log.d(LOG_TAG, "ActivityRecognitionResult: " +  result.getProbableActivities().get(i).toString());
                 }
-                */
+
 
                 mProbableActivities = result.getProbableActivities();        
                 
                 //store the activity and confidence into memory
                 mMostProbableActivity = result.getMostProbableActivity();
 
+                long detectionTime = getCurrentTimeInMillis();
+
                 //TODO: remove this if we don't need to test
                 //save the updated activity to ContextExtractor (for testing puporse
-       //         ContextExtractor.setProbableActivities(mProbableActivities, detectionTime);
-       //         ContextExtractor.setMostProbableActivity(mMostProbableActivity, detectionTime);
+                ContextExtractor.setProbableActivities(mProbableActivities, detectionTime);
+                ContextExtractor.setMostProbableActivity(mMostProbableActivity, detectionTime);
                 
                 
                 if (Constants.isTestingActivity) {
@@ -88,7 +93,7 @@ public class ActivityRecognitionService extends IntentService {
                             LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             message);
 
-                	//Toast.makeText(this , "the detected activity is "  + mMostProbableActivity + ": " +  mProbableActivities , Toast.LENGTH_LONG).show();
+                	Toast.makeText(this, "the detected activity is " + mMostProbableActivity + ": " + mProbableActivities, Toast.LENGTH_LONG).show();
                 }
                 	
                 
@@ -180,6 +185,14 @@ public class ActivityRecognitionService extends IntentService {
         return "unknown";
     }
 
+    /**get the current time in milliseconds**/
+    public static long getCurrentTimeInMillis(){
+        //get timzone
+        TimeZone tz = TimeZone.getDefault();
+        Calendar cal = Calendar.getInstance(tz);
+        long t = cal.getTimeInMillis();
+        return t;
+    }
 
     public static int getActivityTypeFromName(String activityName) {
 

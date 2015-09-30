@@ -15,7 +15,16 @@ public class MobilityManager {
     /** Tag for logging. */
     private static final String LOG_TAG = "MobilityManager";
 
+    public static final int DELAY_LOCATION_UPDATE_WHEN_STATIC = 1;//the default delayed interval is 60 seconds
+    public static final int REMOVE_LOCATION_UPDATE_WHEN_STATIC = 2;
+    public static final int REMAIN_LOCATION_UPDATE_WHEN_STATIC = 0;
+
     public static final String ALARM_MOBILITY = "Mobility Change";
+
+    //this parameter allows researchers to determine whether they want to pause location request or
+    //slow down location request
+    //
+    public static int ADJUST_LOCATION_UPDATE_INTERVAL_WHEN_STATIC = 1;
 
     public static final String MOBILITY = "mobility";
     public static final String MOBILE_OUTDOORS = "mobile_outdoors";
@@ -42,16 +51,16 @@ public class MobilityManager {
 
         int transportation = TransportationModeDetector.getConfirmedActivityType();
 
+        /*
         Log.d(LOG_TAG, "[updateMobility] [testmobility]the current transportation is " + TransportationModeDetector.getActivityNameFromType(transportation) +
                 " and the current stat is " + TransportationModeDetector.getStateName(TransportationModeDetector.getCurrentState()) );
-
+*/
 
         if (transportation == TransportationModeDetector.NO_ACTIVITY_TYPE &&
                 TransportationModeDetector.getCurrentState()==TransportationModeDetector.STATE_STATIC) {
 
             ///the mobility is static....we will slow down the location request rate
             mobility = STATIC;
-
             //LocationManager.setLocationUpdateInterval(LocationManager.LOCATION_UPDATE_SLOW_INTERVAL_IN_SECONDS);
 
         }
@@ -62,12 +71,11 @@ public class MobilityManager {
             ///the phone is or is probably moving....we will recover the location request rate
             //LocationManager.setLocationUpdateInterval(LocationManager.LOCATION_UPDATE_FAST_INTERVAL_IN_SECONDS);
 
-
         }
 
         if (!preMobility.equals(mobility)) {
 
-            Log.d(LOG_TAG, "[updateMobility] [testmobility] mobility is changed" );
+            Log.d(LOG_TAG, "[updateMobility] mobility is changed" );
 
             //fire mobility change event
             Intent intent = new Intent();

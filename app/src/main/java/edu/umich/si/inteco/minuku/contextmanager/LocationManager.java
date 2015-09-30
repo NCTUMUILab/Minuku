@@ -32,7 +32,7 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
     /**constants**/
 
     //The interval for location updates. Inexact. Updates may be more or less frequent.
-    public static long UPDATE_INTERVAL_IN_SECONDS = 10;
+    public static long UPDATE_INTERVAL_IN_SECONDS = 5;
      //The fastest rate for active location updates.
     public static final long FASTEST_UPDATE_INTERVAL_IN_SECONDS = 2;
 
@@ -123,6 +123,7 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
 
     public void removeLocationUpdate() {
         //stop requesting location udpates
+
         mRequestingLocationUpdates = false;
         Log.d(LOG_TAG,"[removeUpdates] going to remove location update ");
 
@@ -192,15 +193,20 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
      */
     protected void startLocationUpdates() {
         // The final argument to {@code requestLocationUpdates()} is a LocationListener
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+        if (mGoogleApiClient.isConnected()){
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+        }
+
     }
 
     /**
      * Removes location updates from the FusedLocationApi.
      */
     protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+        }
     }
 
 
@@ -264,20 +270,30 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
     }
 
 
-    public long getLocationUpdateIntervalInMillis() {
+    public static long getLocationUpdateIntervalInMillis() {
         return UPDATE_INTERVAL_IN_MILLISECONDS;
     }
 
     public void setLocationUpdateInterval(long updateInterval) {
 
-        UPDATE_INTERVAL_IN_MILLISECONDS = updateInterval;
+        Log.i(LOG_TAG, "attempt to update the location request interval to " + updateInterval);
 
-        //after we get location we need to update the location request
-        //1. remove the update
-        removeLocationUpdate();
-        //2. create new update, and then start update
-        createLocationRequest();
-        startLocationUpdates();
+        //before we update we make sure GoogleClient is connected.
+        if (!mGoogleApiClient.isConnected()){
+            //do nothing
+        }
+        else{
+            UPDATE_INTERVAL_IN_MILLISECONDS = updateInterval;
+
+            //after we get location we need to update the location request
+            //1. remove the update
+            removeLocationUpdate();
+            //2. create new update, and then start update
+            createLocationRequest();
+            requestLocationUpdate();
+            startLocationUpdates();
+        }
+
 
     }
 

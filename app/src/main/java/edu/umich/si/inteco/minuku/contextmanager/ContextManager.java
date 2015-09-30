@@ -122,7 +122,6 @@ public class ContextManager {
         RECORD_TYPE_LIST.add(CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY);
 
         //TODO: add more record type
-
     }
 
     public static void addRecordToPool(Record record){
@@ -144,13 +143,10 @@ public class ContextManager {
      */
     public static void startBackgroundRecordingThread() {
 
-
         mScheduledExecutorService.scheduleAtFixedRate(recordContextRunnable,
                 BACKGROUND_RECORDING_INITIAL_DELAY,
                 BACKGROUND_RECORDING_INTERVAL_IN_SECONDS,
                 TimeUnit.SECONDS);
-
-
     }
 
     public static void stopBackgroundRecordingThread() {
@@ -166,6 +162,7 @@ public class ContextManager {
 
                 /** test transporation : feed datain to the datapool**/
 
+            /*
                     if (testActivityRecordIndex<TransportationModeDetector.getActivityRecords().size()){
                         Log.d(LOG_TAG, "[testing transportation] Feed the " + testActivityRecordIndex + " record :"
                         + TransportationModeDetector.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
@@ -177,7 +174,7 @@ public class ContextManager {
                     }
 
                     testActivityRecordIndex+=1;
-
+*/
 
                 //save records to the database
                 DataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
@@ -211,8 +208,5 @@ public class ContextManager {
         }
         return "unknown";
     }
-	
 
-	
-	
 }

@@ -1,0 +1,817 @@
+[	
+	{	
+		"Id":1,
+		"Name":"CrowdBased Labeling Study",
+		"Task":
+			[
+				{
+		            "Id": 1,
+		            "Name": "Participatory Labeling",
+		            "Description": "Record and label the transportation mode of your trips when you are traveling outdoors",
+		            "Timestamp_String": "2014-03-06 11:41:37 UTC",
+		            "Created_Time":"1394106097000",
+		            "Start_Time":"1394106097000",
+		            "End_Time":"1404259199"
+		        },
+		    
+		        {
+		            "Id": 2,
+		            "Name": "In Situ Labeling",
+		            "Description": "Respond to the Prompter to record trips and label transportation mode",
+		            "Timestamp_String": "2014-03-06 11:41:37 UTC",
+		            "Created_Time":"1394106097000",
+		            "Start_Time":"1394106097000",
+		            "End_Time":"1404259199"
+		        },
+		    
+		        {
+		            "Id": 3,
+		            "Name": "Post Hoc Labeling",
+		            "Description": "Label the transportation mode of your recorded trips",
+		            "Timestamp_String": "2014-03-06 11:41:37 UTC",
+		            "Created_Time":"1394106097000",
+		            "Start_Time":"1394106097000",
+		            "End_Time":"1404259199"
+		        },
+
+		        {
+		            "Id": 4,
+		            "Name": "Respond to diary report",
+		            "Description": "Respond to a diary report every day",
+		            "Timestamp_String": "2014-03-06 11:41:37 UTC",
+		            "Created_Time":"1394106097000",
+		            "Start_Time":"1394106097000",
+		            "End_Time":"1404259199"
+		        }
+			
+			
+			], 
+
+		"Configuration":
+		{	
+			"Id": 1,
+			"Version": 1,
+			"Name": "Configuration1",
+			"Content":
+			{
+
+
+
+				"Event": 
+				[
+					{
+						"Id": 1,
+						"Task_id": 1,
+						"Name": "Monitoring tilting",
+						"Description":"NA",
+						"Condition": 
+						[ 
+							{
+								
+								"Type": "activity_type",
+								"Relationship": "string_equal_to",
+								"TargetValue": "tilting",
+					
+								"Constraint": [
+									{
+										"Type": "recency",
+										"Relationship": "<=", 
+										"TargetValue": "5" 
+									}
+								]
+							} 
+						]
+					}, 
+						
+					{
+						"Id": 2,
+						"Task_id": 2,
+						"Name": "Monitoring at home",
+						"Description":"NA",
+						"Condition": 
+						[
+							{
+								"Type": "distance_to",
+								"Lat":42.279469, 
+								"Lng":-83.740973,
+								"Relationship": "<",
+								"TargetValue": "1000",
+					
+								"Constraint": 
+								[
+									{
+										"Type": "duration",
+										"Relationship": ">=", 
+										"TargetValue": "60" 
+									},
+									{
+										"Type": "recency",
+										"Relationship": "<=", 
+										"TargetValue": "120" 
+									}
+								]
+								
+							}
+						]
+					},
+
+					{
+						"Id": 3,
+						"Task_id": 1,
+						"Name": "Monitoring being in a vehicle",
+						"Description":"NA",
+						"Condition": 
+						[ 
+							{
+								
+								"Type": "activity_type",
+								"Relationship": "string_equal_to",
+								"TargetValue": "still",
+					
+								"Constraint": [
+									{
+										"Type": "recency",
+										"Relationship": "<=", 
+										"TargetValue": "5" 
+									}
+								]
+							} 
+						]
+					},
+
+					{
+						"Id": 4,
+						"Task_id": 1,
+						"Name": "Monitoring walking",
+						"Description":"NA",
+						"Condition": 
+						[ 
+							{
+								
+								"Type": "activity_type",
+								"Relationship": "string_equal_to",
+								"TargetValue": "on_foot",
+					
+								"Constraint": [
+									{
+										"Type": "recency",
+										"Relationship": "<=", 
+										"TargetValue": "5" 
+									}
+								]
+							} 
+						]
+					}
+
+					
+				],
+			
+				"Action":
+				[
+
+					{
+						"Id": 2,
+						"Execution_style":"repeated",
+						"Type": "monitoring_events",
+						"Name": "monitoring being home",
+						"Monitoring_events":"2",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "schedule",
+									"Schedule":
+									{
+										"Sample_method":"fixed_interval",
+										"Sample_interval":3000,
+										"Sample_endAt": "23:00"				
+									}
+								}
+							]
+						}
+						
+					}, 
+
+					{
+						"Id": 3,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one-time",
+						"Type": "monitoring_events",
+						"Name": "Monitoring being in a vehicle",
+						"Monitoring_events":"3",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "app_start"
+								}
+
+							],
+
+							"Pause":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 10
+									}
+								}
+							],		
+
+							"Resume":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 300
+									}
+								}
+
+							]
+
+
+						}
+
+					},  
+
+
+					{
+						"Id": 4,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one-time",
+						"Type": "monitoring_events",
+						"Name": "Monitoring walking",
+						"Monitoring_events":"4",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "app_start"
+								}
+
+							],	
+
+							"Pause":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":4,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 10
+									}
+								}
+							],		
+
+							"Resume":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":4,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 300
+									}
+								}
+
+							]					
+						}
+
+					}, 
+
+					{	
+						"Id": 5,
+						"Execution_style":"one-time",
+						"Type": "questionnaire",
+						"Name": "triggering phone placement questionnaire",
+						"Questionnaire_id":1,		
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":5,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 2
+									}
+								}
+							
+							]				
+						},						
+						"Notification":
+						[
+							{
+								"Launch":"when_start",
+								"Type":"normal",
+								"Title": "Where did you put your phone?",
+								"Message": "Please tell us where you just placed your phone"
+							}
+
+						]
+						
+					},   
+
+					{
+						"Id": 6,
+						"Execution_style":"one-time",
+						"Type": "questionnaire",
+						"Name": "triggering carried item questionnaire",
+						"Questionnaire_id":4,
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":2,
+										"Sampling_rate": 1
+									},
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 2
+									}
+								}
+							
+							]
+						
+						},		
+						
+						"Notification":
+						{
+							"Title": "What item are you carrying?",
+							"Message": "Please tab to report what items you are carrying."
+						}
+					}, 
+
+					{
+						"Id": 7,
+						"Execution_style":"repeated",
+						"Type": "questionnaire",
+						"Name": "triggering smoke behavior questionnaire",
+						"Questionnaire_id":5,
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "schedule",
+									"Schedule":
+									{
+										"Sample_method":"fixed_time_of_day",
+										"Time_of_day": "18:40"
+									}
+								}					
+							]
+						},	
+						
+						"Notification":
+						{
+							"Title": "What is the last time you smoked?",
+							"Message": "Please tab to answer the questionnaire."
+						}
+					},
+
+					{
+						"Id": 8,
+						"Execution_style":"one-time",
+						"Type": "annotate_recording",
+						"Name": "triggered annotate in a vehicle questionnaire",
+						"Annotate":{
+						    "Recording_type":1,
+						    "Mode": 1,
+						    "Has_viz": false
+						},
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 1
+									}
+								}
+							
+							]				
+						},						
+						"Notification":
+						{
+							"Title": "Could you please record your current activity?",
+							"Message": "We noticed that you seem to be in a vehicle now."
+						}
+
+					},  
+
+					{
+						"Id": 9,
+						"Execution_style":"one-time",
+						"Type": "questionnaire",
+						"Name": "triggering walking questionnaire",
+						"Questionnaire_id":3,		
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":4,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 2
+									}
+								}
+							
+							]				
+						},						
+						"Notification":
+						{
+							"Title": "Could you please record your current actvity?",
+							"Message": "We notice that you seem to be walking now"
+						}
+
+					},
+
+					{
+						"Id": 10,
+						"Execution_style":"one_time",
+						"Type": "annotate_recording",
+						"Name": "triggered annotating in a vehicle",
+						"Annotate":{
+						    "Recording_type":"new",
+						    "Recording_started_by_user":false,
+						    "Mode": "manual",
+						    "Allow_annotate_in_process":false,
+						    "Viz_type": "none",
+						    "Review_recording": "recent"
+						},
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":4,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 1
+									}
+								}
+							
+							],
+							"Stop":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Action.Start",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 30
+									}
+								}
+
+							]							
+						},						
+						"Notification":
+						[
+							{
+								"Launch":"when_start",	
+								"Type":"normal",
+								"Title": "Could you please record your current activity?",
+								"Message": "We noticed that you seem to be in a vehicle now."
+							},
+
+							{
+								"Launch":"when_stop",	
+								"Type":"normal",
+								"Title": "Could you please label the recording?",
+								"Message": "We have recorded your vehicle trip."
+
+
+							}
+
+						]
+
+
+					},
+
+
+				],
+
+
+
+				"Questionnaire":
+				[
+					{
+						"Id": 1,
+						"Title": "Where do you place your phone?",
+						"Description":"Please answer the following questions.",
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"textbox",
+								"Question_text": "Where are you now?"					
+							},
+
+							{
+								"Index": 2,
+								"Type":"multichoice_one_answer",
+								"Has_other_field":true,
+								"Question_text": "Where did you just place your phone?",	
+								"Option":
+								[
+									{
+										"Option_text":"Desk/Table"
+									},
+									{
+										"Option_text": "Pocket"
+									},
+									{
+										"Option_text": "Bagpack/handbag"
+									},
+									{
+										"Option_text": "Other"
+									}
+
+								]
+
+
+							},
+
+							{
+								"Index": 3,
+								"Type":"multichoice_multiple_answer",
+								"Question_text": "What is/are the reason(s) that you place your phone there?",
+								"Option":
+								[
+									{
+										"Option_text":"It's easier to notice notifications."
+									},
+									{
+										"Option_text": "It's convenient to grab."
+									},
+									{
+										"Option_text": "It's less disturbing."
+									}
+								]					
+							}
+
+						]
+
+					},
+
+					{
+						"Id": 2,
+						"Title": "Could you please record your current actvity?",
+						"Description":"We notice that you are likely in a vehicle now. ",
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"textbox",
+								"Question_text": "Where are you now?"					
+							},
+
+							{
+								"Index": 2,
+								"Type":"multichoice_one_answer",
+								"Has_other_field":true,
+								"Question_text": "What transportation mode are you performing now?",	
+								"Option":
+								[
+									{
+										"Option_text":"In a car (I'm the driver)"
+									},
+									{
+										"Option_text": "In a car (I'm NOT the driver)"
+									},
+									{
+										"Option_text": "Taking a bus"
+									},
+									{
+										"Option_text": "Walking"
+									}
+
+								]
+
+							}
+
+						]
+
+					},		
+
+					{
+						"Id": 3,
+						"Title": "Could you please record your current actvity?",
+						"Description":"We notice that you are likely walking now. ",
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"textbox",
+								"Question_text": "Where are you now?"					
+							},
+
+							{
+								"Index": 2,
+								"Type":"multichoice_one_answer",
+								"Has_other_field":true,
+								"Question_text": "What transportation mode are you performing now?",	
+								"Option":
+								[
+									{
+										"Option_text":"In a car (I'm the driver)"
+									},
+									{
+										"Option_text": "In a car (I'm NOT the driver)"
+									},
+									{
+										"Option_text": "Taking a bus"
+									},
+									{
+										"Option_text": "Walking"
+									}
+
+								]
+
+							}
+
+						]
+
+					},				
+
+					{
+						"Id": 4,
+						"Title": "What were you carrying?",
+						"Description":"Please tell us what personal item(s) you were carrying 5 minutes ago",
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"textbox",
+								"Question_text": "Which room are you in?"					
+							},
+
+							{
+								"Index": 2,
+								"Type":"textbox",
+								"Question_text": "How long have you stayed in the room?"					
+							},
+
+							{
+								"Index": 3,
+								"Type":"multichoice_multiple_answer",
+								"Has_other_field":true,
+								"Question_text": "Which of the following items are you carrying?",
+								"Option":
+								[
+									{
+										"Option_text":"Mobile phone (before you answer this questionnaire)"
+									},
+									{
+										"Option_text":"Watch"
+									},
+									{
+										"Option_text": "Wallet"
+									},
+									{
+										"Option_text":"health-tracking devices"
+									}
+
+								]					
+							}
+						]
+
+					},
+
+					{
+						"Id": 5,
+						"Title": "Opportunities for physical activity",
+						"Description":"We just noticed that you took 1057 steps",
+						"Questions":
+						[
+
+							{
+								"Index": 1,
+								"Type":"multichoice_multiple_answer",
+								"Has_other_field":true,
+								"Question_text": "What were you doing?",
+								"Option":
+								[
+									{
+										"Option_text":"Going to get lunch"
+									},
+									{
+										"Option_text":"Just taking a walk"
+									},
+									{
+										"Option_text": "Going to meet someone"
+									}
+
+								]
+							},
+							{
+								"Index": 2,
+								"Type":"multichoice_multiple_answer",
+								"Has_other_field":true,
+								"Question_text": "Who were you with?",
+								"Option":
+								[
+									{
+										"Option_text":"By myself"
+									},
+									{
+										"Option_text":"With a colleague"
+									},
+									{
+										"Option_text":"With a friend"
+									},
+									{
+										"Option_text":"With partner or child"
+									}
+
+								]
+							}
+						]
+
+
+
+					}
+
+				]
+
+			}
+			
+
+		}
+		
+	}
+]

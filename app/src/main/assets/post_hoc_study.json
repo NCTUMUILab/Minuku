@@ -1,0 +1,911 @@
+[	
+	{	
+		"Id":1,
+		"Name":"CrowdBased Labeling Study",
+		"Task":
+			[
+		        {
+		            "Id": 1,
+		            "Name": "Post Hoc Labeling",
+		            "Description": "Label recorded trips transportation every day",
+		            "Timestamp_string": "2014-07-06 7:00:00 UTC",
+		            "Created_time":"1394106097000",
+		            "Start_time":"1394106097000",
+		            "End_time":"1404259199"
+		        },
+
+		        {
+		            "Id": 2,
+		            "Name": "Daily Report",
+		            "Description": "Respond to a daily report every day",
+		            "Timestamp_string": "2014-03-06 11:41:37 UTC",
+		            "Created_time":"1394106097000",
+		            "Start_time":"1394106097000",
+		            "End_time":"1404259199"
+		        }
+			
+			
+			],    
+
+		"Configuration":
+		{	
+			"Id": 1,
+			"Version": 1,
+			"Name": "Configuration1",
+			"Content":
+			{
+
+
+                "StopServiceDuringMidNight":false,
+				"Event": 
+				[
+					{
+						"Id": 1,
+						"Task_id": 1,
+						"Name": "In a vehicle event",
+						"Description":"NA",
+						"Condition": 
+						[ 
+							{
+								
+								"Type": "transportation_detection",
+								"Relationship": "is",
+								"TargetValue": "in_vehicle"
+							} 
+						]
+					},
+
+					{
+						"Id": 2,
+						"Task_id": 1,
+						"Name": "Walking event",
+						"Description":"NA",
+						"Condition": 
+						[ 
+							{
+								
+								"Type": "transportation_detection",
+								"Relationship": "is",
+								"TargetValue": "on_foot"
+							} 
+						]
+					},
+
+					{
+						"Id": 3,
+						"Task_id": 1,
+						"Name": "Biking event",
+						"Description":"NA",
+						"Condition": 
+						[ 
+							{
+								
+								"Type": "transportation_detection",
+								"Relationship": "is",
+								"TargetValue": "on_bicycle"
+							} 
+						]
+					},
+
+					{
+						"Id": 4,
+						"Task_id": 1,
+						"Name": "No transportation",
+						"Description":"NA",
+						"Condition": 
+						[ 
+							{
+								
+								"Type": "transportation_detection",
+								"Relationship": "is",
+								"TargetValue": "NA"
+							} 
+						]
+					}
+
+					
+				],
+			
+				"Action":
+				[
+
+					{
+						"Id": 1,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one_time",
+						"Type": "monitoring_events",
+						"Name": "Monitoring vehicle",
+						"Monitoring_events":"1",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "app_start"
+								}
+
+							],
+
+							"Pause":
+							[
+								{
+									"_comment":"we pause monitoring vehicle when the transportation is vehicle",
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":1,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+							],		
+
+							"Resume":
+							[
+								{
+									"_comment":"we resume monitoring vehicle when the transportation is not vehicle anymore",
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":2,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								},
+
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								},
+
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":4,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+
+							]
+
+
+						}
+
+					},  
+
+					{
+						"Id": 2,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one_time",
+						"Type": "monitoring_events",
+						"Name": "Monitoring walking",
+						"Monitoring_events":"2",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "app_start"
+								}
+
+							],
+
+							"Pause":
+							[
+								{
+									"_comment":"we pause monitoring vehicle when the transportation is walking",
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":2,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+							],		
+
+							"Resume":
+							[
+								{
+									"_comment":"we resume monitoring vehicle when the transportation is not walking anymore",
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":1,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								},
+
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								},
+
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":4,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+
+							]
+
+
+						}
+					},  
+
+
+					{
+						"Id": 3,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one_time",
+						"Type": "monitoring_events",
+						"Name": "Monitoring biking",
+						"Monitoring_events":"3",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "app_start"
+								}
+
+							],
+
+							"Pause":
+							[
+								{
+									"_comment":"we pause monitoring vehicle when the transportation is biking",
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+							],		
+
+							"Resume":
+							[
+								{
+									"_comment":"we resume monitoring vehicle when the transportation is not biking anymore",
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":1,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								},
+
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":2,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								},
+
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":4,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+
+							]
+
+
+						}
+					}, 
+
+					{
+						"Id": 4,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one_time",
+						"Type": "monitoring_events",
+						"Name": "Monitoring no transportation",
+						"Monitoring_events":"4",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "app_start"
+								}
+
+							],
+
+							"Pause":
+							[
+								{
+									"_comment":"we pause monitoring no transportation when there's no transportation",
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":4,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+							],		
+
+							"Resume":
+							[
+								{
+									"_comment":"we resume monitoring no transportation when users are in some transportation",
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":1,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								},
+
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":2,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								},
+
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+
+							]
+
+
+						}
+					}, 
+
+
+
+
+					{
+						"Id": 5,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one_time",
+						"Type": "saving_record",
+						"Name": "recording  vehicle",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Action.Pause",
+										"Id":1,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 3
+									}
+								}
+							
+							],
+							"Stop":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Action.Resume",
+										"Id":1,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+
+
+							]							
+						},						
+						"Notification":
+						[
+
+							{
+								"Launch":"when_start",	
+								"Type":"normal",
+								"Title": "Could you please record your current actvity?",
+								"Message": "We notice that you seem to be in a vehicle now"
+							}
+
+						]
+
+
+
+					},  
+
+					{
+						"Id": 6,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one_time",
+						"Type": "saving_record",
+						"Name": "recording  walking",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Action.Pause",
+										"Id":2,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 3
+									}
+								}
+							
+							],
+							"Stop":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Action.Resume",
+										"Id":2,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+
+
+							]			
+						},						
+						"Notification":
+						[
+							{
+								"Launch":"when_start",	
+								"Type":"normal",
+								"Title": "Could you please record your current actvity?",
+								"Message": "We notice that you seem to be walking now"
+							}
+						]
+
+						
+
+					},
+
+					{
+						"Id": 7,
+						"Continuity":
+						{
+							"Rate": 3,
+							"Duration": -1
+						},
+						"Execution_style":"one_time",
+						"Type": "saving_record",
+						"Name": "recording  biking",
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Action.Pause",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 3
+									}
+								}
+							
+							],
+							"Stop":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Action.Resume",
+										"Id":3,
+										"Sampling_rate": 1
+									},	
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 0
+									}
+								}
+
+
+							]				
+						},						
+						"Notification":
+						[
+							{
+								"Launch":"when_start",	
+								"Type":"normal",
+								"Title": "Could you please record your current actvity?",
+								"Message": "We notice that you seem to be biking now"
+							}
+						]
+						
+
+					},
+
+					{	
+						"Id": 8,
+						"Execution_style":"one-time",
+						"Type": "email_questionnaire",
+						"Name": "triggering daily journal",
+						"Questionnaire_id":1,		
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "schedule",
+									"Schedule":
+									{
+										"Sample_method":"fixed_time_of_day",
+										"Time_of_day": "21:45"
+									}
+								}	
+							
+							]				
+						},						
+						"Notification":
+						[
+							{
+								"Launch":"when_start",
+								"Type":"normal",
+								"Title": "Daily report",
+								"Message": "Please tap to fill daily report"
+							}
+
+						]
+						
+					},
+
+					{
+						"Id": 9,
+						"Execution_style":"one_time",
+						"Type": "annotate",
+						"Name": "annotate all recordings",		
+						"Annotate":{
+						    "Mode": "manual",
+						    "Viz_type": "none",
+						    "Review_recording": "recent"
+						},
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "schedule",
+									"Schedule":
+									{
+										"Sample_method":"fixed_time_of_day",
+										"Time_of_day": "21:00"
+									}
+								}	
+							
+							]						
+						},						
+						"Notification":
+						[
+							{
+								"Launch":"when_start",	
+								"Type":"normal",
+								"Title": "Label recorded trips",
+								"Message": "Could you please label the recorded trips today?"
+							}
+						]
+						
+
+					}   
+				],
+
+
+
+				"Questionnaire":
+				[
+					{
+						"Id": 1,
+						"Title": "Transportation Mode Labeling Daily Report",
+						"Description":"Please answer the following questions.",
+						"Type":"email",
+						"Email":{
+							"Recipients":["mr.armuro@gmail.com", "yuchang@umich.edu"],
+							"Subject":"Daily Report on $date"
+						},
+						
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"description",
+								"Question_text": "Here are the trips recorded in the last 24 hours. Is there any trip below with a wrong timestamp or label? If yes, please correct it in the text box below it using the similar format (e.g.. hh:mm - hh:mm: activity).  ",
+								"Data": {
+
+									"Data":"Session",
+									"Format":"$startTime - $endTime :  $label"
+
+								}					
+							},
+
+							{
+								"Index": 2,
+								"Type":"text",
+								"Question_text": "Is any of the trip listed above not correct in time or in transportation mode? If yes, please correct the trip using the similar format (e.g.. hh:mm - hh:mm: activity)."	
+							},
+
+							{
+								"Index": 3,
+								"Type":"multichoice_multiple_answer",
+								"Question_text": "Is there any trip we missed today? If yes, please list them below. In addition, for each missed trip please choose any option(s) below that applies to the trip and provide us with more context.",
+								"Option":
+								[
+									{
+										"Option_text":"a. I saw a notification asking me to record, but I forgot to record."
+									},
+									{
+										"Option_text": "b. I saw a notification asking me to record, but it was not safe at the time to do so."
+									},
+									{
+										"Option_text": "c. I saw a notification asking me to record, but it was troublesome at the time to do so."
+									},
+									{
+										"Option_text": "d. I saw a notification asking me to record, but I was too busy at the time to do so."
+									},
+									{
+										"Option_text": "e. I missed the notification asking me to record."
+									},
+									{
+										"Option_text": "f. I knew there was a notification but I thought it was from another app."
+									},
+									{
+										"Option_text": "g. There was no notification asking me to record the trip."
+									},
+									{
+										"Option_text": "h. This trip was not in part of my plan. I will record others. "
+									}
+								]					
+							}
+
+						]
+
+					},
+
+					{
+						"Id": 2,
+						"Title": "Could you please record your current actvity?",
+						"Description":"We notice that you are likely in a vehicle now. ",
+						"Type":"activity",
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"text",
+								"Question_text": "Where are you now?"					
+							},
+
+							{
+								"Index": 2,
+								"Type":"multichoice_one_answer",
+								"Has_other_field":true,
+								"Question_text": "What transportation mode are you performing now?",	
+								"Option":
+								[
+									{
+										"Option_text":"In a car (I'm the driver)"
+									},
+									{
+										"Option_text": "In a car (I'm NOT the driver)"
+									},
+									{
+										"Option_text": "Taking a bus"
+									},
+									{
+										"Option_text": "Walking"
+									}
+
+								]
+
+							}
+
+						]
+
+					},		
+
+					{
+						"Id": 3,
+						"Title": "Could you please record your current actvity?",
+						"Description":"We notice that you are likely walking now. ",
+						"Type":"activity",
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"text",
+								"Question_text": "Where are you now?"					
+							},
+
+							{
+								"Index": 2,
+								"Type":"multichoice_one_answer",
+								"Has_other_field":true,
+								"Question_text": "What transportation mode are you performing now?",	
+								"Option":
+								[
+									{
+										"Option_text":"In a car (I'm the driver)"
+									},
+									{
+										"Option_text": "In a car (I'm NOT the driver)"
+									},
+									{
+										"Option_text": "Taking a bus"
+									},
+									{
+										"Option_text": "Walking"
+									}
+
+								]
+
+							}
+
+						]
+
+					}				
+
+				]
+
+			}
+			
+
+		}
+		
+	}
+]
