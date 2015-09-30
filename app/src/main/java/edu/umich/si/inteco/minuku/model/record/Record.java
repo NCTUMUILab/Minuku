@@ -3,7 +3,7 @@ package edu.umich.si.inteco.minuku.model.record;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.model.Session;
 
 
@@ -56,7 +56,7 @@ public class Record {
 
 	public String getTimeString(){
 		
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		mTimestring = sdf_now.format(_timestamp);
 
 		return mTimestring;

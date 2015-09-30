@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.contextmanager.EventManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
@@ -32,7 +32,7 @@ public class ConfigurationManager {
 
 	private static final String LOG_TAG = "ConfigurationManager";
 
-	public static final String CONFIGURATION_FILE_NAME = GlobalNames.CONFIGURATION_FILE_NAME_PARTI;
+	public static final String CONFIGURATION_FILE_NAME = Constants.CONFIGURATION_FILE_NAME_PARTI;
 
 	public static final String CONFIGURATION_PROPERTIES_ID = "Id";
 	public static final String CONFIGURATION_PROPERTIES_STUDY = "Study";
@@ -63,7 +63,7 @@ public class ConfigurationManager {
 	public ConfigurationManager(Context context){		
 		
 		mContext = context;
-		mLocalDBHelper = new LocalDBHelper(mContext, GlobalNames.TEST_DATABASE_NAME);
+		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 		loadConfiguration();
 	}
 	
@@ -87,7 +87,7 @@ public class ConfigurationManager {
 		for (int i=0; i<res.size() ; i++){
 			
 			String cline = res.get(i);			
-			String [] separated = cline.split(GlobalNames.DELIMITER);
+			String [] separated = cline.split(Constants.DELIMITER);
 			//Log.d(LOG_TAG, "[loadConfiguration] the first configuration from the database has " + separated.length + " attributes the content is " + cline);
 			
 			int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_CONFIGURATION_ID]);
@@ -125,13 +125,13 @@ public class ConfigurationManager {
 			//load files
             String filename = "";
 
-            if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.PARTICIPATORY_LABELING_CONDITION)){
+            if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
 
-                filename = GlobalNames.CONFIGURATION_FILE_NAME_PARTI;
-            }else if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.IN_STIU_LABELING_CONDITION)) {
-                filename = GlobalNames.CONFIGURATION_FILE_NAME_IN_SITU;
-            }else if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.POST_HOC_LABELING_CONDITION) ){
-                filename = GlobalNames.CONFIGURATION_FILE_NAME_POST_HOC;
+                filename = Constants.CONFIGURATION_FILE_NAME_PARTI;
+            }else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.IN_STIU_LABELING_CONDITION)) {
+                filename = Constants.CONFIGURATION_FILE_NAME_IN_SITU;
+            }else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION) ){
+                filename = Constants.CONFIGURATION_FILE_NAME_POST_HOC;
             }
 
             Log.d(LOG_TAG, "[loadConfiguration] no configuration in the database, load file.." + filename);

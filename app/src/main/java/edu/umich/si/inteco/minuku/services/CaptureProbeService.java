@@ -1,21 +1,16 @@
 package edu.umich.si.inteco.minuku.services;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.google.android.gms.location.LocationRequest;
-
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.contextmanager.EventManager;
@@ -63,7 +58,7 @@ public class CaptureProbeService extends Service {
     public static int DEFAULT_ACTION_RATE_INTERVAL_IN_SECONDS = 5;
 
     public static int DEFAULT_ACTION_RATE_INTERVAL =
-            DEFAULT_ACTION_RATE_INTERVAL_IN_SECONDS * GlobalNames.MILLISECONDS_PER_SECOND;
+            DEFAULT_ACTION_RATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
 
     public static int DEFAULT_APP_MONITOR_RATE_INTERVAL = DEFAULT_ACTION_RATE_INTERVAL;
 
@@ -75,7 +70,7 @@ public class CaptureProbeService extends Service {
     public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS = 30;
 
     public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL =
-            ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS * GlobalNames.MILLISECONDS_PER_SECOND;
+            ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
 
 
 
@@ -179,14 +174,14 @@ public class CaptureProbeService extends Service {
         //if device id is not set yet, set device id to the shared prefernece
         if ( PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_DEVICE_ID, "NA").equals("NA")) {
             TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
-            GlobalNames.DEVICE_ID = mngr.getDeviceId();
+            Constants.DEVICE_ID = mngr.getDeviceId();
             PreferenceHelper.setPreferenceValue(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_DEVICE_ID, mngr.getDeviceId());
         }
         else {
-            GlobalNames.DEVICE_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_DEVICE_ID, "NA");
+            Constants.DEVICE_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_DEVICE_ID, "NA");
         }
 
-        mLocalDBHelpder = new LocalDBHelper(this, GlobalNames.TEST_DATABASE_NAME);
+        mLocalDBHelpder = new LocalDBHelper(this, Constants.TEST_DATABASE_NAME);
 
         //this line is required to create the table.
         mLocalDBHelpder.getWritableDatabase();
@@ -385,7 +380,7 @@ public class CaptureProbeService extends Service {
             //Recording is one of the types of actions that users need to put into the configuration.
             //However, now we want to enable background recording so that we can monitor events.
             //eventually. If researachers do not monitor anything, this flag should be false.
-            if (GlobalNames.isBackgroundRecordingEnabled);
+            if (Constants.isBackgroundRecordingEnabled);
                 ContextManager.startBackgroundRecordingThread();
 
         }
@@ -507,7 +502,7 @@ public class CaptureProbeService extends Service {
 
 
                         //TODO: make writing to database an Action
-                        mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), GlobalNames.BACKGOUND_RECORDING_SESSION_ID);
+                        mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
 
                         //after writing the records into files or databases, clear the record pools
                         //ContextManager.getRecordPool().clear();

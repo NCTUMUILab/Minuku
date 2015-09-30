@@ -3,7 +3,6 @@ package edu.umich.si.inteco.minuku.data;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.location.Location;
-import android.net.ConnectivityManager;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
@@ -14,8 +13,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
-import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.contextmanager.TransportationModeDetector;
 import edu.umich.si.inteco.minuku.model.Condition;
@@ -220,7 +218,7 @@ public class DataHandler {
 				
 				//get the content of the record				
 				String s = sr.toString()+"\n";
-				FileHelper.writeStringToFile(GlobalNames.PACKAGE_DIRECTORY_PATH + "Record/", filename + "-" +getLogFileTimeString() + ".txt", s );
+				FileHelper.writeStringToFile(Constants.PACKAGE_DIRECTORY_PATH + "Record/", filename + "-" +getLogFileTimeString() + ".txt", s );
 				
 			}else if (recordpool.get(i).getType()==ContextManager.CONTEXT_RECORD_TYPE_LOCATION  ){
 				
@@ -230,7 +228,7 @@ public class DataHandler {
 				//Log.d(LOG_TAG, " WriteToFile , the record type is " + recordpool.get(i).getType() +  " the source is " + filename);
 				
 				String s = lr.toString()+"\n";
-				FileHelper.writeStringToFile(GlobalNames.PACKAGE_DIRECTORY_PATH + "Record/", filename + "-" +getLogFileTimeString() + ".txt", s );
+				FileHelper.writeStringToFile(Constants.PACKAGE_DIRECTORY_PATH + "Record/", filename + "-" +getLogFileTimeString() + ".txt", s );
 				
 			}else if (recordpool.get(i).getType()==ContextManager.CONTEXT_RECORD_TYPE_ACTIVITY  ){
 				
@@ -240,7 +238,7 @@ public class DataHandler {
 				
 				
 				String s = ar.toString()+"\n";
-				FileHelper.writeStringToFile(GlobalNames.PACKAGE_DIRECTORY_PATH + "Record/", filename + "-" +getLogFileTimeString() + ".txt", s );
+				FileHelper.writeStringToFile(Constants.PACKAGE_DIRECTORY_PATH + "Record/", filename + "-" +getLogFileTimeString() + ".txt", s );
 				
 			}
 			
@@ -358,7 +356,7 @@ public class DataHandler {
         ActivityRecord activityRecord = new ActivityRecord();
         List<DetectedActivity> probableActivities= new ArrayList<DetectedActivity>();
 
-        String[] separated = recordStr.split(GlobalNames.DELIMITER);
+        String[] separated = recordStr.split(Constants.DELIMITER);
 
         long timestamp = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG]);
 
@@ -568,7 +566,7 @@ public class DataHandler {
 			//Phease 1: first check the condition, and filter the resultlist
 			for (int i = 0; i< resultList.size(); i++){
 				
-				String[] res = resultList.get(i).split(GlobalNames.DELIMITER);
+				String[] res = resultList.get(i).split(Constants.DELIMITER);
 
 				/**
 				 * 4. lat
@@ -710,7 +708,7 @@ public class DataHandler {
 		TimeZone tz = TimeZone.getDefault();		
 		Calendar cal = Calendar.getInstance(tz);
 		
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW_HOUR);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW_HOUR);
 		String s = sdf_now.format(cal.getTime());
 		
 		return s;
@@ -818,7 +816,7 @@ public class DataHandler {
 		TimeZone tz = TimeZone.getDefault();		
 		Calendar cal = Calendar.getInstance(tz);
 		
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String currentTimeString = sdf_now.format(cal.getTime());
 		
 		return currentTimeString;

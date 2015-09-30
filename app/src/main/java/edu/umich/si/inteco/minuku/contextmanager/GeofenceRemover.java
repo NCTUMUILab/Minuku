@@ -6,11 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationClient.OnRemoveGeofencesResultListener;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationStatusCodes;
 
 import java.util.ArrayList;
@@ -18,14 +17,15 @@ import java.util.ArrayList;
 import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 
 public class GeofenceRemover implements ConnectionCallbacks,
-		OnConnectionFailedListener, OnRemoveGeofencesResultListener {
+		OnConnectionFailedListener{
 
 	/** Tag for logging. */
     private static final String LOG_TAG = "GeofenceRemover";
     private Context mContext;
     // Stores the current list of geofences
     private ArrayList<String> mCurrentGeofenceIds;
-    private LocationClient mLocationClient;
+    //the client to get Google Play Service
+    private GoogleApiClient mGoogleApiClient;
     // The PendingIntent sent in removeGeofencesByIntent
     private PendingIntent mRemoveGeofenceIntent;
     
@@ -34,10 +34,12 @@ public class GeofenceRemover implements ConnectionCallbacks,
     private boolean mRemovingGeofenceInProgress;
     
     public GeofenceRemover (Context context) {
+
     	mContext = context;
         mCurrentGeofenceIds = null;
-        mLocationClient = null;
+        mGoogleApiClient = null;
         mRemovingGeofenceInProgress = false;
+
     }
     
     public void inProgressFlag(boolean flag) {
@@ -47,44 +49,60 @@ public class GeofenceRemover implements ConnectionCallbacks,
     public boolean isInProgress() {
         return mRemovingGeofenceInProgress;
     }
-    
-    private GooglePlayServicesClient getLocationClient() {
-        
-    	if (mLocationClient == null) {
 
-            mLocationClient = new LocationClient(mContext, this, this);
+    /**
+     * Get the Google Client to get Google Play Service
+     * @return
+     */
+    private GoogleApiClient getGoogleApiClient() {
+
+        if (mGoogleApiClient == null) {
+
+            //create location service so that we can interact with Geofence
+            mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
         }
-        return mLocationClient;
+        return mGoogleApiClient;
 
     }
+
+
     private void requestConnection() {
-        getLocationClient().connect();
+        getGoogleApiClient().connect();
     }
-    
+
+   /*
     private void requestDisconnection() {
     	
     	mRemovingGeofenceInProgress = false;
-        getLocationClient().disconnect();
+        getGoogleApiClient().disconnect();
         
         if (mRequestType == GooglePlayServiceUtil.GEO_FENCE_REMOVE_TYPE.INTENT) {
             mRemoveGeofenceIntent.cancel();
         }
     }
-    
+    */
+
+    /*
+
     private void continueRemoveGeofences() {
         switch (mRequestType) {
 
             // If removeGeofencesByIntent was called
             case INTENT :
-                mLocationClient.removeGeofences(mRemoveGeofenceIntent, this);
+                getGoogleApiClient().removeGeofences(mRemoveGeofenceIntent, this);
                 break;
 
             // If removeGeofencesById was called
             case LIST :
-                mLocationClient.removeGeofences(mCurrentGeofenceIds, this);
+                getGoogleApiClient().removeGeofences(mCurrentGeofenceIds, this);
                 break;
         }
     }
+    */
     
     /**
      * remove geofence by a list of ids ( the list needs to have at least one id )
@@ -136,14 +154,8 @@ public class GeofenceRemover implements ConnectionCallbacks,
             throw new UnsupportedOperationException();
         }
     }
-    
-    
-    /**
-     * When the request to remove geofences by PendingIntent returns, handle the result.
-     *
-     * @param statusCode the code returned by Location Services
-     * @param requestIntent The Intent used to request the removal.
-     */
+    /*
+
 	@Override
 	public void onRemoveGeofencesByPendingIntentResult(int statusCode,
 			PendingIntent requestIntent) {
@@ -165,7 +177,8 @@ public class GeofenceRemover implements ConnectionCallbacks,
  
 
 	}
-
+    */
+/*
 	@Override
 	public void onRemoveGeofencesByRequestIdsResult(int statusCode, String[] geofenceRequestIds) {
 		
@@ -186,6 +199,7 @@ public class GeofenceRemover implements ConnectionCallbacks,
         requestDisconnection();
         
 	}
+*/
 
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -208,11 +222,16 @@ public class GeofenceRemover implements ConnectionCallbacks,
 		Log.d(LOG_TAG,"[onConnected] Google Play services is connected for removing the geofence update");
         
 		// Continue the process of adding geofence
-		 continueRemoveGeofences();
+		 //continueRemoveGeofences();
 
 	}
 
-	@Override
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+/*
+    @Override
 	public void onDisconnected() {
 		
 		// Turn off the request flag
@@ -225,5 +244,5 @@ public class GeofenceRemover implements ConnectionCallbacks,
         mLocationClient = null;
 
 	}
-
+*/
 }

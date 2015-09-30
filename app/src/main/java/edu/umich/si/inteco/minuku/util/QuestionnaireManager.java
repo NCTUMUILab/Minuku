@@ -22,9 +22,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
-import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
 import edu.umich.si.inteco.minuku.model.Annotation;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
@@ -113,7 +112,7 @@ public class QuestionnaireManager {
 		mQuestionnaireList = new ArrayList<Questionnaire>();
 		mQuestionnaireTemplateList = new ArrayList<QuestionnaireTemplate>();
 		mContext = context;
-		mLocalDBHelper = new LocalDBHelper(mContext, GlobalNames.TEST_DATABASE_NAME);
+		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 
 		
 	}
@@ -436,12 +435,12 @@ public class QuestionnaireManager {
         //if the subject contains $id, we need to replace it with participant Id
         if (subject.contains("$id")){
             Log.d(LOG_TAG, "we need to insert id");
-            subject = subject.replace("$id", GlobalNames.DEVICE_ID);
+            subject = subject.replace("$id", Constants.DEVICE_ID);
         }
 
         else if (subject.contains("$date")){
             Log.d(LOG_TAG, "we need to insert date");
-            SimpleDateFormat sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW_DAY);
+            SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW_DAY);
             long now = ScheduleAndSampleManager.getCurrentTimeInMillis();
             subject = subject.replace("$date", ScheduleAndSampleManager.getTimeString(now, sdf));
         }
@@ -491,7 +490,7 @@ public class QuestionnaireManager {
                         //replace $startTime with the timestamp of the session
                         if (dataFormat.contains(QUESTION_DATA_VARIABLE_SESSION_START_TIME)){
 
-                            SimpleDateFormat sdf_date = new SimpleDateFormat(GlobalNames.DATE_FORMAT_DATE_TEXT_HOUR_MIN);
+                            SimpleDateFormat sdf_date = new SimpleDateFormat(Constants.DATE_FORMAT_DATE_TEXT_HOUR_MIN);
                             String startTime = ScheduleAndSampleManager.getTimeString(session.getStartTime(), sdf_date) ;
 
                             //replace the tempalte with real value
@@ -503,7 +502,7 @@ public class QuestionnaireManager {
                         //replace $startTime with the timestamp of the session
                         if (dataFormat.contains(QUESTION_DATA_VARIABLE_SESSION_END_TIME)){
 
-                            SimpleDateFormat sdf_date = new SimpleDateFormat(GlobalNames.DATE_FORMAT_DATE_TEXT_HOUR_MIN);
+                            SimpleDateFormat sdf_date = new SimpleDateFormat(Constants.DATE_FORMAT_DATE_TEXT_HOUR_MIN);
 
                             long endTimeLong = session.getEndTime();
 
@@ -564,8 +563,8 @@ public class QuestionnaireManager {
 
                             //create json
                             JSONObject trip = new JSONObject();
-                            SimpleDateFormat sdf_id = new SimpleDateFormat(GlobalNames.DATE_FORMAT_FOR_ID);
-                            trip.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID, GlobalNames.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(session.getStartTime(), sdf_id) );
+                            SimpleDateFormat sdf_id = new SimpleDateFormat(Constants.DATE_FORMAT_FOR_ID);
+                            trip.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID, Constants.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(session.getStartTime(), sdf_id) );
 
                             trip.put("trip_time_label", dataFormat);
 
@@ -641,7 +640,7 @@ public class QuestionnaireManager {
                    //replace $startTime with the timestamp of the session
                         if (dataFormat.contains(QUESTION_DATA_VARIABLE_SESSION_START_TIME)){
 
-                            SimpleDateFormat sdf_date = new SimpleDateFormat(GlobalNames.DATE_FORMAT_DATE_TEXT_HOUR_MIN);
+                            SimpleDateFormat sdf_date = new SimpleDateFormat(Constants.DATE_FORMAT_DATE_TEXT_HOUR_MIN);
                             String startTime = ScheduleAndSampleManager.getTimeString(session.getStartTime(), sdf_date) ;
 
                             //replace the tempalte with real value
@@ -653,7 +652,7 @@ public class QuestionnaireManager {
                         //replace $startTime with the timestamp of the session
                         if (dataFormat.contains(QUESTION_DATA_VARIABLE_SESSION_END_TIME)){
 
-                            SimpleDateFormat sdf_date = new SimpleDateFormat(GlobalNames.DATE_FORMAT_DATE_TEXT_HOUR_MIN);
+                            SimpleDateFormat sdf_date = new SimpleDateFormat(Constants.DATE_FORMAT_DATE_TEXT_HOUR_MIN);
 
                             long endTimeLong = session.getEndTime();
 
@@ -711,8 +710,8 @@ public class QuestionnaireManager {
 
                             //create json
                             JSONObject trip = new JSONObject();
-                            SimpleDateFormat sdf_id = new SimpleDateFormat(GlobalNames.DATE_FORMAT_FOR_ID);
-                            trip.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID, GlobalNames.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(session.getStartTime(), sdf_id) );
+                            SimpleDateFormat sdf_id = new SimpleDateFormat(Constants.DATE_FORMAT_FOR_ID);
+                            trip.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID, Constants.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(session.getStartTime(), sdf_id) );
 
                             trip.put("trip_time_label", dataFormat);
 
@@ -859,7 +858,7 @@ public class QuestionnaireManager {
 	
 	public static String getTimeString(long time){		
 
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String currentTimeString = sdf_now.format(time);
 		
 		return currentTimeString;

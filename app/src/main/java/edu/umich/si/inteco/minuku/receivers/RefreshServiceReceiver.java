@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
 import edu.umich.si.inteco.minuku.services.CaptureProbeService;
-import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 

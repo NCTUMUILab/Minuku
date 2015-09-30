@@ -6,18 +6,16 @@ import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
 import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
-import edu.umich.si.inteco.minuku.contextmanager.LocationRequester;
 import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;
 import edu.umich.si.inteco.minuku.services.CaptureProbeService;
@@ -131,7 +129,7 @@ public class RecordSectionFragment extends Fragment{
                 });
 
         //set the text of recording task
-        currentRecordingTaskTextView.setText(GlobalNames.CURRENT_STUDY_CONDITION);
+        currentRecordingTaskTextView.setText(Constants.CURRENT_STUDY_CONDITION);
 
         Log.d(LOG_TAG, "[participatory sensing] user clicking on the start action, start recording action"  );
 
@@ -166,7 +164,7 @@ public class RecordSectionFragment extends Fragment{
                                 ActionManager.USER_INITIATED_RECORDING_ACTION_ID,
                                 ActionManager.USER_START_RECORDING_ACTION_NAME,
                                 ActionManager.ACTION_TYPE_SAVING_RECORD,
-                                ActionManager.ACTION_EXECUTION_STYLE_ONETIME, GlobalNames.LABELING_STUDY_ID);
+                                ActionManager.ACTION_EXECUTION_STYLE_ONETIME, Constants.LABELING_STUDY_ID);
 
                         //an user-initiated recoring should allow users to annotate in process
                         action.setAllowAnnotationInProcess(true);

@@ -2,7 +2,6 @@ package edu.umich.si.inteco.minuku.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,9 +24,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.model.Annotation;
@@ -128,7 +126,7 @@ public class AnnotateActivity extends Activity implements OnItemSelectedListener
         //show trip time
         long startTime = session.getStartTime();
         long endTime = session.getEndTime();
-        SimpleDateFormat sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_DATE_TEXT_HOUR_MIN_SEC);
+        SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_DATE_TEXT_HOUR_MIN_SEC);
 
         if (endTime!=0){
             timeLabelViewText.setText( "Time: " + ScheduleAndSampleManager.getTimeString(startTime, sdf) + " - " + ScheduleAndSampleManager.getTimeString(endTime, sdf) );
@@ -204,7 +202,7 @@ public class AnnotateActivity extends Activity implements OnItemSelectedListener
 
         for (int i=0; i<data.size(); i++){
 
-            String[] record = data.get(i).split(GlobalNames.DELIMITER);
+            String[] record = data.get(i).split(Constants.DELIMITER);
 
             //get location parameters
             double lat = Double.parseDouble(record[DatabaseNameManager.COL_INDEX_RECORD_LOC_LATITUDE_] );
@@ -374,7 +372,7 @@ public class AnnotateActivity extends Activity implements OnItemSelectedListener
 
                 //create annotaiton set
                 AnnotationSet annotationSet = new AnnotationSet();
-                annotationSet.setName(GlobalNames.CURRENT_STUDY_CONDITION);
+                annotationSet.setName(Constants.CURRENT_STUDY_CONDITION);
 
 
                 //create annotation for label

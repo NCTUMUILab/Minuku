@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Task;
 
@@ -25,7 +25,7 @@ public class TaskManager {
 	public TaskManager(Context context){
 		mContext = context;
 		mTaskList = new ArrayList<Task>();
-		mLocalDBHelper = new LocalDBHelper(mContext, GlobalNames.TEST_DATABASE_NAME);
+		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 		loadTask();
 	}
 	

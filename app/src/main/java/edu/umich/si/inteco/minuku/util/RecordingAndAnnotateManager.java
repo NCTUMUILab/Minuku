@@ -17,9 +17,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.MainActivity;
-import edu.umich.si.inteco.minuku.activities.ListRecordingActivity;
 import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
@@ -81,7 +80,7 @@ public class RecordingAndAnnotateManager {
 
     public RecordingAndAnnotateManager(Context context) {
         this.mContext = context;
-        mLocalDBHelper = new LocalDBHelper(mContext, GlobalNames.TEST_DATABASE_NAME);
+        mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
         mCurRecordingSessions = new ArrayList<Session>();
 
         //add the background recording to the curRecordingSession
@@ -213,7 +212,7 @@ public class RecordingAndAnnotateManager {
 
             //indicate which session
             bundle.putString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, reviewMode);
-            bundle.putString("launchTab", GlobalNames.MAIN_ACTIVITY_TAB_RECORDINGS);
+            bundle.putString("launchTab", Constants.MAIN_ACTIVITY_TAB_RECORDINGS);
             Intent intent = new Intent(mContext, MainActivity.class);
             intent.putExtras(bundle);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -234,7 +233,7 @@ public class RecordingAndAnnotateManager {
 
         //if the session is not background recording, we add it ti the database (there should only be one background recording in the db
         //which has been added when the app first launches
-        if (session.getId()!=GlobalNames.BACKGOUND_RECORDING_SESSION_ID)
+        if (session.getId()!= Constants.BACKGOUND_RECORDING_SESSION_ID)
             saveSessionToDataBase(session);
     }
 
@@ -254,7 +253,7 @@ public class RecordingAndAnnotateManager {
         for (int i=0; i<res.size() ; i++) {
 
             String sessionStr = res.get(i);
-            String[] separated = sessionStr.split(GlobalNames.DELIMITER);
+            String[] separated = sessionStr.split(Constants.DELIMITER);
 
             int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
             int taskId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_TASK_ID]);
@@ -272,7 +271,7 @@ public class RecordingAndAnnotateManager {
                 String lastRecord = DataHandler.getLastSavedRecordInSession(sessionId);
                 Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
                 if (lastRecord!=null){
-                    long time = Long.parseLong(lastRecord.split(GlobalNames.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
+                    long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
                     Log.d(LOG_TAG, "[test get session time] the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
                     endTime = time;
                 }
@@ -325,7 +324,7 @@ public class RecordingAndAnnotateManager {
         //end time is now
         long queryEndTime = ScheduleAndSampleManager.getCurrentTimeInMillis();
         //start time = 24 hours agochange
-        long queryStartTime = ScheduleAndSampleManager.getCurrentTimeInMillis() - GlobalNames.MILLISECONDS_PER_DAY;
+        long queryStartTime = ScheduleAndSampleManager.getCurrentTimeInMillis() - Constants.MILLISECONDS_PER_DAY;
 
         Log.d(LOG_TAG, " [getRecentSessions] going to query session between " + ScheduleAndSampleManager.getTimeString(queryStartTime) + " and " + ScheduleAndSampleManager.getTimeString(queryEndTime) );
 
@@ -335,7 +334,7 @@ public class RecordingAndAnnotateManager {
         for (int i=0; i<res.size() ; i++) {
 
             String sessionStr = res.get(i);
-            String[] separated = sessionStr.split(GlobalNames.DELIMITER);
+            String[] separated = sessionStr.split(Constants.DELIMITER);
 
             int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
 
@@ -357,7 +356,7 @@ public class RecordingAndAnnotateManager {
                 String lastRecord = DataHandler.getLastSavedRecordInSession(id);
                 Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
                 if (lastRecord!=null){
-                    long time = Long.parseLong(lastRecord.split(GlobalNames.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
+                    long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
                     Log.d(LOG_TAG, "[test get session time] the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
                     endTime = time;
                 }
@@ -411,7 +410,7 @@ public class RecordingAndAnnotateManager {
         for (int i=0; i<res.size() ; i++) {
 
             String sessionStr = res.get(i);
-            String[] separated = sessionStr.split(GlobalNames.DELIMITER);
+            String[] separated = sessionStr.split(Constants.DELIMITER);
 
             int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
 
@@ -432,7 +431,7 @@ public class RecordingAndAnnotateManager {
                 String lastRecord = DataHandler.getLastSavedRecordInSession(id);
                 Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
                 if (lastRecord!=null){
-                    long time = Long.parseLong(lastRecord.split(GlobalNames.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
+                    long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
                     Log.d(LOG_TAG, "[test get session time] the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
                     endTime = time;
                 }
@@ -485,7 +484,7 @@ public class RecordingAndAnnotateManager {
         for (int i=0; i<res.size() ; i++) {
 
             String sessionStr = res.get(i);
-            String[] separated = sessionStr.split(GlobalNames.DELIMITER);
+            String[] separated = sessionStr.split(Constants.DELIMITER);
 
             int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
 
@@ -506,7 +505,7 @@ public class RecordingAndAnnotateManager {
                 String lastRecord = DataHandler.getLastSavedRecordInSession(id);
                 Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
                 if (lastRecord!=null){
-                    long time = Long.parseLong(lastRecord.split(GlobalNames.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
+                    long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
                     Log.d(LOG_TAG, "[test get session time] the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
                     endTime = time;
                 }
@@ -613,10 +612,10 @@ public class RecordingAndAnnotateManager {
         session.setId(BACKGOUND_RECORDING_SESSION_ID);
         addCurRecordingSession(session);
 
-        Task task = new Task(GlobalNames.BACKGOUND_RECORDING_TASK_ID,
-                GlobalNames.BACKGOUND_RECORDING_TASK_NAME,
-                GlobalNames.BACKGOUND_RECORDING_TASK_DESCRIPTION,
-                GlobalNames.BACKGOUND_RECORDING_NO_STUDY_ID);
+        Task task = new Task(Constants.BACKGOUND_RECORDING_TASK_ID,
+                Constants.BACKGOUND_RECORDING_TASK_NAME,
+                Constants.BACKGOUND_RECORDING_TASK_DESCRIPTION,
+                Constants.BACKGOUND_RECORDING_NO_STUDY_ID);
 
         session.setTaskId(task.getId());
 
@@ -655,7 +654,7 @@ public class RecordingAndAnnotateManager {
 
 
         //get the hour to see how many sections we have in records
-        SimpleDateFormat sdf_hour = new SimpleDateFormat(GlobalNames.DATE_FORMAT_HOUR);
+        SimpleDateFormat sdf_hour = new SimpleDateFormat(Constants.DATE_FORMAT_HOUR);
 
 //        2014-05-25 14:00:00 -0700
 
@@ -811,15 +810,15 @@ public class RecordingAndAnnotateManager {
             startCal.set(year, month-1,day, hour, 0,0);
 
             startTime = startCal.getTimeInMillis();
-            endTime = startTime + GlobalNames.MILLISECONDS_PER_HOUR;
+            endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
             Log.d (LOG_TAG, "[getBackgroundRecordingDocuments] no backgorund recording yet, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
 
         }
         //there are specific lastSynchourTime
         else {
             //if the last sync hour in the database is 9, we start from 10, because 9 indicates that 9:00-10:00 has been stored. So we start from 10-11
-            startTime = lastSyncHourTime+ GlobalNames.MILLISECONDS_PER_HOUR;
-            endTime = startTime + GlobalNames.MILLISECONDS_PER_HOUR;
+            startTime = lastSyncHourTime+ Constants.MILLISECONDS_PER_HOUR;
+            endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
             Log.d (LOG_TAG, "[getBackgroundRecordingDocuments] get lastSynchour, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
         }
 
@@ -832,7 +831,7 @@ public class RecordingAndAnnotateManager {
             JSONObject document= getBackgroundRecordingDocument(startTime, endTime);
             documents.add(document);
             startTime = endTime;
-            endTime += GlobalNames.MILLISECONDS_PER_HOUR;
+            endTime += Constants.MILLISECONDS_PER_HOUR;
         }
 
         return documents;
@@ -849,16 +848,16 @@ public class RecordingAndAnnotateManager {
 
          //get data from the database
 
-         SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+         SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 
          JSONObject hourJSON = new JSONObject();
 
          try {
 
-             SimpleDateFormat sdf_id = new SimpleDateFormat(GlobalNames.DATE_FORMAT_FOR_ID);
-             document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ID, GlobalNames.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(startTime, sdf_id) );
-             document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION, GlobalNames.CURRENT_STUDY_CONDITION );
-             document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
+             SimpleDateFormat sdf_id = new SimpleDateFormat(Constants.DATE_FORMAT_FOR_ID);
+             document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ID, Constants.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(startTime, sdf_id) );
+             document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION, Constants.CURRENT_STUDY_CONDITION );
+             document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
              document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP_HOUR, ScheduleAndSampleManager.getTimeString(startTime));
          } catch (JSONException e) {
              e.printStackTrace();
@@ -883,13 +882,13 @@ public class RecordingAndAnnotateManager {
 
                  //each record
                  String recordStr = res.get(j);
-                 String[] separated = recordStr.split(GlobalNames.DELIMITER);
+                 String[] separated = recordStr.split(Constants.DELIMITER);
                  //Log.d (LOG_TAG, "[getBackgroundRecordingDocument] recordStr" + recordStr );
                  /** based on the time of record assign to the right key **/
 
                  long timestamp = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG]);
 
-                 SimpleDateFormat sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_HOUR_MIN_SECOND);
+                 SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_HOUR_MIN_SECOND);
                  String timeStr = ScheduleAndSampleManager.getTimeString(timestamp, sdf);
                  String[] timeparts = timeStr.split(":");
 
@@ -971,7 +970,7 @@ public class RecordingAndAnnotateManager {
 
         //Log.d (LOG_TAG, "[getSessionDocument] the hour keys are " + hourKeys );
 
-        SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+        SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
         long startTime = 0, endTime = 0;
 
        //the highest level structure is hour
@@ -985,7 +984,7 @@ public class RecordingAndAnnotateManager {
                //generate start and end time to get records in the session
                Date startTimeDate = sdf_now.parse(hourKeys.get(indexOfhourKeys));
                startTime = startTimeDate.getTime();
-               endTime = startTime + GlobalNames.MILLISECONDS_PER_HOUR;
+               endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
            } catch (JSONException e) {
                e.printStackTrace();
            } catch (ParseException e) {
@@ -1016,13 +1015,13 @@ public class RecordingAndAnnotateManager {
 
                    //each record
                    String recordStr = res.get(j);
-                   String[] separated = recordStr.split(GlobalNames.DELIMITER);
+                   String[] separated = recordStr.split(Constants.DELIMITER);
                   // Log.d (LOG_TAG, "[getSessionDocument] recordStr" + recordStr );
                    /** based on the time of record assign to the right key **/
 
                    long timestamp = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG]);
 
-                   SimpleDateFormat sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_HOUR_MIN_SECOND);
+                   SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_HOUR_MIN_SECOND);
                    String timeStr = ScheduleAndSampleManager.getTimeString(timestamp,sdf);
                    String[] timeparts = timeStr.split(":");
 
@@ -1084,7 +1083,7 @@ public class RecordingAndAnnotateManager {
            }//end of recordtype
 
            startTime = sessionStartTime;
-           endTime = startTime + GlobalNames.MILLISECONDS_PER_HOUR;
+           endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
 
            //add the records in that hour to the sessionJSOn
            allRecordJSON.put(hourJSON);
@@ -1093,16 +1092,16 @@ public class RecordingAndAnnotateManager {
 
         //complete the rest proprerties of the session
         try {
-            SimpleDateFormat sdf_id = new SimpleDateFormat(GlobalNames.DATE_FORMAT_FOR_ID);
-            sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ID, GlobalNames.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(startTime, sdf_id) );
-            sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION, GlobalNames.CURRENT_STUDY_CONDITION );
+            SimpleDateFormat sdf_id = new SimpleDateFormat(Constants.DATE_FORMAT_FOR_ID);
+            sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ID, Constants.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(startTime, sdf_id) );
+            sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION, Constants.CURRENT_STUDY_CONDITION );
             sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_START_TIME, ScheduleAndSampleManager.getTimeString(sessionStartTime));
             sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_BATTERY_LIFE, session.getBatteryLife());
             sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_END_TIME, ScheduleAndSampleManager.getTimeString(sessionEndTime));
             sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_RECORDS, allRecordJSON);
             sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ANNOTATIONSET, session.getAnnotationsSet().toJSONObject());
             sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID, getSessionId(sessionId) );
-            sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
+            sessionJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
 
             JSONObject taskJSON = new JSONObject();
 

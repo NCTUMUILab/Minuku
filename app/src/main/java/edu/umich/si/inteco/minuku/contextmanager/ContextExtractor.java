@@ -28,7 +28,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.model.SimpleGeofence;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
@@ -97,11 +97,10 @@ public class ContextExtractor implements SensorEventListener {
     private ActivityRecognitionRequester mActivityRecognitionRequester;
     // The activity recognition update removal object
     private ActivityRecognitionRemover mActivityRecognitionRemover; 
-    // The activity recognition update request object
-    private GeofenceRequester mGeofenceRequester;
-    // The activity recognition update removal object
-    private GeofenceRemover mGeofenceRemover;
-	private static LocationRequester mLocationRequester;
+    // The geofence update request object
+	private GeofenceManager mGeofenceManager;
+	// the location update manager
+	private static LocationManager mLocationManager;
 	
     
 	/**Location & Activity Recognition & Geofence**/
@@ -176,12 +175,11 @@ public class ContextExtractor implements SensorEventListener {
 		mActivityRecognitionRemover = new ActivityRecognitionRemover(mContext);
 		
 		/**Geofence**/
-		mGeofenceRemover = new GeofenceRemover(mContext);
-		mGeofenceRequester = new GeofenceRequester(mContext);
+		mGeofenceManager = new GeofenceManager(mContext);
 		
 		/**Location**/
         //Location is a little difference from activity recognition service and geofence. The location client can just remove updates when it is disconnected from the play service.
-		mLocationRequester = new LocationRequester(mContext);
+		mLocationManager = new LocationManager(mContext);
 	}
 
 	/**functions called by the ContextManager**/
@@ -240,7 +238,7 @@ public class ContextExtractor implements SensorEventListener {
             return;
         }
 
-        mLocationRequester.requestUpdates();
+        mLocationManager.requestLocationUpdates();
     }
 
     private void stopRequestingLocation(){
@@ -255,7 +253,7 @@ public class ContextExtractor implements SensorEventListener {
         mLocationRequestType= GooglePlayServiceUtil.LOCATION_REQUEST_TYPE.REMOVE;
 
         // Pass the remove request to the remover object (the intent is the same as the request intent)
-        mLocationRequester.removeUpdate();
+        mLocationManager.removeLocationUpdate();
 
     }
 
@@ -313,7 +311,8 @@ public class ContextExtractor implements SensorEventListener {
 	 */
 	private void startRequestingGeofence(){
 		Log.d(LOG_TAG, "[startRequestingGeofence] start to request Geofence udpate");
-		
+
+		/*
 		mGeofenceRequestType = GooglePlayServiceUtil.GEOFENCE_REQUEST_TYPE.ADD;	
 		
 		//check Google Place first
@@ -345,6 +344,7 @@ public class ContextExtractor implements SensorEventListener {
         	Log.d(LOG_TAG, "[startRequestingGeofence] the previosu request is not finished yet");
     		
         }
+        */
 	}
 	
 	
@@ -356,6 +356,7 @@ public class ContextExtractor implements SensorEventListener {
          * onRemoveGeofencesByPendingIntentResult() when the removal is done.
      * */
 	private void stopRequestingGeofence(){
+		/*
 		Log.d(LOG_TAG, "[stopRequestingActivityRecognition] stop to remove Geofence from the server");
 		
 		// Check for Google Play services
@@ -372,11 +373,9 @@ public class ContextExtractor implements SensorEventListener {
                                     mGeofenceRequester.getRequestPendingIntent());
 
 
-        /*
-         * Cancel the PendingIntent of the requester. Even if the removal request fails, canceling the PendingIntent
-         * will stop the updates.
-         */
+
         mGeofenceRequester.getRequestPendingIntent().cancel();
+		*/
 
 	}
 	
@@ -946,8 +945,8 @@ public class ContextExtractor implements SensorEventListener {
         return wifi.isConnected();
     }
 
-    public static LocationRequester getLocationRequester(){
-        return mLocationRequester;
+    public static LocationManager getLocationRequester(){
+        return mLocationManager;
     }
 
 	public static String getCurrentForegroundActivity(){
@@ -989,7 +988,7 @@ public class ContextExtractor implements SensorEventListener {
 		TimeZone tz = TimeZone.getDefault();		
 		Calendar cal = Calendar.getInstance(tz);
 		
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String currentTimeString = sdf_now.format(cal.getTime());
 		
 		return currentTimeString;

@@ -11,7 +11,6 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,10 +18,9 @@ import java.util.Calendar;
 import java.util.Random;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.Schedule;
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
 
 public class ScheduleAndSampleManager {
 
@@ -130,9 +128,9 @@ public class ScheduleAndSampleManager {
 
         //register action alarm
         IntentFilter alarm_filter = new IntentFilter();
-        alarm_filter.addAction(GlobalNames.UPDATE_SCHEDULE_ALARM);
-        alarm_filter.addAction(GlobalNames.STOP_SERVICE_ALARM);
-        alarm_filter.addAction(GlobalNames.START_SERVICE_ALARM);
+        alarm_filter.addAction(Constants.UPDATE_SCHEDULE_ALARM);
+        alarm_filter.addAction(Constants.STOP_SERVICE_ALARM);
+        alarm_filter.addAction(Constants.START_SERVICE_ALARM);
 
         mContext.registerReceiver(UpdateScheduleAlarmReceiver, alarm_filter);
 
@@ -141,7 +139,7 @@ public class ScheduleAndSampleManager {
 	
 	public static void registerActionAlarmReceiver(){
 		//register action alarm
-		IntentFilter alarm_filter = new IntentFilter(GlobalNames.ACTION_ALARM);
+		IntentFilter alarm_filter = new IntentFilter(Constants.ACTION_ALARM);
 		mContext.registerReceiver(ActionAlarmReceiver, alarm_filter);
 		
 	}
@@ -196,7 +194,7 @@ public class ScheduleAndSampleManager {
 	
 	private static long getSamplingStartTime(long base, Schedule schedule){
 		
-		return (base + schedule.getSampleDelay()*GlobalNames.MILLISECONDS_PER_SECOND);
+		return (base + schedule.getSampleDelay()* Constants.MILLISECONDS_PER_SECOND);
 		
 	}
 
@@ -257,7 +255,7 @@ public class ScheduleAndSampleManager {
 		//1. starTime  + duration = endTime
 		if ( schedule.getSampleDuration()!=-1){	
 			
-			endTime = startTime + schedule.getSampleDuration()*GlobalNames.MILLISECONDS_PER_SECOND;
+			endTime = startTime + schedule.getSampleDuration()* Constants.MILLISECONDS_PER_SECOND;
 
 			//TODO: avoid bed time?
 			/*
@@ -487,7 +485,7 @@ public class ScheduleAndSampleManager {
 			int sample_period;
 			long sub_startTime = startTime;
 			long sub_endTime  = endTime;			
-			long min_interval = schedule.getMinInterval() * GlobalNames.MILLISECONDS_PER_SECOND;
+			long min_interval = schedule.getMinInterval() * Constants.MILLISECONDS_PER_SECOND;
 					
 			//1. first get the entire sampling period			
 			
@@ -540,13 +538,13 @@ public class ScheduleAndSampleManager {
 			
 			//Log.d(LOG_TAG, " [calculateSampleTimes] the fixed sample interval is" + sample_interval + " and the period is " + sample_period);
 			
-			long next_sample_time = startTime+ sample_interval* GlobalNames.MILLISECONDS_PER_SECOND;
+			long next_sample_time = startTime+ sample_interval* Constants.MILLISECONDS_PER_SECOND;
 			
 			while (next_sample_time < endTime){				
 				
 				Log.d(LOG_TAG, "adding sampled time " + getTimeString(next_sample_time));
 				times.add(next_sample_time);			
-				next_sample_time+=sample_interval* GlobalNames.MILLISECONDS_PER_SECOND;
+				next_sample_time+=sample_interval* Constants.MILLISECONDS_PER_SECOND;
 			}
 			
 		}
@@ -577,7 +575,7 @@ public class ScheduleAndSampleManager {
             stopServiceIntent.putExtra(ScheduleAndSampleManager.ALARM_REQUEST_CODE, REQUEST_CODE_REFRESH_STOP);
             PendingIntent stopServicePi = PendingIntent.getBroadcast(mContext, REQUEST_CODE_REFRESH_STOP, stopServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             mAlarmManager.set(AlarmManager.RTC_WAKEUP, stopServiceTime,  stopServicePi);
-            Log.d(LOG_TAG, "[test reschedule] [generateRefreshServiceScheduleAlarms] the scheduled stop service is " + getTimeString(stopServiceTime) +" and the next is " + getTimeString(stopServiceTime + GlobalNames.MILLISECONDS_PER_DAY) );
+            Log.d(LOG_TAG, "[test reschedule] [generateRefreshServiceScheduleAlarms] the scheduled stop service is " + getTimeString(stopServiceTime) +" and the next is " + getTimeString(stopServiceTime + Constants.MILLISECONDS_PER_DAY) );
 
 
             //intent for starting service
@@ -588,7 +586,7 @@ public class ScheduleAndSampleManager {
             startServiceIntent.putExtra(ScheduleAndSampleManager.ALARM_REQUEST_CODE, REQUEST_CODE_REFRESH_START);
             PendingIntent startServicePi = PendingIntent.getBroadcast(mContext, REQUEST_CODE_REFRESH_START, startServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             mAlarmManager.set(AlarmManager.RTC_WAKEUP, startServiceTime,  startServicePi);
-            Log.d(LOG_TAG, "[test reschedule] [generateRefreshServiceScheduleAlarms] the scheduled start service is " + getTimeString(startServiceTime) +" and the next is " + getTimeString(startServiceTime+ GlobalNames.MILLISECONDS_PER_DAY) );
+            Log.d(LOG_TAG, "[test reschedule] [generateRefreshServiceScheduleAlarms] the scheduled start service is " + getTimeString(startServiceTime) +" and the next is " + getTimeString(startServiceTime+ Constants.MILLISECONDS_PER_DAY) );
 
         }
 
@@ -608,7 +606,7 @@ public class ScheduleAndSampleManager {
             //the updateschedule is repeated on a daily basis
             PendingIntent pi = PendingIntent.getBroadcast(mContext, REQUEST_CODE_REFRESH_UPDATE,intent, PendingIntent.FLAG_CANCEL_CURRENT);
             mAlarmManager.set(AlarmManager.RTC_WAKEUP, updateScheduletime, pi);
-            Log.d(LOG_TAG, "[test reschedule] [generateRefreshServiceScheduleAlarms] the scheduled update time is " + getTimeString(updateScheduletime) +" and the next is " + getTimeString(updateScheduletime + GlobalNames.MILLISECONDS_PER_DAY) );
+            Log.d(LOG_TAG, "[test reschedule] [generateRefreshServiceScheduleAlarms] the scheduled update time is " + getTimeString(updateScheduletime) +" and the next is " + getTimeString(updateScheduletime + Constants.MILLISECONDS_PER_DAY) );
 
 
         }
@@ -642,7 +640,7 @@ public class ScheduleAndSampleManager {
                 " with request code " + request_code);
 
                 //create an alarm for a time
-                Intent intent = new Intent(GlobalNames.ACTION_ALARM);
+                Intent intent = new Intent(Constants.ACTION_ALARM);
                 Bundle bundle = new Bundle();
 
 
@@ -834,7 +832,7 @@ public class ScheduleAndSampleManager {
 
 	public static String getTimeString(long time){
 
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String currentTimeString = sdf_now.format(time);
 
 		return currentTimeString;
@@ -904,7 +902,7 @@ public class ScheduleAndSampleManager {
 	public static void cancelAllActionAlarms() {
 		
 		//create action alarm intent
-		Intent intent = new Intent(GlobalNames.ACTION_ALARM);	
+		Intent intent = new Intent(Constants.ACTION_ALARM);
 
         //get request code
         if (PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, null)!=null) {
@@ -949,7 +947,7 @@ public class ScheduleAndSampleManager {
     {
         public void onReceive(Context context, Intent intent)
         {
-        	if (intent.getAction().equals(GlobalNames.ACTION_ALARM)){
+        	if (intent.getAction().equals(Constants.ACTION_ALARM)){
     			Log.d(LOG_TAG, "In ActionAlarmReceiver ");
     			
     			//based on the action type, choose which action to do

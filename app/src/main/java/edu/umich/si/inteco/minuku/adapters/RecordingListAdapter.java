@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.model.Annotation;
 import edu.umich.si.inteco.minuku.model.Session;
@@ -99,13 +99,13 @@ public class RecordingListAdapter extends ArrayAdapter<Session> {
 
                 if ( recordingDateTextView != null) {
 
-                    SimpleDateFormat sdf_date = new SimpleDateFormat(GlobalNames.DATE_FORMAT_DATE_TEXT);
+                    SimpleDateFormat sdf_date = new SimpleDateFormat(Constants.DATE_FORMAT_DATE_TEXT);
                     recordingDateTextView.setText(String.format("%s", ScheduleAndSampleManager.getTimeString(session.getStartTime(), sdf_date) ));
                 }
 
                 if (recordingTimeTextView  != null) {
 
-                    SimpleDateFormat sdf_time = new SimpleDateFormat(GlobalNames.DATE_FORMAT_HOUR_MIN);
+                    SimpleDateFormat sdf_time = new SimpleDateFormat(Constants.DATE_FORMAT_HOUR_MIN);
                     recordingTimeTextView .setText(String.format("%s", ScheduleAndSampleManager.getTimeString(session.getStartTime(), sdf_time) ));
                 }
 

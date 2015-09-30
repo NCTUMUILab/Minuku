@@ -1,15 +1,13 @@
 package edu.umich.si.inteco.minuku.Fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListView;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.model.actions.GenerateEmailQuestionnaireAction;
 import edu.umich.si.inteco.minuku.util.ActionManager;
@@ -42,7 +40,7 @@ public class DailyJournalSectionFragment extends Fragment{
                                 ActionManager.USER_INITIATED_RESPONDING_TO_DAILY_REPORT,
                                 ActionManager.USER_RESPOND_TO_DAILY_REPORT_ACTION_NAME,
                                 ActionManager.ACTION_TYPE_EMAIL_QUESTIONNAIRE,
-                                ActionManager.ACTION_EXECUTION_STYLE_ONETIME, GlobalNames.LABELING_STUDY_ID);
+                                ActionManager.ACTION_EXECUTION_STYLE_ONETIME, Constants.LABELING_STUDY_ID);
 
 
                 generateEmailQuestionnaireAction.setQuestionnaireId(1);

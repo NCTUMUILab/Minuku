@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.record.Record;
@@ -29,7 +29,7 @@ public class ContextManager {
 
     //the threshold of life of a record
     public static int RECORD_PRESERVATION_THRESHOLD_IN_MILLISECONDS = 2 *
-            GlobalNames.MILLISECONDS_PER_SECOND * GlobalNames.SECONDS_PER_MINUTE;   //2 minutes
+            Constants.MILLISECONDS_PER_SECOND * Constants.SECONDS_PER_MINUTE;   //2 minutes
 
     /*RECORD TYPE NAME*/
     public static final String CONTEXT_RECORD_TYPE_LOCATION_NAME = "Location";
@@ -103,7 +103,7 @@ public class ContextManager {
 	public ContextManager(Context context){
 
 		mContext = context;
-		mLocalDBHelpder = new LocalDBHelper(mContext, GlobalNames.TEST_DATABASE_NAME);
+		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
         //initiate the RecordPool
         mRecordPool = new ArrayList<Record>();
 
@@ -180,7 +180,7 @@ public class ContextManager {
 
 
                 //save records to the database
-                DataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), GlobalNames.BACKGOUND_RECORDING_SESSION_ID);
+                DataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
 
                 //update mobility
                 MobilityManager.updateMobility();

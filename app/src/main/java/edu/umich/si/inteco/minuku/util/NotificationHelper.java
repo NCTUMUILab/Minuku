@@ -15,13 +15,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.tansuo.app.GlobalNames;
-import edu.umich.si.inteco.tansuo.app.R;
-import edu.umich.si.inteco.tansuo.app.activities.AnnotateActivity;
-import edu.umich.si.inteco.tansuo.app.activities.ListRecordingActivity;
-import edu.umich.si.inteco.tansuo.app.MainActivity;
-import edu.umich.si.inteco.tansuo.app.activities.QuestionnaireActivity;
-import edu.umich.si.inteco.tansuo.app.model.Log.ProbeLog;
+import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.R;
+import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
+import edu.umich.si.inteco.minuku.activities.ListRecordingActivity;
+import edu.umich.si.inteco.minuku.MainActivity;
+import edu.umich.si.inteco.minuku.activities.QuestionnaireActivity;
 
 public class NotificationHelper {
 
@@ -132,6 +131,7 @@ public class NotificationHelper {
                 .setLights(Color.BLUE, 500, 500)
                 .setSound(alarmSound)
                 .setContentIntent(pi).build();
+
         noti.flags |= Notification.FLAG_AUTO_CANCEL;
         noti_id = NOTIFICATION_ID_ANNOTATE;
 
@@ -176,7 +176,7 @@ public class NotificationHelper {
 
             intent = new Intent(mContext, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            bundle.putString("launchTab", GlobalNames.MAIN_ACTIVITY_TAB_RECORD);
+            bundle.putString("launchTab", Constants.MAIN_ACTIVITY_TAB_RECORD);
         }
 
         //else if the recording is initiated by system, then the ongoing notification should allow user to annotate
@@ -388,7 +388,7 @@ public class NotificationHelper {
 		TimeZone tz = TimeZone.getDefault();		
 		Calendar cal = Calendar.getInstance(tz);
 		
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String currentTimeString = sdf_now.format(cal.getTime());
 		
 		return currentTimeString;

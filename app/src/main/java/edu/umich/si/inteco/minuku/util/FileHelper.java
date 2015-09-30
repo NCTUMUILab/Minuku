@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.contextmanager.TransportationModeDetector;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
@@ -33,33 +33,33 @@ public class FileHelper {
 
     public static File getPackageDirectory() {
 
-        return new File (Environment.getExternalStorageDirectory() + GlobalNames.PACKAGE_DIRECTORY_PATH);
+        return new File (Environment.getExternalStorageDirectory() + Constants.PACKAGE_DIRECTORY_PATH);
     }
 
     public static File getLogDirectory() {
 
-        return new File (Environment.getExternalStorageDirectory() + GlobalNames.PACKAGE_DIRECTORY_PATH + LogManager.LOG_DIRECTORY_PATH);
+        return new File (Environment.getExternalStorageDirectory() + Constants.PACKAGE_DIRECTORY_PATH + LogManager.LOG_DIRECTORY_PATH);
     }
 
 	public static void writeStringToFile(String directory_name, String filename, String content){
     	
     	if(isExternalStorageWritable()){
 			try{
-				File PackageDirectory = new File(Environment.getExternalStorageDirectory() + GlobalNames.PACKAGE_DIRECTORY_PATH);
+				File PackageDirectory = new File(Environment.getExternalStorageDirectory() + Constants.PACKAGE_DIRECTORY_PATH);
 				
 				//check whether the project diectory exists
 				if(!PackageDirectory.exists()){
 					PackageDirectory.mkdir();
 				}
 				
-				File directory = new File (Environment.getExternalStorageDirectory() + GlobalNames.PACKAGE_DIRECTORY_PATH + directory_name);
+				File directory = new File (Environment.getExternalStorageDirectory() + Constants.PACKAGE_DIRECTORY_PATH + directory_name);
 
 				//check whether the directory exists
 				if(!directory.exists()){
 					directory.mkdir();
 				}
 				
-				String pathfilename = Environment.getExternalStorageDirectory()+ GlobalNames.PACKAGE_DIRECTORY_PATH+directory_name+ filename;
+				String pathfilename = Environment.getExternalStorageDirectory()+ Constants.PACKAGE_DIRECTORY_PATH+directory_name+ filename;
 				//Log.d(LOG_TAG, "[writeStringToFile] the file name is " + pathfilename + " the content is " + content);
 				File file = new File(pathfilename);
 				FileWriter filewriter = new FileWriter(file, true);
@@ -181,7 +181,7 @@ public class FileHelper {
     public static void readFilesFromNarrative() {
 
         //Get the text file
-        File file[] = new File(Environment.getExternalStorageDirectory() + GlobalNames.PACKAGE_DIRECTORY_NARRATIVE_PATH).listFiles();
+        File file[] = new File(Environment.getExternalStorageDirectory() + Constants.PACKAGE_DIRECTORY_NARRATIVE_PATH).listFiles();
 
         recursiveFileFind(file);
     }

@@ -4,21 +4,25 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import org.json.JSONObject;
-
-import edu.umich.si.inteco.tansuo.app.GlobalNames;
-
 /**
  * Created by Armuro on 7/16/14.
  */
 public class PreferenceHelper {
 
-    //preferndce name
     private static final String LOG_TAG = "PreferenceHelper";
-    public static final String SHARED_PREFERENCE_NAME = "probe sharedpreference";
-    public static final String SHARED_PREFERENCE_PROPERTY_DEVICE_ID = "device_id";
-    public static final String SHARED_PREFERENCE_PROPERTY_REQUEST_CODE = "request_code";
-    public static final String SHARED_PREFERENCE_PROPERTY_LAST_SEVER_SYNC_TIME = "last_server_sync_time";
+
+    //preferndce name
+    public static final String PACKAGE_NAME = "edu.umich.si.inteco.minuku";
+
+    public static final String SHARED_PREFERENCE_NAME = PACKAGE_NAME + ".SHARED_PREFERENCES_NAME";
+    public static final String DEVICE_ID = PACKAGE_NAME+ ".DEVICE_ID";
+    public static final String NOTIFICATION_REQUEST_CODE = PACKAGE_NAME+".REQUEST_CODE";
+    public static final String DATABASE_LAST_SEVER_SYNC_TIME = PACKAGE_NAME+ ".LAST_SERVER_SYNC_TIME";
+
+    /***
+     * Shared preference for storing context related information
+     */
+    public static final String CONTEXT_GEOFENCE_ADDED_KEY = PACKAGE_NAME + ".GEOFENCES_ADDED_KEY";
 
 
     private static Context mContext;

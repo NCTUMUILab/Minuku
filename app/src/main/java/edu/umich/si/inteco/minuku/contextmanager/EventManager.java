@@ -8,7 +8,7 @@ import com.google.android.gms.location.DetectedActivity;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
@@ -42,7 +42,7 @@ public class EventManager {
 		
 		mContext = context;
 		mEventList = new ArrayList<Event>();
-		mLocalDBHelper = new LocalDBHelper(mContext, GlobalNames.TEST_DATABASE_NAME);
+		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 	}
 	
 	public void updateEvents(){
@@ -252,12 +252,12 @@ public class EventManager {
 		boolean pass = true; 
     	
     	//duration: check if the latest timestamp  - earliest timestamp 
-    	String[] lastResult = results.get(results.size()-1).split(GlobalNames.DELIMITER);
-    	String[] firstResult = results.get(0).split(GlobalNames.DELIMITER);
+    	String[] lastResult = results.get(results.size()-1).split(Constants.DELIMITER);
+    	String[] firstResult = results.get(0).split(Constants.DELIMITER);
     	
     	long earliestTime = Long.parseLong( firstResult[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
     	long latestTime = Long.parseLong( lastResult[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
-    	int duration = (int) (latestTime - earliestTime)/GlobalNames.MILLISECONDS_PER_SECOND ;
+    	int duration = (int) (latestTime - earliestTime)/ Constants.MILLISECONDS_PER_SECOND ;
     	/*
     	Log.d (LOG_TAG, "[ eventPassTimeConstraint] the earliest time is " + getTimeString (earliestTime) 
     			+ " the latest time is " + getTimeString (latestTime) + " the duration is " + duration + " seconds " );
@@ -389,7 +389,7 @@ public class EventManager {
 	
 	public static String getTimeString(long time){		
 
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String currentTimeString = sdf_now.format(time);
 		
 		return currentTimeString;

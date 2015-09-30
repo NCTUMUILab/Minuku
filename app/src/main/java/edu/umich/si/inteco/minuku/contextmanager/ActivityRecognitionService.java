@@ -16,7 +16,7 @@ import com.google.android.gms.location.DetectedActivity;
 
 import java.util.List;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 import edu.umich.si.inteco.minuku.util.LogManager;
 
@@ -71,7 +71,7 @@ public class ActivityRecognitionService extends IntentService {
        //         ContextExtractor.setMostProbableActivity(mMostProbableActivity, detectionTime);
                 
                 
-                if (GlobalNames.isTestingActivity) {
+                if (Constants.isTestingActivity) {
                 	//sendNotification();
                 	
                 	//logging the activity information..

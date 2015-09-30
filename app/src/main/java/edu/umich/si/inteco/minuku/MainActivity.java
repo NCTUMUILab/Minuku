@@ -14,7 +14,6 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 
-import edu.umich.si.inteco.minuku.R.*;
 import edu.umich.si.inteco.minuku.Fragments.DailyJournalSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.ListRecordingSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.RecordSectionFragment;
@@ -33,7 +32,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static final int PAGE_POSITION_DAILY_JOURMAL = 2;
 
     private static String mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_ALL;
-    private static String mLaunchTab = GlobalNames.MAIN_ACTIVITY_TAB_RECORD;
+    private static String mLaunchTab = Constants.MAIN_ACTIVITY_TAB_RECORD;
     private int currentTabPos = -1;
 
     //provide fragments for each of the three primary sections of the app. We use a {@link android.support.v4.app.FragmentPagerAdapter} 
@@ -56,8 +55,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         /** when the app starts, first obtain the participant ID **/
         TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
-        GlobalNames.DEVICE_ID = mngr.getDeviceId();
-        Log.d(LOG_TAG, "[GlobalNames.DEVICE_ID] get the synTime is " + GlobalNames.DEVICE_ID);
+        Constants.DEVICE_ID = mngr.getDeviceId();
+        Log.d(LOG_TAG, "[Constants.DEVICE_ID] get the synTime is " + Constants.DEVICE_ID);
 
         /**start the contextManager service**/
         if (!CaptureProbeService.isServiceRunning()){
@@ -102,22 +101,22 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         //we first set the mLaunchtab parameter based on the study condition
         //TODO: Probe should not have conditions, remove this after the labeling study..
-        if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.PARTICIPATORY_LABELING_CONDITION)) {
-            mLaunchTab = GlobalNames.MAIN_ACTIVITY_TAB_RECORD;
-            actionBar.addTab(actionBar.newTab().setText(GlobalNames.MAIN_ACTIVITY_TAB_RECORD).setTabListener(this));
-            actionBar.addTab(actionBar.newTab().setText(GlobalNames.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
+        if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)) {
+            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_RECORD;
+            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORD).setTabListener(this));
+            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
         }
-        else if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.IN_STIU_LABELING_CONDITION)) {
-            mLaunchTab = GlobalNames.MAIN_ACTIVITY_TAB_DAILY_REPORT;
-        }
-
-        else if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.POST_HOC_LABELING_CONDITION)) {
-            mLaunchTab = GlobalNames.MAIN_ACTIVITY_TAB_DAILY_REPORT;
-            actionBar.addTab(actionBar.newTab().setText(GlobalNames.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
+        else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.IN_STIU_LABELING_CONDITION)) {
+            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT;
         }
 
-        actionBar.addTab(actionBar.newTab().setText(GlobalNames.MAIN_ACTIVITY_TAB_DAILY_REPORT).setTabListener(this));
-        actionBar.addTab(actionBar.newTab().setText(GlobalNames.MAIN_ACTIVITY_TAB_TASKS).setTabListener(this));
+        else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)) {
+            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT;
+            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
+        }
+
+        actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT).setTabListener(this));
+        actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_TASKS).setTabListener(this));
 
         currentTabPos = -1;
 
@@ -203,7 +202,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         Log.d(LOG_TAG, "[onTabSelected] the selected page position is " + tab.getPosition());
 
         //refrest list recording if users click on the tab
-        if (tab.getText().equals(GlobalNames.MAIN_ACTIVITY_TAB_RECORDINGS)){
+        if (tab.getText().equals(Constants.MAIN_ACTIVITY_TAB_RECORDINGS)){
             ListRecordingSectionFragment.refreshRecordingList();
         }
 
@@ -239,12 +238,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             switch (i) {
                 case 0:
 
-                    if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.PARTICIPATORY_LABELING_CONDITION)){
+                    if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
                         RecordSectionFragment recordSectionFragment = new RecordSectionFragment();
                         recordSectionFragment.setRetainInstance(true);
                         return recordSectionFragment;
                     }
-                    else if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.POST_HOC_LABELING_CONDITION)) {
+                    else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)) {
                         mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_RECENT;
                         ListRecordingSectionFragment listRecordingSectionFragment = new ListRecordingSectionFragment();
                         listRecordingSectionFragment.setReviewMode(mReviewMode);
@@ -262,14 +261,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     // a launchpad into the other demonstrations in this example application.
 
                 case 1:
-                    if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.PARTICIPATORY_LABELING_CONDITION)){
+                    if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
                         mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_ALL;
                         ListRecordingSectionFragment listRecordingSectionFragment = new ListRecordingSectionFragment();
                         listRecordingSectionFragment.setReviewMode(mReviewMode);
                         listRecordingSectionFragment.setRetainInstance(true);
                         return listRecordingSectionFragment;
                     }
-                    else if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.POST_HOC_LABELING_CONDITION)){
+                    else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)){
                         mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_RECENT;
                         DailyJournalSectionFragment dailyJournalSectionFragment = new DailyJournalSectionFragment();
                         dailyJournalSectionFragment.setRetainInstance(true);
@@ -283,7 +282,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     }
 
                 case 2:
-                    if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.PARTICIPATORY_LABELING_CONDITION)){
+                    if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
 
                         DailyJournalSectionFragment dailyJournalSectionFragment = new DailyJournalSectionFragment();
                         dailyJournalSectionFragment.setRetainInstance(true);
@@ -296,7 +295,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     }
 
                 case 3:
-                    if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.PARTICIPATORY_LABELING_CONDITION)){
+                    if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
 
                         Log.d(LOG_TAG, "enter task fragment");
                         TaskSectionFragment taskSectionFragment = new TaskSectionFragment();
@@ -314,9 +313,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         @Override
         public int getCount() {
 
-            if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.PARTICIPATORY_LABELING_CONDITION))
+            if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION))
                 return 4;
-            else if (GlobalNames.CURRENT_STUDY_CONDITION.equals(GlobalNames.IN_STIU_LABELING_CONDITION))
+            else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.IN_STIU_LABELING_CONDITION))
                 return 2;
             else
                 return 3;

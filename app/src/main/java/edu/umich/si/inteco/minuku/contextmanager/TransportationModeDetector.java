@@ -7,7 +7,7 @@ import com.google.android.gms.location.DetectedActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -35,14 +35,14 @@ public class TransportationModeDetector {
     public static final String TRANSPORTATION_MODE_NAME_ON_BICYCLE = "on_bicycle";
     public static final String TRANSPORTATION_MODE_NAME_IN_NO_TRANSPORTATION = "NA";
 
-    private static final long WINDOW_LENGTH_START_ACTIVITY_DEFAULT = 20 * GlobalNames.MILLISECONDS_PER_SECOND;
-    private static final long WINDOW_LENGTH_STOP_ACTIVITY_DEFAULT = 20 * GlobalNames.MILLISECONDS_PER_SECOND;
-    private static final long WINDOW_LENGTH_START_ACTIVITY_IN_VEHICLE = 20 * GlobalNames.MILLISECONDS_PER_SECOND;
-    private static final long WINDOW_LENGTH_START_ACTIVITY_ON_FOOT = 20 * GlobalNames.MILLISECONDS_PER_SECOND;
-    private static final long WINDOW_LENGTH_START_ACTIVITY_ON_BICYCLE = 20 * GlobalNames.MILLISECONDS_PER_SECOND;
-    private static final long WINDOW_LENGTH_STOP_ACTIVITY_IN_VEHICLE = 150 * GlobalNames.MILLISECONDS_PER_SECOND;
-    private static final long WINDOW_LENGTH_STOP_ACTIVITY_ON_FOOT = 60 * GlobalNames.MILLISECONDS_PER_SECOND;
-    private static final long WINDOW_LENGTH_STOP_ACTIVITY_ON_BICYCLE = 90 * GlobalNames.MILLISECONDS_PER_SECOND;
+    private static final long WINDOW_LENGTH_START_ACTIVITY_DEFAULT = 20 * Constants.MILLISECONDS_PER_SECOND;
+    private static final long WINDOW_LENGTH_STOP_ACTIVITY_DEFAULT = 20 * Constants.MILLISECONDS_PER_SECOND;
+    private static final long WINDOW_LENGTH_START_ACTIVITY_IN_VEHICLE = 20 * Constants.MILLISECONDS_PER_SECOND;
+    private static final long WINDOW_LENGTH_START_ACTIVITY_ON_FOOT = 20 * Constants.MILLISECONDS_PER_SECOND;
+    private static final long WINDOW_LENGTH_START_ACTIVITY_ON_BICYCLE = 20 * Constants.MILLISECONDS_PER_SECOND;
+    private static final long WINDOW_LENGTH_STOP_ACTIVITY_IN_VEHICLE = 150 * Constants.MILLISECONDS_PER_SECOND;
+    private static final long WINDOW_LENGTH_STOP_ACTIVITY_ON_FOOT = 60 * Constants.MILLISECONDS_PER_SECOND;
+    private static final long WINDOW_LENGTH_STOP_ACTIVITY_ON_BICYCLE = 90 * Constants.MILLISECONDS_PER_SECOND;
 
     public static final int NO_ACTIVITY_TYPE = -1;
     public static final int IN_VEHICLE = DetectedActivity.IN_VEHICLE;

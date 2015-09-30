@@ -1,12 +1,10 @@
 package edu.umich.si.inteco.minuku.data;
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
@@ -17,8 +15,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
-import edu.umich.si.inteco.minuku.MainActivity;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
@@ -892,7 +889,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			while(cursor.moveToNext()){
 				String curRow = "";
 				for (int i=0; i<columnCount; i++){
-					curRow += cursor.getString(i)+ GlobalNames.DELIMITER;		
+					curRow += cursor.getString(i)+ Constants.DELIMITER;
 				}
 				rows.add(curRow);
 			}
@@ -923,7 +920,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			while(cursor.moveToNext()){
 				String curRow = "";
 				for (int i=0; i<columnCount; i++){
-					curRow += cursor.getString(i)+ GlobalNames.DELIMITER;		
+					curRow += cursor.getString(i)+ Constants.DELIMITER;
 				}
 				rows.add(curRow);
 			}
@@ -960,7 +957,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             while(cursor.moveToNext()){
                 String curRow = "";
                 for (int i=0; i<columnCount; i++){
-                    curRow += cursor.getString(i)+ GlobalNames.DELIMITER;
+                    curRow += cursor.getString(i)+ Constants.DELIMITER;
                 }
                 rows.add(curRow);
             }
@@ -994,7 +991,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             while(cursor.moveToNext()){
                 String curRow = "";
                 for (int i=0; i<columnCount; i++){
-                    curRow += cursor.getString(i)+ GlobalNames.DELIMITER;
+                    curRow += cursor.getString(i)+ Constants.DELIMITER;
                 }
                 rows.add(curRow);
             }
@@ -1027,7 +1024,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			while(cursor.moveToNext()){
 				String curRow = "";
 				for (int i=0; i<columnCount; i++){
-					curRow += cursor.getString(i)+ GlobalNames.DELIMITER;		
+					curRow += cursor.getString(i)+ Constants.DELIMITER;
 				}
 				rows.add(curRow);
 			}
@@ -1062,7 +1059,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             while(cursor.moveToNext()){
                 String curRow = "";
                 for (int i=0; i<columnCount; i++){
-                    curRow += cursor.getString(i)+ GlobalNames.DELIMITER;
+                    curRow += cursor.getString(i)+ Constants.DELIMITER;
                 }
                 rows.add(curRow);
             }
@@ -1158,7 +1155,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 		//add time into SQL
 		if (recency!=-1){
 			
-			long targetTime =  getCurrentTimeInMilli() - (long)(recency*GlobalNames.MILLISECONDS_PER_SECOND) ;
+			long targetTime =  getCurrentTimeInMilli() - (long)(recency* Constants.MILLISECONDS_PER_SECOND) ;
 			
 			sql += DatabaseNameManager.COL_TIMESTAMP_LONG + " > "  + targetTime; 
 			
@@ -1197,7 +1194,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             while(cursor.moveToNext()){
                 String curRow = "";
                 for (int i=0; i<columnCount; i++){
-                    curRow += cursor.getString(i)+ GlobalNames.DELIMITER;
+                    curRow += cursor.getString(i)+ Constants.DELIMITER;
                 }
                 Log.d(LOG_TAG, "[queryLastRecord] get result row " +curRow);
 
@@ -1238,7 +1235,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             while(cursor.moveToNext()){
                 String curRow = "";
                 for (int i=0; i<columnCount; i++){
-                    curRow += cursor.getString(i)+ GlobalNames.DELIMITER;
+                    curRow += cursor.getString(i)+ Constants.DELIMITER;
                 }
                 //Log.d(LOG_TAG, "[queryRecordsInSession] get result row " +curRow);
 
@@ -1279,7 +1276,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             while(cursor.moveToNext()){
                 String curRow = "";
                 for (int i=0; i<columnCount; i++){
-                    curRow += cursor.getString(i)+ GlobalNames.DELIMITER;
+                    curRow += cursor.getString(i)+ Constants.DELIMITER;
                 }
                 Log.d(LOG_TAG, "[queryRecordsInSession] get result row " +curRow);
 
@@ -1327,7 +1324,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			while(cursor.moveToNext()){
 				String curRow = "";
 				for (int i=0; i<columnCount; i++){
-					curRow += cursor.getString(i)+ GlobalNames.DELIMITER;		
+					curRow += cursor.getString(i)+ Constants.DELIMITER;
 				}
 				//Log.d(LOG_TAG, "[queryWithoutColumn] get result row " +curRow);
 	    		
@@ -1388,7 +1385,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			while(cursor.moveToNext()){
 				String curRow = "";
 				for (int i=0; i<columnCount; i++){
-					curRow += cursor.getString(i)+ GlobalNames.DELIMITER;		
+					curRow += cursor.getString(i)+ Constants.DELIMITER;
 				}
 				rows.add(curRow);
 			}
@@ -1434,7 +1431,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 	/**Generate a formated time string (in the format of "yyyy-MM-dd HH:mm:ss" **/
 	private static String getTimeString(long time) {
 		
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String timeString = sdf_now.format(time);
 		
 		return timeString;

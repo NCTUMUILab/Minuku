@@ -2,14 +2,13 @@ package edu.umich.si.inteco.minuku.Fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.adapters.MyTaskArrayAdapter;
 import edu.umich.si.inteco.minuku.util.TaskManager;
@@ -43,7 +42,7 @@ public class TaskSectionFragment extends Fragment{
 
 
         idTextView = (TextView) rootView.findViewById(R.id.idTextView);
-        idTextView.setText("My ID:" + GlobalNames.DEVICE_ID);
+        idTextView.setText("My ID:" + Constants.DEVICE_ID);
 
         taskListView = (ListView) rootView.findViewById(R.id.task_list);
 

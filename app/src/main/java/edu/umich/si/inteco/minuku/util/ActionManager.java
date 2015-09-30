@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
 import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
@@ -162,7 +162,7 @@ public class ActionManager {
 		mActionList = new ArrayList<Action> ();
 		mActionControlList = new ArrayList<ActionControl>();
 		mRunningActionList = new ArrayList<Action> ();
-		mLocalDBHelper = new LocalDBHelper(mContext, GlobalNames.TEST_DATABASE_NAME);
+		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 		mDataHandler = new DataHandler (mContext);
         mRunningActionExecutor = Executors.newScheduledThreadPool(5);
 		//registerActions();
@@ -474,8 +474,8 @@ public class ActionManager {
                         }
 
                         Log.d(LOG_TAG,"[execute EmailQuestionnaire Action] emailBody " + trips);
-                        Log.d(LOG_TAG,"[execute EmailQuestionnaire Action] deviceId " + GlobalNames.DEVICE_ID);
-                        Log.d(LOG_TAG,"[execute EmailQuestionnaire Action] Study condition " + GlobalNames.CURRENT_STUDY_CONDITION);
+                        Log.d(LOG_TAG,"[execute EmailQuestionnaire Action] deviceId " + Constants.DEVICE_ID);
+                        Log.d(LOG_TAG,"[execute EmailQuestionnaire Action] Study condition " + Constants.CURRENT_STUDY_CONDITION);
                         //we need to tell the server which condition it is in, email subject, email content. device id
                         String emailSubject = QuestionnaireManager.getEmailQuestionnaireSubject(questionnaireTemplateId);
                         Log.d(LOG_TAG,"[execute EmailQuestionnaire Action] emailSubject " + emailSubject);
@@ -486,8 +486,8 @@ public class ActionManager {
 
                             requestEmailJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_EMAIL_SUBJECT, emailSubject);
                             requestEmailJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_TRIPS, trips);
-                            requestEmailJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
-                            requestEmailJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION, GlobalNames.CURRENT_STUDY_CONDITION);
+                            requestEmailJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
+                            requestEmailJSON.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION, Constants.CURRENT_STUDY_CONDITION);
 
                             RemoteDBHelper.requestEmailFromServer(requestEmailJSON);
 
@@ -626,7 +626,7 @@ public class ActionManager {
                     else if (annotateRecordingAction.getRecordingType().equals(RecordingAndAnnotateManager.ANNOTATE_RECORDING_BACKGROUND)){
 
                         //if the annotation is for the background recording, then the session number is 1, and we don't need to start a new recording
-                        sessionId = (GlobalNames.BACKGOUND_RECORDING_SESSION_ID);
+                        sessionId = (Constants.BACKGOUND_RECORDING_SESSION_ID);
 
                         //TODO: if annotating background recording, we need to specify the startTime and endTime of the annotation
 
@@ -725,7 +725,7 @@ public class ActionManager {
                 ActionManager.SYSTEM_INITIATED_RECORDING_ACTION_ID + annotateRecordingActionId,
                 ActionManager.SYSTEM_GENERATED_RECORDING_BY_ANNOTATION_ACTION_NAME,
                 ActionManager.ACTION_TYPE_SAVING_RECORD,
-                ActionManager.ACTION_EXECUTION_STYLE_ONETIME, GlobalNames.LABELING_STUDY_ID
+                ActionManager.ACTION_EXECUTION_STYLE_ONETIME, Constants.LABELING_STUDY_ID
         );
 
         //recording is a continuous action.
@@ -1237,7 +1237,7 @@ public class ActionManager {
 	
 	public static String getTimeString(long time){		
 
-		SimpleDateFormat sdf_now = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String currentTimeString = sdf_now.format(time);
 		
 		return currentTimeString;

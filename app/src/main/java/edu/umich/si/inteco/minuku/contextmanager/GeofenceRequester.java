@@ -3,90 +3,129 @@ package edu.umich.si.inteco.minuku.contextmanager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
-import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
-import com.google.android.gms.location.LocationStatusCodes;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 
-public class GeofenceRequester implements OnAddGeofencesResultListener,
-		ConnectionCallbacks, OnConnectionFailedListener {
+public class GeofenceRequester implements ConnectionCallbacks, OnConnectionFailedListener {
 
 	/** Tag for logging. */
     private static final String LOG_TAG = "GeofenceRequester";
     private final Context mContext;
+
+    //Client for Google Play service
+    private GoogleApiClient mGoogleApiClient;
+
+    //the list of geofences to add
+    private ArrayList<Geofence> mGeofenceList;
+
+    //keep track of whether geogences were added
+    private boolean mGeofencesAdded;
+
+    //requesting to add or remove geofences
     private PendingIntent mGeofencePendingIntent;
-    private ArrayList<Geofence> mCurrentGeofences;
-    private LocationClient mLocationClient;
 
     ///Flag that indicates whether an add or remove request is underway. 
     private boolean mAddingGeofenceInProgress;
+
+    //Used to persist application state about whether geofences were added.
+    private SharedPreferences mSharedPreferences;
+
 	
 	public GeofenceRequester(Context context) {
         // Save the context
         mContext = context;
+        //initiate the pendingIntent for adding or removing geofence
         mGeofencePendingIntent = null;
-        mLocationClient = null;
+
+        //build GoogleAPIClient to connect to the Google Play Service
+        buildGoogleApiClient();
+
         mAddingGeofenceInProgress = false;
-    }
-	 
-    public void inProgressFlag(boolean flag) {
-        mAddingGeofenceInProgress = flag;
+
+        //empty list for storing geofences
+        mGeofenceList = new ArrayList<Geofence>();
+
     }
 
-    public boolean isInProgress() {
+    /*
+    public void inProgressFlag(boolean flag) {
+        mAddingGeofenceInProgress = flag;
+    }*/
+/*
+   public boolean isInProgress() {
         return mAddingGeofenceInProgress;
     }
-    
+  */
+
     public PendingIntent getRequestPendingIntent() {
         return createRequestPendingIntent();
     }
-    
-    private GooglePlayServicesClient getLocationClient() {
+
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    /**
+     * get the current GoogleAPIClient
+     * @return
+     */
+    private GoogleApiClient getGoogleApiClient() {
         
-    	if (mLocationClient == null) {
+    	if (mGoogleApiClient == null) {
 
-            mLocationClient = new LocationClient(mContext, this, this);
+            //create location service so that we can interact with Geofence
+            mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
         }
-        return mLocationClient;
+        return mGoogleApiClient;
 
     }
-    
+
+    /**
+     * connect to the service
+     */
     private void requestConnection() {
-        getLocationClient().connect();
+        getGoogleApiClient().connect();
     }
-    
+
+
     private void requestDisconnection() {
         mAddingGeofenceInProgress = false;
-        getLocationClient().disconnect();
+        getGoogleApiClient().disconnect();
     }
-    
-    private void continueAddGeofences() {
 
 
-        mGeofencePendingIntent = createRequestPendingIntent();
-
-        // Send a request to add the current geofences
-        mLocationClient.addGeofences(mCurrentGeofences, mGeofencePendingIntent, this);
-    }
-    
+    /**
+     *
+     * @return
+     */
     private PendingIntent createRequestPendingIntent() {
 
-    	
         if (mGeofencePendingIntent !=null) {
             return mGeofencePendingIntent;
-        } else {
+        }
+        else{
 
             // Create an Intent pointing to the transition intent service
             Intent intent = new Intent(mContext, GeofenceTransitionService.class);
@@ -103,7 +142,7 @@ public class GeofenceRequester implements OnAddGeofencesResultListener,
     public void addGeofences(List<Geofence> geofences) throws UnsupportedOperationException {
 
     	//save the geofences
-        mCurrentGeofences = (ArrayList<Geofence>) geofences;
+        mGeofenceList = (ArrayList<Geofence>) geofences;
 
         // If a request is not already in progress
         if (!mAddingGeofenceInProgress) {
@@ -141,12 +180,21 @@ public class GeofenceRequester implements OnAddGeofencesResultListener,
 	@Override
 	public void onConnected(Bundle arg0) {
 		Log.d(LOG_TAG,"[onConnected] Google Play services is connected for requesting the geofence update");
-        
-		// Continue the process of adding geofence
-		continueAddGeofences();
-	}
 
-	@Override
+        //add geofence
+        mGeofencePendingIntent = createRequestPendingIntent();
+
+        // Send a request to add the current geofences
+        //mGoogleApiClient.addGeofences(mGeofenceList, mGeofencePendingIntent, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    /*
+    @Override
 	public void onDisconnected() {
 		
         // Turn off the request flag
@@ -159,11 +207,10 @@ public class GeofenceRequester implements OnAddGeofencesResultListener,
         mLocationClient = null;
 
 	}
-	
+	*/
 
 	/**
-	 * Handle the result of adding the geofences
-	 */
+
 	@Override
 	public void onAddGeofencesResult(int statusCode, String[] geofenceRequestIds) {
 		
@@ -183,5 +230,5 @@ public class GeofenceRequester implements OnAddGeofencesResultListener,
         // no matter what disconnect the location client
         requestDisconnection();
 	}
-
+*/
 }

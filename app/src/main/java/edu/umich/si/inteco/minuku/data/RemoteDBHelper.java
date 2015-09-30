@@ -16,7 +16,6 @@ import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -34,37 +33,28 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import edu.umich.si.inteco.minuku.GlobalNames;
-import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.FileHelper;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -80,7 +70,7 @@ public class RemoteDBHelper {
     /** The time it takes for client to timeout */
     public static final int HTTP_TIMEOUT = 10000; // millisecond
     public static final int SOCKET_TIMEOUT = 20000; // millisecond
-    public static final int MINIMUM_UPDATE_FREQUENCY = 20*GlobalNames.MILLISECONDS_PER_MINUTE; // 30 minutes
+    public static final int MINIMUM_UPDATE_FREQUENCY = 20* Constants.MILLISECONDS_PER_MINUTE; // 30 minutes
 
     public static final int POST_DATA_TYPE_JSON = 0;
     public static final int POST_DATA_TYPE_STRING = 1;
@@ -228,19 +218,19 @@ public class RemoteDBHelper {
             int eindex = logFile[i].getPath().indexOf(".txt");
             String fileDateStr = logFile[i].getPath().substring(eindex-10, eindex);
 
-            SimpleDateFormat sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW_DAY);
+            SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW_DAY);
             try {
                 Date fileDate = sdf.parse(fileDateStr);
 
                 Log.d(LOG_TAG, "[test post file] examine  the file " + logFile[i].getPath() + " the time is " + fileDate + " compared to lastsyncdata " + lastSyncDate.getTime()
-                 + " the difference is " + (fileDate.getTime() - lastSyncDate.getTime() )/ (3*GlobalNames.MILLISECONDS_PER_DAY) );
+                 + " the difference is " + (fileDate.getTime() - lastSyncDate.getTime() )/ (3* Constants.MILLISECONDS_PER_DAY) );
 
                 //if the file is within 3 days old, submit the data
-                if ( (lastSyncDate.getTime() - fileDate.getTime()) <=3*GlobalNames.MILLISECONDS_PER_DAY) {
+                if ( (lastSyncDate.getTime() - fileDate.getTime()) <=3* Constants.MILLISECONDS_PER_DAY) {
                     //post the file..
                     Log.d(LOG_TAG, "[test post file] upload log file " + logFile[i].getPath());
 
-                    String[] param = {GlobalNames.WEB_SERVICE_URL_POST_FILES, logFile[i].getPath()} ;
+                    String[] param = {Constants.WEB_SERVICE_URL_POST_FILES, logFile[i].getPath()} ;
                     //post the session document
                     new HttpAsyncPostFileTask().execute(param);
                 }
@@ -256,7 +246,7 @@ public class RemoteDBHelper {
         String res = null;
 
         try {
-            //res = HTTPClient.executeHttpPost(GlobalNames.WEB_SERVICE_URL_POST_SESSION);
+            //res = HTTPClient.executeHttpPost(Constants.WEB_SERVICE_URL_POST_SESSION);
         }catch(Exception e){
             Log.e(LOG_TAG, "data base errror:" + e.getMessage() + ""+"");
             //FileHelper.WriteFile(pathfilename, new Date().toString() + "\t"+ LOG_TAG + "\t" + e.getMessage() + ""  + ":" + e.getCause().toString()   + "\r\n");
@@ -276,7 +266,7 @@ public class RemoteDBHelper {
         if (documents!=null) {
             for (int i= 0; i<documents.size(); i++) {
                 String json = documents.get(i).toString();
-                new HttpAsyncPostJsonTask().execute(GlobalNames.WEB_SERVICE_URL_POST_BACKGROUND_RECORDING, json, DATA_TYPE_BACKGROUND_RECORDING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
+                new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_BACKGROUND_RECORDING, json, DATA_TYPE_BACKGROUND_RECORDING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
             }
         }
 
@@ -295,7 +285,7 @@ public class RemoteDBHelper {
                     String time = documents.get(i).getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_START_TIME);
                     Log.d(LOG_TAG, "[postModifiedSessionDocuments][test modified session] post document " + documents.get(i).getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID) + " that starts at " + time);
                     String json = documents.get(i).toString();
-                    new HttpAsyncPostJsonTask().execute(GlobalNames.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING, ScheduleAndSampleManager.getTimeString(0));
+                    new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING, ScheduleAndSampleManager.getTimeString(0));
 
                     //we should make the modified flag of all uploaded documents to 0
                     int sessionId = documents.get(i).getInt(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID);
@@ -320,7 +310,7 @@ public class RemoteDBHelper {
         if (documents!=null) {
             for (int i= 0; i<documents.size(); i++) {
                 String json = documents.get(i).toString();
-                new HttpAsyncPostJsonTask().execute(GlobalNames.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
+                new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
             }
         }
 
@@ -332,12 +322,12 @@ public class RemoteDBHelper {
         String json = sessionDocument.toString();
 
         //post the session document
-        new HttpAsyncPostJsonTask().execute(GlobalNames.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING);
+        new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING);
 
         String res = null;
 
         try {
-            //res = HTTPClient.executeHttpPost(GlobalNames.WEB_SERVICE_URL_POST_SESSION);
+            //res = HTTPClient.executeHttpPost(Constants.WEB_SERVICE_URL_POST_SESSION);
         }catch(Exception e){
             Log.e(LOG_TAG, "data base errror:" + e.getMessage() + ""+"");
             //FileHelper.WriteFile(pathfilename, new Date().toString() + "\t"+ LOG_TAG + "\t" + e.getMessage() + ""  + ":" + e.getCause().toString()   + "\r\n");
@@ -349,7 +339,7 @@ public class RemoteDBHelper {
 
 
     public static void queryRemoteDB(String queryType) {
-            new HttpAsyncQuery().execute(GlobalNames.WEB_SERVICE_URL_QUERY, queryType);
+            new HttpAsyncQuery().execute(Constants.WEB_SERVICE_URL_QUERY, queryType);
     }
 
 
@@ -371,7 +361,7 @@ public class RemoteDBHelper {
         JSONObject obj = new JSONObject();
         try {
             obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_PHONE_LOG);
-            obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
+            obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -443,7 +433,7 @@ public class RemoteDBHelper {
             JSONObject obj = new JSONObject();
             try {
                 obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_PHONE_LOG);
-                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
+                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
 
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_QUERY_DATA,
@@ -480,7 +470,7 @@ public class RemoteDBHelper {
 
 
         //based on the result (e.g.2014-07-10 00:00:00), we select the file to upload..
-        SimpleDateFormat sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW_HOUR_MIN);
+        SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW_HOUR_MIN);
         try {
             Date date = sdf.parse(result);
             Log.d(LOG_TAG, "[queryLastFileDay] the date of the result is" + date);
@@ -493,7 +483,7 @@ public class RemoteDBHelper {
 
     public static void deviceChecking() {
 
-        new HttpAsyncDeviceChecking().execute(GlobalNames.WEB_SERVICE_URL_DEVICE_CHECKING);
+        new HttpAsyncDeviceChecking().execute(Constants.WEB_SERVICE_URL_DEVICE_CHECKING);
     }
 
     /**
@@ -522,12 +512,12 @@ public class RemoteDBHelper {
 
             JSONObject obj = new JSONObject();
             try {
-                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
+                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_QUERY_DATA,
                         "DeviceChecking");
 
-                Log.d(LOG_TAG, " sendind device id" + GlobalNames.DEVICE_ID);
+                Log.d(LOG_TAG, " sendind device id" + Constants.DEVICE_ID);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -591,7 +581,7 @@ public class RemoteDBHelper {
             JSONObject obj = new JSONObject();
             try {
                 obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_SESSION_RECORDING);
-                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
+                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_QUERY_DATA,
                         "Query:\t" + "Session Recording" + "\t");
@@ -640,7 +630,7 @@ public class RemoteDBHelper {
 
                     Log.d(LOG_TAG, "[queryLastSyncSession] the startime of the last session is " + lastSyncStartTimeStr);
 
-                    SimpleDateFormat sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+                    SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
                     try {
                         Date lastSynhHour = sdf.parse(lastSyncStartTimeStr);
                         postSessionDocuments(lastSynhHour.getTime());
@@ -688,7 +678,7 @@ public class RemoteDBHelper {
         JSONObject obj = new JSONObject();
         try {
             obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_BACKGROUND_RECORDING);
-            obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
+            obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -762,7 +752,7 @@ public class RemoteDBHelper {
             JSONObject obj = new JSONObject();
             try {
                 obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_BACKGROUND_RECORDING);
-                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, GlobalNames.DEVICE_ID);
+                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_QUERY_DATA,
                         "Query:\t" + "Background Recording" + "\t");
@@ -810,7 +800,7 @@ public class RemoteDBHelper {
 
                     Log.d(LOG_TAG, "the last sync hour is " + lastSyncHourStr);
 
-                    SimpleDateFormat sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+                    SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
                     try {
                         Date lastSynhHour = sdf.parse(lastSyncHourStr);
                         postBackgroundRecordingDocuments(lastSynhHour.getTime());
@@ -882,7 +872,7 @@ public class RemoteDBHelper {
             MultipartEntityBuilder multiPartEntityBuilder = MultipartEntityBuilder.create();
 
             multiPartEntityBuilder.addPart("file", bin);
-            multiPartEntityBuilder.addPart("device", new StringBody(GlobalNames.DEVICE_ID));
+            multiPartEntityBuilder.addPart("device", new StringBody(Constants.DEVICE_ID));
 
             httpPostRequest.setEntity(multiPartEntityBuilder.build());
 
@@ -962,7 +952,7 @@ public class RemoteDBHelper {
             // Send parameter #1
             ds.writeBytes(twoHyphens + boundary + lineEnd);
             ds.writeBytes("Content-Disposition: form-data; name=\"device\"" + lineEnd + lineEnd);
-            ds.writeBytes(GlobalNames.DEVICE_ID + lineEnd);
+            ds.writeBytes(Constants.DEVICE_ID + lineEnd);
 
             //file
             ds.writeBytes(twoHyphens + boundary + lineEnd);
@@ -1048,7 +1038,7 @@ public class RemoteDBHelper {
         String json  = data.toString();
 
        // Log.d(LOG_TAG, "[requestEmailFromServer] posting email" + json );
-        new HttpAsyncPostEmailJSONTask().execute(GlobalNames.WEB_SERVICE_URL_REQUEST_SENDING_EMAIL, json);
+        new HttpAsyncPostEmailJSONTask().execute(Constants.WEB_SERVICE_URL_REQUEST_SENDING_EMAIL, json);
 
     }
 

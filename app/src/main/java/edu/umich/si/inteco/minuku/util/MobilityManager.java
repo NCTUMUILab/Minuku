@@ -59,7 +59,7 @@ public class MobilityManager {
             ///the mobility is static....we will slow down the location request rate
             mobility = STATIC;
 
-            //LocationRequester.setLocationUpdateInterval(LocationRequester.LOCATION_UPDATE_SLOW_INTERVAL_IN_SECONDS);
+            //LocationManager.setLocationUpdateInterval(LocationManager.LOCATION_UPDATE_SLOW_INTERVAL_IN_SECONDS);
 
         }
 
@@ -67,7 +67,7 @@ public class MobilityManager {
             //TODO: make the rule more sophsticated
             mobility = MOBILE;
             ///the phone is or is probably moving....we will recover the location request rate
-            //LocationRequester.setLocationUpdateInterval(LocationRequester.LOCATION_UPDATE_FAST_INTERVAL_IN_SECONDS);
+            //LocationManager.setLocationUpdateInterval(LocationManager.LOCATION_UPDATE_FAST_INTERVAL_IN_SECONDS);
 
 
         }
