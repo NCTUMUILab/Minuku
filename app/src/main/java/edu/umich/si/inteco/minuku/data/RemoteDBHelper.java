@@ -7,20 +7,7 @@ package edu.umich.si.inteco.minuku.data;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.params.ConnManagerParams;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
+
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.json.JSONException;
@@ -65,8 +52,6 @@ import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
 public class RemoteDBHelper {
 
-    /** Single instance of our HttpClient */
-    private static DefaultHttpClient mHttpClient;
     /** The time it takes for client to timeout */
     public static final int HTTP_TIMEOUT = 10000; // millisecond
     public static final int SOCKET_TIMEOUT = 20000; // millisecond
@@ -829,26 +814,6 @@ public class RemoteDBHelper {
     }
 
 
-
-    private static HttpClient getHttpClient(){
-        if (mHttpClient == null){
-            try {
-                mHttpClient = new DefaultHttpClient();
-
-                final HttpParams params = mHttpClient.getParams();
-                HttpConnectionParams.setConnectionTimeout(params, HTTP_TIMEOUT);
-                HttpConnectionParams.setSoTimeout(params, HTTP_TIMEOUT);
-                ConnManagerParams.setTimeout(params, HTTP_TIMEOUT);
-            }catch (Exception e){
-                Log.e(LOG_TAG, e.getMessage()+"");
-            }
-
-        }
-        return mHttpClient;
-    }
-
-
-
     public static String postFile(String address, String filepath) throws IOException{
 
         Log.d(LOG_TAG, "postFile");
@@ -1465,11 +1430,11 @@ public class RemoteDBHelper {
     }
 
     public static long getLastServerSyncTime() {
-        long time = PreferenceHelper.getPreferenceLong(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_LAST_SEVER_SYNC_TIME, 0);
+        long time = PreferenceHelper.getPreferenceLong(PreferenceHelper.DATABASE_LAST_SEVER_SYNC_TIME, 0);
         return time;
     }
 
     public static void setLastSeverSyncTime(long lastSessionUpdateTime) {
-        PreferenceHelper.setPreferenceValue(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_LAST_SEVER_SYNC_TIME, lastSessionUpdateTime);
+        PreferenceHelper.setPreferenceValue(PreferenceHelper.DATABASE_LAST_SEVER_SYNC_TIME, lastSessionUpdateTime);
     }
 }

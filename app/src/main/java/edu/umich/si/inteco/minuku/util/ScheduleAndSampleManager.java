@@ -205,16 +205,16 @@ public class ScheduleAndSampleManager {
         //we first get the current requestcode json from the sharedpference then we add a new request code and then overwrite it
 
         Log.d(LOG_TAG, "[savePendingIntentRequestCodeToPreference] checking existing request code "
-                + PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, null));
+                + PreferenceHelper.getPreferenceString(PreferenceHelper.SCHEDULE_REQUEST_CODE, null));
 
-        if (PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, null)!=null) {
+        if (PreferenceHelper.getPreferenceString(PreferenceHelper.SCHEDULE_REQUEST_CODE, null)!=null) {
             try {
                 Log.d(LOG_TAG, "[savePendingIntentRequestCodeToPreference] the existing saved request code json is "
-                        + PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, null));
+                        + PreferenceHelper.getPreferenceString(PreferenceHelper.SCHEDULE_REQUEST_CODE, null));
 
-                JSONArray existingRequestCodes =  new JSONArray(PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, null));
+                JSONArray existingRequestCodes =  new JSONArray(PreferenceHelper.getPreferenceString(PreferenceHelper.SCHEDULE_REQUEST_CODE, null));
                 existingRequestCodes.put(requestCode);
-                PreferenceHelper.setPreferenceValue(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE,  existingRequestCodes.toString());
+                PreferenceHelper.setPreferenceValue(PreferenceHelper.SCHEDULE_REQUEST_CODE,  existingRequestCodes.toString());
 
                 Log.d(LOG_TAG, "[savePendingIntentRequestCodeToPreference] the new request code json is " + existingRequestCodes );
 
@@ -229,7 +229,7 @@ public class ScheduleAndSampleManager {
 
             JSONArray requestCodes = new JSONArray();
             requestCodes.put(requestCode);
-            PreferenceHelper.setPreferenceValue(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, requestCodes.toString());
+            PreferenceHelper.setPreferenceValue(PreferenceHelper.SCHEDULE_REQUEST_CODE, requestCodes.toString());
 
             Log.d(LOG_TAG, "[savePendingIntentRequestCodeToPreference] the new request code json is " + requestCodes );
 
@@ -905,9 +905,9 @@ public class ScheduleAndSampleManager {
 		Intent intent = new Intent(Constants.ACTION_ALARM);
 
         //get request code
-        if (PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, null)!=null) {
+        if (PreferenceHelper.getPreferenceString(PreferenceHelper.SCHEDULE_REQUEST_CODE, null)!=null) {
             try {
-                JSONArray requestcodes = new JSONArray(PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, null));
+                JSONArray requestcodes = new JSONArray(PreferenceHelper.getPreferenceString(PreferenceHelper.SCHEDULE_REQUEST_CODE, null));
 
                 Log.d(LOG_TAG, "[cancelAllActionAlarms] we are going to cancel " + requestcodes.length() + " pendingIntents");
 
@@ -922,7 +922,7 @@ public class ScheduleAndSampleManager {
                 }
 
                 //after removing all pendingintents by request codes, should clear the request code in the preference
-                PreferenceHelper.setPreferenceValue(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_REQUEST_CODE, null);
+                PreferenceHelper.setPreferenceValue(PreferenceHelper.SCHEDULE_REQUEST_CODE, null);
 
 
             } catch (JSONException e) {

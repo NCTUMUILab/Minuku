@@ -105,7 +105,7 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
      * Start the activity recognition update request process by
      * getting a connection.
      */
-    public void requestLocationUpdates() {
+    public void requestLocationUpdate() {
 
         Log.d(LOG_TAG,"[requestUpdates] going to request location update ");
         //we need to get location. Set this true

@@ -172,13 +172,13 @@ public class CaptureProbeService extends Service {
         Log.d(LOG_TAG, "going to create the probe service");
 
         //if device id is not set yet, set device id to the shared prefernece
-        if ( PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_DEVICE_ID, "NA").equals("NA")) {
+        if ( PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA").equals("NA")) {
             TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
             Constants.DEVICE_ID = mngr.getDeviceId();
-            PreferenceHelper.setPreferenceValue(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_DEVICE_ID, mngr.getDeviceId());
+            PreferenceHelper.setPreferenceValue(PreferenceHelper.DEVICE_ID, mngr.getDeviceId());
         }
         else {
-            Constants.DEVICE_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.SHARED_PREFERENCE_PROPERTY_DEVICE_ID, "NA");
+            Constants.DEVICE_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA");
         }
 
         mLocalDBHelpder = new LocalDBHelper(this, Constants.TEST_DATABASE_NAME);

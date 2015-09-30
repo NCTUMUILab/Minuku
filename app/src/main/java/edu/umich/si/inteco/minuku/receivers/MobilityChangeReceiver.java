@@ -29,11 +29,13 @@ public class MobilityChangeReceiver extends BroadcastReceiver{
 //            ContextExtractor.getLocationRequester().setLocationUpdateInterval(LocationManager.LOCATION_UPDATE_SLOW_INTERVAL_IN_SECONDS);
 
             //turn off location if is static
-            ContextExtractor.getLocationRequester().removeUpdate();
+            ContextExtractor.getLocationManager().removeLocationUpdate();
 
             LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                     LogManager.LOG_TAG_ALARM_RECEIVED,
-                    "Alarm Received:\t" + MobilityManager.ALARM_MOBILITY + "\t" + MobilityManager.STATIC + "\t" + "new location interval" + LocationManager.LOCATION_UPDATE_SLOW_INTERVAL_IN_SECONDS);
+                    "Alarm Received:\t" + MobilityManager.ALARM_MOBILITY +
+                            "\t" + MobilityManager.STATIC + "\t" + "new location interval" +
+                            LocationManager.SLOW_UPDATE_INTERVAL_IN_SECONDS);
 
         }
 
@@ -42,10 +44,12 @@ public class MobilityChangeReceiver extends BroadcastReceiver{
             //slow down locationUpdate rate
   //          ContextExtractor.getLocationRequester().setLocationUpdateInterval(LocationManager.LOCATION_UPDATE_FAST_INTERVAL_IN_SECONDS);
 
-            ContextExtractor.getLocationRequester().requestUpdates();
+            ContextExtractor.getLocationManager().requestLocationUpdate();
             LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                     LogManager.LOG_TAG_ALARM_RECEIVED,
-                    "Alarm Received:\t" + MobilityManager.ALARM_MOBILITY + "\t" + MobilityManager.MOBILE + "\t" + "new location interval" + LocationManager.LOCATION_UPDATE_FAST_INTERVAL_IN_SECONDS);
+                    "Alarm Received:\t" + MobilityManager.ALARM_MOBILITY + "\t" +
+                            MobilityManager.MOBILE + "\t" + "new location interval" +
+                            LocationManager.FASTEST_UPDATE_INTERVAL_IN_SECONDS);
 
 
         }

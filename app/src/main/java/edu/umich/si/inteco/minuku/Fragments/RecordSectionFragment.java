@@ -203,7 +203,7 @@ public class RecordSectionFragment extends Fragment{
 
 
                         //start to get location
-                        ContextExtractor.getLocationRequester().requestUpdates();
+                        ContextExtractor.getLocationManager().requestLocationUpdate();
 
                     }
 
@@ -332,7 +332,7 @@ public class RecordSectionFragment extends Fragment{
                         "User Click:\t" + "stoptRecording"+ "\t" + "RecordingTab");
 
                 //start to get location
-                ContextExtractor.getLocationRequester().removeUpdate();
+                ContextExtractor.getLocationManager().removeLocationUpdate();
 
             }
         });

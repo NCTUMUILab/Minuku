@@ -4,9 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.tansuo.app.GlobalNames;
-import edu.umich.si.inteco.tansuo.app.contextmanager.ContextExtractor;
-import edu.umich.si.inteco.tansuo.app.model.Log.ProbeLog;
+import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
+import edu.umich.si.inteco.minuku.model.Log.ProbeLog;
 
 public class LogManager {
 
@@ -89,12 +89,12 @@ public class LogManager {
 	
 		String path= LOG_DIRECTORY_PATH; 
 		
-		String filename = log.getType() + "-" + getLogFileTimeString(GlobalNames.DATA_FORMAT_TYPE_DAY) + ".txt" ;
+		String filename = log.getType() + "-" + getLogFileTimeString(Constants.DATA_FORMAT_TYPE_DAY) + ".txt" ;
 		FileHelper.writeStringToFile(path, filename, log.toString());
 
         //if also write to all logs..(but not activity recognition)
         if (WRITE_ALL_LOG && !log.getTag().equals(LOG_TAG_ACTIVITY_RECOGNITION)){
-            filename = ALL_LOG_FILE_NAME + "-" + getLogFileTimeString(GlobalNames.DATA_FORMAT_TYPE_DAY) + ".txt" ;
+            filename = ALL_LOG_FILE_NAME + "-" + getLogFileTimeString(Constants.DATA_FORMAT_TYPE_DAY) + ".txt" ;
             FileHelper.writeStringToFile(path, filename, log.toString());
         }
 
@@ -125,19 +125,19 @@ public class LogManager {
 		Calendar cal = Calendar.getInstance(tz);
 		SimpleDateFormat sdf=null;
 		
-		if ( data_format_type== GlobalNames.DATA_FORMAT_TYPE_DAY){
+		if ( data_format_type== Constants.DATA_FORMAT_TYPE_DAY){
 			
-			sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW_DAY);
+			sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW_DAY);
 		}
 		
-		else if ( data_format_type== GlobalNames.DATA_FORMAT_TYPE_HOUR){
+		else if ( data_format_type== Constants.DATA_FORMAT_TYPE_HOUR){
 			
-			sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW_HOUR);
+			sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW_HOUR);
 		}
 		
-		else if ( data_format_type== GlobalNames.DATA_FORMAT_TYPE_NOW){
+		else if ( data_format_type== Constants.DATA_FORMAT_TYPE_NOW){
 			
-			sdf = new SimpleDateFormat(GlobalNames.DATE_FORMAT_NOW);
+			sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		}
 
 		

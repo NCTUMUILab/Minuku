@@ -16,7 +16,7 @@ public class PreferenceHelper {
 
     public static final String SHARED_PREFERENCE_NAME = PACKAGE_NAME + ".SHARED_PREFERENCES_NAME";
     public static final String DEVICE_ID = PACKAGE_NAME+ ".DEVICE_ID";
-    public static final String NOTIFICATION_REQUEST_CODE = PACKAGE_NAME+".REQUEST_CODE";
+    public static final String SCHEDULE_REQUEST_CODE = PACKAGE_NAME+".REQUEST_CODE";
     public static final String DATABASE_LAST_SEVER_SYNC_TIME = PACKAGE_NAME+ ".LAST_SERVER_SYNC_TIME";
 
     /***

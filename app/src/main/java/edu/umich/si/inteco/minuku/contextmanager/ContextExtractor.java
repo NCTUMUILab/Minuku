@@ -238,7 +238,7 @@ public class ContextExtractor implements SensorEventListener {
             return;
         }
 
-        mLocationManager.requestLocationUpdates();
+        mLocationManager.requestLocationUpdate();
     }
 
     private void stopRequestingLocation(){
@@ -945,7 +945,7 @@ public class ContextExtractor implements SensorEventListener {
         return wifi.isConnected();
     }
 
-    public static LocationManager getLocationRequester(){
+    public static LocationManager getLocationManager(){
         return mLocationManager;
     }
 

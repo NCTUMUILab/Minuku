@@ -1,16 +1,9 @@
 package edu.umich.si.inteco.minuku.util;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-
-import com.google.android.gms.location.DetectedActivity;
-
-import edu.umich.si.inteco.tansuo.app.GlobalNames;
-import edu.umich.si.inteco.tansuo.app.contextmanager.LocationRequester;
-import edu.umich.si.inteco.tansuo.app.contextmanager.TransportationModeDetector;
+import edu.umich.si.inteco.minuku.contextmanager.TransportationModeDetector;
 
 /**
  * Created by Armuro on 7/22/14.

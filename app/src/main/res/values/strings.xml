@@ -41,6 +41,7 @@
     <string name="geofence_transition_exited">Exited</string>
     <string name="unknown_geofence_transition">Unknown Transition</string>
 
+    <string name="geofence_transition_notification_text">Click notification to return to app</string>
 
     <!-- study condition -->
     <string name="study_condition_participatory">Participatory Labeling</string>
