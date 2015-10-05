@@ -122,10 +122,7 @@ public class EventManager {
                                     if (    //walking, in vehicle, and biking
                                             (transportationMode== DetectedActivity.IN_VEHICLE ||
                                             transportationMode== DetectedActivity.ON_FOOT ||
-                                            transportationMode== DetectedActivity.ON_BICYCLE)
-                                            &&
-                                            //not in a wifi connection
-                                            !ContextExtractor.isWifiConnected()){
+                                            transportationMode== DetectedActivity.ON_BICYCLE)){
 
                                         Log.d(LOG_TAG, "[examineEventConditions] examineTransportation The event " + event.getId() + "  condition is satisfied, check its triggerLinks! "+ " the event has " + event.getTriggerLinks().size() + " triggerlinks ");
 

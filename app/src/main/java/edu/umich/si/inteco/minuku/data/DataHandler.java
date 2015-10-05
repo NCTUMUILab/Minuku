@@ -2,6 +2,7 @@ package edu.umich.si.inteco.minuku.data;
 
 import android.app.AlarmManager;
 import android.content.Context;
+import android.hardware.Sensor;
 import android.location.Location;
 import android.util.Log;
 
@@ -19,11 +20,11 @@ import edu.umich.si.inteco.minuku.contextmanager.TransportationModeDetector;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.TimeConstraint;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
-import edu.umich.si.inteco.minuku.model.record.AppActivityRecord;
+import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.LocationRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.FileHelper;
@@ -35,7 +36,7 @@ public class DataHandler {
 	
 	private static Context mContext;
 	
-	private static CaptureProbeService mContextManager;
+	private static MinukuMainService mContextManager;
 	
 	//handle alarmManager
 	private static AlarmManager mAlarmManager;
@@ -50,7 +51,7 @@ public class DataHandler {
 		
 		mContext= c;
 		
-		mContextManager = (CaptureProbeService) c;
+		mContextManager = (MinukuMainService) c;
 
 		mAlarmManager  = (AlarmManager)mContext.getSystemService( mContext.ALARM_SERVICE );
 
@@ -128,7 +129,7 @@ public class DataHandler {
 
                 }else if (recordpool.get(i).getType()==ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY){
 
-                    AppActivityRecord ar = (AppActivityRecord) recordpool.get(i);
+                    PhoneActivityRecord ar = (PhoneActivityRecord) recordpool.get(i);
 
                     //insert record into the Activity Record Table
                     LocalDBHelper.insertRecordTable(ar, DatabaseNameManager.RECORD_TABLE_NAME_APPLICATION_ACTIVITY, session_id );
@@ -174,12 +175,13 @@ public class DataHandler {
                 }
 
 
-                //if we found any session that has not been stored in SavedSessionIds(), the flag is set false
+                //if we found any record that is not marked as been saved in a session, the flag is set false
                 if (!recordpool.get(i).getSavedSessionIds().contains(runningSessionId)) {
                     savedByAllSessions = false;
                     break;
                 }
-                //at the end of the loop means all sessions have saved the current record.  the flag stays true
+
+                //at the end of the loop means all sessions have saved the current record.  the flag is still true
             }
 
             //if the record has been saved by all running sessions, remove the record
@@ -725,32 +727,41 @@ public class DataHandler {
 		
 		String tableName = "";
 		
-		if (number==ContextManager.SENSOR_SOURCE_PHONE_ACCELEROMETER){
+		if (number== Sensor.TYPE_ACCELEROMETER){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_ACCELEROMETER;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_GRAVITY){
+		}else if (number==Sensor.TYPE_GRAVITY){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_GRAVITY;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_GYRSCOPE){
+		}else if (number==Sensor.TYPE_GYROSCOPE){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_GYRSCOPE;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_LINEAR_ACCELERATION){
+		}else if (number==Sensor.TYPE_LINEAR_ACCELERATION){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_ACCELERATION;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_ROTATION_VECTOR){
+		}else if (number==Sensor.TYPE_ROTATION_VECTOR){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_ROTATION_VECTOR;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_MAGNETIC_FIELD){
+		}else if (number==Sensor.TYPE_MAGNETIC_FIELD){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_MAGNETIC_FIELD;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_ORIENTATION){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_ORIENTATION;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_PROXIMITY){
+		}else if (number==Sensor.TYPE_PROXIMITY){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_PROXIMITY;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_AMBIENT_TEMPERATURE){
+		}else if (number==Sensor.TYPE_AMBIENT_TEMPERATURE){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_AMBIENT_TEMPERATURE;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_LIGHT){
+		}else if (number==Sensor.TYPE_LIGHT){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_LIGHT;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_PRESSURE){
+		}else if (number==Sensor.TYPE_PRESSURE){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_PRESSURE;
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_RELATIVE_HUMIDITY){
+		}else if (number==Sensor.TYPE_RELATIVE_HUMIDITY){
 			tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
 		}
-		
+        //TODO: add health relate sensor conditions, e.g. hear reate, step
+
+        else if (number==Sensor.TYPE_HEART_RATE){
+            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
+        }
+        else if (number==Sensor.TYPE_STEP_COUNTER){
+            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
+        }
+        else if (number==Sensor.TYPE_STEP_DETECTOR){
+            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
+        }
+
 		
 		return tableName; 
 	}
@@ -763,31 +774,38 @@ public class DataHandler {
 		
 		String filename = "undefined sensor type";
 		
-		if (number==ContextManager.SENSOR_SOURCE_PHONE_ACCELEROMETER){
+		if (number==Sensor.TYPE_ACCELEROMETER){
 			filename = "PHONE_ACCELEROMETER";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_GRAVITY){
+		}else if (number==Sensor.TYPE_GRAVITY){
 			filename = "PHONE_GRAVITY";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_GYRSCOPE){
+		}else if (number==Sensor.TYPE_GYROSCOPE){
 			filename = "PHONE_GYRSCOPE";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_LINEAR_ACCELERATION){
+		}else if (number==Sensor.TYPE_LINEAR_ACCELERATION){
 			filename = "LINEAR_ACCELERATION";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_ROTATION_VECTOR){
+		}else if (number==Sensor.TYPE_ROTATION_VECTOR){
 			filename = "ROTATION_VECTOR";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_MAGNETIC_FIELD){
+		}else if (number==Sensor.TYPE_MAGNETIC_FIELD){
 			filename = "MAGNETIC_FIELD";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_ORIENTATION){
-			filename = "PHONE_ORIENTATION";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_PROXIMITY){
+		}else if (number==Sensor.TYPE_PROXIMITY){
 			filename = "PHONE_PROXIMITY";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_AMBIENT_TEMPERATURE){
+		}else if (number==Sensor.TYPE_AMBIENT_TEMPERATURE){
 			filename = "PHONE_AMBIENT_TEMPERATURE";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_LIGHT){
+		}else if (number==Sensor.TYPE_LIGHT){
 			filename = "PHONE_LIGHT";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_PRESSURE){
+		}else if (number==Sensor.TYPE_PRESSURE){
 			filename = "PHONE_PRESSURE";
-		}else if (number==ContextManager.SENSOR_SOURCE_PHONE_RELATIVE_HUMIDITY){
+		}else if (number==Sensor.TYPE_RELATIVE_HUMIDITY){
 			filename = "RELATIVE_HUMIDITY";
-		}
+        //TODO: add health relate sensor conditions, e.g. hear reate, step
+		}else if (number==Sensor.TYPE_HEART_RATE){
+            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
+        }
+        else if (number==Sensor.TYPE_STEP_COUNTER){
+            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
+        }
+        else if (number==Sensor.TYPE_STEP_DETECTOR){
+            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
+        }
 		
 		return filename;
 	}

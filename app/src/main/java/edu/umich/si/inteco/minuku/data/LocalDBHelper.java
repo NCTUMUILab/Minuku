@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.hardware.Sensor;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
@@ -26,7 +27,7 @@ import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.TimeConstraint;
 import edu.umich.si.inteco.minuku.model.UserResponse;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
-import edu.umich.si.inteco.minuku.model.record.AppActivityRecord;
+import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.LocationRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
@@ -228,12 +229,6 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     }
     
     
-    
-    
-
-    
-    
-    
     /**
      * 
      * @param db
@@ -270,7 +265,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_LOCATION, ContextManager.CONTEXT_RECORD_TYPE_LOCATION, -1);
     	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY, ContextManager.CONTEXT_RECORD_TYPE_ACTIVITY, -1);
         createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_APPLICATION_ACTIVITY, ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY, -1);
-    	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_ACCELEROMETER, ContextManager.CONTEXT_RECORD_TYPE_SENSOR, ContextManager.SENSOR_SOURCE_PHONE_ACCELEROMETER);
+    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_ACCELEROMETER, ContextManager.CONTEXT_RECORD_TYPE_SENSOR, Sensor.TYPE_ACCELEROMETER);
 
     }
     
@@ -597,20 +592,27 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
 		return rowId;
     }
-    
-    
-    
-    //insert a record into a RecordTable
+
+
+	/**
+	 * insert a Record into the local SQLLite DB
+	 * @param record
+	 * @param table_name
+	 * @param session_id
+	 * @return
+	 */
     public static long insertRecordTable(Record record, String table_name, int session_id){
 
-
-		
 		long rowId=0;
 		try{
+
+			//get DB instance
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
+			//create a ContentValues object to store record values
             ContentValues values = new ContentValues();
 
+			//put record values into ContentValues object
             values.put(DatabaseNameManager.COL_SESSION_ID, session_id);
             values.put(DatabaseNameManager.COL_TIMESTAMP_STRING, getTimeString(record.getTimestamp()));
             values.put(DatabaseNameManager.COL_TIMESTAMP_LONG, record.getTimestamp());
@@ -702,7 +704,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 		}
         else if(record.getType() == ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY) {
 
-            AppActivityRecord appActivityRecord = (AppActivityRecord) record;
+            PhoneActivityRecord appActivityRecord = (PhoneActivityRecord) record;
 
             //examine whether the Top1, 2, and 3 activity exist. Put the activity into the ContentValues..
             try{

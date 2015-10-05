@@ -19,7 +19,6 @@ import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.MainActivity;
-import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
@@ -608,7 +607,7 @@ public class RecordingAndAnnotateManager {
         //Create a task and a session for background recording
 
         //if the task and the session for background recording has been setup, then return
-        Session session = new Session(ContextExtractor.getCurrentTimeInMillis());
+        Session session = new Session(ContextManager.getCurrentTimeInMillis());
         session.setId(BACKGOUND_RECORDING_SESSION_ID);
         addCurRecordingSession(session);
 
@@ -786,7 +785,7 @@ public class RecordingAndAnnotateManager {
         ArrayList<JSONObject> documents = new ArrayList<JSONObject>();
 
         //time range is from the last SyncHour to the most recent complete hour
-        long now = ContextExtractor.getCurrentTimeInMillis();
+        long now = ContextManager.getCurrentTimeInMillis();
 
         long startTime =0;
         long endTime  =0;

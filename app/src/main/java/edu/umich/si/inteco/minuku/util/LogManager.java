@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
+import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.model.Log.ProbeLog;
 
 public class LogManager {
@@ -14,7 +14,6 @@ public class LogManager {
     public static final String ALL_LOG_FILE_NAME = "All-Log";
 
 	private static final String LOG_TAG = "LogManager";
-	
 	public static final String LOG_DIRECTORY_PATH = "Logs/";
 	
 	/**types of log**/
@@ -65,8 +64,6 @@ public class LogManager {
     public static final String LOG_MESSAGE_EMAIL_QUESTIONNAIRE_NOTI_SUBMITTED = "email questionnaire notification submitted";
 
 	public LogManager(){
-
-
 		
 	}
 
@@ -75,10 +72,10 @@ public class LogManager {
         ProbeLog systemLog = new ProbeLog(
                 type,
                 tag,
-                ContextExtractor.getCurrentTimeInMillis(),
-                ContextExtractor.getCurrentTimeString(),
+                ContextManager.getCurrentTimeInMillis(),
+                ContextManager.getCurrentTimeString(),
                 //also get the app info
-                content + "\t" + ContextExtractor.getCurrentForegroundActivity()
+                content
         );
 
         writeLogToFile(systemLog);

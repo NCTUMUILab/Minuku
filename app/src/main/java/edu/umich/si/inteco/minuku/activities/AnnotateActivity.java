@@ -31,7 +31,7 @@ import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.model.Annotation;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Session;
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -287,7 +287,7 @@ public class AnnotateActivity extends Activity implements OnItemSelectedListener
                             }catch (IllegalArgumentException e){
                                 //Log.e(LOG_TAG, "Could not unregister receiver " + e.getMessage()+"");
                             }
-                            updateMapHandler.postDelayed(this, CaptureProbeService.DEFAULT_ACTION_RATE_INTERVAL);
+                            updateMapHandler.postDelayed(this, MinukuMainService.DEFAULT_ACTION_RATE_INTERVAL);
                         }
                     };
 

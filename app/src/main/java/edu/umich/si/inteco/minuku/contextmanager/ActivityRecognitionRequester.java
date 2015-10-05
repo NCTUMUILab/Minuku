@@ -13,7 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.MinukuMainService;
 
 
 public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConnectionFailedListener{
@@ -116,7 +116,7 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
         //request activity recognition update
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 mGoogleApiClient,                                       //GoogleApiClient client
-                CaptureProbeService.ACTIVITY_RECOGNITION_UPDATE_INTERVAL,//detectionIntervalMillis
+                MinukuMainService.ACTIVITY_RECOGNITION_UPDATE_INTERVAL,//detectionIntervalMillis
                 activityRecognitionPendingIntent);                      //callbackIntent
 		
 		Log.d(LOG_TAG,"requesting activity update!");
@@ -153,7 +153,7 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
         	PendingIntent pendingIntent =
                      PendingIntent.getService(mContext, 
                     		 0,
-                    		 //NotificationHelper.generatePendingIntentRequestCode(ContextExtractor.getCurrentTimeInMillis()), 
+                    		 //NotificationHelper.generatePendingIntentRequestCode(ContextManager.getCurrentTimeInMillis()),
                     		 intent,
                     		 PendingIntent.FLAG_UPDATE_CURRENT);
         	 

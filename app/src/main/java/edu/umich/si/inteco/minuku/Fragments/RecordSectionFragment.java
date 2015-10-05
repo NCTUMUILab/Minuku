@@ -15,10 +15,9 @@ import android.widget.TextView;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
-import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
 import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -43,9 +42,9 @@ public class RecordSectionFragment extends Fragment{
     public void onResume() {
         super.onResume();
 /*
-            Log.d(LOG_TAG, "the base is " + CaptureProbeService.getCentralChrometer().getBase());
+            Log.d(LOG_TAG, "the base is " + MinukuMainService.getCentralChrometer().getBase());
 
-            long t= SystemClock.elapsedRealtime() - CaptureProbeService.getCentralChrometer().getBase();
+            long t= SystemClock.elapsedRealtime() - MinukuMainService.getCentralChrometer().getBase();
 
             int h   = (int)(t/3600000);
             int m = (int)(t - h*3600000)/60000;
@@ -53,7 +52,7 @@ public class RecordSectionFragment extends Fragment{
             String hh = h < 10 ? "0"+h: h+"";
             String mm = m < 10 ? "0"+m: m+"";
             String ss = s < 10 ? "0"+s: s+"";
-            CaptureProbeService.getCentralChrometer().setText(hh+":"+mm+":"+ss);
+            MinukuMainService.getCentralChrometer().setText(hh+":"+mm+":"+ss);
 */
     }
 
@@ -64,8 +63,8 @@ public class RecordSectionFragment extends Fragment{
         View rootView = inflater.inflate(R.layout.fragment_record, container, false);
 
 /*
-            if (CaptureProbeService.getCentralChrometer()==null)
-                CaptureProbeService.setCentralChrometer((Chronometer) rootView.findViewById(R.id.recording_chronometer));
+            if (MinukuMainService.getCentralChrometer()==null)
+                MinukuMainService.setCentralChrometer((Chronometer) rootView.findViewById(R.id.recording_chronometer));
                 */
 
         chronometer = (Chronometer) rootView.findViewById(R.id.recording_chronometer);
@@ -79,13 +78,13 @@ public class RecordSectionFragment extends Fragment{
         //can be used by multiple tasks, and the user would choose which task the current recording is for.
         //For the labeling study, we change the textview based on which condition they are in
 
-        Log.d(LOG_TAG, "back to creatView the base is " + CaptureProbeService.getBaseForChronometer());
+        Log.d(LOG_TAG, "back to creatView the base is " + MinukuMainService.getBaseForChronometer());
 
 
         //if the chrometer was running when we leave the fragment, after coming back we should recover it
-        if (CaptureProbeService.isCentralChrometerRunning()) {
+        if (MinukuMainService.isCentralChrometerRunning()) {
 
-            long time = SystemClock.elapsedRealtime() -  CaptureProbeService.getBaseForChronometer();
+            long time = SystemClock.elapsedRealtime() -  MinukuMainService.getBaseForChronometer();
             int h   = (int)(time/3600000);
             int m = (int)(time - h*3600000)/60000;
             int s= (int)(time - h*3600000- m*60000)/1000 ;
@@ -95,16 +94,16 @@ public class RecordSectionFragment extends Fragment{
 
             chronometer.setText(hh+":"+mm+":"+ss);
             chronometer.start();
-            CaptureProbeService.setCentralChrometerRunning(true);
+            MinukuMainService.setCentralChrometerRunning(true);
 
             startButton.setText("PAUSE");
 
         }
         else {
 
-            chronometer.setText(CaptureProbeService.getCentralChrometerText());
+            chronometer.setText(MinukuMainService.getCentralChrometerText());
             //if it is not running, check if it's paused
-            if (CaptureProbeService.isCentralChrometerPaused())
+            if (MinukuMainService.isCentralChrometerPaused())
                 startButton.setText("RESUME");
 
         }
@@ -116,7 +115,7 @@ public class RecordSectionFragment extends Fragment{
                 new Chronometer.OnChronometerTickListener(){
                     @Override
                     public void onChronometerTick(Chronometer cArg) {
-                        long time = SystemClock.elapsedRealtime() -  CaptureProbeService.getBaseForChronometer();
+                        long time = SystemClock.elapsedRealtime() -  MinukuMainService.getBaseForChronometer();
                         int h   = (int)(time/3600000);
                         int m = (int)(time - h*3600000)/60000;
                         int s= (int)(time - h*3600000- m*60000)/1000 ;
@@ -148,16 +147,16 @@ public class RecordSectionFragment extends Fragment{
 
                         Log.d(LOG_TAG, "[participatory sensing] user clicking on the start action, start recording action" );
 
-                        CaptureProbeService.setBaseForChronometer(SystemClock.elapsedRealtime());
+                        MinukuMainService.setBaseForChronometer(SystemClock.elapsedRealtime());
 
                         //start recording and start the stopwatch
-                        chronometer.setBase( CaptureProbeService.getBaseForChronometer());
+                        chronometer.setBase( MinukuMainService.getBaseForChronometer());
                         chronometer.start();
-                        CaptureProbeService.setCentralChrometerRunning(true);
-                        CaptureProbeService.setCentralChrometerPaused(false);
+                        MinukuMainService.setCentralChrometerRunning(true);
+                        MinukuMainService.setCentralChrometerPaused(false);
 
 
-                        //Log.d(LOG_TAG, " CaptureProbeService is runnung? " + CaptureProbeService.isCentralChrometerRunning() + " start! the base is " + CaptureProbeService.getBaseForChronometer());
+                        //Log.d(LOG_TAG, " MinukuMainService is runnung? " + MinukuMainService.isCentralChrometerRunning() + " start! the base is " + MinukuMainService.getBaseForChronometer());
 
                         //when clicking on the recording action, execute the saveRecordAction
                         SavingRecordAction action = new SavingRecordAction(
@@ -202,8 +201,8 @@ public class RecordSectionFragment extends Fragment{
                                 "User Click:\t" + "startRecording" + "\t" + "RecordingTab");
 
 
-                        //start to get location
-                        ContextExtractor.getLocationManager().requestLocationUpdate();
+                        //TODO: request location udpate after hitting the start button
+                        //ContextExtractor.getLocationManager().requestLocationUpdate();
 
                     }
 
@@ -213,16 +212,16 @@ public class RecordSectionFragment extends Fragment{
 
                         //stop the watch
                         chronometer.stop();
-                        CaptureProbeService.setCentralChrometerRunning(false);
-                        CaptureProbeService.setCentralChrometerPaused(true);
+                        MinukuMainService.setCentralChrometerRunning(false);
+                        MinukuMainService.setCentralChrometerPaused(true);
                         //rememeber the text of the chrometer
-                        CaptureProbeService.setCentralChrometerText(chronometer.getText().toString());
+                        MinukuMainService.setCentralChrometerText(chronometer.getText().toString());
 
                         //remember the time
-                        CaptureProbeService.setTimeWhenStopped(SystemClock.elapsedRealtime());
+                        MinukuMainService.setTimeWhenStopped(SystemClock.elapsedRealtime());
 
 
-                        Log.d(LOG_TAG, "pause at time" + SystemClock.elapsedRealtime() + " remember text " + CaptureProbeService.getCentralChrometerText() + " and time " + CaptureProbeService.getTimeWhenStopped());
+                        Log.d(LOG_TAG, "pause at time" + SystemClock.elapsedRealtime() + " remember text " + MinukuMainService.getCentralChrometerText() + " and time " + MinukuMainService.getTimeWhenStopped());
 
 
                         SavingRecordAction action  = (SavingRecordAction) ActionManager.getRunningAction(ActionManager.USER_INITIATED_RECORDING_ACTION_ID);
@@ -251,17 +250,17 @@ public class RecordSectionFragment extends Fragment{
                     else if (startButton.getText().toString().equals("RESUME")){
 
                         //new base = original base + (the time of resuming - the time of pausing)
-                        CaptureProbeService.setBaseForChronometer( CaptureProbeService.getBaseForChronometer() + (SystemClock.elapsedRealtime() - CaptureProbeService.getTimeWhenStopped()) );
+                        MinukuMainService.setBaseForChronometer(MinukuMainService.getBaseForChronometer() + (SystemClock.elapsedRealtime() - MinukuMainService.getTimeWhenStopped()));
                         //stop the watch
-                        chronometer.setBase( CaptureProbeService.getBaseForChronometer());
+                        chronometer.setBase( MinukuMainService.getBaseForChronometer());
                         chronometer.start();
-                        CaptureProbeService.setCentralChrometerRunning(true);
-                        CaptureProbeService.setCentralChrometerPaused(false);
+                        MinukuMainService.setCentralChrometerRunning(true);
+                        MinukuMainService.setCentralChrometerPaused(false);
 
-                        Log.d(LOG_TAG, "resume at time" + SystemClock.elapsedRealtime() + " need to add base " + ( SystemClock.elapsedRealtime() - CaptureProbeService.getTimeWhenStopped() )  );
+                        Log.d(LOG_TAG, "resume at time" + SystemClock.elapsedRealtime() + " need to add base " + ( SystemClock.elapsedRealtime() - MinukuMainService.getTimeWhenStopped() )  );
 
 
-                        Log.d(LOG_TAG, " CaptureProbeService is runnung? " + CaptureProbeService.isCentralChrometerRunning() + " resume the base is " + CaptureProbeService.getBaseForChronometer());
+                        Log.d(LOG_TAG, " MinukuMainService is runnung? " + MinukuMainService.isCentralChrometerRunning() + " resume the base is " + MinukuMainService.getBaseForChronometer());
 
 
                         SavingRecordAction action  = (SavingRecordAction) ActionManager.getRunningAction(ActionManager.USER_INITIATED_RECORDING_ACTION_ID);
@@ -299,12 +298,12 @@ public class RecordSectionFragment extends Fragment{
 
                 //stop recording and stop the stopwatch
                 chronometer.stop();
-                CaptureProbeService.setCentralChrometerRunning(false);
-                CaptureProbeService.setCentralChrometerPaused(false);
+                MinukuMainService.setCentralChrometerRunning(false);
+                MinukuMainService.setCentralChrometerPaused(false);
                 //reset
                 chronometer.setText("00:00:00");
                 //rememeber the text of the chrometer
-                CaptureProbeService.setCentralChrometerText(chronometer.getText().toString());
+                MinukuMainService.setCentralChrometerText(chronometer.getText().toString());
 
 
                 /**stop the user-initiated recording action **/
@@ -331,8 +330,8 @@ public class RecordSectionFragment extends Fragment{
                         LogManager.LOG_TAG_USER_CLICKING,
                         "User Click:\t" + "stoptRecording"+ "\t" + "RecordingTab");
 
-                //start to get location
-                ContextExtractor.getLocationManager().removeLocationUpdate();
+                //TODO: remove location udpate after hitting the stop button
+                //ContextExtractor.getLocationManager().removeLocationUpdate();
 
             }
         });

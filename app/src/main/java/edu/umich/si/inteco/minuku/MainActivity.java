@@ -18,7 +18,7 @@ import edu.umich.si.inteco.minuku.Fragments.DailyJournalSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.ListRecordingSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.RecordSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.TaskSectionFragment;
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
@@ -59,10 +59,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         Log.d(LOG_TAG, "[Constants.DEVICE_ID] get the synTime is " + Constants.DEVICE_ID);
 
         /**start the contextManager service**/
-        if (!CaptureProbeService.isServiceRunning()){
-            Log.d(LOG_TAG, "[test service running]  going start the probe service isServiceRunning:" + CaptureProbeService.isServiceRunning());
+        if (!MinukuMainService.isServiceRunning()){
+            Log.d(LOG_TAG, "[test service running]  going start the probe service isServiceRunning:" + MinukuMainService.isServiceRunning());
             Intent intent = new Intent();
-            intent.setClass(MainActivity.this, CaptureProbeService.class);
+            intent.setClass(MainActivity.this, MinukuMainService.class);
             startService(intent);
         }
 

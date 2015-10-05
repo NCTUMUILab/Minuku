@@ -72,8 +72,8 @@ public class ActivityRecognitionService extends IntentService {
 
                 //TODO: remove this if we don't need to test
                 //save the updated activity to ContextExtractor (for testing puporse
-                ContextExtractor.setProbableActivities(mProbableActivities, detectionTime);
-                ContextExtractor.setMostProbableActivity(mMostProbableActivity, detectionTime);
+               // ContextExtractor.setProbableActivities(mProbableActivities, detectionTime);
+               // ContextExtractor.setMostProbableActivity(mMostProbableActivity, detectionTime);
                 
                 
                 if (Constants.isTestingActivity) {

@@ -1,9 +1,6 @@
 package edu.umich.si.inteco.minuku.contextmanager;
 
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.IntentSender.SendIntentException;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +16,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -32,14 +28,14 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
     /**constants**/
 
     //The interval for location updates. Inexact. Updates may be more or less frequent.
-    public static long UPDATE_INTERVAL_IN_SECONDS = 5;
+    public static final long UPDATE_INTERVAL_IN_SECONDS = 5;
      //The fastest rate for active location updates.
     public static final long FASTEST_UPDATE_INTERVAL_IN_SECONDS = 2;
 
     //the frequency of requesting location from the google play service
-    public static int SLOW_UPDATE_INTERVAL_IN_SECONDS = 60 ;
+    public static final int SLOW_UPDATE_INTERVAL_IN_SECONDS = 60 ;
 
-    public static long UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_SECONDS *
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_SECONDS *
             Constants.MILLISECONDS_PER_SECOND;
 
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = FASTEST_UPDATE_INTERVAL_IN_SECONDS*
@@ -49,8 +45,10 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
             Constants.MILLISECONDS_PER_SECOND;
 
     //the accuracy of location update
-    public static int LOCATION_UPDATE_LOCATION_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY;
+    public static final int LOCATION_UPDATE_LOCATION_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY;
 
+    //initial value
+    private static long sUpdateIntervalInMilliSeconds = UPDATE_INTERVAL_IN_MILLISECONDS;
 
     // Keys for storing activity state in the Bundle.
     protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
@@ -72,18 +70,18 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
     /**
      * Represents a geographical location.
      */
-    protected Location mCurrentLocation;
+    protected static Location mCurrentLocation;
 
     /**
      * Tracks the status of the location updates request. The value is true when Context Manager
      * requests Minuku to request locaiton
      */
-    protected Boolean mRequestingLocationUpdates;
+    protected static Boolean mRequestingLocationUpdates;
 
     /**
      * Time when the location was updated represented as a String.
      */
-    protected String mLastUpdateTime;
+    protected static String mLastUpdateTime;
 
 
     public LocationManager(Context c){
@@ -269,6 +267,10 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
         mGoogleApiClient.connect();
     }
 
+    public static Location getLocation(){
+        return mCurrentLocation;
+    }
+
 
     public static long getLocationUpdateIntervalInMillis() {
         return UPDATE_INTERVAL_IN_MILLISECONDS;
@@ -283,7 +285,7 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
             //do nothing
         }
         else{
-            UPDATE_INTERVAL_IN_MILLISECONDS = updateInterval;
+            sUpdateIntervalInMilliSeconds = updateInterval;
 
             //after we get location we need to update the location request
             //1. remove the update

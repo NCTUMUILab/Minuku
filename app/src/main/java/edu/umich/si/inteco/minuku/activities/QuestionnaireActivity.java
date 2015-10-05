@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
+import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.model.Log.ProbeLog;
 import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -27,8 +27,8 @@ public class QuestionnaireActivity extends Activity {
 		ProbeLog systemLog = new ProbeLog(
     			LogManager.LOG_TYPE_SYSTEM_LOG,
     			LogManager.LOG_TAG_QUESTIONNAIRE_NOTI_ATTENDED,
-    			ContextExtractor.getCurrentTimeInMillis(),
-    			ContextExtractor.getCurrentTimeString(), 
+    			ContextManager.getCurrentTimeInMillis(),
+				ContextManager.getCurrentTimeString(),
     			LogManager.LOG_MESSAGE_QUESTIONNAIRE_NOTI_ATTENDED + ":" +  questionnaire_id
     			);
     	   	

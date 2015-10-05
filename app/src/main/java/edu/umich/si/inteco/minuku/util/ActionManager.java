@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
-import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.contextmanager.EventManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
@@ -278,7 +277,7 @@ public class ActionManager {
 					savingRecordAction.setSessionId(sessionId);
 					
 					//create a session and insert the session into the session table
-					Session session = new Session(ContextExtractor.getCurrentTimeInMillis(), savingRecordAction.getTaskId());
+					Session session = new Session(ContextManager.getCurrentTimeInMillis(), savingRecordAction.getTaskId());
                     session.setId(sessionId);
 
                     //if not specified otherwise, record all types of records (specify that the session record all types of records)
@@ -745,7 +744,7 @@ public class ActionManager {
 
 
         //create a session and save it
-        Session session = new Session(ContextExtractor.getCurrentTimeInMillis(), savingRecordAction.getTaskId());
+        Session session = new Session(ContextManager.getCurrentTimeInMillis(), savingRecordAction.getTaskId());
         session.setId(sessionId);
         RecordingAndAnnotateManager.addCurRecordingSession(session);
 
@@ -792,7 +791,7 @@ public class ActionManager {
                 if (session!=null) {
 
                     //add EndTime to the session
-                    long endTime = ContextExtractor.getCurrentTimeInMillis();
+                    long endTime = ContextManager.getCurrentTimeInMillis();
                     mLocalDBHelper.updateSessionEndTime(savingRecordAction.getSessionId(), DatabaseNameManager.SESSION_TABLE_NAME, endTime);
                     Log.d(LOG_TAG,"[stopAction] examineTransportation stop saving record, the " + session.getId() + " endtime is " + ScheduleAndSampleManager.getTimeString(endTime));
                     //remove the session from the curRuningSession

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
@@ -54,7 +54,7 @@ public class RefreshServiceReceiver extends BroadcastReceiver {
                     "Alarm Received:\t" + ScheduleAndSampleManager.ALARM_TYPE_REFRESH + "\t" + "Start Service" + "\t" + intent.getIntExtra(ScheduleAndSampleManager.ALARM_REQUEST_CODE, 0));
 
       //otherwise we start the service.
-            Intent sintent = new Intent(context, CaptureProbeService.class);
+            Intent sintent = new Intent(context, MinukuMainService.class);
             //		            sintent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       //      context.startService(sintent);
 
@@ -66,7 +66,7 @@ public class RefreshServiceReceiver extends BroadcastReceiver {
 
             Log.d(LOG_TAG, "[UpdateScheduleAlarmReceiver ] we will stop the service ");
 
-            Intent stopintent = new Intent(context, CaptureProbeService.class);
+            Intent stopintent = new Intent(context, MinukuMainService.class);
      //       context.stopService(stopintent);
 
         }

@@ -6,7 +6,7 @@ import com.google.android.gms.location.DetectedActivity;
 
 import java.util.List;
 
-import edu.umich.si.inteco.minuku.contextmanager.ContextExtractor;
+import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 
 public class ActivityRecord extends Record {
@@ -50,11 +50,10 @@ public class ActivityRecord extends Record {
 		s+= this.getTimeString() + "\t" + 
 			this.getTimestamp() +  "\t"	+
 			this.getType() +"\t" ;
-		
+
 		for (int i=0; i<mProbableActivities.size();i++){
-			Log.d(LOG_TAG, "ActivityRecord" + ContextExtractor.getActivityNameFromType(mProbableActivities.get(i).getType()) + "\t" + mProbableActivities.get(i).getConfidence());
-			s+= ContextExtractor.getActivityNameFromType(mProbableActivities.get(i).getType()) + "\t" + mProbableActivities.get(i).getConfidence();
-			
+			//Log.d(LOG_TAG, "ActivityRecord" + ContextExtractor.getActivityNameFromType(mProbableActivities.get(i).getType()) + "\t" + mProbableActivities.get(i).getConfidence());
+			s+= ActivityRecognitionManager.getActivityNameFromType(mProbableActivities.get(i).getType()) + "\t" + mProbableActivities.get(i).getConfidence();
         }
 		
 		s+="\n";

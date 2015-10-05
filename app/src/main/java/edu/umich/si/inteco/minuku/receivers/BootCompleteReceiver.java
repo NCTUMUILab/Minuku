@@ -5,9 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.LogManager;
-import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
 public class BootCompleteReceiver extends BroadcastReceiver {
 
@@ -22,7 +21,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 			
 		     Log.d(LOG_TAG, "Successfully receive reboot request");
 		     //here we start the service             
-		     Intent sintent = new Intent(context, CaptureProbeService.class);
+		     Intent sintent = new Intent(context, MinukuMainService.class);
 //		     sintent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		     context.startService(sintent);
 

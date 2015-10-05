@@ -77,36 +77,6 @@ public class RemoteDBHelper {
     public RemoteDBHelper(){
     }
 
-
-/*
-    private static DefaultHttpClient getSSLHttpClient(boolean isTLS, InputStream trustStoreInputStream, String trustStorePsw)
-            throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, KeyManagementException, UnrecoverableKeyException {
-        DefaultHttpClient client = null;
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        Scheme http = new Scheme("http", PlainSocketFactory.getSocketFactory(), 80);
-        schemeRegistry.register(http);
-        if(isTLS) {
-            KeyStore trustKeyStore = null;
-            char[] trustStorePswCharArray = null;
-            if(trustStorePsw!=null) {
-                trustStorePswCharArray = trustStorePsw.toCharArray();
-            }
-            trustKeyStore = KeyStore.getInstance("BKS");
-            trustKeyStore.load(trustStoreInputStream, trustStorePswCharArray);
-            SSLSocketFactory sslSocketFactory = null;
-            sslSocketFactory = new SSLSocketFactory(trustKeyStore);
-            Scheme https = new Scheme("https", sslSocketFactory, 5002);
-            schemeRegistry.register(https);
-        }
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, HTTP_TIMEOUT);
-        HttpConnectionParams.setSoTimeout(httpParams, HTTP_TIMEOUT);
-        ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
-        client = new DefaultHttpClient(clientConnectionManager, httpParams);
-        return client;
-    }
-*/
-
     /***
      * trust all hsot....
      */
@@ -164,12 +134,8 @@ public class RemoteDBHelper {
 
         //if we just updated the database, then we don't need to update again right away
 
-        //if (ContextExtractor.isWifiConnected()) {
-
-
             //update the session that just been modified
             postModifiedSessionDocuments();
-
 
             Log.d(LOG_TAG, "[syncWithRemoteDatabase][test modified session] the wifi is connected, we can submit the data");
             Log.d(LOG_TAG, "[syncWithRemoteDatabase][test modified session] the last time we sync with the server is " + ScheduleAndSampleManager.getTimeString(getLastServerSyncTime()));
@@ -186,9 +152,6 @@ public class RemoteDBHelper {
 
                 setLastSeverSyncTime(now);
             }
-
-        //}
-
     }
 
     public static String postLogFiles(Date lastSyncDate){
@@ -331,59 +294,11 @@ public class RemoteDBHelper {
 
     public static void queryLastFileDay(String address){
 
-
         //if today is 11th, we check whether files until 10th have been uploaded
         //get lastSynhour by query the MongoDB
 
-
         InputStream inputStream = null;
         String result = "";
-         /*
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-
-        //create query json
-        JSONObject obj = new JSONObject();
-        try {
-            obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_PHONE_LOG);
-            obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String json = obj.toString();
-
-        //set json to StringEntity
-        StringEntity se = null;
-        try {
-            se = new StringEntity(json);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        //set httpPost Entity
-        httpPost.setEntity(se);
-        //Set headers to inform server about the type of the content
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Content-type", "application/json");
-
-        //Execute POST request to the given URL
-        HttpResponse httpResponse = null;
-        try {
-            httpResponse = httpclient.execute(httpPost);
-            if (httpResponse != null) {
-                inputStream = httpResponse.getEntity().getContent();
-                if(inputStream != null){
-                    result = convertInputStreamToString(inputStream);
-                    Log.d(LOG_TAG, "[queryLastFileDay] the query result is " + result);
-                }
-                else
-                    result = "Did not work!";
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
 
         try {
 
@@ -655,55 +570,6 @@ public class RemoteDBHelper {
         InputStream inputStream = null;
         String result = "";
 
-        /*
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-
-        //create query json
-        JSONObject obj = new JSONObject();
-        try {
-            obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_BACKGROUND_RECORDING);
-            obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String json = obj.toString();
-
-        //set json to StringEntity
-        StringEntity se = null;
-        try {
-            se = new StringEntity(json);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        //set httpPost Entity
-        httpPost.setEntity(se);
-        //Set headers to inform server about the type of the content
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Content-type", "application/json");
-
-        //Execute POST request to the given URL
-        HttpResponse httpResponse = null;
-        try {
-            httpResponse = httpclient.execute(httpPost);
-            if (httpResponse != null) {
-                inputStream = httpResponse.getEntity().getContent();
-                if(inputStream != null){
-                    result = convertInputStreamToString(inputStream);
-                    Log.d(LOG_TAG, "[queryLastBackgroundRecordingLogSyncHour] the query result is " + result);
-                }
-                else
-                    result = "Did not work!";
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-*/
-
-
-
         try {
 
             URL url = new URL(address);
@@ -818,52 +684,6 @@ public class RemoteDBHelper {
 
         Log.d(LOG_TAG, "postFile");
 
-/*
-        String result = "";
-
-        try {
-
-            // Client-side HTTP transport library
-            HttpClient httpClient = new DefaultHttpClient();
-
-            // using POST method
-            HttpPost httpPostRequest = new HttpPost(url);
-            File file = new File(filepath);
-
-            Log.d(LOG_TAG, "postFile post file:" + file.getAbsolutePath());
-
-            FileBody bin = new FileBody(file);
-
-            MultipartEntityBuilder multiPartEntityBuilder = MultipartEntityBuilder.create();
-
-            multiPartEntityBuilder.addPart("file", bin);
-            multiPartEntityBuilder.addPart("device", new StringBody(Constants.DEVICE_ID));
-
-            httpPostRequest.setEntity(multiPartEntityBuilder.build());
-
-            // Execute POST request to the given URL
-            HttpResponse httpResponse = null;
-            InputStream inputStream = null;
-
-                httpResponse = httpClient.execute(httpPostRequest);
-                inputStream = httpResponse.getEntity().getContent();
-
-                if (inputStream != null) {
-                    result = convertInputStreamToString(inputStream);
-
-                    //successfully uploaded. set the last update time
-                    setLastLogfileUpdateTime(ContextExtractor.getCurrentTimeInMillis());
-
-                } else
-                    result = "Did not work!";
-
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            return null;
-        }
-
-        return result;
-*/
         String response=null;
         InputStream is = null;
         String lineEnd = "\r\n";
@@ -1070,67 +890,8 @@ public class RemoteDBHelper {
         } catch (OutOfMemoryError e) {
 
         }
-
-
-        /*
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-
-        Log.d(LOG_TAG, "[postEmailBodyJSON] posting email\t" + json );
-
-        //set json to StringEntity
-        StringEntity se = null;
-        try {
-            se = new StringEntity(json);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        //set httpPost Entity
-        httpPost.setEntity(se);
-        //Set headers to inform server about the type of the content
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Content-type", "application/json");
-
-        //Execute POST request to the given URL
-        HttpResponse httpResponse = null;
-        try {
-            httpResponse = httpclient.execute(httpPost);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //receive response as inputStream
-        if (httpResponse != null) {
-            try {
-                inputStream = httpResponse.getEntity().getContent();
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // 10. convert inputstream to string
-        if(inputStream != null)
-            try {
-                result = convertInputStreamToString(inputStream);
-
-                Log.d(LOG_TAG, "receiving the result from requesting emails " + result);
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        else
-            result = "Did not work!";
-*/
-
         return  result;
-
     }
-
-
 
 
     public static String postJSON (String address, String json, String dataType, String lastSyncTime) {
@@ -1192,71 +953,6 @@ public class RemoteDBHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        /*
-
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(url);
-
-        Log.d(LOG_TAG, "posting " + dataType + "\t" + json );
-
-        //set json to StringEntity
-        StringEntity se = null;
-        try {
-            se = new StringEntity(json);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        //set httpPost Entity
-        httpPost.setEntity(se);
-        //Set headers to inform server about the type of the content
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Content-type", "application/json");
-
-        //Execute POST request to the given URL
-        HttpResponse httpResponse = null;
-        try {
-            httpResponse = httpclient.execute(httpPost);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //receive response as inputStream
-        if (httpResponse != null) {
-            try {
-                inputStream = httpResponse.getEntity().getContent();
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // 10. convert inputstream to string
-        if(inputStream != null)
-            try {
-                result = convertInputStreamToString(inputStream);
-
-                //set last update time
-                if (dataType.equals(DATA_TYPE_BACKGROUND_RECORDING)){
-                    Log.d(LOG_TAG, "receiving the result from inserting document: " + result);
-                    Log.d(LOG_TAG, "postJSON updated the last update time of background reocrding " + ContextExtractor.getCurrentTimeInMillis());
-                    setLastBackgroundRecordingUpdateTime(ContextExtractor.getCurrentTimeInMillis());
-                }
-
-                else if (dataType.equals(DATA_TYPE_SESSION_RECORDING)){
-                    Log.d(LOG_TAG, "receiving the result from inserting document: " + result);
-                    Log.d(LOG_TAG, "postJSON updated the last update time of session reocrding " +ContextExtractor.getCurrentTimeInMillis() );
-                    setLastSessionUpdateTime(ContextExtractor.getCurrentTimeInMillis());
-
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        else
-            result = "Did not work!";
-*/
 
         return  result;
 

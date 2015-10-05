@@ -5,12 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.BatteryManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
+import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.BatteryHelper;
-import edu.umich.si.inteco.minuku.util.LogManager;
-import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
 /**
  * Created by Armuro on 7/21/14.
@@ -58,10 +55,10 @@ public class BatteryStatusReceiver extends BroadcastReceiver{
         //when the phone is charging, we should just have the service running, regardless of the battery status
         if (isCharging) {
             //keep the service running and start the service it if it is not running
-            if (!CaptureProbeService.isServiceRunning()){
+            if (!MinukuMainService.isServiceRunning()){
                 Log.d(LOG_TAG, "[BatteryStatusReceiver] the battery is charging, we can restart the service");
 /*
-                Intent sintent = new Intent(context, CaptureProbeService.class);
+                Intent sintent = new Intent(context, MinukuMainService.class);
                 context.startService(sintent);
 
                 Toast.makeText(context, " battery is charging: " + BatteryHelper.getBatteryChargingState() + ", start Probe service", Toast.LENGTH_LONG).show();
@@ -79,10 +76,10 @@ public class BatteryStatusReceiver extends BroadcastReceiver{
             if (battPercentage < BatteryHelper.BATTERY_LIFE_PERCENTAGE_THRESHOLD){
 
                 //if the batterly percentage is lower than the threshould and the phone is not charging, we should stop the service
-                if (CaptureProbeService.isServiceRunning()){
+                if (MinukuMainService.isServiceRunning()){
                     Log.d(LOG_TAG, "[BatteryStatusReceiver] the battery is not charging and the battery life is low, we now stop the service");
 /*
-                    Intent stopintent = new Intent(context, CaptureProbeService.class);
+                    Intent stopintent = new Intent(context, MinukuMainService.class);
                     context.stopService(stopintent);
 
                     Toast.makeText(context, " battery level "  + battPercentage + " is too low, stop Probe service", Toast.LENGTH_LONG).show();

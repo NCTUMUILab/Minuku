@@ -968,52 +968,6 @@ public class ContextExtractor implements SensorEventListener {
 	 * 
 	 * ***/
 	
-	
-	
-	/**get the current time in milliseconds**/
-	public static long getCurrentTimeInMillis(){		
-		//get timzone		
-		TimeZone tz = TimeZone.getDefault();		
-		Calendar cal = Calendar.getInstance(tz);
-		long t = cal.getTimeInMillis();		
-		return t;
-	}
-	
-	/**get the current time in string (in the format of "yyyy-MM-dd HH:mm:ss" **/
-	public static String getCurrentTimeString(){		
-		//get timzone		
-		TimeZone tz = TimeZone.getDefault();		
-		Calendar cal = Calendar.getInstance(tz);
-		
-		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
-		String currentTimeString = sdf_now.format(cal.getTime());
-		
-		return currentTimeString;
-	}
-
-
-	/**
-     * Map detected activity types to strings
-     */
-    public static String getActivityNameFromType(int activityType) {
-        switch(activityType) {
-            case DetectedActivity.IN_VEHICLE:
-                return "in_vehicle";
-            case DetectedActivity.ON_BICYCLE:
-                return "on_bicycle";
-            case DetectedActivity.ON_FOOT:
-                return "on_foot";
-            case DetectedActivity.STILL:
-                return "still";
-            case DetectedActivity.UNKNOWN:
-                return "unknown";
-            case DetectedActivity.TILTING:
-                return "tilting";
-        }
-        return "unknown";
-    }
-
-
 
 
     private static void sendNotification(String title, String message) {

@@ -1,9 +1,11 @@
 package edu.umich.si.inteco.minuku.contextmanager;
 
 import android.content.Context;
-import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -12,12 +14,21 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.record.Record;
-import edu.umich.si.inteco.minuku.util.MobilityManager;
 
 public class ContextManager {
 
     private static final String LOG_TAG = "ContextManager";
+
+    //whether we want a background recording
 	public static boolean isSavingRecordingDefault = true;
+
+    //flag of whether ContextManager needs to extractContext
+    protected static boolean isExtractingContext = true;
+
+    //flag of whether ContextManager has paused extracting context
+//    protected static boolean hasStoppedExtractingContext = false;
+
+    //mContext is MinukuService
 	private Context mContext;
 
     private static final long BACKGROUND_RECORDING_INITIAL_DELAY = 0;
@@ -53,24 +64,6 @@ public class ContextManager {
     public static final int CONTEXT_RECORD_TYPE_GEOFENCE= 4;
     public static final int CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY = 5;
 
-	/*SENSOR: MOTION SENSORS*/
-	public static final int SENSOR_SOURCE_PHONE_ACCELEROMETER = 1;
-	public static final int SENSOR_SOURCE_PHONE_GRAVITY = 2;
-	public static final int SENSOR_SOURCE_PHONE_GYRSCOPE = 3;
-	public static final int SENSOR_SOURCE_PHONE_LINEAR_ACCELERATION = 4;
-	public static final int SENSOR_SOURCE_PHONE_ROTATION_VECTOR = 5;
-	
-	/*SENSOR: POSITION SENSORS*/
-	public static final int SENSOR_SOURCE_PHONE_MAGNETIC_FIELD = 6;
-	public static final int SENSOR_SOURCE_PHONE_ORIENTATION = 7;
-	public static final int SENSOR_SOURCE_PHONE_PROXIMITY = 8;
-	
-	/*SENSOR: ENVIRONMENT SENSORS*/
-	public static final int SENSOR_SOURCE_PHONE_AMBIENT_TEMPERATURE = 9;
-	public static final int SENSOR_SOURCE_PHONE_LIGHT = 10;
-	public static final int SENSOR_SOURCE_PHONE_PRESSURE = 11;	
-	public static final int SENSOR_SOURCE_PHONE_RELATIVE_HUMIDITY = 12;
-	
     
     /**Turning on or off sensor**/
     public static boolean accelerometerSensorIsEnabled = true;
@@ -87,8 +80,6 @@ public class ContextManager {
     public static boolean lightSensorIsEnabled = true;
     public static boolean pressureSensorIsEnabled = true;
     public static boolean relativeHumiditySensorIsEnabled = true;   
-    
-    public static boolean isContextExtractorEnabled = true;
 
     private static int testActivityRecordIndex = 0;
 
@@ -98,11 +89,30 @@ public class ContextManager {
     //handle the local SQLite operation
   	private static LocalDBHelper mLocalDBHelpder;
 
-    private static ScheduledExecutorService mScheduledExecutorService;
+    /***sensor values***/
+    private float mAccelationSquareRoot;
+    // The activity recognition update request object
+    private ActivityRecognitionRequester mActivityRecognitionRequester;
+    // The activity recognition update removal object
+    private ActivityRecognitionRemover mActivityRecognitionRemover;
+    // The geofence update request object
+    private GeofenceManager mGeofenceManager;
+    // the location update manager
+    private LocationManager mLocationManager;
+
+    //the manager that manages the status of the phone (network, battery)
+    private PhoneStatusManager  mPhoneStatusManager;
+
+    private PhoneActivityManager mPhoneActivityManager;
+
+    private MobilityManager mMobilityManager;
+
+    private ScheduledExecutorService mScheduledExecutorService;
 
 	public ContextManager(Context context){
 
 		mContext = context;
+
 		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
         //initiate the RecordPool
         mRecordPool = new ArrayList<Record>();
@@ -110,10 +120,30 @@ public class ContextManager {
         mScheduledExecutorService = Executors.newScheduledThreadPool(5);
 
         RECORD_TYPE_LIST = new ArrayList<Integer>();
+        
         //add the record types into the list
         initiateRecordTypeList();
+
+        //initiate Context Source Manager
+        mLocationManager = new LocationManager(mContext);
+
+        mPhoneStatusManager = new PhoneStatusManager(mContext);
+
+        mPhoneActivityManager = new PhoneActivityManager(mContext);
+
+        mMobilityManager = new MobilityManager(mContext, this);
 		
 	}
+
+
+    public boolean isExtractingContext() {
+        return isExtractingContext;
+    }
+
+    public void setExtractingContext(boolean flag) {
+        isExtractingContext = flag;
+    }
+
 
     public static void initiateRecordTypeList() {
 
@@ -138,10 +168,101 @@ public class ContextManager {
     }
 
 
+    public LocationManager getLocationManager(){
+        if (mLocationManager==null){
+            mLocationManager = new LocationManager(mContext);
+        }
+        return mLocationManager;
+    }
+
+
+    public void requesLocationUpdate () {
+        if (mLocationManager!=null){
+            mLocationManager.requestLocationUpdate();
+        }
+    }
+
+
+/*
+    private void startRequestingLocation(){
+        Log.d(LOG_TAG, "[startRequestingLocation] start to request location udpate");
+
+        mLocationRequestType = GooglePlayServiceUtil.LOCATION_REQUEST_TYPE.ADD;
+
+        //check Google Play first
+        if (!servicesConnected()) {
+            return;
+        }
+
+        mLocationManager.requestLocationUpdate();
+    }
+
+    private void stopRequestingLocation(){
+        Log.d(LOG_TAG, "[stopRequestingActivityRecognition] stop to request location");
+
+        // Check for Google Play services
+        if (!servicesConnected()) {
+            return;
+        }
+
+        //if Google Play service is available, stop the update
+        mLocationRequestType= GooglePlayServiceUtil.LOCATION_REQUEST_TYPE.REMOVE;
+
+        // Pass the remove request to the remover object (the intent is the same as the request intent)
+        mLocationManager.removeLocationUpdate();
+
+    }
+*/
+
+    /**functions called by the ContextManager**/
+
+    /*
+    public void startExtractingContext(){
+
+        this.isExtractingContext = true;
+        this.hasStoppedExtractingContext = false;
+
+        //registerSensors();
+
+        //get activity information
+        startRequestingActivityRecognition();
+
+        startRequestingLocation();
+
+        //get geofence transitions
+        startRequestingGeofence();
+
+        //extrating app information
+        if (isExtractinAppInfo){
+            Log.d(LOG_TAG, "[startExtractingContext] ready to extract app info");
+            mAppManager.runMonitoringAppThread();
+        }
+
+    }
+*/
+    /*
+    public void stopExtractingContext(){
+
+        Log.d("LOG_TAG", "[stopExtractingContext]");
+        this.isExtractingContext = false;
+        this.hasStoppedExtractingContext = true;
+
+        //unregister sensors
+        unRegisterSensors();
+
+        //remove activity update
+        stopRequestingActivityRecognition();
+
+        //remove location update
+        stopRequestingLocation();
+
+    }
+*/
+
     /**
      * The function starts a thread to run background recording to save records.
      */
-    public static void startBackgroundRecordingThread() {
+    public void startBackgroundRecordingThread() {
 
         mScheduledExecutorService.scheduleAtFixedRate(recordContextRunnable,
                 BACKGROUND_RECORDING_INITIAL_DELAY,
@@ -149,11 +270,10 @@ public class ContextManager {
                 TimeUnit.SECONDS);
     }
 
-    public static void stopBackgroundRecordingThread() {
+    public void stopBackgroundRecordingThread() {
 
         mScheduledExecutorService.shutdown();
     }
-
 
     static Runnable recordContextRunnable = new Runnable() {
         @Override
@@ -208,5 +328,33 @@ public class ContextManager {
         }
         return "unknown";
     }
+
+
+
+    /**get the current time in milliseconds**/
+    public static long getCurrentTimeInMillis(){
+        //get timzone
+        TimeZone tz = TimeZone.getDefault();
+        Calendar cal = Calendar.getInstance(tz);
+        long t = cal.getTimeInMillis();
+        return t;
+    }
+
+    /**get the current time in string (in the format of "yyyy-MM-dd HH:mm:ss" **/
+    public static String getCurrentTimeString(){
+        //get timzone
+        TimeZone tz = TimeZone.getDefault();
+        Calendar cal = Calendar.getInstance(tz);
+
+        SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
+        String currentTimeString = sdf_now.format(cal.getTime());
+
+        return currentTimeString;
+    }
+
+
+
+
+
 
 }

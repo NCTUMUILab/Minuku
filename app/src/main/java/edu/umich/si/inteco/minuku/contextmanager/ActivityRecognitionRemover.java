@@ -10,8 +10,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.*;
 import com.google.android.gms.location.ActivityRecognition;
 
-import edu.umich.si.inteco.minuku.services.CaptureProbeService;
-
 public class ActivityRecognitionRemover implements ConnectionCallbacks,
 		OnConnectionFailedListener {
 
