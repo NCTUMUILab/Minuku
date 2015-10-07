@@ -1,9 +1,16 @@
 package edu.umich.si.inteco.minuku.contextmanager;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 import edu.umich.si.inteco.minuku.util.LogManager;
 
 /**
@@ -86,6 +93,9 @@ public class MobilityManager {
         Log.d(LOG_TAG, "[updateMobility] sStaticCountDown: " + sStaticCountDown + " mobility: " + mobility);
 
 
+        //test mobility: send notification
+        sendNotification();
+
         //we need to adjust the location update frequency when we see a different mobility
         if (!preMobility.equals("NA") && !preMobility.equals(mobility)) {
 
@@ -103,7 +113,6 @@ public class MobilityManager {
         else if (mobility==STATIC && sStaticCountDown==0){
             setStaticLocationUpdateFrequency();
         }
-
 
         preMobility = mobility;
 
@@ -143,6 +152,47 @@ public class MobilityManager {
 
     public static void setMobility(String mobility) {
         MobilityManager.mobility = mobility;
+    }
+
+    /**
+     * Get a content Intent for the notification
+     */
+    private static PendingIntent getContentIntent() {
+
+        // Set the Intent action to open Location Settings
+        Intent activityIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+
+        // Create a PendingIntent to start an Activity
+        return PendingIntent.getService(mContext.getApplicationContext(),
+                GooglePlayServiceUtil.TRANSPORTATION_PENDING_INTENT_REQUEST_CODE,
+                activityIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
+
+    private static void sendNotification() {
+
+        // Create a notification builder that's compatible with platforms >= version 4
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(mContext);
+
+        getContentIntent().cancel();
+
+        String message = MobilityManager.getMobility();
+
+        // Set the title, text, and icon
+        builder.setContentTitle("mobility")
+                .setContentText( message)
+                .setSmallIcon(android.R.drawable.ic_notification_overlay)
+                        // Get the Intent that starts the Location settings panel
+                .setContentIntent(getContentIntent());
+
+        // Get an instance of the Notification Manager
+        NotificationManager notifyManager = (NotificationManager)
+                mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Build the notification and post it
+        notifyManager.notify(9998, builder.build());
     }
 
 

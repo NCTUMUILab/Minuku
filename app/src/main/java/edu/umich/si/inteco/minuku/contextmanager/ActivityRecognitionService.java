@@ -62,7 +62,7 @@ public class ActivityRecognitionService extends IntentService {
                 mMostProbableActivity = result.getMostProbableActivity();
                 Log.d(LOG_TAG, "[test ActivityRecognition] " +   mMostProbableActivity.toString());
 
-                Toast.makeText(this, "the detected activity is " + mMostProbableActivity + ": " + mProbableActivities, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "the detected activity is " + mMostProbableActivity + ": " + mProbableActivities, Toast.LENGTH_SHORT).show();
 
                 /** save activity labels and detection time to ActivityRecognition Manager **/
                 ActivityRecognitionManager.setMostProbableActivity(mMostProbableActivity);

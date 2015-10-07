@@ -222,7 +222,8 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
                 mCurrentLocation.getLongitude() + " , " +
                 mCurrentLocation.getAccuracy());
 
-        Toast.makeText(mContext, mCurrentLocation.getLatitude() + " , " + mCurrentLocation.getLongitude(),
+        Toast.makeText(mContext, mCurrentLocation.getLatitude() + " , " + mCurrentLocation.getLongitude()
+                        + " , " + mCurrentLocation.getAccuracy(),
                 Toast.LENGTH_SHORT).show();
 
     }

@@ -30,7 +30,8 @@ public class GooglePlayServiceUtil {
 	public static final int ACTIVITY_RECOGNITION_PENDING_INTENT_REQUEST_CODE = 2;
 	
 	public static final int GEOFENCE_TRANSITION_PENDING_INTENT_REQUEST_CODE = 4;
-    
+
+    public static final int TRANSPORTATION_PENDING_INTENT_REQUEST_CODE = 8;
     
     public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 

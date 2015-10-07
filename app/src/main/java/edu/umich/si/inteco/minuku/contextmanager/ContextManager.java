@@ -1,7 +1,13 @@
 package edu.umich.si.inteco.minuku.contextmanager;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,6 +21,7 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.record.Record;
+import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 
 public class ContextManager {
 
@@ -405,5 +412,6 @@ public class ContextManager {
 
         return currentTimeString;
     }
+
 
 }
