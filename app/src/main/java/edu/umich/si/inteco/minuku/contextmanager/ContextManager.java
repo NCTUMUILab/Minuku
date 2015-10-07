@@ -1,13 +1,7 @@
 package edu.umich.si.inteco.minuku.contextmanager;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,7 +15,7 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.record.Record;
-import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
+import edu.umich.si.inteco.minuku.util.LogManager;
 
 public class ContextManager {
 
@@ -327,7 +321,7 @@ public class ContextManager {
 
                 /** test transporation : feed datain to the datapool**/
 
-            /*
+                 /*** REPLAY ACTIIVITY LOG **
                     if (testActivityRecordIndex<TransportationModeManager.getActivityRecords().size()){
                         Log.d(LOG_TAG, "[testing transportation] Feed the " + testActivityRecordIndex + " record :"
                         + TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
@@ -349,20 +343,37 @@ public class ContextManager {
                 }
 
 
-                /** update transportation mode. Transporation Manager will use the latet activity label
+                /* update transportation mode. Transporation Manager will use the latet activity label
                  * saved in the ActivityRecognitionManager to infer the user's current transportation mode
                  * **/
-
                 int transportationMode= mTransportationModeManager.examineTransportation();
-                Log.d(LOG_TAG, "[examineTransportation] the transportation mdoe is "
-                        + TransportationModeManager.getActivityNameFromType(transportationMode));
 
-
-                /** after the transportationModeManager generate a transportation label, we update Mobility
+                /* after the transportationModeManager generate a transportation label, we update Mobility
                  * of the user. The mobility information, right now,  will be used to control the
-                 * frequency of location udpate to save battery life***/
+                 * frequency of location udpate to save battery life**/
                 MobilityManager.updateMobility();
 
+
+                String travelHistoryMessage="NA";
+                /*we create a travel log here*/
+                if (ActivityRecognitionManager.getProbableActivities()!=null){
+                    travelHistoryMessage= MobilityManager.getMobility() + "\t" +
+                            TransportationModeManager.getConfirmedActvitiyString() + "\t" +
+                            "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
+                            ActivityRecognitionManager.getProbableActivities().toString() + "\t" +
+                            LocationManager.getCurrentLocation().getLatitude() + "," +
+                            LocationManager.getCurrentLocation().getLongitude() + "," +
+                            LocationManager.getCurrentLocation().getAccuracy();
+                }
+
+                Log.d(LOG_TAG, "travel history message:" + travelHistoryMessage);
+
+                //create travel history file
+                LogManager.log(LogManager.LOG_TYPE_TRAVEL_LOG,
+                        LogManager.LOG_TAG_TRAVEL_HISTORY,
+                        //content of the log
+                        travelHistoryMessage
+                        );
 
             }catch (IllegalArgumentException e){
                 //Log.e(LOG_TAG, "Could not unregister receiver " + e.getMessage()+"");

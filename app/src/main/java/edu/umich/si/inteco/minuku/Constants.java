@@ -94,7 +94,7 @@ public class Constants {
 
 	/**File Path **/
 
-	public static String PACKAGE_DIRECTORY_PATH = "/Android/data/edu.umich.si.inteco.tansuo.app/";
+	public static String PACKAGE_DIRECTORY_PATH = "/Android/data/edu.umich.si.inteco.minuku.app/";
     public static String PACKAGE_DIRECTORY_NARRATIVE_PATH = "/Android/data/com.narrative.main/cache/";
 
 

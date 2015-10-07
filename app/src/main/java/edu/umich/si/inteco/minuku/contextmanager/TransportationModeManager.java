@@ -634,6 +634,10 @@ public class TransportationModeManager {
         TransportationModeManager.mConfirmedActivityType = confirmedActivityType;
     }
 
+    public static String getConfirmedActvitiyString() {
+        return getActivityNameFromType(mConfirmedActivityType);
+    }
+
     public static ArrayList<ActivityRecord> getActivityRecords() {
 
         if (mActivityRecords==null){
@@ -643,9 +647,14 @@ public class TransportationModeManager {
 
     }
 
+    public static String getCurrentStateString() {
+        return getStateName(getCurrentState());
+    }
+
     public static void addActivityRecord(ActivityRecord record) {
         getActivityRecords().add(record);
     }
+
 
     public static String getStateName(int state) {
 

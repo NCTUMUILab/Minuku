@@ -278,7 +278,7 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
         mGoogleApiClient.connect();
     }
 
-    public static Location getLocation(){
+    public static Location getCurrentLocation(){
         return mCurrentLocation;
     }
 
