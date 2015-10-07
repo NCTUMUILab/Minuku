@@ -65,13 +65,6 @@ public class MinukuMainService extends Service {
     /**Google Play (Location & Activity) Services*/
     public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
-    //the frequency of requesting google activity from the google play service
-    public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS = 30;
-
-    public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL =
-            ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
-
-
 
     /**Supported Context Source number (for the Record use)**/
 
@@ -296,7 +289,7 @@ public class MinukuMainService extends Service {
         getMainThread().removeCallbacks(mMainThreadrunnable);
 
         //stop background recording
-        mContextManager.stopBackgroundRecordingThread();
+        mContextManager.stopContextManagerMainThread();
 
         super.onDestroy();
     }
@@ -356,25 +349,15 @@ public class MinukuMainService extends Service {
     public void startProbeService(){
 
         Log.d(LOG_TAG, "[testing start service]  [startProbeService] star the probe service");
-
-        if (!mContextManager.isExtractingContext() && ContextManager.isSavingRecordingDefault){
-
-            //TODO: ContextManager register each context source manager to extract contextual information
-
-            //Recording is one of the types of actions that users need to put into the configuration.
-            //However, now we want to enable background recording so that we can monitor events.
-            //eventually. If researachers do not monitor anything, this flag should be false.
-            if (Constants.isBackgroundRecordingEnabled);
-                mContextManager.startBackgroundRecordingThread();
-
-        }
         //TODO: checking updated configurations
 
+
+        //start the main functions of ContextManager
+        mContextManager.startContextManager();
 
         //running mainthread for running continuous action
         runMainThread();
         //ActionManager.startRunningActionThread();
-
     }
 
 
@@ -382,18 +365,11 @@ public class MinukuMainService extends Service {
      * create threads for these continuoulsy running actions.
      */
     public static void runMainThread (){
-
         //Log.d(LOG_TAG, " [RUN] : action manager is setting up the main thread" );
-
         mMainThread = new Handler();
-
-
 
         /**start repeatedly store the extracted contextual information into Record objects**/
         mMainThread.post(mMainThreadrunnable);
-
-
-
     }
 
     static Runnable mMainThreadrunnable = new Runnable() {

@@ -4,12 +4,7 @@ public class Constants {
 
 	/**for testing**/
 	public static boolean isTestingActivity = true;
-
-	public static boolean isBackgroundRecordingEnabled  = true;
-
 	public static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
-
-
 	public static final String TEST_DATABASE_NAME = "SensingStudyDatabase";
 
     /***Main Activity Tab Name**/

@@ -16,7 +16,7 @@ import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
-import edu.umich.si.inteco.minuku.contextmanager.TransportationModeDetector;
+import edu.umich.si.inteco.minuku.contextmanager.TransportationModeManager;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.TimeConstraint;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
@@ -65,7 +65,11 @@ public class DataHandler {
 	 * @param recordpool
 	 */
 	public static  void SaveRecordsToLocalDatabase(ArrayList<Record> recordpool, int session_id ){
-	
+
+        //no record to save into the database
+        if (recordpool.size()==0)
+            return;
+
 		//Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase]  there are " + recordpool.size() + " records in the pool, saving records to session " + session_id);
 
           /** Because a record may need to be saved by different sessions, we will mark the record which session it has been saved for
@@ -365,21 +369,21 @@ public class DataHandler {
         //activity 1
         String activityType1 = separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_LABEL_1];
         int activityConf1 = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_CONFIDENCE_1]);
-        DetectedActivity detectedActivity1 = new DetectedActivity(TransportationModeDetector.getActivityTypeFromName(activityType1), activityConf1);
+        DetectedActivity detectedActivity1 = new DetectedActivity(TransportationModeManager.getActivityTypeFromName(activityType1), activityConf1);
 
         probableActivities.add(detectedActivity1);
 
         String activityType2 = separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_LABEL_2];
         if (activityType2!=null && !activityType2.equals("null") ) {
             int activityConf2 = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_CONFIDENCE_2]);
-            DetectedActivity detectedActivity2 = new DetectedActivity(TransportationModeDetector.getActivityTypeFromName(activityType2), activityConf2);
+            DetectedActivity detectedActivity2 = new DetectedActivity(TransportationModeManager.getActivityTypeFromName(activityType2), activityConf2);
             probableActivities.add(detectedActivity2);
         }
 
         String activityType3 = separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_LABEL_3];
         if (activityType3!=null && !activityType3.equals("null")) {
             int activityConf3 = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_CONFIDENCE_3]);
-            DetectedActivity detectedActivity3 = new DetectedActivity(TransportationModeDetector.getActivityTypeFromName(activityType3), activityConf3);
+            DetectedActivity detectedActivity3 = new DetectedActivity(TransportationModeManager.getActivityTypeFromName(activityType3), activityConf3);
             probableActivities.add(detectedActivity3);
         }
 

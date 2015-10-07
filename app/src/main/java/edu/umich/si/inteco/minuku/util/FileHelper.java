@@ -16,7 +16,7 @@ import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService;
-import edu.umich.si.inteco.minuku.contextmanager.TransportationModeDetector;
+import edu.umich.si.inteco.minuku.contextmanager.TransportationModeManager;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 
 public class FileHelper {
@@ -159,12 +159,12 @@ public class FileHelper {
             //  Log.d(LOG_TAG, "[readTestFile] readline " + lines[i]);
 
             //also add to the transportationModeDetector
-            TransportationModeDetector.addActivityRecord(record);
+            TransportationModeManager.addActivityRecord(record);
 
         }
 
 
-        // TransportationModeDetector.test();
+        // TransportationModeManager.test();
     }
 
 

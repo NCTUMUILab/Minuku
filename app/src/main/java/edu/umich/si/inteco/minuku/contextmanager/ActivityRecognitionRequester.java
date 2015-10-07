@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 
 
@@ -25,6 +26,13 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
     
     /***Activity Recognition Requester**/
     private PendingIntent mActivityRecognitionPendingIntent;
+
+
+    //the frequency of requesting google activity from the google play service
+    public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS = 5;
+
+    public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL =
+            ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
     
     // Store the current activity recognition client
     private GoogleApiClient mGoogleApiClient;
@@ -116,7 +124,7 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
         //request activity recognition update
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 mGoogleApiClient,                                       //GoogleApiClient client
-                MinukuMainService.ACTIVITY_RECOGNITION_UPDATE_INTERVAL,//detectionIntervalMillis
+                ACTIVITY_RECOGNITION_UPDATE_INTERVAL,//detectionIntervalMillis
                 activityRecognitionPendingIntent);                      //callbackIntent
 		
 		Log.d(LOG_TAG,"requesting activity update!");

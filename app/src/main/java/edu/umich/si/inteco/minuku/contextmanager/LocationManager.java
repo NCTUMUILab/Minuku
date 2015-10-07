@@ -11,6 +11,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -28,12 +29,12 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
     /**constants**/
 
     //The interval for location updates. Inexact. Updates may be more or less frequent.
-    public static final long UPDATE_INTERVAL_IN_SECONDS = 5;
+    public static final long UPDATE_INTERVAL_IN_SECONDS = 10;
      //The fastest rate for active location updates.
     public static final long FASTEST_UPDATE_INTERVAL_IN_SECONDS = 2;
 
     //the frequency of requesting location from the google play service
-    public static final int SLOW_UPDATE_INTERVAL_IN_SECONDS = 60 ;
+    public static final int SLOW_UPDATE_INTERVAL_IN_SECONDS = 90 ;
 
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_SECONDS *
             Constants.MILLISECONDS_PER_SECOND;
@@ -105,17 +106,20 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
      */
     public void requestLocationUpdate() {
 
-        Log.d(LOG_TAG,"[requestUpdates] going to request location update ");
+        Log.d(LOG_TAG,"[testLocationUpdate] going to request location update ");
         //we need to get location. Set this true
         mRequestingLocationUpdates = true;
 
         //first check whether we have GoogleAPIClient connected. if yes, we request location. Otherwise
         //we connect the client and then in onConnected() we request location
         if (!mGoogleApiClient.isConnected()){
+            Log.d(LOG_TAG,"[testLocationUpdate] Google Service is not connected, need to connect ");
             connentClient();
         }
         else {
+            Log.d(LOG_TAG, "[testLocationUpdate] Google Service is connected, now starts to start location update ");
             startLocationUpdates();
+            disconnectClient();
         }
     }
 
@@ -123,11 +127,16 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
         //stop requesting location udpates
 
         mRequestingLocationUpdates = false;
-        Log.d(LOG_TAG,"[removeUpdates] going to remove location update ");
+        Log.d(LOG_TAG, "[testLocationUpdate]  going to remove location update ");
 
-        //we stop location update and then disconnect the Clinet.
-        stopLocationUpdates();
-        disconnectClient();
+        if (!mGoogleApiClient.isConnected()) {
+            connentClient();
+        }
+        else {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            Log.d(LOG_TAG, "[testLocationUpdate] we have removed location update ");
+            disconnectClient();
+        }
     }
 
     /**
@@ -158,7 +167,6 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
         createLocationRequest();
     }
 
-
     /**
      * Sets up the location request. Android has two location request settings:
      * {@code ACCESS_COARSE_LOCATION} and {@code ACCESS_FINE_LOCATION}. These settings control
@@ -176,7 +184,9 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
         mLocationRequest = new LocationRequest();
 
         //set intervals for the locaiton request
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setInterval(sUpdateIntervalInMilliSeconds);
+
+        Log.d(LOG_TAG, "[testLocationUpdate] the interval is  " + sUpdateIntervalInMilliSeconds);
 
         // Sets the fastest rate for active location updates.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
@@ -192,21 +202,15 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
     protected void startLocationUpdates() {
         // The final argument to {@code requestLocationUpdates()} is a LocationListener
         if (mGoogleApiClient.isConnected()){
+            Log.d(LOG_TAG, "[testLocationUpdate] send out location udpate request");
+
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     mGoogleApiClient, mLocationRequest, this);
+
+            Log.d(LOG_TAG, "[testLocationUpdate] after send out location udpate request");
         }
 
     }
-
-    /**
-     * Removes location updates from the FusedLocationApi.
-     */
-    protected void stopLocationUpdates() {
-        if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-        }
-    }
-
 
 	/**this function is where we got the updated location information**/
     @Override
@@ -215,7 +219,7 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         Log.d(LOG_TAG,"[onLocationChanged] get location " + mCurrentLocation.getLatitude() + mCurrentLocation.getLongitude());
 
-        Toast.makeText(mContext, mContext.getString(R.string.location_updated_message),
+        Toast.makeText(mContext, mCurrentLocation.getLatitude() + " , " + mCurrentLocation.getLongitude(),
                 Toast.LENGTH_SHORT).show();
 
     }
@@ -224,10 +228,10 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.i(LOG_TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
-	}
+    }
 
-	
-	 /*
+
+    /*
     * Called by Location Services when the request to connect the
     * client finishes successfully. At this point, you can
     * request the current location or start periodic updates
@@ -256,6 +260,9 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
+        else {
+            removeLocationUpdate();
+        }
 
 	}
 
@@ -278,7 +285,7 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
 
     public void setLocationUpdateInterval(long updateInterval) {
 
-        Log.i(LOG_TAG, "attempt to update the location request interval to " + updateInterval);
+        Log.i(LOG_TAG, "[testLocationUpdate] attempt to update the location request interval to " + updateInterval);
 
         //before we update we make sure GoogleClient is connected.
         if (!mGoogleApiClient.isConnected()){
@@ -293,7 +300,6 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
             //2. create new update, and then start update
             createLocationRequest();
             requestLocationUpdate();
-            startLocationUpdates();
         }
 
 

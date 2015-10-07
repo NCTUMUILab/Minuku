@@ -1,6 +1,7 @@
 package edu.umich.si.inteco.minuku.contextmanager;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,19 +21,22 @@ public class ContextManager {
     private static final String LOG_TAG = "ContextManager";
 
     //whether we want a background recording
-	public static boolean isSavingRecordingDefault = true;
+    protected static boolean sIsSavingRecordingDefault = true;
+
+    //flag of whether ContextManager is currently extracting Context
+    protected static boolean sIsExtractingContext = false;
 
     //flag of whether ContextManager needs to extractContext
-    protected static boolean isExtractingContext = true;
+    protected static boolean sIsExtractingContextEnabled = true;
 
-    //flag of whether ContextManager has paused extracting context
-//    protected static boolean hasStoppedExtractingContext = false;
+    //flag of whether BackgroundRecording is enabled
+    protected static boolean sIsBackgroundRecordingEnabled  = false;
 
     //mContext is MinukuService
 	private Context mContext;
 
-    private static final long BACKGROUND_RECORDING_INITIAL_DELAY = 0;
-    private static final long BACKGROUND_RECORDING_INTERVAL_IN_SECONDS = 5 ;
+    private static final int BACKGROUND_RECORDING_INITIAL_DELAY = 0;
+    private static final int CONTEXT_MANAGER_REFRESH_FREQUENCY = 5 ;
 
 
     /**RecordPool is a List for temporarily storing records that will be stored into the database or files later**/
@@ -91,12 +95,14 @@ public class ContextManager {
 
     /***sensor values***/
     private float mAccelationSquareRoot;
-    // The activity recognition update request object
-    private ActivityRecognitionRequester mActivityRecognitionRequester;
-    // The activity recognition update removal object
-    private ActivityRecognitionRemover mActivityRecognitionRemover;
-    // The geofence update request object
+
+    private ActivityRecognitionManager mActivityRecognitionManager;
+
+    //inspect transportation mode of the user
+    private TransportationModeManager mTransportationModeManager;
+
     private GeofenceManager mGeofenceManager;
+
     // the location update manager
     private LocationManager mLocationManager;
 
@@ -107,7 +113,7 @@ public class ContextManager {
 
     private MobilityManager mMobilityManager;
 
-    private ScheduledExecutorService mScheduledExecutorService;
+    private final ScheduledExecutorService mScheduledExecutorService;
 
 	public ContextManager(Context context){
 
@@ -117,31 +123,63 @@ public class ContextManager {
         //initiate the RecordPool
         mRecordPool = new ArrayList<Record>();
 
-        mScheduledExecutorService = Executors.newScheduledThreadPool(5);
+        mScheduledExecutorService = Executors.newScheduledThreadPool(CONTEXT_MANAGER_REFRESH_FREQUENCY);
 
         RECORD_TYPE_LIST = new ArrayList<Integer>();
         
         //add the record types into the list
         initiateRecordTypeList();
 
-        //initiate Context Source Manager
+        //initiate Context Source Managers
         mLocationManager = new LocationManager(mContext);
+
+        mActivityRecognitionManager = new ActivityRecognitionManager(mContext);
+
+        mTransportationModeManager = new TransportationModeManager(mContext);
 
         mPhoneStatusManager = new PhoneStatusManager(mContext);
 
         mPhoneActivityManager = new PhoneActivityManager(mContext);
 
         mMobilityManager = new MobilityManager(mContext, this);
-		
+
+
+      //  mActivityRecognitionRequester = new ActivityRecognitionRequester(mContext);
+
+      //  mActivityRecognitionRemover = new ActivityRecognitionRemover(mContext);
+
 	}
 
+    /**
+     * we start the main function of ContextManager here
+     */
+    public void startContextManager() {
+
+        Log.d(LOG_TAG, "[startContextManager]");
+
+        /**if extractign contextual information is enabled, extract information**/
+        if (sIsExtractingContextEnabled) {
+            startExtractingContext();
+        }
+
+        startContextManagerMainThread();
+
+    }
 
     public boolean isExtractingContext() {
-        return isExtractingContext;
+        return sIsExtractingContext;
     }
 
     public void setExtractingContext(boolean flag) {
-        isExtractingContext = flag;
+        sIsExtractingContext = flag;
+    }
+
+    public boolean isExtractingContextEnabled() {
+        return sIsExtractingContextEnabled;
+    }
+
+    public void setExtractingContextEnabled(boolean flag) {
+        sIsExtractingContextEnabled = flag;
     }
 
 
@@ -178,128 +216,144 @@ public class ContextManager {
 
     public void requesLocationUpdate () {
         if (mLocationManager!=null){
+            Log.d(LOG_TAG, "[startRequestingLocation] start to request location udpate");
             mLocationManager.requestLocationUpdate();
         }
     }
 
-
-/*
-    private void startRequestingLocation(){
-        Log.d(LOG_TAG, "[startRequestingLocation] start to request location udpate");
-
-        mLocationRequestType = GooglePlayServiceUtil.LOCATION_REQUEST_TYPE.ADD;
-
-        //check Google Play first
-        if (!servicesConnected()) {
-            return;
+    public void removeLocationUpdate () {
+        if (mLocationManager!=null){
+            Log.d(LOG_TAG, "[stopRequestingActivityRecognition] stop to request location");
+            mLocationManager.removeLocationUpdate();
         }
-
-        mLocationManager.requestLocationUpdate();
     }
 
-    private void stopRequestingLocation(){
-        Log.d(LOG_TAG, "[stopRequestingActivityRecognition] stop to request location");
 
-        // Check for Google Play services
-        if (!servicesConnected()) {
-            return;
-        }
+    /***
+     * Requesting and Removing Activity Recognition Service
+     */
+    private void requestActivityRecognitionUpdate(){
+        Log.d(LOG_TAG, "[startRequestingActivityRecognition] start to request activity udpate");
+        mActivityRecognitionManager.requestActivityRecognitionUpdates();
+    }
 
+    private void removeActivityRecognitionUpdate(){
+        Log.d(LOG_TAG, "[stopRequestingActivityRecognition] stop to request activity udpate");
         //if Google Play service is available, stop the update
-        mLocationRequestType= GooglePlayServiceUtil.LOCATION_REQUEST_TYPE.REMOVE;
-
         // Pass the remove request to the remover object (the intent is the same as the request intent)
-        mLocationManager.removeLocationUpdate();
-
+        mActivityRecognitionManager.removeActivityRecognitionUpdates();
     }
-*/
+
 
     /**functions called by the ContextManager**/
 
-    /*
+
     public void startExtractingContext(){
 
-        this.isExtractingContext = true;
-        this.hasStoppedExtractingContext = false;
+        //TODO: ContextManager register each context source manager to extract contextual information
+
+        //if this.sIsExtractingContextEnabled is false, we don't extract context
+        if (!sIsExtractingContextEnabled){
+            return;
+        }
+
+        //TODO: depending on the source requested in the configuration, determine the source to use
+
+        //get location information
+        requesLocationUpdate();
+
+        //get activity information
+        requestActivityRecognitionUpdate();
 
         //registerSensors();
 
-        //get activity information
-        startRequestingActivityRecognition();
 
-        startRequestingLocation();
 
         //get geofence transitions
-        startRequestingGeofence();
+        //startRequestingGeofence();
 
-        //extrating app information
-        if (isExtractinAppInfo){
-            Log.d(LOG_TAG, "[startExtractingContext] ready to extract app info");
-            mAppManager.runMonitoringAppThread();
-        }
+        //set sIsExtractingContext true to indicate that ContextManager is currently extracting
+        // contextual information
+        this.sIsExtractingContext = true;
 
     }
-*/
-    /*
+
+
     public void stopExtractingContext(){
 
         Log.d("LOG_TAG", "[stopExtractingContext]");
-        this.isExtractingContext = false;
-        this.hasStoppedExtractingContext = true;
+        this.sIsExtractingContext = false;
 
         //unregister sensors
-        unRegisterSensors();
-
-        //remove activity update
-        stopRequestingActivityRecognition();
+       // unRegisterSensors();
 
         //remove location update
-        stopRequestingLocation();
+        removeLocationUpdate();
+
+        //remove activity update
+        removeActivityRecognitionUpdate();
 
     }
-*/
+
 
     /**
      * The function starts a thread to run background recording to save records.
      */
-    public void startBackgroundRecordingThread() {
-
-        mScheduledExecutorService.scheduleAtFixedRate(recordContextRunnable,
+    public void startContextManagerMainThread() {
+        mScheduledExecutorService.scheduleAtFixedRate(
+                ContextManagerRunnable,
                 BACKGROUND_RECORDING_INITIAL_DELAY,
-                BACKGROUND_RECORDING_INTERVAL_IN_SECONDS,
+                CONTEXT_MANAGER_REFRESH_FREQUENCY,
                 TimeUnit.SECONDS);
     }
 
-    public void stopBackgroundRecordingThread() {
-
-        mScheduledExecutorService.shutdown();
+    public void stopContextManagerMainThread() {
+       // mScheduledExecutorService.shutdown();
     }
 
-    static Runnable recordContextRunnable = new Runnable() {
+    Runnable ContextManagerRunnable = new Runnable() {
         @Override
         public void run() {
             try{
 
+                Log.d(LOG_TAG, "Context Manager beginning");
+
                 /** test transporation : feed datain to the datapool**/
 
             /*
-                    if (testActivityRecordIndex<TransportationModeDetector.getActivityRecords().size()){
+                    if (testActivityRecordIndex<TransportationModeManager.getActivityRecords().size()){
                         Log.d(LOG_TAG, "[testing transportation] Feed the " + testActivityRecordIndex + " record :"
-                        + TransportationModeDetector.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
-                        + TransportationModeDetector.getActivityNameFromType(TransportationModeDetector.getActivityRecords().get(testActivityRecordIndex).getProbableActivities().get(0).getType())  );
+                        + TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
+                        + TransportationModeManager.getActivityNameFromType(TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities().get(0).getType())  );
 
                         ContextExtractor.setProbableActivities(
-                                TransportationModeDetector.getActivityRecords().get(testActivityRecordIndex).getProbableActivities(),
-                                TransportationModeDetector.getActivityRecords().get(testActivityRecordIndex).getTimestamp());
+                                TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities(),
+                                TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getTimestamp());
                     }
 
                     testActivityRecordIndex+=1;
 */
 
-                //save records to the database
-                DataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
+                //Recording is one of the types of actions that users need to put into the configuration.
+                //However, now we want to enable background recording so that we can monitor events.
+                //eventually. If researachers do not monitor anything, this flag should be false.
+                if (sIsBackgroundRecordingEnabled){
+                    DataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
+                }
 
-                //update mobility
+
+                /** update transportation mode. Transporation Manager will use the latet activity label
+                 * saved in the ActivityRecognitionManager to infer the user's current transportation mode
+                 * **/
+
+                int transportationMode= mTransportationModeManager.examineTransportation();
+                Log.d(LOG_TAG, "[examineTransportation] the transportation mdoe is "
+                        + TransportationModeManager.getActivityNameFromType(transportationMode));
+
+
+                /** after the transportationModeManager generate a transportation label, we update Mobility
+                 * of the user. The mobility information, right now,  will be used to control the
+                 * frequency of location udpate to save battery life***/
                 MobilityManager.updateMobility();
 
 
@@ -351,10 +405,5 @@ public class ContextManager {
 
         return currentTimeString;
     }
-
-
-
-
-
 
 }
