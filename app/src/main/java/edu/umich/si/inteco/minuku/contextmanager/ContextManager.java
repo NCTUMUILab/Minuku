@@ -35,8 +35,8 @@ public class ContextManager {
     //mContext is MinukuService
 	private Context mContext;
 
-    private static final int BACKGROUND_RECORDING_INITIAL_DELAY = 0;
-    private static final int CONTEXT_MANAGER_REFRESH_FREQUENCY = 5 ;
+    public static final int BACKGROUND_RECORDING_INITIAL_DELAY = 0;
+    public static final int CONTEXT_MANAGER_REFRESH_FREQUENCY = 5 ;
 
 
     /**RecordPool is a List for temporarily storing records that will be stored into the database or files later**/

@@ -217,7 +217,10 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
 	public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-        Log.d(LOG_TAG,"[onLocationChanged] get location " + mCurrentLocation.getLatitude() + mCurrentLocation.getLongitude());
+        Log.d(LOG_TAG,"[onLocationChanged] get location " +
+                mCurrentLocation.getLatitude() + " , " +
+                mCurrentLocation.getLongitude() + " , " +
+                mCurrentLocation.getAccuracy());
 
         Toast.makeText(mContext, mCurrentLocation.getLatitude() + " , " + mCurrentLocation.getLongitude(),
                 Toast.LENGTH_SHORT).show();

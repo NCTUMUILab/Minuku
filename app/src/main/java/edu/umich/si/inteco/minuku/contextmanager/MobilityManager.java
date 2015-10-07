@@ -3,6 +3,7 @@ package edu.umich.si.inteco.minuku.contextmanager;
 import android.content.Context;
 import android.util.Log;
 
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.util.LogManager;
 
 /**
@@ -18,6 +19,7 @@ public class MobilityManager {
     public static final int DELAY_LOCATION_UPDATE_WHEN_STATIC = 1;//the default delayed interval is 60 seconds
     public static final int REMOVE_LOCATION_UPDATE_WHEN_STATIC = 2;
     public static final int REMAIN_LOCATION_UPDATE_WHEN_STATIC = 0;
+
 
     public static final String ALARM_MOBILITY = "Mobility Change";
 
@@ -37,7 +39,8 @@ public class MobilityManager {
 
     //even though mobility has not changed, if the phone stays in Static state for 5 cycles, we slow down the
     //location update frequency
-    private static int sStaticCountDown = 5;
+    private static int sStaticCountDown = Constants.SECONDS_PER_MINUTE /
+            ContextManager.CONTEXT_MANAGER_REFRESH_FREQUENCY; // 60/5 = 12
 
     public MobilityManager(Context context, ContextManager contextManager) {
         this.mContext = context;
