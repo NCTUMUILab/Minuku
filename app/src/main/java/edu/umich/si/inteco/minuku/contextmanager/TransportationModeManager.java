@@ -12,13 +12,14 @@ import java.util.List;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
+import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
 /**
  * Created by Armuro on 7/8/14.
  */
-public class TransportationModeManager {
+public class TransportationModeManager extends ContextSourceManager {
 
     public static final int STATE_STATIC = 0;
     public static final int STATE_SUSPECTING_START = 1;
@@ -63,7 +64,7 @@ public class TransportationModeManager {
     private Context mContext;
 
     private static ArrayList<ActivityRecord> mActivityRecords;
-    public static List<String> testList;
+
     /** Tag for logging. */
     private static final String LOG_TAG = "TransModeDetector";
 
@@ -76,22 +77,16 @@ public class TransportationModeManager {
      * @return transportation mode. We make this synchronized because we don't want other classes
      * to use the transportation label before this function generates a new label
      */
-    public int examineTransportation() {
+    public int examineTransportation(ActivityRecord record) {
 
    //     Log.d(LOG_TAG, "[examineTransportation] enter" );
 //        Log.d(LOG_TAG, "[examineTransportation] enter" + ActivityRecognitionManager.getProbableActivities() );
 
-        //if we haven't get any activity labels, we don't examine transportation
-        if (ActivityRecognitionManager.getProbableActivities()==null ||
-                ActivityRecognitionManager.getLatestDetectionTime()==-1 ){
-            return -1;
-        }
-
-        List<DetectedActivity> probableActivities = ActivityRecognitionManager.getProbableActivities();
-        long detectionTime = ActivityRecognitionManager.getLatestDetectionTime();
+        List<DetectedActivity> probableActivities = record.getProbableActivities();
+        long detectionTime = record.getDetectionTime();
 
 
-        Log.d(LOG_TAG, "[examineTransportation] before examineTransportation. at  " +
+        Log.d(LOG_TAG, "[testing transportation] before examineTransportation. at  " +
                 ScheduleAndSampleManager.getTimeString(detectionTime) + " the acitivty is: " +
                 getActivityNameFromType(probableActivities.get(0).getType()) + ":" +
                 probableActivities.get(0).getConfidence());
@@ -101,8 +96,8 @@ public class TransportationModeManager {
         if (getCurrentState()==STATE_STATIC) {
             //getLatestActivityRecord();
 
-            Log.d (LOG_TAG, " examineTransportation at STATE_STATIC" +
-                    getActivityNameFromType(getSuspectedStartActivityType()) );
+            //Log.d (LOG_TAG, " examineTransportation at STATE_STATIC " +
+            //        getActivityNameFromType(getSuspectedStartActivityType()) );
 
 
             //if the detected activity is vehicle, bike or on foot, then we suspect the activity from now
@@ -119,12 +114,13 @@ public class TransportationModeManager {
                 //set suspect time
                 setSuspectTime(detectionTime);
 
-                Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()) );
+           //     Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()) );
 
                 LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                         LogManager.LOG_TAG_PROBE_TRANSPORTATION,
                         "Suspect Start Transportation:\t" + getActivityNameFromType(getSuspectedStartActivityType()) + "\t" + "state:" + getStateName(getCurrentState()) );
             }
+
         }
         else if (getCurrentState()==STATE_SUSPECTING_START) {
             boolean isTimeToConfirm = checkTimeElapseOfLatestActivityFromSuspectPoint(detectionTime, getSuspectTime(), getWindowLengh(getSuspectedStartActivityType(), getCurrentState()) );
@@ -147,7 +143,7 @@ public class TransportationModeManager {
                     //set the suspect time so that other class can access it.(startTime is when we think the transportation starts)
                     setSuspectTime(startTime);
 
-                    Log.d (LOG_TAG, " examineTransportation [confiremd start activity]  " + getActivityNameFromType(getConfirmedActivityType()) + " entering state " + getStateName(getCurrentState()) );
+//                    Log.d (LOG_TAG, " examineTransportation [confiremd start activity]  " + getActivityNameFromType(getConfirmedActivityType()) + " entering state " + getStateName(getCurrentState()) );
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -165,7 +161,7 @@ public class TransportationModeManager {
 
                     setSuspectTime(0);
 
-                    Log.d (LOG_TAG, " examineTransportation [cancel activity suspection], back to state " + getStateName(getCurrentState()) );
+            //        Log.d (LOG_TAG, " examineTransportation [cancel activity suspection], back to state " + getStateName(getCurrentState()) );
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -192,7 +188,7 @@ public class TransportationModeManager {
                 //set suspect time
                 setSuspectTime(detectionTime);
 
-                Log.d (LOG_TAG, " examineTransportation [detected stop possible activity] " + getActivityNameFromType(getSuspectedStopActivityType()) + " entering state " + getStateName(getCurrentState())  );
+           //     Log.d (LOG_TAG, " examineTransportation [detected stop possible activity] " + getActivityNameFromType(getSuspectedStopActivityType()) + " entering state " + getStateName(getCurrentState())  );
 
 
                 LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
@@ -226,7 +222,7 @@ public class TransportationModeManager {
                     //set the suspect time so that other class can access it.(startTime is when we think the transportation starts)
                     setSuspectTime(startTime);
 
-                    Log.d (LOG_TAG, " examineTransportation [stop activity], entering state" + getStateName(getCurrentState()) );
+//                    Log.d (LOG_TAG, " examineTransportation [stop activity], entering state" + getStateName(getCurrentState()) );
 
 
                 }
@@ -238,7 +234,7 @@ public class TransportationModeManager {
 
                     setSuspectedStartActivityType(NO_ACTIVITY_TYPE);
 
-                    Log.d (LOG_TAG, " examineTransportation [still maintain confirmed]" + getActivityNameFromType(getConfirmedActivityType()) + " still in the state " + getStateName(getCurrentState()));
+         //           Log.d (LOG_TAG, " examineTransportation [still maintain confirmed]" + getActivityNameFromType(getConfirmedActivityType()) + " still in the state " + getStateName(getCurrentState()));
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -266,8 +262,8 @@ public class TransportationModeManager {
 
                 if (isTimeToConfirm) {
 
-                    Log.d (LOG_TAG, " examineTransportation yes it's good time to confirm whether we can change the suspection for "
-                            + getActivityNameFromType(probableActivities.get(0).getType()));
+     //               Log.d (LOG_TAG, " examineTransportation yes it's good time to confirm whether we can change the suspection for "
+       //                     + getActivityNameFromType(probableActivities.get(0).getType()));
 
                     long startTime = detectionTime - getWindowLengh(probableActivities.get(0).getType(), STATE_SUSPECTING_START) ;
                     long endTime = detectionTime;
@@ -277,7 +273,7 @@ public class TransportationModeManager {
 
                     if (isActuallyStartingAnotherActivity) {
 
-                        Log.d (LOG_TAG, " examineTransportation [interrupt suspecting stop activity] " + getActivityNameFromType(getSuspectedStopActivityType()));
+//                        Log.d (LOG_TAG, " examineTransportation [interrupt suspecting stop activity] " + getActivityNameFromType(getSuspectedStopActivityType()));
 
 
 
@@ -291,7 +287,7 @@ public class TransportationModeManager {
 
                         setSuspectedStartActivityType(probableActivities.get(0).getType());
 
-                        Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()) );
+           //             Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()) );
 
                         //start suspecting new activity
                         setSuspectTime(detectionTime);
@@ -355,14 +351,6 @@ public class TransportationModeManager {
     }
 
 
-    public static void getLatestActivityRecord() {
-        //TODO: get data from the database
-
-
-    }
-
-
-
     public static boolean checkTimeElapseOfLatestActivityFromSuspectPoint( long lastestActivityTime, long suspectTime, long windowLenth) {
 
         if (lastestActivityTime - suspectTime > windowLenth)
@@ -373,21 +361,37 @@ public class TransportationModeManager {
             return false;
     }
 
+    /**
+     * We get previous activity records from ActivityRecognitionManager
+     * @param startTime
+     * @param endTime
+     * @return
+     */
     private static ArrayList<ActivityRecord> getWindowData(long startTime, long endTime) {
 
         ArrayList<ActivityRecord> windowData = new ArrayList<ActivityRecord>();
 
         //TODO: get activity records from the database
-        windowData = DataHandler.getActivityRecordsBetweenTimes(startTime, endTime);
+        //windowData = DataHandler.getActivityRecordsBetweenTimes(startTime, endTime);
 
-        /*for testing: get data from the testData
+        ///for testing: get data from the testData
 
-        for (int i=0; i<getActivityRecords().size(); i++) {
+        ArrayList<Record> recordPool = ActivityRecognitionManager.getLocalRecordPool();
 
-            if (getActivityRecords().get(i).getTimestamp() > startTime && getActivityRecords().get(i).getTimestamp() < endTime)
-                windowData.add(getActivityRecords().get(i));
+  //      Log.d(LOG_TAG, " examineTransportation you find " + recordPool.size() + " records in the activity recognition pool");
+
+        for (int i=0; i<recordPool.size(); i++) {
+
+            ActivityRecord record = (ActivityRecord) recordPool.get(i);
+
+     //       Log.d(LOG_TAG, " record.getTimestamp() " + record.getTimestamp() +
+       //             " windwo startTime " + startTime + " windwo endTime " + endTime);
+
+
+            if (record.getTimestamp() >= startTime && record.getTimestamp() <= endTime)
+                windowData.add(record);
         }
-        */
+
 
         return windowData;
     }
@@ -490,6 +494,8 @@ public class TransportationModeManager {
 
         float threshold = getConfirmStartThreshold(activityType);
 
+        Log.d(LOG_TAG, " examineTransportation the threshold is " + threshold + " the windowDAta size is " + windowData.size());
+
         /** check if in the window data the number of the possible activity exceeds the threshold**/
 
         //get number of targeted data
@@ -502,8 +508,15 @@ public class TransportationModeManager {
 
             //in the recent 6 there are more than 3
             if (i >= windowData.size()-5) {
+
+                Log.d(LOG_TAG, " examineTransportation start to see if there're more than 3");
+
+
                 if (detectedActivities.get(0).getType()==activityType ) {
                     inRecentCount +=1;
+                    Log.d(LOG_TAG, " examineTransportation got " + getActivityNameFromType(detectedActivities.get(0).getType())
+                            + " equal to  " + getActivityNameFromType(activityType));
+
                 }
             }
 
@@ -514,13 +527,14 @@ public class TransportationModeManager {
 
         }
 
-      //  Log.d(LOG_TAG, "[confirmStartPossibleTransportation] there are " + count  +  " " + getActivityNameFromType(activityType) + " out of " + windowData.size() + " data ");
+        Log.d(LOG_TAG, "[confirmStartPossibleTransportation] examineTransportation there are " + count  +  " " +
+                getActivityNameFromType(activityType) + " out of " + windowData.size() + " data ");
 
         if (windowData.size()!=0) {
 
             float percentage = (float)count/windowData.size();
             //if the percentage > threshold
-           Log.d(LOG_TAG, "[confirmStartPossibleTransportation] the percentage is  " + percentage + " recentCount " +inRecentCount);
+           Log.d(LOG_TAG, "[confirmStartPossibleTransportation] examineTransportation the percentage is  " + percentage + " recentCount " +inRecentCount);
 
            if ( threshold <= percentage || inRecentCount >= 2)
                return true;
@@ -672,7 +686,7 @@ public class TransportationModeManager {
                 return "NA";
         }
     }
-    
+
     /**
      * Map detected activity types to strings
      */
@@ -686,6 +700,10 @@ public class TransportationModeManager {
                 return "on_foot";
             case DetectedActivity.STILL:
                 return "still";
+            case DetectedActivity.RUNNING:
+                return "running";
+            case DetectedActivity.WALKING:
+                return "walking";
             case DetectedActivity.UNKNOWN:
                 return "unknown";
             case DetectedActivity.TILTING:
@@ -693,7 +711,7 @@ public class TransportationModeManager {
             case NO_ACTIVITY_TYPE:
                 return "NA";
         }
-        return "unknown";
+        return "NA";
     }
 
 
@@ -709,17 +727,29 @@ public class TransportationModeManager {
             return DetectedActivity.STILL;
         }else if(activityName.equals("unknown")) {
             return DetectedActivity.UNKNOWN ;
+        }else if(activityName.equals("running")) {
+            return DetectedActivity.RUNNING ;
+        }else if (activityName.equals("walking")){
+            return DetectedActivity.WALKING;
         }else if(activityName.equals("tilting")) {
             return DetectedActivity.TILTING;
-        }else if (activityName.equals("NA")) {
+        }else {
             return NO_ACTIVITY_TYPE;
         }
-        else
-            return DetectedActivity.UNKNOWN;
     }
 
+    @Override
+    public void examineConditions() {
 
+    }
 
+    @Override
+    public void stateChanged() {
 
+    }
 
+    @Override
+    public void saveRecordsInLocalRecordPool() {
+
+    }
 }

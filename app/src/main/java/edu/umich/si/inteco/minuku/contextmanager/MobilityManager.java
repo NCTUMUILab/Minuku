@@ -169,6 +169,7 @@ public class MobilityManager {
                 PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
+    /**for testing*/
 
     private static void sendNotification() {
 
@@ -178,7 +179,11 @@ public class MobilityManager {
 
         getContentIntent().cancel();
 
-        String message = MobilityManager.getMobility();
+
+        String message = "NA";
+        message = MobilityManager.getMobility()+ "::";
+        message += TransportationModeManager.getConfirmedActvitiyString()+ "::" ;
+        message += TransportationModeManager.getCurrentStateString();
 
         // Set the title, text, and icon
         builder.setContentTitle("mobility")

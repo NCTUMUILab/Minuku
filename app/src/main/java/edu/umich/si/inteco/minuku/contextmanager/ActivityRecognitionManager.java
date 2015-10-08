@@ -1,6 +1,7 @@
 package edu.umich.si.inteco.minuku.contextmanager;
 
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -15,19 +16,26 @@ import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.LocationServices;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 
 /**
  * Created by Armuro on 10/4/15.
  */
-public class ActivityRecognitionManager implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class ActivityRecognitionManager extends ContextSourceManager
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     /** Tag for logging. */
     private static final String LOG_TAG = "ActRcgnManager";
+
+    public static final int NO_ACTIVITY_TYPE = -1;
 
     //the frequency of requesting google activity from the google play service
     public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS = 5;
@@ -65,7 +73,6 @@ public class ActivityRecognitionManager implements GoogleApiClient.ConnectionCal
         buildGoogleApiClient();
 
         sLatestDetectionTime = -1;
-
     }
 
 
@@ -103,7 +110,7 @@ public class ActivityRecognitionManager implements GoogleApiClient.ConnectionCal
      */
     public void requestActivityRecognitionUpdates() {
 
-        Log.d(LOG_TAG,"[requestUpdates] going to request location update ");
+        Log.d(LOG_TAG, "[requestUpdates] going to request location update ");
         //we need to get location. Set this true
         mRequestingActivityRecognitionUpdates = true;
 
@@ -229,7 +236,7 @@ public class ActivityRecognitionManager implements GoogleApiClient.ConnectionCal
             Log.d(LOG_TAG,"[onConnectionFailed] Conntection to Google Play services is failed");
 
         } else {
-            Log.e(LOG_TAG,"[onConnectionFailed] No Google Play services is available, the error code is "
+            Log.e(LOG_TAG, "[onConnectionFailed] No Google Play services is available, the error code is "
                     + connectionResult.getErrorCode());
         }
 
@@ -259,7 +266,18 @@ public class ActivityRecognitionManager implements GoogleApiClient.ConnectionCal
     }
 
     public static void setProbableActivities(List<DetectedActivity> probableActivities) {
+
         sProbableActivities = probableActivities;
+        setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
+
+        //store activityRecord
+        ActivityRecord record = new ActivityRecord();
+        record.setProbableActivities(sProbableActivities);
+        record.setTimestamp(sLatestDetectionTime);
+        record.setDetectionTime(sLatestDetectionTime);
+        //add record to local record pool of ActivityRecognitionManager
+        addRecord(record);
+
     }
 
     public static DetectedActivity getMostProbableActivity() {
@@ -286,6 +304,7 @@ public class ActivityRecognitionManager implements GoogleApiClient.ConnectionCal
         mGoogleApiClient.connect();
     }
 
+
     /**
      * Map detected activity types to strings
      */
@@ -299,14 +318,59 @@ public class ActivityRecognitionManager implements GoogleApiClient.ConnectionCal
                 return "on_foot";
             case DetectedActivity.STILL:
                 return "still";
+            case DetectedActivity.RUNNING:
+                return "running";
+            case DetectedActivity.WALKING:
+                return "walking";
             case DetectedActivity.UNKNOWN:
                 return "unknown";
             case DetectedActivity.TILTING:
                 return "tilting";
+            case NO_ACTIVITY_TYPE:
+                return "NA";
         }
-        return "unknown";
+        return "NA";
     }
 
 
+    public static int getActivityTypeFromName(String activityName) {
+
+        if (activityName.equals("in_vehicle")) {
+            return DetectedActivity.IN_VEHICLE;
+        }else if(activityName.equals("on_bicycle")) {
+            return DetectedActivity.ON_BICYCLE;
+        }else if(activityName.equals("on_foot")) {
+            return DetectedActivity.ON_FOOT;
+        }else if(activityName.equals("still")) {
+            return DetectedActivity.STILL;
+        }else if(activityName.equals("unknown")) {
+            return DetectedActivity.UNKNOWN ;
+        }else if(activityName.equals("running")) {
+            return DetectedActivity.RUNNING ;
+        }else if (activityName.equals("walking")){
+            return DetectedActivity.WALKING;
+        }else if(activityName.equals("tilting")) {
+            return DetectedActivity.TILTING;
+        }else {
+            return NO_ACTIVITY_TYPE;
+        }
+
+    }
+
+
+    @Override
+    public void examineConditions() {
+
+    }
+
+    @Override
+    public void stateChanged() {
+
+    }
+
+    @Override
+    public void saveRecordsInLocalRecordPool() {
+
+    }
 
 }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.contextmanager.TransportationModeManager;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
@@ -133,10 +134,13 @@ public class FileHelper {
         //testing postfiles
 
 
-        String string = loadFileFromAsset("testData3.txt");
+        String string = loadFileFromAsset("testData4.txt");
         String[] lines = string.split(System.getProperty("line.separator"));
         for (int i=0; i<lines.length; i++) {
 
+            if (lines[i].contains("Susp")){
+                continue;
+            }
             long time = Long.parseLong(lines[i].split("\t")[0]);
             String activitiesStr =  lines[i].split("\t")[1];
 
@@ -148,9 +152,10 @@ public class FileHelper {
                 String activityStr = activities[j].split(":")[0];
                 int confidence = Integer.parseInt(activities[j].split(":")[1]);
 
-                DetectedActivity activity= new DetectedActivity(ActivityRecognitionService.getActivityTypeFromName(activityStr),confidence);
+                DetectedActivity activity= new DetectedActivity(
+                    ActivityRecognitionManager.getActivityTypeFromName(activityStr),confidence);
                 activityList.add(activity);
-                //  Log.d(LOG_TAG, "[readTestFile] activity " + activity + " : " + confidence);
+                  Log.d(LOG_TAG, "[readTestFile] activity " + activity + " : " + confidence);
             }
 
             ActivityRecord record = new ActivityRecord();

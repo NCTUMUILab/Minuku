@@ -65,11 +65,13 @@ public class ActivityRecognitionService extends IntentService {
                 //Toast.makeText(this, "the detected activity is " + mMostProbableActivity + ": " + mProbableActivities, Toast.LENGTH_SHORT).show();
 
                 /** save activity labels and detection time to ActivityRecognition Manager **/
+
+                //we don't save this when we playback activity traces from file
+                //instead, we let ContextManager to feed activity
+
                 ActivityRecognitionManager.setMostProbableActivity(mMostProbableActivity);
                 ActivityRecognitionManager.setProbableActivities(mProbableActivities);
-                ActivityRecognitionManager.setLatestDetectionTime(getCurrentTimeInMillis());
 
-                
                 if (Constants.isTestingActivity) {
                 	sendNotification();
                 	
@@ -77,7 +79,7 @@ public class ActivityRecognitionService extends IntentService {
                     String message = "";
 
                     for (int i=0; i<mProbableActivities.size(); i++){
-                        message += getActivityNameFromType(mProbableActivities.get(i).getType()) + ":" + mProbableActivities.get(i).getConfidence();
+                        message += ActivityRecognitionManager.getActivityNameFromType(mProbableActivities.get(i).getType()) + ":" + mProbableActivities.get(i).getConfidence();
                         if (i<mProbableActivities.size()-1){
                             message+= ";;";
                         }
@@ -108,7 +110,7 @@ public class ActivityRecognitionService extends IntentService {
         String message = "";
 
         for (int i=0; i<mProbableActivities.size(); i++){
-            message += getActivityNameFromType(mProbableActivities.get(i).getType()) + ":" + mProbableActivities.get(i).getConfidence();
+            message += ActivityRecognitionManager.getActivityNameFromType(mProbableActivities.get(i).getType()) + ":" + mProbableActivities.get(i).getConfidence();
             if (i<mProbableActivities.size()-1){
                 message+= ";;";
             }
@@ -142,58 +144,6 @@ public class ActivityRecognitionService extends IntentService {
         // Create a PendingIntent to start an Activity
         return PendingIntent.getService(getApplicationContext(), GooglePlayServiceUtil.ACTIVITY_RECOGNITION_PENDING_INTENT_REQUEST_CODE, activityIntent,
                 PendingIntent.FLAG_CANCEL_CURRENT);
-    }
-	
-	/**
-     * Map detected activity types to strings
-     */
-    public static String getActivityNameFromType(int activityType) {
-        switch(activityType) {
-            case DetectedActivity.IN_VEHICLE:
-                return "in_vehicle";
-            case DetectedActivity.ON_BICYCLE:
-                return "on_bicycle";
-            case DetectedActivity.ON_FOOT:
-                return "on_foot";
-            case DetectedActivity.STILL:
-                return "still";
-            case DetectedActivity.RUNNING:
-                return "running";
-            case DetectedActivity.UNKNOWN:
-                return "unknown";
-            case DetectedActivity.TILTING:
-                return "tilting";
-        }
-        return "unknown";
-    }
-
-    /**get the current time in milliseconds**/
-    public static long getCurrentTimeInMillis(){
-        //get timzone
-        TimeZone tz = TimeZone.getDefault();
-        Calendar cal = Calendar.getInstance(tz);
-        long t = cal.getTimeInMillis();
-        return t;
-    }
-
-    public static int getActivityTypeFromName(String activityName) {
-
-        if (activityName.equals("in_vehicle")) {
-            return DetectedActivity.IN_VEHICLE;
-        }else if(activityName.equals("on_bicycle")) {
-            return DetectedActivity.ON_BICYCLE;
-        }else if(activityName.equals("on_foot")) {
-            return DetectedActivity.ON_FOOT;
-        }else if(activityName.equals("still")) {
-            return DetectedActivity.STILL;
-        }else if(activityName.equals("unknown")) {
-            return DetectedActivity.UNKNOWN ;
-        }else if(activityName.equals("running")) {
-            return DetectedActivity.RUNNING ;
-        }else if(activityName.equals("tilting")) {
-            return DetectedActivity.TILTING;
-        }else
-            return DetectedActivity.UNKNOWN;
     }
 	
 }

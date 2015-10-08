@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
+import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
 
@@ -113,6 +114,8 @@ public class ContextManager {
     private PhoneActivityManager mPhoneActivityManager;
 
     private MobilityManager mMobilityManager;
+
+    private int testCount = 0;
 
     private final ScheduledExecutorService mScheduledExecutorService;
 
@@ -317,24 +320,29 @@ public class ContextManager {
         public void run() {
             try{
 
-                Log.d(LOG_TAG, "Context Manager beginning");
+                testCount +=1;
+
+
+                Log.d(LOG_TAG, "[testCount]"  + testCount);
 
                 /** test transporation : feed datain to the datapool**/
 
-                 /*** REPLAY ACTIIVITY LOG **
+                 //REPLAY ACTIIVITY LOG
+/*
                     if (testActivityRecordIndex<TransportationModeManager.getActivityRecords().size()){
                         Log.d(LOG_TAG, "[testing transportation] Feed the " + testActivityRecordIndex + " record :"
                         + TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
                         + TransportationModeManager.getActivityNameFromType(TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities().get(0).getType())  );
 
-                        ContextExtractor.setProbableActivities(
-                                TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities(),
+                        ActivityRecognitionManager.setProbableActivities(
+                                TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities());
+
+                        ActivityRecognitionManager.setLatestDetectionTime(
                                 TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getTimestamp());
                     }
 
                     testActivityRecordIndex+=1;
 */
-
                 //Recording is one of the types of actions that users need to put into the configuration.
                 //However, now we want to enable background recording so that we can monitor events.
                 //eventually. If researachers do not monitor anything, this flag should be false.
@@ -346,7 +354,11 @@ public class ContextManager {
                 /* update transportation mode. Transporation Manager will use the latet activity label
                  * saved in the ActivityRecognitionManager to infer the user's current transportation mode
                  * **/
-                int transportationMode= mTransportationModeManager.examineTransportation();
+
+                ActivityRecord record = (ActivityRecord) ActivityRecognitionManager.getLastSavedRecord();
+                if (record!=null){
+                    int transportationMode= mTransportationModeManager.examineTransportation(record);
+                }
 
                 /* after the transportationModeManager generate a transportation label, we update Mobility
                  * of the user. The mobility information, right now,  will be used to control the
@@ -356,7 +368,9 @@ public class ContextManager {
 
                 String travelHistoryMessage="NA";
                 /*we create a travel log here*/
-                if (ActivityRecognitionManager.getProbableActivities()!=null){
+
+                if (ActivityRecognitionManager.getProbableActivities()!=null &&
+                        LocationManager.getCurrentLocation()!=null ){
                     travelHistoryMessage= MobilityManager.getMobility() + "\t" +
                             TransportationModeManager.getConfirmedActvitiyString() + "\t" +
                             "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +

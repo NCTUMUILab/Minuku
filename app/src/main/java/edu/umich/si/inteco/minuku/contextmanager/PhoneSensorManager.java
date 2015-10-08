@@ -14,11 +14,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.minuku.ContextSourceManager;
-import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
 
-public class PhoneSensorManager implements SensorEventListener, ContextSourceManager {
+public class PhoneSensorManager extends ContextSourceManager implements SensorEventListener {
 
 
     /** Tag for logging. */
@@ -148,6 +146,11 @@ public class PhoneSensorManager implements SensorEventListener, ContextSourceMan
 
     @Override
     public void stateChanged() {
+
+    }
+
+    @Override
+    public void saveRecordsInLocalRecordPool() {
 
     }
 

@@ -13,11 +13,10 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import edu.umich.si.inteco.minuku.ContextSourceManager;
 import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 
-public class PhoneActivityManager implements ContextSourceManager {
+public class PhoneActivityManager extends ContextSourceManager {
 
 	/** Tag for logging. */
     private static final String LOG_TAG = "AppsManager";
@@ -183,6 +182,11 @@ public class PhoneActivityManager implements ContextSourceManager {
 
 	@Override
 	public void stateChanged() {
+
+	}
+
+	@Override
+	public void saveRecordsInLocalRecordPool() {
 
 	}
 

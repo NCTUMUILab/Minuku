@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
@@ -680,18 +681,18 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     		//examine whether the Top1, 2, and 3 activity exist. Put the activity into the ContentValues..
     		try{
     			if(activities.get(0)!=null){
-        			values.put(DatabaseNameManager.COL_ACTIVITY_1, ActivityRecognitionService.getActivityNameFromType(activities.get(0).getType()));
+        			values.put(DatabaseNameManager.COL_ACTIVITY_1, ActivityRecognitionManager.getActivityNameFromType(activities.get(0).getType()));
         			values.put(DatabaseNameManager.COL_ACTIVITY_CONF_1, activities.get(0).getConfidence());
 
                     //detection time
                     values.put(DatabaseNameManager.COL_ACTIVITY_DETECTION_TIME, activityRecord.getDetectionTime());
         		}
     			if(activities.size() ==2 && activities.get(1)!=null){
-    				values.put(DatabaseNameManager.COL_ACTIVITY_2, ActivityRecognitionService.getActivityNameFromType(activities.get(1).getType()));
+    				values.put(DatabaseNameManager.COL_ACTIVITY_2, ActivityRecognitionManager.getActivityNameFromType(activities.get(1).getType()));
         			values.put(DatabaseNameManager.COL_ACTIVITY_CONF_2, activities.get(1).getConfidence());
     			}
     			if(activities.size() ==3 && activities.get(2)!=null){
-    				values.put(DatabaseNameManager.COL_ACTIVITY_3, ActivityRecognitionService.getActivityNameFromType(activities.get(2).getType()));
+    				values.put(DatabaseNameManager.COL_ACTIVITY_3, ActivityRecognitionManager.getActivityNameFromType(activities.get(2).getType()));
         			values.put(DatabaseNameManager.COL_ACTIVITY_CONF_3, activities.get(2).getConfidence());
     			}
 
