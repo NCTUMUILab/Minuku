@@ -29,12 +29,12 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
     /**constants**/
 
     //The interval for location updates. Inexact. Updates may be more or less frequent.
-    public static final long UPDATE_INTERVAL_IN_SECONDS = 10;
+    public static final long UPDATE_INTERVAL_IN_SECONDS = 5;
      //The fastest rate for active location updates.
     public static final long FASTEST_UPDATE_INTERVAL_IN_SECONDS = 2;
 
     //the frequency of requesting location from the google play service
-    public static final int SLOW_UPDATE_INTERVAL_IN_SECONDS = 90 ;
+    public static final int SLOW_UPDATE_INTERVAL_IN_SECONDS = 60 ;
 
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_SECONDS *
             Constants.MILLISECONDS_PER_SECOND;
