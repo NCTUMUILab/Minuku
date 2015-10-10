@@ -16,7 +16,7 @@ import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
 
-public class PhoneSensorManager extends ContextSourceManager implements SensorEventListener {
+public class PhoneSensorManager extends ContextStateManager implements SensorEventListener {
 
 
     /** Tag for logging. */

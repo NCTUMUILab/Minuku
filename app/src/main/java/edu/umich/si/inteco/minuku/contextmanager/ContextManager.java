@@ -111,7 +111,7 @@ public class ContextManager {
     //the manager that manages the status of the phone (network, battery)
     private PhoneStatusManager  mPhoneStatusManager;
 
-    private PhoneActivityManager mPhoneActivityManager;
+    private UserInteractionManager mUserInteractionManager;
 
     private MobilityManager mMobilityManager;
 
@@ -143,7 +143,7 @@ public class ContextManager {
 
         mPhoneStatusManager = new PhoneStatusManager(mContext);
 
-        mPhoneActivityManager = new PhoneActivityManager(mContext);
+        mUserInteractionManager = new UserInteractionManager(mContext);
 
         mMobilityManager = new MobilityManager(mContext, this);
 
@@ -414,8 +414,6 @@ public class ContextManager {
         }
         return "unknown";
     }
-
-
 
     /**get the current time in milliseconds**/
     public static long getCurrentTimeInMillis(){

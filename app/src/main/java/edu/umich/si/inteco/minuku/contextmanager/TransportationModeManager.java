@@ -2,7 +2,6 @@ package edu.umich.si.inteco.minuku.contextmanager;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.location.DetectedActivity;
 
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -19,7 +17,7 @@ import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 /**
  * Created by Armuro on 7/8/14.
  */
-public class TransportationModeManager extends ContextSourceManager {
+public class TransportationModeManager extends ContextStateManager {
 
     public static final int STATE_STATIC = 0;
     public static final int STATE_SUSPECTING_START = 1;
