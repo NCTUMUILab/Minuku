@@ -25,10 +25,6 @@ public class UserInteractionManager extends ContextStateManager {
 		mContext = context;
 	}
 
-	@Override
-	public void examineConditions() {
-
-	}
 
 	@Override
 	public void stateChanged() {
@@ -37,6 +33,20 @@ public class UserInteractionManager extends ContextStateManager {
 
 	@Override
 	public void saveRecordsInLocalRecordPool() {
+
+	}
+
+	public static int getContextSourceTypeFromName(String sourceName) {
+		return -1;
+	}
+
+	public static String getContextSourceNameFromType(int sourceType) {
+
+				return "NA";
+	}
+
+	@Override
+	public void updateStateValues() {
 
 	}
 }

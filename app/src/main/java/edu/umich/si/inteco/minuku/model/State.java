@@ -7,7 +7,7 @@ public class State {
 
     private int mId;
     private String mName;
-    private String mValue;
+    private String mValue = "default";
 
     public State(String name) {
         mName = name;

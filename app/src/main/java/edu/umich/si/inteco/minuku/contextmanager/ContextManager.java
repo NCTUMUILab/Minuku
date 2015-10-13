@@ -48,6 +48,14 @@ public class ContextManager {
     public static int RECORD_PRESERVATION_THRESHOLD_IN_MILLISECONDS = 2 *
             Constants.MILLISECONDS_PER_SECOND * Constants.SECONDS_PER_MINUTE;   //2 minutes
 
+    public static final String CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION = "ActivityRecognition";
+    public static final String CONTEXT_STATE_MANAGER_LOCATION = "Location";
+    public static final String CONTEXT_STATE_MANAGER_PHONE_SENSOR = "PhoneSensor";
+    public static final String CONTEXT_STATE_MANAGER_PHONE_STATUS = "PhoneStatus";
+    public static final String CONTEXT_STATE_MANAGER_TRANSPORTATION = "Transportation";
+    public static final String CONTEXT_STATE_MANAGER_USER_INTERACTION = "UserInteraction";
+
+
     /*RECORD TYPE NAME*/
     public static final String CONTEXT_RECORD_TYPE_LOCATION_NAME = "Location";
     public static final String CONTEXT_RECORD_TYPE_ACTIVITY_NAME = "Activity";
@@ -155,7 +163,7 @@ public class ContextManager {
 	}
 
     /**
-     * we start the main function of ContextManager here
+     * we start the main function of ContextManager here: extracting information and monitoring states
      */
     public void startContextManager() {
 
@@ -396,6 +404,30 @@ public class ContextManager {
         }
     };
 
+    public static String getSourceName(String contextStateManager, int sourceType){
+
+        if (contextStateManager.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION)){
+            return ActivityRecognitionManager.getContextSourceNameFromType(sourceType);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION)){
+            return TransportationModeManager.getContextSourceNameFromType(sourceType);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_LOCATION)){
+            return LocationManager.getContextSourceNameFromType(sourceType);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR)){
+            return PhoneSensorManager.getContextSourceNameFromType(sourceType);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS)){
+            return PhoneStatusManager.getContextSourceNameFromType(sourceType);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION)){
+            return UserInteractionManager.getContextSourceNameFromType(sourceType);
+        }
+        else{
+            return  null;
+        }
+    }
 
     public static String getSensorTypeName(int recordType){
 

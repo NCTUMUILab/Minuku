@@ -10,7 +10,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.contextmanager.ContextStateManager;
 import edu.umich.si.inteco.minuku.contextmanager.EventManager;
+import edu.umich.si.inteco.minuku.contextmanager.TransportationModeManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
@@ -20,6 +24,7 @@ import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.model.QuestionnaireTemplate;
+import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.actions.Action;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateAction;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateRecordingAction;
@@ -77,7 +82,6 @@ public class ConfigurationManager {
 		Log.d(LOG_TAG, "[loadConfiguration]");
 		
 		//connect to the DB and load configuration from the DB
-		
 		ArrayList<String> res = new ArrayList<String>();		
 	
 		/** 1. first try to load configurations from the database **/
@@ -113,12 +117,8 @@ public class ConfigurationManager {
 		}
 		*/
 
-
-
-
 		/*** 2 if there is no data in the DB, then load file **/
-		
-		
+
 		
 		if (res.size()==0){
 
@@ -183,13 +183,53 @@ public class ConfigurationManager {
 		
 		
 	}
+
+
+	/**
+	 * this function is only loading conditions for the purpose of testing StateRule
+	 */
+	private void loadTestStateRule() {
+
+		//create stateRule and save it to ContextStateManagers.
+		//StateMappingRule(String source, String measure, String relationship, String targetValue, String stateName
+		StateMappingRule smr = new StateMappingRule(
+				ContextManager.CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION,
+				ActivityRecognitionManager.CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES,
+				ContextStateManager.CONTEXT_SOURCE_MEASURE_LATEST_ONE,
+				ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL,
+				ActivityRecognitionManager.TILTING_STRING,
+				"Check Phone"
+		);
+
+		ActivityRecognitionManager.addStateMappingRule(smr);
+
+
+		//add another rule to transportation manager
+		StateMappingRule smr2 = new StateMappingRule(
+				ContextManager.CONTEXT_STATE_MANAGER_TRANSPORTATION,
+				TransportationModeManager.CONTEXT_SOURCE_TRANSPORTATION,
+				ContextStateManager.CONTEXT_SOURCE_MEASURE_LATEST_ONE,
+				ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL,
+				TransportationModeManager.ON_FOOT_STRING,
+				"Walking"
+		);
+
+		TransportationModeManager.addStateMappingRule(smr2);
+
+	}
 	
 	
 	/**
 	 * The Configuration has a source in JSON format. The function takse a JSON and configurate the app
 	 */
+	//TODO: we need to change the configutaiton.
 	public void loadConfigurationContent(Configuration config) {
-		
+
+
+		//TODO: just for testing condition and staterule, we create some here.
+		loadTestStateRule();
+
+
 		//source is in JSON format
 		JSONObject content = config.getContent();
 		

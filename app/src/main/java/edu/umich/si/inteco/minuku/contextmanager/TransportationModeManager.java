@@ -19,6 +19,13 @@ import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
  */
 public class TransportationModeManager extends ContextStateManager {
 
+    /**ContextSourceType**/
+    public static final int CONTEXT_SOURCE_TRANSPORTATION = 0;
+    public static final int CONTEXT_SOURCE_DETECTION_STATE = 1;
+
+    public static final String CONTEXT_SOURCE_TRANSPORTATION_STRING = "transportation";
+    public static final String CONTEXT_SOURCE_DETECTION_STATE_STRING = "detectoinState";
+
     public static final int STATE_STATIC = 0;
     public static final int STATE_SUSPECTING_START = 1;
     public static final int STATE_CONFIRMED = 2;
@@ -53,6 +60,17 @@ public class TransportationModeManager extends ContextStateManager {
     public static final int STILL = DetectedActivity.STILL;
     public static final int TILTING = DetectedActivity.TILTING;
 
+    /**Constant **/
+    public static final String IN_VEHICLE_STRING = "in_vehicle";
+    public static final String ON_FOOT_STRING = "on_foot";
+    public static final String WALKING_STRING = "walking";
+    public static final String RUNNING_STRING = "running";
+    public static final String TILTING_STRING = "tilting";
+    public static final String STILL_STRING = "still";
+    public static final String ON_BiCYCLE_STRING = "on_bicycle";
+    public static final String UNKNOWN_STRING = "unknown";
+    public static final String NA_STRING = "NA";
+
     private static int mSuspectedStartActivityType = -1;
     private static int mSuspectedStopActivityType = -1;
     private static int mConfirmedActivityType = NO_ACTIVITY_TYPE;// the initial value of activity is STILL.
@@ -67,6 +85,8 @@ public class TransportationModeManager extends ContextStateManager {
     private static final String LOG_TAG = "TransModeDetector";
 
     public TransportationModeManager(Context context) {
+
+        setName(ContextManager.CONTEXT_STATE_MANAGER_TRANSPORTATION);
         mContext = context;
     }
 
@@ -737,11 +757,6 @@ public class TransportationModeManager extends ContextStateManager {
     }
 
     @Override
-    public void examineConditions() {
-
-    }
-
-    @Override
     public void stateChanged() {
 
     }
@@ -750,4 +765,39 @@ public class TransportationModeManager extends ContextStateManager {
     public void saveRecordsInLocalRecordPool() {
 
     }
+
+
+    public static int getContextSourceTypeFromName(String sourceName) {
+
+        switch (sourceName){
+
+            case CONTEXT_SOURCE_TRANSPORTATION_STRING:
+                return CONTEXT_SOURCE_TRANSPORTATION;
+            case CONTEXT_SOURCE_DETECTION_STATE_STRING:
+                return CONTEXT_SOURCE_DETECTION_STATE;
+            default:
+                return -1;
+        }
+    }
+
+    public static String getContextSourceNameFromType(int sourceType) {
+
+        switch (sourceType){
+
+            case CONTEXT_SOURCE_TRANSPORTATION:
+                return CONTEXT_SOURCE_TRANSPORTATION_STRING;
+            case CONTEXT_SOURCE_DETECTION_STATE:
+                return CONTEXT_SOURCE_DETECTION_STATE_STRING;
+            default:
+                return "NA";
+
+        }
+    }
+
+
+    @Override
+    public void updateStateValues() {
+
+    }
+
 }

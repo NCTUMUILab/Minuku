@@ -23,6 +23,27 @@ import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 public class ActivityRecognitionManager extends ContextStateManager
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+
+    /**ContextSourceType**/
+    public static final int CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES = 0;
+    public static final int CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES = 1;
+
+
+    public static final String CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING = "mostProbableActivities";
+    public static final String CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING = "allProbableActivities";
+
+
+    /**label **/
+    public static final String IN_VEHICLE_STRING = "in_vehicle";
+    public static final String ON_FOOT_STRING = "on_foot";
+    public static final String WALKING_STRING = "walking";
+    public static final String RUNNING_STRING = "running";
+    public static final String TILTING_STRING = "tilting";
+    public static final String STILL_STRING = "still";
+    public static final String ON_BiCYCLE_STRING = "on_bicycle";
+    public static final String UNKNOWN_STRING = "unknown";
+    public static final String NA_STRING = "NA";
+
     /** Tag for logging. */
     private static final String LOG_TAG = "ActRcgnManager";
 
@@ -33,6 +54,7 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL =
             ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
+
 
     private Context mContext;
 
@@ -53,6 +75,8 @@ public class ActivityRecognitionManager extends ContextStateManager
     public ActivityRecognitionManager(Context context) {
 
         mContext= context;
+
+        setName(ContextManager.CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION);
 
         sProbableActivities = null;
 
@@ -302,23 +326,23 @@ public class ActivityRecognitionManager extends ContextStateManager
     public static String getActivityNameFromType(int activityType) {
         switch(activityType) {
             case DetectedActivity.IN_VEHICLE:
-                return "in_vehicle";
+                return IN_VEHICLE_STRING;
             case DetectedActivity.ON_BICYCLE:
-                return "on_bicycle";
+                return ON_BiCYCLE_STRING;
             case DetectedActivity.ON_FOOT:
-                return "on_foot";
+                return ON_FOOT_STRING;
             case DetectedActivity.STILL:
-                return "still";
+                return STILL_STRING;
             case DetectedActivity.RUNNING:
-                return "running";
+                return RUNNING_STRING;
             case DetectedActivity.WALKING:
-                return "walking";
+                return WALKING_STRING;
             case DetectedActivity.UNKNOWN:
-                return "unknown";
+                return UNKNOWN_STRING;
             case DetectedActivity.TILTING:
-                return "tilting";
+                return TILTING_STRING;
             case NO_ACTIVITY_TYPE:
-                return "NA";
+                return NA_STRING;
         }
         return "NA";
     }
@@ -326,31 +350,25 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     public static int getActivityTypeFromName(String activityName) {
 
-        if (activityName.equals("in_vehicle")) {
+        if (activityName.equals(IN_VEHICLE_STRING)) {
             return DetectedActivity.IN_VEHICLE;
-        }else if(activityName.equals("on_bicycle")) {
+        }else if(activityName.equals(ON_BiCYCLE_STRING)) {
             return DetectedActivity.ON_BICYCLE;
-        }else if(activityName.equals("on_foot")) {
+        }else if(activityName.equals(ON_FOOT_STRING)) {
             return DetectedActivity.ON_FOOT;
-        }else if(activityName.equals("still")) {
+        }else if(activityName.equals(STILL_STRING)) {
             return DetectedActivity.STILL;
-        }else if(activityName.equals("unknown")) {
+        }else if(activityName.equals(UNKNOWN_STRING)) {
             return DetectedActivity.UNKNOWN ;
-        }else if(activityName.equals("running")) {
+        }else if(activityName.equals(RUNNING_STRING)) {
             return DetectedActivity.RUNNING ;
-        }else if (activityName.equals("walking")){
+        }else if (activityName.equals(WALKING_STRING)){
             return DetectedActivity.WALKING;
-        }else if(activityName.equals("tilting")) {
+        }else if(activityName.equals(TILTING_STRING)) {
             return DetectedActivity.TILTING;
         }else {
             return NO_ACTIVITY_TYPE;
         }
-
-    }
-
-
-    @Override
-    public void examineConditions() {
 
     }
 
@@ -362,6 +380,39 @@ public class ActivityRecognitionManager extends ContextStateManager
     @Override
     public void saveRecordsInLocalRecordPool() {
 
+    }
+
+
+    @Override
+    public void updateStateValues() {
+
+    }
+
+    public static int getContextSourceTypeFromName(String sourceName) {
+
+        switch (sourceName){
+
+            case CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING:
+                return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES;
+            case CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING:
+                return CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES;
+            default:
+                return -1;
+        }
+    }
+
+    public static String getContextSourceNameFromType(int sourceType) {
+
+        switch (sourceType){
+
+            case CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES:
+                return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING;
+            case CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES:
+                return CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING;
+            default:
+                return "NA";
+
+        }
     }
 
 }

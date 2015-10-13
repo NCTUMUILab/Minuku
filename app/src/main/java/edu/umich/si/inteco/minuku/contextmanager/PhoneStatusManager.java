@@ -97,32 +97,6 @@ public class PhoneStatusManager extends ContextStateManager{
 
     }
 
-    @Override
-    public void updateStates(int typeOfSource, String value) {
-
-        /** get the relevant rule to the source. **/
-        for (int i=0; i <mStateMappingRules.size(); i++){
-            StateMappingRule rule = mStateMappingRules.get(i);
-
-            //get type from the rule
-            int sourceType = getContextSourceTypeFromName(rule.getName() );
-
-            //the source type is app
-            if(sourceType==SOURCE_TYPE_APP){
-
-            }
-
-        }
-        //
-
-
-    }
-
-    @Override
-    public void updateStates(int typeOfSource, int value) {
-
-    }
-
 
     protected void getMostRecentRunningApp() {
 
@@ -210,12 +184,6 @@ public class PhoneStatusManager extends ContextStateManager{
     }
 
 
-
-    @Override
-    public void examineConditions() {
-
-    }
-
     @Override
     public void stateChanged() {
 
@@ -229,18 +197,49 @@ public class PhoneStatusManager extends ContextStateManager{
 
 
     //TODO: complete the source type table
-    @Override
-    public int getContextSourceTypeFromName(String sourceName) {
+    public static int getContextSourceTypeFromName(String sourceName) {
 
-        int type=-1;
         switch (sourceName){
 
             case SOURCE_TYPE_APP_STRING:
                 return SOURCE_TYPE_APP;
+            default:
+                return -1;
+        }
+    }
+
+    public static String getContextSourceNameFromType(int sourceType) {
+
+        switch (sourceType){
+
+            case SOURCE_TYPE_APP:
+                return SOURCE_TYPE_APP_STRING;
+            default:
+                return "NA";
 
         }
+    }
 
-        return  type;
+
+
+    @Override
+    public void updateStateValues() {
+
+        /** get the relevant rule to the source. **/
+        for (int i=0; i <mStateMappingRules.size(); i++){
+            StateMappingRule rule = mStateMappingRules.get(i);
+
+            //get type from the rule
+            int sourceType = getContextSourceTypeFromName(rule.getName() );
+
+            //the source type is app
+            if(sourceType==SOURCE_TYPE_APP){
+
+            }
+
+        }
+        //
+
     }
 
 }

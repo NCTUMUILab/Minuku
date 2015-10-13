@@ -217,7 +217,7 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
 	public void onLocationChanged(Location location) {
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-        Log.d(LOG_TAG,"[onLocationChanged] get location " +
+        Log.d(LOG_TAG, "[onLocationChanged] get location " +
                 mCurrentLocation.getLatitude() + " , " +
                 mCurrentLocation.getLongitude() + " , " +
                 mCurrentLocation.getAccuracy());
@@ -307,6 +307,15 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
         }
 
 
+    }
+
+    public static int getContextSourceTypeFromName(String sourceName) {
+        return -1;
+    }
+
+    public static String getContextSourceNameFromType(int sourceType) {
+
+        return "NA";
     }
 
 }

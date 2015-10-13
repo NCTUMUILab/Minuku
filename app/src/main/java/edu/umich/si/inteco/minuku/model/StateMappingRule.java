@@ -4,6 +4,9 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.contextmanager.ContextStateManager;
+
 /**
  * Created by Armuro on 10/9/15.
  */
@@ -16,13 +19,15 @@ public class StateMappingRule {
 
     private String mName;
 
-    private String mSource;
+    private String mContextStateManagerName;
 
-    private String mValueType;
+    private int mSource;
+
+    private int mMeasure;
 
     private boolean mIsValueString;
 
-    private String mRelationship;
+    private int mRelationship;
 
     private String mStateValue;
 
@@ -40,56 +45,66 @@ public class StateMappingRule {
     }
 
     //stringEqualTo
-    public StateMappingRule(String source, String type, String relationship, String targetValue, String stateName){
+    public StateMappingRule(String contextStateManagerName, int source, int measure, int relationship, String targetValue, String stateName){
 
+        mContextStateManagerName = contextStateManagerName;
         mSource = source;
-        mValueType = type;
+        mMeasure = measure;
         mRelationship = relationship;
         mStringTargetValue = targetValue;
         mStateValue = stateName;
         mIsValueString = true;
 
-        mName = mSource + mValueType + mRelationship + mStringTargetValue + mStateValue;
-
+        setName();
     }
 
     //larger, equal, smaller
-    public StateMappingRule(String source, String type, String relationship, float targetValue, String stateName){
+    public StateMappingRule(String contextStateManagerName, int source, int measure, int relationship, float targetValue, String stateName){
 
+        mContextStateManagerName = contextStateManagerName;
         mSource = source;
-        mValueType = type;
+        mMeasure = measure;
         mRelationship = relationship;
         mFloatTargetValue = targetValue;
         mStateValue = stateName;
         mIsValueString = false;
 
-        mName = mSource + mValueType + mRelationship + mFloatTargetValue + mStateValue;
+        setName();
 
     }
 
-    public StateMappingRule(String source, String type, String relationship, float upper, float lower, String stateName){
+    public StateMappingRule(String contextStateManagerName, int source, int measure, int relationship, float upper, float lower, String stateName){
 
+        mContextStateManagerName = contextStateManagerName;
         mSource = source;
-        mValueType = type;
+        mMeasure = measure;
         mRelationship = relationship;
         mUpper = upper;
         mLower = lower;
         mStateValue = stateName;
         mIsValueString = false;
 
-        mName = mSource + mValueType + mRelationship + mUpper + "-" + mLower + mStateValue;
+        setName();
     }
 
     public String getName() {
         return mName;
     }
 
+    private void setName() {
+        mName = ContextManager.getSourceName(mContextStateManagerName, mSource)
+                + ContextStateManager.getMeasureName(mMeasure)
+                + ContextStateManager.getRelationshipName(mRelationship)
+                + mStringTargetValue
+                + mStateValue;
+    }
+
     @Override
     public String toString() {
         return "StateMappingRule{" +
                 ", mName='" + mName + '\'' +
-                ", mSource='" + mSource + '\'' +
-                ", mValueType='" + mValueType + '\'' +
+                ", mSource='" + ContextManager.getSourceName(mContextStateManagerName, mSource) + '\'' +
+                ", mMeasure='" + mMeasure + '\'' +
                 ", mRelationship='" + mRelationship + '\'' +
                 ", mStateValue='" + mStateValue + '\'' +
                 ", mStringTargetValue='" + mStringTargetValue + '\'' +

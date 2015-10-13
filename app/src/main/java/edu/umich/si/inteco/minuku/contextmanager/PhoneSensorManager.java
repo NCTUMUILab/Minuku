@@ -140,17 +140,25 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     }
 
     @Override
-    public void examineConditions() {
-
-    }
-
-    @Override
     public void stateChanged() {
 
     }
 
     @Override
     public void saveRecordsInLocalRecordPool() {
+
+    }
+
+    public static int getContextSourceTypeFromName(String sourceName) {
+        return 0;
+    }
+
+    public static String getContextSourceNameFromType(int sourceType) {
+        return "NA";
+    }
+
+    @Override
+    public void updateStateValues() {
 
     }
 

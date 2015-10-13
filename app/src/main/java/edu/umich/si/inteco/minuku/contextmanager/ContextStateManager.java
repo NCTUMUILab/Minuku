@@ -18,6 +18,36 @@ public abstract class ContextStateManager {
     /** Tag for logging. */
     private static final String LOG_TAG = "ContextStateManager";
 
+    /* context measure **/
+    public static final int CONTEXT_SOURCE_MEASURE_LATEST_ONE = 0;
+    public static final int CONTEXT_SOURCE_MEASURE_AVERAGE = 1;
+
+    public static final String CONTEXT_SOURCE_MEASURE_LATEST_ONE_STRING = "Latest";
+    public static final String CONTEXT_SOURCE_MEASURE_AVERAGE_STRING = "Average";
+
+    /* relationship **/
+    public static final int STATE_MAPPING_RELATIONSHIP_EQUAL = 0;
+    public static final int STATE_MAPPING_RELATIONSHIP_LARGER = 1;
+    public static final int STATE_MAPPING_RELATIONSHIP_SMALLER = 2;
+    public static final int STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL = 3;
+    public static final int STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL = 4;
+    public static final int STATE_MAPPING_RELATIONSHIP_BETWEEN = 5;
+    public static final int STATE_MAPPING_RELATIONSHIP_STRING_EQUAL = 6;
+    public static final int STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN = 7;
+
+
+    /* relationship **/
+    public static final String STATE_MAPPING_RELATIONSHIP_EQUAL_STRING = "Equal";
+    public static final String STATE_MAPPING_RELATIONSHIP_LARGER_STRING = "Larger";
+    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_STRING = "Smaller";
+    public static final String STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL_STRING = "LargerEqual";
+    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL_STRING = "SmallerEqual";
+    public static final String STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING = "Between";
+    public static final String STATE_MAPPING_RELATIONSHIP_STRING_EQUAL_STRING = "Equal";
+    public static final String STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING = "Contain";
+
+
+    protected static String mName;
     protected static ArrayList<Record> mLocalRecordPool;
     protected static ArrayList<Condition> mConditions;
     protected static ArrayList<StateMappingRule> mStateMappingRules;
@@ -28,10 +58,15 @@ public abstract class ContextStateManager {
     private int mSizeOfRecordPool = 300;
 
 
-    public abstract void examineConditions();
     public abstract void stateChanged();
     public abstract void saveRecordsInLocalRecordPool();
-    public abstract int getContextSourceTypeFromName(String sourceName);
+
+    public static int getContextSourceTypeFromName(String sourceName){
+        return 0;
+    }
+    public static String getContextSourceNameFromType(int sourceType){
+        return null;
+    }
 
     /**
      * updateStates()
@@ -39,30 +74,33 @@ public abstract class ContextStateManager {
      * change the value of the state. When a ContextStateManager check the values and update states
      * depends on the sampling rate and how it obtains the value (pull vs. push)
      */
-    public abstract void updateStates(int typeOfSource, String value);
-    public abstract void updateStates(int typeOfSource, int value);
+    public abstract void updateStateValues();
 
     public ContextStateManager() {
         mLocalRecordPool = new ArrayList<Record>();
         mStateMappingRules = new ArrayList<StateMappingRule>();
         mStateList = new ArrayList<State>();
-
-
-
     }
 
-    /*** given the current StetMappingRules, ContextStateManager needs to create the states for
-     * ContextManager to mointor.
-     */
-    public void setupStates() {
 
-        /** for each StateMappingRule, we create a state, even if two rules use the same source. **/
+    /*** given the current StetMappingRules, ContextStateManager needs to create the states for
+     * ContextManager to mointor. We call this whenever we modify (e.g. add, remove) the current rules
+     * We reset the current stateList, and then reconstruct it.
+     * TODO: in the future we just update the list for the newly added ones and removed ones.
+     */
+    public static void updateStates() {
+
+        //we reset the stateList
+        mStateList.clear();
+
+        // for each StateMappingRule, we create a state, even if two rules use the same source. **/
        for (int i=0; i <mStateMappingRules.size(); i++){
            StateMappingRule rule = mStateMappingRules.get(i);
            //we use the rule name as the name of the state
            State state = new State(rule.getName());
            //we add the state into the StateList
            mStateList.add(state);
+           //Log.d(LOG_TAG, "[testing stateMappingRule] creating state: " + state.getName() + " current value: " + state.getValue());
         }
     }
 
@@ -122,7 +160,12 @@ public abstract class ContextStateManager {
     }
 
     public static void addStateMappingRule(StateMappingRule rule){
+
         mStateMappingRules.add(rule);
+        //Log.d(LOG_TAG, "[testing stateMappingRule] adding rule: " + rule.toString() + " to " + getName());
+
+        //for each time we add a state, we update the list of State.
+        updateStates();
     }
 
     public static void removeStateMappingRule(StateMappingRule rule) {
@@ -142,4 +185,51 @@ public abstract class ContextStateManager {
         mLocalRecordPool = localRecordPool;
     }
 
+    public static String getName() {
+        return mName;
+    }
+
+    public static void setName(String name) {
+        mName = name;
+    }
+
+    public static String getRelationshipName(int relationship) {
+        
+        if (relationship==STATE_MAPPING_RELATIONSHIP_EQUAL){
+            return STATE_MAPPING_RELATIONSHIP_EQUAL_STRING;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER){
+            return STATE_MAPPING_RELATIONSHIP_LARGER_STRING;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_SMALLER){
+            return STATE_MAPPING_RELATIONSHIP_SMALLER_STRING;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL){
+            return STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL_STRING;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL){
+            return STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL_STRING;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_BETWEEN){
+            return STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_EQUAL){
+            return STATE_MAPPING_RELATIONSHIP_STRING_EQUAL_STRING;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN){
+            return STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING;
+        }
+        else
+            return null;
+    }
+
+    public static String getMeasureName(int measure) {
+
+        if (measure == CONTEXT_SOURCE_MEASURE_LATEST_ONE) {
+            return CONTEXT_SOURCE_MEASURE_LATEST_ONE_STRING;
+        } else if (measure == CONTEXT_SOURCE_MEASURE_AVERAGE) {
+            return CONTEXT_SOURCE_MEASURE_AVERAGE_STRING;
+        } else
+            return null;
+    }
 }
