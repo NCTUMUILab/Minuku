@@ -15,9 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionManager;
-import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService;
-import edu.umich.si.inteco.minuku.contextmanager.TransportationModeManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 
 public class FileHelper {

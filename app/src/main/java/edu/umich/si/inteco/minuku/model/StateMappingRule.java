@@ -1,11 +1,7 @@
 package edu.umich.si.inteco.minuku.model;
 
-import android.util.Log;
-
-import com.google.android.gms.maps.model.LatLng;
-
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
-import edu.umich.si.inteco.minuku.contextmanager.ContextStateManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 
 /**
  * Created by Armuro on 10/9/15.

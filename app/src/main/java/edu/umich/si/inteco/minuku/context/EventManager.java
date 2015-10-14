@@ -1,9 +1,7 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context;
 
 import android.content.Context;
 import android.util.Log;
-
-import com.google.android.gms.location.DetectedActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,7 +16,6 @@ import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.SimpleGeofence;
 import edu.umich.si.inteco.minuku.model.TimeConstraint;
 import edu.umich.si.inteco.minuku.model.TriggerLink;
-import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;

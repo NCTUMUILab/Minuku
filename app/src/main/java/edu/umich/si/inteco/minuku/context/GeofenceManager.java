@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context;
 
 /**
  * Created by Armuro on 9/29/15.
@@ -11,8 +11,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -29,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 import edu.umich.si.inteco.minuku.util.PreferenceHelper;
 
 

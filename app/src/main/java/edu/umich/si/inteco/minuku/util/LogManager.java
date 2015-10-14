@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Log.ProbeLog;
 
 public class LogManager {

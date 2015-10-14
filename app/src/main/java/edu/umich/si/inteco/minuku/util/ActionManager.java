@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
-import edu.umich.si.inteco.minuku.contextmanager.EventManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;

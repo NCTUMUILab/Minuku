@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 /**
  * Created by Armuro on 10/2/15.
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
 
 public class PhoneSensorManager extends ContextStateManager implements SensorEventListener {

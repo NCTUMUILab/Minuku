@@ -1,6 +1,6 @@
 package edu.umich.si.inteco.minuku.model.record;
 
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 
 /**
  * Created by Armuro on 6/18/14.

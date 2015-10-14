@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -7,9 +7,10 @@ import android.content.Intent;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 import edu.umich.si.inteco.minuku.util.LogManager;
 

@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context;
 
 import edu.umich.si.inteco.minuku.R;
 import android.app.IntentService;

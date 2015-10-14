@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context;
 
 import android.app.PendingIntent;
 import android.content.Context;

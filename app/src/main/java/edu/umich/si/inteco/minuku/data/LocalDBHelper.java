@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionManager;
-import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService;
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Configuration;
 import edu.umich.si.inteco.minuku.model.Questionnaire;

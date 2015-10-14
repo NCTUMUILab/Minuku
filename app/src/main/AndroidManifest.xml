@@ -63,14 +63,14 @@
         </service>
 
         <!-- Activity Recognition -->
-        <service android:name="edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionService"
+        <service android:name="edu.umich.si.inteco.minuku.context.ActivityRecognitionService"
             android:enabled="true"
             android:exported="true"
             >
         </service>
 
         <!--  Geofence  -->
-        <service  android:name="edu.umich.si.inteco.minuku.contextmanager.GeofenceTransitionService"
+        <service  android:name="edu.umich.si.inteco.minuku.context.GeofenceTransitionService"
             android:enabled="true"
             android:exported="true"
             >

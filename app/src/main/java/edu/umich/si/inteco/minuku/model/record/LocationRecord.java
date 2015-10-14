@@ -2,7 +2,7 @@ package edu.umich.si.inteco.minuku.model.record;
 
 import android.location.Location;
 
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 
 public class LocationRecord extends Record {
 

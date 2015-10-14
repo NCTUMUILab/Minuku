@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 import android.app.ActivityManager;
 import android.app.usage.UsageStats;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
@@ -20,7 +21,7 @@ import edu.umich.si.inteco.minuku.services.MinukuMainService;
 /**
  * Created by Armuro on 10/4/15.
  */
-public class PhoneStatusManager extends ContextStateManager{
+public class PhoneStatusManager extends ContextStateManager {
 
     //network
     //NetworkStats & NetworkStatsManager : api 23

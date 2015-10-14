@@ -1,13 +1,11 @@
 package edu.umich.si.inteco.minuku.model.record;
 
-import android.util.Log;
-
 import com.google.android.gms.location.DetectedActivity;
 
 import java.util.List;
 
-import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionManager;
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 
 public class ActivityRecord extends Record {
 

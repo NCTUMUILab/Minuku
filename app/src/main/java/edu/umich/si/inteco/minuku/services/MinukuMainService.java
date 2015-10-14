@@ -11,8 +11,8 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
-import edu.umich.si.inteco.minuku.contextmanager.EventManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
@@ -24,7 +24,6 @@ import edu.umich.si.inteco.minuku.util.BatteryHelper;
 import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.FileHelper;
 import edu.umich.si.inteco.minuku.util.LogManager;
-import edu.umich.si.inteco.minuku.contextmanager.MobilityManager;
 import edu.umich.si.inteco.minuku.util.NotificationHelper;
 import edu.umich.si.inteco.minuku.util.PreferenceHelper;
 import edu.umich.si.inteco.minuku.util.QuestionnaireManager;

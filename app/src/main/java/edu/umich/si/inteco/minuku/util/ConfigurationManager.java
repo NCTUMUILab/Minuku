@@ -10,11 +10,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.contextmanager.ActivityRecognitionManager;
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
-import edu.umich.si.inteco.minuku.contextmanager.ContextStateManager;
-import edu.umich.si.inteco.minuku.contextmanager.EventManager;
-import edu.umich.si.inteco.minuku.contextmanager.TransportationModeManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
+import edu.umich.si.inteco.minuku.context.EventManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;

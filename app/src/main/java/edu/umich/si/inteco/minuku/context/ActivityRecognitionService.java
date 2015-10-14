@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context;
 
 import android.R;
 import android.app.IntentService;
@@ -10,16 +10,14 @@ import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 
-import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 import edu.umich.si.inteco.minuku.util.LogManager;
 

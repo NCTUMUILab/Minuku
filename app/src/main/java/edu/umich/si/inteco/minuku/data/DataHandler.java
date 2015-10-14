@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
-import edu.umich.si.inteco.minuku.contextmanager.TransportationModeManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.TimeConstraint;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;

@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 
 import android.app.PendingIntent;
@@ -15,6 +15,8 @@ import com.google.android.gms.location.DetectedActivity;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ActivityRecognitionService;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 

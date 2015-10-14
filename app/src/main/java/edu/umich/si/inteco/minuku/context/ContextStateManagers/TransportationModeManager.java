@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;

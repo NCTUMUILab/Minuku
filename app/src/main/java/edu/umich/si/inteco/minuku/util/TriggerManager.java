@@ -5,7 +5,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.contextmanager.EventManager;
+import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.model.Event;
 import edu.umich.si.inteco.minuku.model.ProbeObject;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;

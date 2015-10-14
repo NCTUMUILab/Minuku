@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Log.ProbeLog;
 import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.util.LogManager;

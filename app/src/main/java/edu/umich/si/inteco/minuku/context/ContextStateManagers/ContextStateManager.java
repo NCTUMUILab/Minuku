@@ -1,11 +1,9 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.State;
@@ -54,6 +52,7 @@ public abstract class ContextStateManager {
     protected static ArrayList<Condition> mConditions;
     protected static ArrayList<StateMappingRule> mStateMappingRules;
     protected static ArrayList<State> mStateList;
+//    protected static HashMap<Integer, Boolean>mSourceExtractTable
 
     //size of record pool. If the number of records exceed the size, we remove outdated
     //record pool or clear the record pool if we save it in the public record pool

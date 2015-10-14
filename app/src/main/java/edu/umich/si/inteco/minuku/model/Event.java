@@ -19,15 +19,9 @@ public class Event extends ProbeObject{
     /**property**/
     private String _name;
     private String _description="NA";
-    private Task _task;
-    private JSONArray _conditionJSON = null;
-	private Schedule mSchedule;
     
     /**member**/
     private ArrayList<Condition> mConditionSet;
-    private ArrayList<Action> mTriggeredActionList;
-    
-    
     
     /**
      * Constructor
@@ -63,20 +57,10 @@ public class Event extends ProbeObject{
     public Event(String name, Task task){
     	super();
     	_name = name;
-    	_task = task;
     	mConditionSet = new ArrayList<Condition>();
-    	_task.getEventList().add(this);
     	 _class = TriggerManager.PROBE_OBJECT_CLASS_EVENT;
     }
-    
 
-    public void setTask(Task task){
-    	_task = task;
-    }
-    
-    public Task getTask (){
-    	return _task;
-    }
     
     public void setName(String name){
     	_name = name;
@@ -85,16 +69,8 @@ public class Event extends ProbeObject{
     public String getName(){
     	return _name;
     }
-    
-    
-    public void setConditionJSON(JSONArray conditionJSON){
-    	_conditionJSON = conditionJSON;
-    }
-    
-    public JSONArray getConditionJSON(){
-    	return _conditionJSON;
-    }
-    
+
+
     public void setConditionSet(ArrayList<Condition> conditionSet ){
     	
     	mConditionSet = conditionSet;
@@ -267,12 +243,5 @@ public class Event extends ProbeObject{
 		_description = d;
 	} 
 
-	public Schedule getSchedule (){
-		return mSchedule;
-	}
-	
-	public void setSchedule(Schedule schedule){
-		mSchedule = schedule;
-	}
 	
 }

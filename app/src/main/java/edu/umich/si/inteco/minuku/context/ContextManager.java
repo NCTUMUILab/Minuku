@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context;
 
 import android.content.Context;
 import android.util.Log;
@@ -12,6 +12,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.UserInteractionManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
@@ -117,7 +123,7 @@ public class ContextManager {
     private LocationManager mLocationManager;
 
     //the manager that manages the status of the phone (network, battery)
-    private PhoneStatusManager  mPhoneStatusManager;
+    private PhoneStatusManager mPhoneStatusManager;
 
     private UserInteractionManager mUserInteractionManager;
 

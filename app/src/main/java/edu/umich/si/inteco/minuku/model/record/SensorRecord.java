@@ -2,7 +2,7 @@ package edu.umich.si.inteco.minuku.model.record;
 
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.contextmanager.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 
 public class SensorRecord extends Record {
 

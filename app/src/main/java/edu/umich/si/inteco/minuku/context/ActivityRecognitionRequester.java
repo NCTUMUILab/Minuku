@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.contextmanager;
+package edu.umich.si.inteco.minuku.context;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -14,7 +14,6 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.services.MinukuMainService;
 
 
 public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConnectionFailedListener{
