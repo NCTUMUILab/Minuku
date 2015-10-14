@@ -15,6 +15,7 @@ import com.google.android.gms.location.DetectedActivity;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 
 /**
@@ -74,6 +75,7 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     public ActivityRecognitionManager(Context context) {
 
+        super();
         mContext= context;
 
         setName(ContextManager.CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION);
@@ -96,7 +98,7 @@ public class ActivityRecognitionManager extends ContextStateManager
      * LocationServices API.
      */
     protected synchronized void buildGoogleApiClient() {
-        Log.i(LOG_TAG, "Building GoogleApiClient");
+
         mGoogleApiClient =
                 new GoogleApiClient.Builder(mContext)
                         .addApi(ActivityRecognition.API)
@@ -125,7 +127,7 @@ public class ActivityRecognitionManager extends ContextStateManager
      */
     public void requestActivityRecognitionUpdates() {
 
-        Log.d(LOG_TAG, "[requestUpdates] going to request location update ");
+        //Log.d(LOG_TAG, "[requestUpdates] going to request location update ");
         //we need to get location. Set this true
         mRequestingActivityRecognitionUpdates = true;
 
@@ -151,7 +153,7 @@ public class ActivityRecognitionManager extends ContextStateManager
 
         mRequestingActivityRecognitionUpdates = false;
 
-        Log.d(LOG_TAG,"[removeUpdates] going to remove activity recognition ");
+        //Log.d(LOG_TAG,"[removeUpdates] going to remove activity recognition ");
         //first check whether we have GoogleAPIClient connected. if yes, we request activity
         // recognition. Otherwise we connect the client and then in onConnected() we request location
         if (!mGoogleApiClient.isConnected()){
@@ -221,6 +223,7 @@ public class ActivityRecognitionManager extends ContextStateManager
             // If no PendingIntent exists
         } else {
             // Create an Intent pointing to the IntentService
+
             Intent intent = new Intent(
                     mContext, ActivityRecognitionService.class);
             /*
@@ -248,7 +251,7 @@ public class ActivityRecognitionManager extends ContextStateManager
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
         if (connectionResult.hasResolution()) {
-            Log.d(LOG_TAG,"[onConnectionFailed] Conntection to Google Play services is failed");
+           // Log.d(LOG_TAG,"[onConnectionFailed] Conntection to Google Play services is failed");
 
         } else {
             Log.e(LOG_TAG, "[onConnectionFailed] No Google Play services is available, the error code is "
@@ -259,7 +262,7 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.d(LOG_TAG,"[test activity recognition update] the location servce is connected, going to request locaiton updates");
+        //Log.d(LOG_TAG,"[test activity recognition update] the location servce is connected, going to request locaiton updates");
 
         // If Minuku requests location updates before GoogleApiClient connects, we set
         // mRequestingLocationUpdates to true (See requestLocationUpdates). Here, we check
@@ -280,8 +283,20 @@ public class ActivityRecognitionManager extends ContextStateManager
         return sProbableActivities;
     }
 
-    public static void setProbableActivities(List<DetectedActivity> probableActivities) {
+    public static void setActivities (List<DetectedActivity> probableActivities, DetectedActivity mostProbableActivity ) {
+        //set activities
+        //Log.d(LOG_TAG, "set most probsble: inside setActivities : " + mostProbableActivity + " and " + probableActivities);
 
+        //set a list of probable activities
+        setProbableActivities(probableActivities);
+        //set the most probable activity
+        setMostProbableActivity(mostProbableActivity);
+
+        //after update activity information, update the values of the states
+        updateStateValues(CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES);
+    }
+
+    private static void setProbableActivities(List<DetectedActivity> probableActivities) {
         sProbableActivities = probableActivities;
         setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
@@ -292,7 +307,6 @@ public class ActivityRecognitionManager extends ContextStateManager
         record.setDetectionTime(sLatestDetectionTime);
         //add record to local record pool of ActivityRecognitionManager
         addRecord(record);
-
     }
 
     public static DetectedActivity getMostProbableActivity() {
@@ -301,6 +315,9 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     public static void setMostProbableActivity(DetectedActivity mostProbableActivity) {
         sMostProbableActivity = mostProbableActivity;
+//        Log.d(LOG_TAG, "set most probsble: inside sMostProbableActivity: " + mostProbableActivity);
+        //after update activity information, update the values of the states
+        updateStateValues(CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES);
     }
 
     public static long getLatestDetectionTime() {
@@ -383,10 +400,116 @@ public class ActivityRecognitionManager extends ContextStateManager
     }
 
 
-    @Override
-    public void updateStateValues() {
+    /**
+     * Examine whether the context source is needed in order to monitor a state.
+     * @param sourceType
+     * @return
+     */
+    private static boolean isStateMonitored(int sourceType) {
+
+        Log.d(LOG_TAG, "examine statemappingrule: in isStateMonitored");
+        for (int i=0; i<getStateMappingRules().size(); i++){
+
+            if (getStateMappingRules().get(i).getSource()==sourceType){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *the timing for ActivityRecognitionManager to updateStateValues is whenever it's activity information
+     * is updated. We use the StateMappingRules to decide whether we should change the values of the states.
+     * To to do this,we first get the relevant state based on the type.
+     * @param sourceType
+     */
+    public static void updateStateValues(int sourceType) {
+
+
+        //1. we first make sure whether the sourceType is being monitored. If not, we don't need to update
+        //the state values
+        //Log.d(LOG_TAG, "examine statemappingrule, the state is being monitored: " + isStateMonitored(sourceType));
+        if (!isStateMonitored(sourceType)) {
+            return;
+        }
+
+        //2. if yes, we get the stateMappingRule by the type to see it's threshold
+        // source  = all probable activities
+
+        for (int i=0; i<getStateMappingRules().size(); i++) {
+            //get the rule
+            StateMappingRule rule = getStateMappingRules().get(i);
+            boolean pass= false;
+
+            //1. get the targer value and relaionship
+            int relationship = rule.getRelationship();
+            String targetValue = rule.getStringTargetValue();
+            int measure = rule.getMeasure();
+
+            //Log.d(LOG_TAG, "examine statemappingrule, now examine " + rule.getName() + " meausre: " +  rule.getMeasure()  + " sourceType: " + sourceType );
+
+            /** examine criteri on specified in the SateMappingRule **/
+            //1 first we need to get the right source based on the sourcetype.
+            //so that we know where the get the source value.
+            //
+            if (sourceType==CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES){
+
+
+            }
+
+            else if (sourceType==CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES){
+
+                String sourceValue=null;
+
+                /**get source value based on the measure**/
+                //2. if the measure is "latest value", get the latest saved data
+                if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
+                    sourceValue= getActivityNameFromType(getMostProbableActivity().getType());
+                   // Log.d(LOG_TAG, "examine statemappingrule, now examine " + rule.getName() + " source : " +  sourceValue);
+                }
+                else if (measure==CONTEXT_SOURCE_MEASURE_AVERAGE) {
+                    //there is no average value for ACTIVITY_RECOGNITION
+                }
+
+
+                //3. examine the criterion after we get the source value
+                if (sourceValue != null) {
+                    Log.d(LOG_TAG, "examine statemappingrule " + rule.getName() + " with current source value " + sourceValue);
+                    pass = satisfyCriterion(sourceValue, relationship, targetValue);
+                }
+
+
+            }
+
+            Log.d(LOG_TAG, "examine statemappingrule, after the examination the criterion is " + pass);
+
+            //4. if the criterion is passed, we change the state value
+            if (pass){
+                for (int j=0; j<getStateList().size(); j++){
+                    //find the state corresponding to the StateMappingRule
+                    if (getStateList().get(j).getName().equals(rule.getName())){
+
+                        String stateValue = rule.getStateValue();
+                        //change the value based on the mapping rule.
+                        getStateList().get(j).setValue(stateValue );
+
+                        Log.d(LOG_TAG, "examine statemappingrule, the state " + getStateList().get(j).getName() + " value change to " + getStateList().get(j).getValue());
+
+                    }
+                }
+            }
+
+        }
+
+
+
+
+
+
 
     }
+
+
 
     public static int getContextSourceTypeFromName(String sourceName) {
 

@@ -22,6 +22,7 @@ public class UserInteractionManager extends ContextStateManager {
 
 
 	public UserInteractionManager(Context context) {
+		super();
 		mContext = context;
 	}
 
@@ -45,8 +46,7 @@ public class UserInteractionManager extends ContextStateManager {
 				return "NA";
 	}
 
-	@Override
-	public void updateStateValues() {
+	public static void updateStateValues() {
 
 	}
 }

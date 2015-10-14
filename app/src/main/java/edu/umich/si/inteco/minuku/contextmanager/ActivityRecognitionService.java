@@ -69,8 +69,9 @@ public class ActivityRecognitionService extends IntentService {
                 //we don't save this when we playback activity traces from file
                 //instead, we let ContextManager to feed activity
 
-                ActivityRecognitionManager.setMostProbableActivity(mMostProbableActivity);
-                ActivityRecognitionManager.setProbableActivities(mProbableActivities);
+                //after we get activity information from Google's Play service, we update the activity information
+                //in ActitivityRecognition Manager
+                ActivityRecognitionManager.setActivities(mProbableActivities, mMostProbableActivity);
 
                 if (Constants.isTestingActivity) {
                 	sendNotification();

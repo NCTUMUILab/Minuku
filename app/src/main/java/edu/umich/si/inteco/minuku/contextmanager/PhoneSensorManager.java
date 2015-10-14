@@ -53,6 +53,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     public PhoneSensorManager(Context context) {
 
+        super();
         Log.d(LOG_TAG, "[testing start service] going to start the context extractor");
 
         mContext = context;
@@ -157,8 +158,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         return "NA";
     }
 
-    @Override
-    public void updateStateValues() {
+    public static void updateStateValues() {
 
     }
 

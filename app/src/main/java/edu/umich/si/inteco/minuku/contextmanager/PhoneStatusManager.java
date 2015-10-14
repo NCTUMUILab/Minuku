@@ -50,7 +50,7 @@ public class PhoneStatusManager extends ContextStateManager{
     private static Handler mMainThread;
 
     public PhoneStatusManager(Context context){
-
+        super();
         mContext = context;
         mActivityManager = (ActivityManager) mContext.getSystemService(mContext.ACTIVITY_SERVICE);
         mPowerManager = (PowerManager) mContext.getSystemService(mContext.POWER_SERVICE);
@@ -222,8 +222,7 @@ public class PhoneStatusManager extends ContextStateManager{
 
 
 
-    @Override
-    public void updateStateValues() {
+    public static void updateStateValues() {
 
         /** get the relevant rule to the source. **/
         for (int i=0; i <mStateMappingRules.size(); i++){

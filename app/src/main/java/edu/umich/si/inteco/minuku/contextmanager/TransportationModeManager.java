@@ -85,7 +85,7 @@ public class TransportationModeManager extends ContextStateManager {
     private static final String LOG_TAG = "TransModeDetector";
 
     public TransportationModeManager(Context context) {
-
+        super();
         setName(ContextManager.CONTEXT_STATE_MANAGER_TRANSPORTATION);
         mContext = context;
     }
@@ -794,9 +794,7 @@ public class TransportationModeManager extends ContextStateManager {
         }
     }
 
-
-    @Override
-    public void updateStateValues() {
+    public static void updateStateValues() {
 
     }
 

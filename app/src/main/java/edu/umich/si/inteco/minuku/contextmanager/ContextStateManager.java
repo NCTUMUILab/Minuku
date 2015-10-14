@@ -27,13 +27,15 @@ public abstract class ContextStateManager {
 
     /* relationship **/
     public static final int STATE_MAPPING_RELATIONSHIP_EQUAL = 0;
-    public static final int STATE_MAPPING_RELATIONSHIP_LARGER = 1;
-    public static final int STATE_MAPPING_RELATIONSHIP_SMALLER = 2;
-    public static final int STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL = 3;
-    public static final int STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL = 4;
-    public static final int STATE_MAPPING_RELATIONSHIP_BETWEEN = 5;
-    public static final int STATE_MAPPING_RELATIONSHIP_STRING_EQUAL = 6;
-    public static final int STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN = 7;
+    public static final int STATE_MAPPING_RELATIONSHIP_NOT_EQUAL = 1;
+    public static final int STATE_MAPPING_RELATIONSHIP_LARGER = 2;
+    public static final int STATE_MAPPING_RELATIONSHIP_SMALLER = 3;
+    public static final int STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL = 4;
+    public static final int STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL = 5;
+    public static final int STATE_MAPPING_RELATIONSHIP_BETWEEN = 6;
+    public static final int STATE_MAPPING_RELATIONSHIP_STRING_EQUAL = 7;
+    public static final int STATE_MAPPING_RELATIONSHIP_STRING_NOT_EQUAL = 8;
+    public static final int STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN = 9;
 
 
     /* relationship **/
@@ -68,13 +70,7 @@ public abstract class ContextStateManager {
         return null;
     }
 
-    /**
-     * updateStates()
-     * ContextStateManager check the value for each countextual source and determine whether to
-     * change the value of the state. When a ContextStateManager check the values and update states
-     * depends on the sampling rate and how it obtains the value (pull vs. push)
-     */
-    public abstract void updateStateValues();
+
 
     public ContextStateManager() {
         mLocalRecordPool = new ArrayList<Record>();
@@ -82,6 +78,13 @@ public abstract class ContextStateManager {
         mStateList = new ArrayList<State>();
     }
 
+    /**
+     * updateStates()
+     * ContextStateManager check the value for each countextual source and determine whether to
+     * change the value of the state for every 5 seconds When a ContextStateManager check the values and update states
+     * depends on the sampling rate and how it obtains the value (pull vs. push)
+     */
+    public static void updateStateValues( ){};
 
     /*** given the current StetMappingRules, ContextStateManager needs to create the states for
      * ContextManager to mointor. We call this whenever we modify (e.g. add, remove) the current rules
@@ -191,6 +194,57 @@ public abstract class ContextStateManager {
 
     public static void setName(String name) {
         mName = name;
+    }
+
+    protected  static boolean satisfyCriterion(String value, int relationship, String targetValue ){
+
+        boolean pass=false;
+
+        if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_EQUAL){
+            if (value.equals(targetValue)) pass = true;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_NOT_EQUAL){
+            if (!value.equals(targetValue)) pass = true;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN){
+            if (value.equals(targetValue)) pass = true;
+        }
+
+        Log.d(LOG_TAG, "[examine statemappingrule] comparing value " + value +" and targetvalue " + targetValue + " rel: " + relationship  + " pass: " + pass) ;
+
+        return pass;
+
+    }
+
+
+
+    protected  static boolean satisfyCriterion(float value, int relationship, float targetValue ) {
+
+        boolean pass=false;
+
+        if (relationship==STATE_MAPPING_RELATIONSHIP_EQUAL){
+            if (value==targetValue) pass = true;
+        }else if (relationship==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL){
+            if (value!=targetValue)  pass = true;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER){
+            if (value>targetValue) pass = true;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL){
+            if (value>=targetValue) pass = true;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_SMALLER){
+            if (value<targetValue) pass = true;
+        }
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL){
+            if (value<=targetValue) pass = true;
+        }
+
+
+        Log.d(LOG_TAG, "satisfyCriterion] comparing value " + value +" and targetvalue " + targetValue + " relship: " + relationship  + " pass: " + pass) ;
+
+        return pass;
+
     }
 
     public static String getRelationshipName(int relationship) {

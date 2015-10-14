@@ -8,6 +8,7 @@ public class State {
     private int mId;
     private String mName;
     private String mValue = "default";
+    private long mLatestUpdatedTime= -1;
 
     public State(String name) {
         mName = name;
@@ -37,7 +38,15 @@ public class State {
         return mValue;
     }
 
-    public void setmValue(String value) {
+    public void setValue(String value) {
         this.mValue = value;
+    }
+
+    public long getLatestUpdatedTime() {
+        return mLatestUpdatedTime;
+    }
+
+    public void setLatestUpdatedTime(long latestUpdatedTime) {
+        this.mLatestUpdatedTime = latestUpdatedTime;
     }
 }

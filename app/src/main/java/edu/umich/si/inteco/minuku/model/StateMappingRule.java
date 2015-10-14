@@ -87,8 +87,36 @@ public class StateMappingRule {
         setName();
     }
 
+    public boolean isValueString() {
+        return mIsValueString;
+    }
+
+    public float getFloatTargetValue() {
+        return mFloatTargetValue;
+    }
+
+    public String getStringTargetValue() {
+        return mStringTargetValue;
+    }
+
+    public int getRelationship(){
+        return mRelationship;
+    }
+
+    public int getMeasure() {
+        return mMeasure;
+    }
+
     public String getName() {
         return mName;
+    }
+
+    public String getStateValue() {
+        return mStateValue;
+    }
+
+    public void setmStateValue(String stateValue) {
+        this.mStateValue = stateValue;
     }
 
     private void setName() {
@@ -97,6 +125,10 @@ public class StateMappingRule {
                 + ContextStateManager.getRelationshipName(mRelationship)
                 + mStringTargetValue
                 + mStateValue;
+    }
+
+    public int getSource() {
+        return mSource;
     }
 
     @Override
