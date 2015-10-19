@@ -13,7 +13,7 @@ public class Condition {
 
 	private int _id;
 	protected String mStateName;
-	protected String mStateValue;
+	protected String mStateTargetValue;
     private ArrayList<TimeConstraint> mTimeConstraintList;
 
     private float[] mTargetValues;
@@ -30,7 +30,7 @@ public class Condition {
 	 */
 	public Condition(String stateName, String stateValue) {
 		mStateName = stateName;
-		mStateValue = stateValue;
+		mStateTargetValue = stateValue;
 	}
 
 	/****
@@ -46,7 +46,15 @@ public class Condition {
 		mTimeConstraintList.add(timeConstraint);
 		
 	}
-	
+
+	public String getStateName() {
+		return mStateName;
+	}
+
+	public String getStateTargetValue() {
+		return mStateTargetValue;
+	}
+
 	/**
 	 * 
 	 * @param constraintType

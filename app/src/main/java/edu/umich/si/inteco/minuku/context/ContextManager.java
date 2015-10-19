@@ -20,9 +20,15 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationMod
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.UserInteractionManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
+import edu.umich.si.inteco.minuku.model.Condition;
+import edu.umich.si.inteco.minuku.model.Event;
+import edu.umich.si.inteco.minuku.model.ProbeObject;
+import edu.umich.si.inteco.minuku.model.State;
+import edu.umich.si.inteco.minuku.model.TriggerLink;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
+import edu.umich.si.inteco.minuku.util.TriggerManager;
 
 public class ContextManager {
 
@@ -323,6 +329,60 @@ public class ContextManager {
                 BACKGROUND_RECORDING_INITIAL_DELAY,
                 CONTEXT_MANAGER_REFRESH_FREQUENCY,
                 TimeUnit.SECONDS);
+    }
+
+
+    /**
+     * This function receives notifications from ContextSTateManager about a value change of a state,
+     * It then examines any events of which the conditions involve the state, detemrining whether the
+     * event occurs.
+     * @param state
+     */
+    public static void examineEventConditions(State state) {
+
+        /**get all the events that use the state **/
+        ArrayList <Event> evtList = state.getEventList();
+
+        //for each event, get all of the conditions, and check whether the condition has been met.
+        for (int i=0; i< evtList.size(); i++) {
+
+            Event event = evtList.get(i);
+            /** an event is a list of conditions. An event occurs only when all conditions are met **/
+            boolean pass = true;
+
+            ArrayList<Condition> conditions = event.getConditionList();
+
+            //we use "&" operation for all condition. As long as there is one false for one condition
+            //pass is false.
+                for (int j=0 ; j<conditions.size(); j++){
+                    Condition condition = conditions.get(j);
+                    //the final pass is true only when all the conditions are true.
+                    pass = pass & state.getValue().equals(condition.getStateTargetValue());
+                }
+
+            /** for any event for which the conditions are true, we let TriggerManager to see which action/action control to trigger.**/
+
+            //if the conditions of the event is satisfied.
+            if (pass) {
+
+                //log when an event is detected
+                LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
+                        LogManager.LOG_TAG_EVENT_DETECTED,
+                        "Event detected:\t" + event.getId() + "\t" + event.getName());
+
+                //check the triggerlinks of the current event to see if it would trigger anything.
+                Log.d(LOG_TAG, "[examineEventConditions] The event " + event.getId() + "  condition is satisfied, check its triggerLinks! "
+                        + " the event has " + event.getTriggerLinks().size() + " triggerlinks ");
+
+                //the event will trigger something, we call TriggerManager to manage its trigger.
+                if (event.getTriggerLinks().size() > 0) {
+                    TriggerManager.executeTriggers(event.getTriggerLinks());
+                }
+            }
+
+        }
+
+
     }
 
     public void stopContextManagerMainThread() {

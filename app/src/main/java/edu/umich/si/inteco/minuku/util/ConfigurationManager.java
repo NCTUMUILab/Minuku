@@ -37,6 +37,8 @@ public class ConfigurationManager {
 
 	private static final String LOG_TAG = "ConfigurationManager";
 
+	private static final String TEST_FILE_NAME = "new_study.json";
+
 	public static final String CONFIGURATION_FILE_NAME = Constants.CONFIGURATION_FILE_NAME_PARTI;
 
 	public static final String CONFIGURATION_PROPERTIES_ID = "Id";
@@ -117,22 +119,13 @@ public class ConfigurationManager {
 		}
 		*/
 
-		/*** 2 if there is no data in the DB, then load file **/
+		/*** 2 if there is no data in the DB ( or sharedpreference), then load file **/
 
 		
 		if (res.size()==0){
 
 			//load files
-            String filename = "";
-
-            if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
-
-                filename = Constants.CONFIGURATION_FILE_NAME_PARTI;
-            }else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.IN_STIU_LABELING_CONDITION)) {
-                filename = Constants.CONFIGURATION_FILE_NAME_IN_SITU;
-            }else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION) ){
-                filename = Constants.CONFIGURATION_FILE_NAME_POST_HOC;
-            }
+            String filename =  TEST_FILE_NAME;
 
             Log.d(LOG_TAG, "[loadConfiguration] no configuration in the database, load file.." + filename);
             String study_str = new FileHelper(mContext).loadFileFromAsset(filename);
@@ -168,7 +161,10 @@ public class ConfigurationManager {
 					//store the configuration into the database
 				//	Log.d(LOG_TAG, "[loadConfiguration]  After creating the configuration object, inser the configuration into the database");
 					
-					mLocalDBHelper.insertConfigurationTable(config, DatabaseNameManager.CONFIGURATION_TABLE_NAME);
+				//	mLocalDBHelper.insertConfigurationTable(config, DatabaseNameManager.CONFIGURATION_TABLE_NAME);
+
+					//TODO: save configuration in SharedPreference
+
 	
 				}
 				

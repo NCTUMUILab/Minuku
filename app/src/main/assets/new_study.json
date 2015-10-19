@@ -1,0 +1,181 @@
+[	
+	{	
+		"Id":1,
+		"Name":"CrowdBased Labeling Study",
+		"Task":
+			[
+		        {
+		            "Id": 1,
+		            "Name": "Using Phone at North Quad",
+		            "Description": "respond to the questionnaire when using phone at",
+		            "Timestamp_string": "2014-03-06 11:41:37 UTC",
+		            "Created_time":"1394106097000",
+		            "Start_time":"1394106097000",
+		            "End_time":"1404259199"
+		        }		   
+			
+			], 
+
+		"Configuration":
+		{	
+			"Id": 1,
+			"Version": 1,
+			"Name": "Configuration1",
+			"Content":
+			{
+				"Event": 
+				[
+					{
+						"Id": 1,
+						"Task_id": 1,
+						"Name": "Tilting event at NQ",
+						"Description":"NA",
+						"Conditions": 
+						[ 
+							{							
+								"StateName":"Use Phone",
+								"Source": "ActivityRecognition",
+								"TargetValue": "tilting",				
+								"Constraint": [
+									{
+										"Type": "recency",
+										"Relationship": "<=", 
+										"TargetValue": "5" 
+									}
+								]
+							} 
+						]
+					}, 
+					{
+						"Id": 2,
+						"Task_id": 1,
+						"Name": "No attention on the phone",
+						"Description":"NA",
+						"Conditions": 
+						[ 
+							{
+								
+								"StateName": "Phone Still for a period",
+								"Source": "ActivityRecognition",
+								"TargetValue": "still",					
+								"Constraint": [
+									{
+										"Type": "duration",
+										"Relationship": ">", 
+										"TargetValue": "30" 
+									}
+								]
+							} 
+						]
+					}					
+				],
+			
+				"Action":
+				[
+					{
+						"Id": 1,
+						"Execution_style":"one-time",
+						"Type": "questionnaire",
+						"Name": "triggering carried item questionnaire",
+						"Questionnaire_id":1,
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Event",
+										"Id":2,
+										"Sampling_rate": 1
+									},
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 2
+									}
+								}							
+							]
+						
+						},		
+						
+						"Notification":
+						{
+							"Title": "What item are you carrying?",
+							"Message": "Please tab to report what items you are carrying."
+						}
+					}  
+				],
+
+
+
+				"Questionnaire":
+				[
+					{
+						"Id": 1,
+						"Title": "Where do you place your phone?",
+						"Description":"Please answer the following questions.",
+						"Questions":
+						[
+							{
+								"Index": 1,
+								"Type":"textbox",
+								"Question_text": "Where are you now?"					
+							},
+
+							{
+								"Index": 2,
+								"Type":"multichoice_one_answer",
+								"Has_other_field":true,
+								"Question_text": "Where did you just place your phone?",	
+								"Option":
+								[
+									{
+										"Option_text":"Desk/Table"
+									},
+									{
+										"Option_text": "Pocket"
+									},
+									{
+										"Option_text": "Bagpack/handbag"
+									},
+									{
+										"Option_text": "Other"
+									}
+
+								]
+
+
+							},
+
+							{
+								"Index": 3,
+								"Type":"multichoice_multiple_answer",
+								"Question_text": "What is/are the reason(s) that you place your phone there?",
+								"Option":
+								[
+									{
+										"Option_text":"It's easier to notice notifications."
+									},
+									{
+										"Option_text": "It's convenient to grab."
+									},
+									{
+										"Option_text": "It's less disturbing."
+									}
+								]					
+							}
+
+						]
+
+					}		
+
+				]
+
+			}
+			
+
+		}
+		
+	}
+]

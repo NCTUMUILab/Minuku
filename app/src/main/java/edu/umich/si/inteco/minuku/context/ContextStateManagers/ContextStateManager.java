@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
@@ -59,7 +60,7 @@ public abstract class ContextStateManager {
     private int mSizeOfRecordPool = 300;
 
 
-    public abstract void stateChanged();
+
     public abstract void saveRecordsInLocalRecordPool();
 
     public static int getContextSourceTypeFromName(String sourceName){
@@ -76,6 +77,13 @@ public abstract class ContextStateManager {
         mStateMappingRules = new ArrayList<StateMappingRule>();
         mStateList = new ArrayList<State>();
     }
+
+
+    /** if the value of the state is changed, we inform ContextManager about the change so that it can
+     * examine the conditions of the events related to the state **/
+    public static void stateChanged(State state){
+        ContextManager.examineEventConditions(state);
+    };
 
     /**
      * updateStates()

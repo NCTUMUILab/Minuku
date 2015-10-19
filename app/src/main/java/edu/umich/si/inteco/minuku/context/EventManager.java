@@ -75,7 +75,7 @@ public class EventManager {
 					//Log.d(LOG_TAG,"[examineEventConditions] the " + i + " event is  " + event.getName());
 					
 					//get conditions from the event
-					ArrayList<Condition> conditionSet = event.getConditionSet();
+					ArrayList<Condition> conditionSet = event.getConditionList();
 					//Log.d(LOG_TAG, "[examineEventConditions] currently there are " + conditionSet.size() + " conditions in the event " + event.getName());
 					
 
@@ -85,7 +85,7 @@ public class EventManager {
 
 
                         //check if the condition is special type...such as TransportaionModeDetection
-                        if (condition.getType().equals(ConditionManager.CONDITION_TYPE_PROBE_TRANSPORTATION)) {
+                        if (condition.getStateName().equals(ConditionManager.CONDITION_TYPE_PROBE_TRANSPORTATION)) {
 
 
 

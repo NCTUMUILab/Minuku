@@ -12,25 +12,17 @@ import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.TriggerManager;
 
 public class Event extends ProbeObject{
-
-	/** Tag for logging. */
+	
     private static final String LOG_TAG = "Event";
-    
-    /**property**/
-    private String _name;
-    private String _description="NA";
-    
-    /**member**/
-    private ArrayList<Condition> mConditionSet;
-    
-    /**
-     * Constructor
-     */
-    
+	
+    private String mName;
+    private String mDescription="NA";
+    private ArrayList<Condition> mConditionList;
+
     public Event(String name){
     	super();
-    	_name = name;
-    	mConditionSet = new ArrayList<Condition>();
+    	mName = name;
+    	mConditionList = new ArrayList<Condition>();
         _class = TriggerManager.PROBE_OBJECT_CLASS_EVENT;
 
     }
@@ -38,9 +30,9 @@ public class Event extends ProbeObject{
     public Event(int id, String name, int study_id){
     	super();
     	_id = id;
-    	_name = name;
+    	mName = name;
     	_studyId = study_id;
-    	mConditionSet = new ArrayList<Condition>();
+    	mConditionList = new ArrayList<Condition>();
     	 _class = TriggerManager.PROBE_OBJECT_CLASS_EVENT;
     }
     
@@ -48,199 +40,62 @@ public class Event extends ProbeObject{
     public Event(int id, String name, String description){
     	super();
     	_id = id;
-    	_name = name;
-    	_description = description;
-    	mConditionSet = new ArrayList<Condition>();
+    	mName = name;
+    	mDescription = description;
+    	mConditionList = new ArrayList<Condition>();
     	 _class = TriggerManager.PROBE_OBJECT_CLASS_EVENT;
     }    
 
     public Event(String name, Task task){
     	super();
-    	_name = name;
-    	mConditionSet = new ArrayList<Condition>();
+    	mName = name;
+    	mConditionList = new ArrayList<Condition>();
     	 _class = TriggerManager.PROBE_OBJECT_CLASS_EVENT;
     }
 
-    
     public void setName(String name){
-    	_name = name;
+    	mName = name;
     }
     
     public String getName(){
-    	return _name;
+    	return mName;
     }
 
-
-    public void setConditionSet(ArrayList<Condition> conditionSet ){
-    	
-    	mConditionSet = conditionSet;
+    public void setConditionList(ArrayList<Condition> ConditionList ){
+    	mConditionList = ConditionList;
     }
     
-    public ArrayList<Condition> getConditionSet(){
-    	
-    	return mConditionSet;
+    public ArrayList<Condition> getConditionList(){
+    	return mConditionList;
     }
     
     public void addCondition(Condition condition){
-    	
-    	mConditionSet.add(condition);
+    	mConditionList.add(condition);
     }
     
-    public void addCondition(String type, String relationship, String targetValue){
-    	
-    	Condition condition = new Condition(type, relationship, targetValue);
-    	mConditionSet.add(condition);
-    	
+    public void addCondition(String stateName, String stateValue){
+    	Condition condition = new Condition(stateName, stateValue);
+    	mConditionList.add(condition);
     }
-    
-    public void addCondition(String type, String relationship, float targetValue){
-    	
-    	Condition condition = new Condition(type, relationship, targetValue);
-    	mConditionSet.add(condition);
-    	
-    }
-    
-    public void addCondition(String type, double latitude, double longitude, String relationship, float targetValue){
-    	
-    	Condition condition = new Condition(type, latitude, longitude, relationship, targetValue);
-    	mConditionSet.add(condition);
-    	
-    }
-    
-    public void addCondition(String type, double latitude, double longitude, String relationship, float upper, float lower){
-    	
-    	Condition condition = new Condition(type, latitude, longitude, relationship, upper, lower);
-    	mConditionSet.add(condition);
-    	
-    	
-    	
-    }
-    
-    /**
-     * create JSON object according to the condition set arraylist
-     * @return json object
-     */
-    
-    
 
-	
-	
-    //there is a bug in this function
-    public String getConditionsInJSONString (){
-    	
-    	String jsonString = null; 
-    	JSONObject jObjectConditionSet= new JSONObject();
-    	
-    	//convert condition into JSON object 
-    	
-    	try {
-    		
-    		for (int i=0; i <mConditionSet.size(); i++){
-        		
-        		Condition condition = mConditionSet.get(i);
-        		
-        		JSONObject jObjectCondition = new JSONObject();
-        		
-        		//add type & relationship
-    			jObjectCondition.put("type", condition.getType());
-        		jObjectCondition.put("relationship", condition.getRelationship());
-        		
-        		/** Location **/
-        		if (condition.getType()==ConditionManager.CONDITION_TYPE_DISTANCE_TO){       			
-        			jObjectCondition.put("lat", condition.getLatLng().latitude);
-        			jObjectCondition.put("lng", condition.getLatLng().longitude);
-        			jObjectCondition.put("floatTargetValue", condition.getFloatTargetValue());
-        			Log.d(LOG_TAG, "the generated jason object is " + jObjectCondition.toString(4));
-
-        		}
-        		/** Activity **/
-        		if (condition.getType()==ConditionManager.CONDITION_TYPE_ACTIVITY_TYPE){	      			
-        			jObjectCondition.put("stringTargetValue", condition.getStringTargetValue());
-        			Log.d(LOG_TAG, "the generated jason object is " + jObjectCondition.toString(4));
-        		}
-        		
-        		if (condition.getType()==ConditionManager.CONDITION_TYPE_ACTIVITY_CONFIDENCE){
-        			
-        			
-        		}
-        		Log.d(LOG_TAG, "adding json to the condition");
-        		
-        		
-        		/**check if there's constraint to add to the condition**/      		
-        		JSONObject jObjectConstraint = new JSONObject();       		
-    	
-    			for (int j=0; j<condition.getTimeConstraints().size(); j++){
-        			
-    				Log.d(LOG_TAG, "adding constraint...");
-        			TimeConstraint constraint = condition.getTimeConstraints().get(j);
-        			jObjectConstraint.put("type", constraint.getType());
-        			jObjectConstraint.put("relationship", constraint.getRelationship());
-        			
-        			if (constraint.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_RECENCY) || 
-        					constraint.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_DURATION) ){
-        			
-        				jObjectConstraint.put("targetValue", constraint.getInterval());
-        				
-        				
-        			}if (constraint.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_EXACTTIME)){
-        			
-        				jObjectConstraint.put("targetValue", constraint.getExactTime());
-        				
-        				
-        			}if (constraint.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_TIMEOFDAY)){
-        			
-        				jObjectConstraint.put("targetValue", constraint.getTimeDay());
-        			
-        			}
-        			
-        			
-        		}
-    			
-    			Log.d(LOG_TAG, "going to adding json constraint to the condition");
-    			
-    			//add constraint to the JSONCondition
-    			jObjectCondition.put("Constraint", jObjectConstraint);
-
-    			jObjectConditionSet.put("Condition", jObjectConditionSet);
-    			
-    		}//1st for loop
-    		
-    		Log.d(LOG_TAG, "going to print the jason object");
-    		Log.d(LOG_TAG, "the generated jason object is " + jObjectConditionSet.toString(4));
-
-    		
-    	}catch (Exception e){
-    		
-    		
-    		
-    	}
-    	
-    	
-    	return jsonString;
-    }
-    
-    
     public void getCondition(int index){
-        
-    	mConditionSet.get(index);
+    	mConditionList.get(index);
     }
 
     public void removeCondition(int index){
-    
-    	mConditionSet.remove(index);
+    	mConditionList.remove(index);
     }
     
     public void removeCondition(Condition condition){
-        
-    	mConditionSet.remove(condition);
+    	mConditionList.remove(condition);
     }
     
 	public String getDescription(){
-		return _description;
+		return mDescription;
 	} 
 	
 	public void setDescription(String d){
-		_description = d;
+		mDescription = d;
 	} 
 
 	

@@ -17,6 +17,7 @@ import java.util.List;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 
@@ -391,10 +392,6 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     }
 
-    @Override
-    public void stateChanged() {
-
-    }
 
     @Override
     public void saveRecordsInLocalRecordPool() {
@@ -463,8 +460,10 @@ public class ActivityRecognitionManager extends ContextStateManager
 
                 String sourceValue=null;
 
-                /**get source value based on the measure**/
-                //2. if the measure is "latest value", get the latest saved data
+
+                /**2. get source value according to the measure type**/
+
+                //if the measure is "latest value", get the latest saved data**/
                 if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
                     sourceValue= getActivityNameFromType(getMostProbableActivity().getType());
                    // Log.d(LOG_TAG, "examine statemappingrule, now examine " + rule.getName() + " source : " +  sourceValue);
@@ -474,9 +473,10 @@ public class ActivityRecognitionManager extends ContextStateManager
                 }
 
 
-                //3. examine the criterion after we get the source value
+
+                /**3. examine the criterion after we get the source value**/
                 if (sourceValue != null) {
-                    Log.d(LOG_TAG, "examine statemappingrule " + rule.getName() + " with current source value " + sourceValue);
+                   // Log.d(LOG_TAG, "examine statemappingrule " + rule.getName() + " with current source value " + sourceValue);
                     pass = satisfyCriterion(sourceValue, relationship, targetValue);
                 }
 
@@ -485,29 +485,47 @@ public class ActivityRecognitionManager extends ContextStateManager
 
             Log.d(LOG_TAG, "examine statemappingrule, after the examination the criterion is " + pass);
 
-            //4. if the criterion is passed, we change the state value
+
+            /** 4. if the criterion is passed, we set the state value based on the mappingRule **/
             if (pass){
+
                 for (int j=0; j<getStateList().size(); j++){
                     //find the state corresponding to the StateMappingRule
+
+                    boolean valueChanged = false;
+
                     if (getStateList().get(j).getName().equals(rule.getName())){
 
                         String stateValue = rule.getStateValue();
                         //change the value based on the mapping rule.
-                        getStateList().get(j).setValue(stateValue );
+
+                        /** 5. now we need to check whether the new value is different from its current value
+                         * if yes. we need to call StateChange Method later **/
+                        if (!getStateList().get(j).getValue().equals(stateValue) ){
+                            //the value is changed to the new value,
+                            valueChanged = true;
+                        }
+
+                        getStateList().get(j).setValue(stateValue);
 
                         Log.d(LOG_TAG, "examine statemappingrule, the state " + getStateList().get(j).getName() + " value change to " + getStateList().get(j).getValue());
 
                     }
+
+                    //if the state changes to a new value
+                    if (valueChanged){
+                        //we call this method to invoke ContextManager to inspect event conditions.
+                        stateChanged(getStateList().get(j));
+                    }
+
                 }
             }
 
+
+
+
+
         }
-
-
-
-
-
-
 
     }
 

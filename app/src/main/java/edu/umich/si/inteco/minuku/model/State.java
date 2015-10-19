@@ -1,5 +1,7 @@
 package edu.umich.si.inteco.minuku.model;
 
+import java.util.ArrayList;
+
 /**
  * Created by Armuro on 10/9/15.
  */
@@ -9,6 +11,8 @@ public class State {
     private String mName;
     private String mValue = "default";
     private long mLatestUpdatedTime= -1;
+    /**this stores information about which event in Minuku is going to use this state**/
+    private ArrayList<Event> mEventList;
 
     public State(String name) {
         mName = name;
@@ -17,8 +21,31 @@ public class State {
     public State(String name, String value) {
         mName = name;
         mValue = value;
+
     }
 
+    public ArrayList<Event> getEventList() {
+        if (mEventList ==null){
+            mEventList = new ArrayList<Event>();
+        }
+
+        return mEventList;
+    }
+
+    public void addEvent(Event event) {
+        if (mEventList ==null){
+            mEventList = new ArrayList<Event>();
+        }
+        mEventList.add(event);
+    }
+
+    public void removeEvents(Event event) {
+        if (mEventList ==null){
+            return;
+        }
+
+        mEventList.remove(event);
+    }
 
     public int getId() {
         return mId;

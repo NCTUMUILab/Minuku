@@ -42,6 +42,18 @@ public class TriggerManager {
 
     }
 
+
+    public static  void executeTriggers(ArrayList<TriggerLink> triggerLinks){
+
+        if (triggerLinks!=null && triggerLinks.size()>0) {
+
+            for (int i=0; i<triggerLinks.size(); i++ ){
+
+                executeTrigger(triggerLinks.get(i));
+            }
+        }
+    }
+
     public static void executeTrigger(TriggerLink tl) {
 
         Log.d(LOG_TAG, "[executeTrigger] examineTransportation the triggerdlinks's trigger is " + tl.getTriggerClass() + " " +

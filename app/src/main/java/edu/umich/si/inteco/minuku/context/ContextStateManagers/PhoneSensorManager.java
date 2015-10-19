@@ -141,10 +141,6 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     }
 
-    @Override
-    public void stateChanged() {
-
-    }
 
     @Override
     public void saveRecordsInLocalRecordPool() {
