@@ -78,11 +78,8 @@ public class Task {
     	return mEventList;
     }
 	
-    public void addEvent(Event event){  
-    	
+    public void addEvent(Event event){
     	mEventList.add(event);
-    	event.setTask(this);
-    	
     }
     
 	public void setStartTime(long t){

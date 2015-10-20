@@ -68,15 +68,6 @@ public class Event extends ProbeObject{
     public ArrayList<Condition> getConditionList(){
     	return mConditionList;
     }
-    
-    public void addCondition(Condition condition){
-    	mConditionList.add(condition);
-    }
-    
-    public void addCondition(String stateName, String stateValue){
-    	Condition condition = new Condition(stateName, stateValue);
-    	mConditionList.add(condition);
-    }
 
     public void getCondition(int index){
     	mConditionList.get(index);

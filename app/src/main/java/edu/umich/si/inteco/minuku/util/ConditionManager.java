@@ -15,9 +15,11 @@ public class ConditionManager {
 	/**constant condition type**/	
 	
 	//properties 
-	public static final String CONDITION_PROPERTIES_TYPE = "Type";
-	public static final String CONDITION_PROPERTIES_RELATIONSHIP = "Relationship"; 
+	public static final String CONDITION_PROPERTIES_STATE = "State";
+	public static final String CONDITION_PROPERTIES_SOURCE = "Source";
+	public static final String CONDITION_PROPERTIES_RELATIONSHIP = "Relationship";
 	public static final String CONDITION_PROPERTIES_TARGETVALUE ="TargetValue";
+	public static final String CONDITION_PROPERTIES_CRITERION ="Criterion";
 	public static final String CONDITION_PROPERTIES_LATITUDE = "Lat";
 	public static final String CONDITION_PROPERTIES_LONGITUDE = "Lng";
 	

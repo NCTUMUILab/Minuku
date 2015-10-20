@@ -758,11 +758,6 @@ public class TransportationModeManager extends ContextStateManager {
     }
 
     @Override
-    public void stateChanged() {
-
-    }
-
-    @Override
     public void saveRecordsInLocalRecordPool() {
 
     }

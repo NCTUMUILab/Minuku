@@ -357,7 +357,7 @@ public class ContextManager {
                 for (int j=0 ; j<conditions.size(); j++){
                     Condition condition = conditions.get(j);
                     //the final pass is true only when all the conditions are true.
-                    pass = pass & state.getValue().equals(condition.getStateTargetValue());
+                    pass = pass & state.getValue().equals(condition.getStateValue());
                 }
 
             /** for any event for which the conditions are true, we let TriggerManager to see which action/action control to trigger.**/

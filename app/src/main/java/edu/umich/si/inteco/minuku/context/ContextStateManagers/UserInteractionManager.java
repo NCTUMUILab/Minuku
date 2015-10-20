@@ -14,11 +14,6 @@ public class UserInteractionManager extends ContextStateManager {
 
 
 	@Override
-	public void stateChanged() {
-
-	}
-
-	@Override
 	public void saveRecordsInLocalRecordPool() {
 
 	}

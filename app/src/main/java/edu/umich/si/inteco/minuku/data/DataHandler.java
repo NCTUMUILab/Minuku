@@ -470,6 +470,7 @@ public class DataHandler {
 	/**
 	 * Based on the rules, decide which tables and columns the DB need to query 
 	 */
+    /*
 	public static ArrayList<String> getDataByCondition(Condition condition) {
 		
 		ArrayList<String> resultList = new ArrayList<String>();
@@ -556,9 +557,9 @@ public class DataHandler {
 
 		return resultList;
 		
-	}
+	}*/
 	
-	
+	/*
 	private static ArrayList<String> filterDataResultByCondition (ArrayList<String> resultList, Condition condition ){
 		
 		//Log.d(LOG_TAG, "[filterDataResultByCondition]  the result to filter is  " + resultList );
@@ -573,25 +574,14 @@ public class DataHandler {
 			for (int i = 0; i< resultList.size(); i++){
 				
 				String[] res = resultList.get(i).split(Constants.DELIMITER);
-
-				/**
-				 * 4. lat
-				 * 5. lng
-				 * 6. accuracy
-				 * 7. altitude
-				 * 8. provider
-				 * 9. bearing
-				 * 10.speed
-				 * 
-				 */
 				
 				//get location parameters
 				double lat = Double.parseDouble(res[DatabaseNameManager.COL_INDEX_RECORD_LOC_LATITUDE_] );
 				double lng = Double.parseDouble(res[DatabaseNameManager.COL_INDEX_RECORD_LOC_LONGITUDE] );
-				/*
+
 				Log.d(LOG_TAG, "[filterDataResultByCondition] the result lat:  " + lat + " lng: " + lng
 						 + " the target lat:  " + condition.getLatLng().latitude + " lng: " + condition.getLatLng().longitude);
-*/
+
 				//The computed distance is stored in results[0]. If results has length 2 or greater, the initial bearing is stored in results[1]. If results has length 3 or greater, the final bearing is stored in results[2].
 				float distance[] = new float[1];
 				Location.distanceBetween(lat, lng, condition.getLatLng().latitude, condition.getLatLng().longitude, distance);
@@ -620,7 +610,7 @@ public class DataHandler {
 
 		return newResultList ;
 		
-	}
+	}*/
 
     public static ArrayList<String> getTableAndColumnByRecordType(int recordType) {
 
@@ -670,14 +660,14 @@ public class DataHandler {
 	 * @param condition
 	 * @return
 	 */
+    /*
 	public static ArrayList<String> getTableAndColumnByConditionType (Condition condition) {
 		
 		//the first value in the array is Table name, the rest is the column names. Note that there could be more than one column
 		ArrayList<String> TableAndColumns = new ArrayList<String>();	
 		
 		//Log.d(LOG_TAG, "[getTableAndColumnByConditionType] the condition type is " + condition.getType());
-		
-		/** Activity **/
+
 		if (condition.getType().equals(ConditionManager.CONDITION_TYPE_ACTIVITY_TYPE)){	
 			
 			TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY);
@@ -690,8 +680,7 @@ public class DataHandler {
 			TableAndColumns.add(DatabaseNameManager.COL_ACTIVITY_CONF_1);	//confidence of the most probable activity	
 		}
 		
-		
-		/** Location **/
+
 		if (condition.getType().equals(ConditionManager.CONDITION_TYPE_DISTANCE_TO)){
 			//Log.d(LOG_TAG, "[getTableAndColumnByConditionType] the condition is distance");
 			TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_LOCATION);
@@ -701,7 +690,7 @@ public class DataHandler {
 		return TableAndColumns;
 		
 	}
-	
+	*/
 	
 	
 	/***

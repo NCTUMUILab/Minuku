@@ -33,9 +33,11 @@
 						"Conditions": 
 						[ 
 							{							
-								"StateName":"Use Phone",
 								"Source": "ActivityRecognition",
-								"TargetValue": "tilting",				
+								"State":"Use Phone",								
+								"Criterion": {
+									"value": "tilting"
+								},				
 								"Constraint": [
 									{
 										"Type": "recency",
@@ -43,7 +45,7 @@
 										"TargetValue": "5" 
 									}
 								]
-							} 
+							}						
 						]
 					}, 
 					{
@@ -55,9 +57,11 @@
 						[ 
 							{
 								
-								"StateName": "Phone Still for a period",
 								"Source": "ActivityRecognition",
-								"TargetValue": "still",					
+								"State": "Phone Still for a period",								
+								"Criterion": {
+									"value": "still"
+								},					
 								"Constraint": [
 									{
 										"Type": "duration",
@@ -100,10 +104,14 @@
 						},		
 						
 						"Notification":
-						{
-							"Title": "What item are you carrying?",
-							"Message": "Please tab to report what items you are carrying."
-						}
+						[
+							{
+								"Launch":"when_start",	
+								"Type":"normal",
+								"Title": "What item are you carrying?",
+								"Message": "Please tab to report what items you are carrying."
+							}
+						]
 					}  
 				],
 

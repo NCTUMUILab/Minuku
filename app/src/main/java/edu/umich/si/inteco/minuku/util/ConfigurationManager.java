@@ -47,15 +47,13 @@ public class ConfigurationManager {
 	public static final String CONFIGURATION_PROPERTIES_NAME = "Name";
 	public static final String CONFIGURATION_PROPERTIES_CONTENT = "Content";
 	public static final String CONFIGURATION_PROPERTIES_CONFIGURATION = "Configuration";
-
-	public static final String TASK_PROPERTIES_ID = "Id";
-	public static final String TASK_PROPERTIES_NAME = "Name";
-	public static final String TASK_PROPERTIES_DESCRIPTION = "Description";
+	public static final String CONFIGURATION_PROPERTIES_DESCRIPTION = "Description";
 	public static final String TASK_PROPERTIES_TIMESTAMP_STRING = "Timestamp_string";
 	public static final String TASK_PROPERTIES_CREATED_TIME = "Created_time";
 	public static final String TASK_PROPERTIES_START_TIME = "Start_time";
 	public static final String TASK_PROPERTIES_END_TIME = "End_time";
 
+	public static final String CONFIGURATION_CATEGORY_CONDITIONS = "Conditions";
 	public static final String CONFIGURATION_CATEGORY_ACTION = "Action";
 	public static final String CONFIGURATION_CATEGORY_TASK = "Task";
 	public static final String CONFIGURATION_CATEGORY_EVENT = "Event";
@@ -223,8 +221,7 @@ public class ConfigurationManager {
 
 
 		//TODO: just for testing condition and staterule, we create some here.
-		loadTestStateRule();
-
+		//loadTestStateRule();
 
 		//source is in JSON format
 		JSONObject content = config.getContent();
@@ -236,9 +233,8 @@ public class ConfigurationManager {
             if (content.has(ConfigurationManager.SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT)){
                 boolean stopServiceDuringMidNight = content.getBoolean(ConfigurationManager.SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT);
                 Log.d(LOG_TAG, "stop service at night is" + stopServiceDuringMidNight);
-                PreferenceHelper.setPreferenceValue(ConfigurationManager.SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT, stopServiceDuringMidNight);
-               
-                //write into the preference
+				//write into the preference
+				PreferenceHelper.setPreferenceValue(ConfigurationManager.SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT, stopServiceDuringMidNight);
 
             }
         } catch (JSONException e) {
@@ -302,27 +298,26 @@ public class ConfigurationManager {
 			try {
 				eventJSON = eventsJSON.getJSONObject(i);
 				
-				int id= eventJSON.getInt("Id");
-				String name = eventJSON.getString("Name");
-				String description = eventJSON.getString("Description");
+				int id= eventJSON.getInt(CONFIGURATION_PROPERTIES_ID);
+				String name = eventJSON.getString(CONFIGURATION_PROPERTIES_NAME);
+				String description = eventJSON.getString(CONFIGURATION_PROPERTIES_DESCRIPTION);
 
-				//creat event object
+				//creat the event object
 				event = new Event(id, name, study_id);
 				
 				//add the conditionJSON to the event
-				if (eventJSON.has("Condition")){
+				if (eventJSON.has(CONFIGURATION_CATEGORY_CONDITIONS)){
 					
-					JSONArray conditionJSONArray = eventJSON.getJSONArray("Condition");	
-					event.setConditionJSON(conditionJSONArray);
+					JSONArray conditionJSONArray = eventJSON.getJSONArray(CONFIGURATION_CATEGORY_CONDITIONS);
 					
 					//get the list of condition from each event
 					ArrayList<Condition> conditions = loadConditionsFromJSON(conditionJSONArray);
 					
 					Log.d(LOG_TAG, "[ In loadEventsFromJSON] setting conditionJSONArray: " + conditionJSONArray);
-					//set the condition arraylist to the event.
-					event.setConditionSet(conditions);
-				}
 
+					//set the condition object arraylist to the event.
+					event.setConditionList(conditions);
+				}
 				
 			} catch (JSONException e1) {
 
@@ -332,11 +327,8 @@ public class ConfigurationManager {
 			/** after creating the event object, add event to eventList, and to the databasse..**/
 			//add to the list
 			EventManager.addEvent(event);
-			Log.d(LOG_TAG, "[loadEventsFromJSON] adding the events into the EventManager, now it has " + EventManager.getEventList().size() + " events");
+
 		}//end of reading eventJSONArray
-		
-		
-	
 	}
 	
 	
@@ -375,8 +367,9 @@ public class ConfigurationManager {
 				
 				action = new Action (action_id, name, type, execution_style, study_id);
 
-				/** 2 if the action is to generate a quesitonnaire add questionnaire id **/					
-				if (type.equals(ActionManager.ACTION_TYPE_QUESTIONNAIRE)){						
+				/** 2 We generate actions based on the type. Different actions have different properties**/
+				//Action of phone questionnaire
+				if (type.equals(ActionManager.ACTION_TYPE_QUESTIONNAIRE)){
 					
 					int questionnaire_id = actionJSON.getInt(ActionManager.ACTION_PROPERTIES_QUESTIONNAIRE_ID);
 					GeneratingQuestionnaireAction a = new GeneratingQuestionnaireAction (action_id, name, type,execution_style, study_id);
@@ -385,6 +378,7 @@ public class ConfigurationManager {
 					//Log.d(LOG_TAG, " the aciton" + action.getId() + " questionnaire id:  " + a.getQuestionnaireId());
 					
 				}
+				//Action of email questionnaire
                 else if (type.equals(ActionManager.ACTION_TYPE_EMAIL_QUESTIONNAIRE)){
 
                     int questionnaire_id = actionJSON.getInt(ActionManager.ACTION_PROPERTIES_QUESTIONNAIRE_ID);
@@ -397,7 +391,7 @@ public class ConfigurationManager {
 
                 }
 				
-				/** 3. if the action is to monitor events add monitored event ids.**/
+				////Action of monitoring events. We associate event ids with the action.
 				else if (type.equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){						
 					
 					String monitor_event_ids = actionJSON.getString(ActionManager.ACTION_PROPERTIES_MONITORING_EVENTS);
@@ -405,7 +399,7 @@ public class ConfigurationManager {
 					
 					MonitoringEventAction a = new MonitoringEventAction (action_id, name, type, execution_style, study_id);
 
-					
+					//associate event ids to the monitoring action.
 					for (int j=0; j<ids.length; j++){
 						int id = Integer.parseInt(ids[j]);
 						a.addMonitoredEvent(id);
@@ -414,18 +408,17 @@ public class ConfigurationManager {
 					}
 					
 					action  = a;
-					
-					
+
 				}
 
-                //if the action is to save record
+                //Action of saving record
                 else if (type.equals(ActionManager.ACTION_TYPE_SAVING_RECORD)) {
 
                     SavingRecordAction a = new SavingRecordAction(action_id,name, type,execution_style, study_id );
                     action = a;
                 }
 
-                //just annotate without recording
+                //Action of annotating data (no saving records)
                 else if (type.equals(ActionManager.ACTION_TYPE_ANNOTATE)) {
 
                     JSONObject annotateJSON = actionJSON.getJSONObject(ActionManager.ACTION_PROPERTIES_ANNOTATE);
@@ -438,7 +431,8 @@ public class ConfigurationManager {
                     action = a;
                 }
 
-                //if the action is to annotate recording
+                //Action of saving and apply annotation together.
+				//TODO: check if we can make this cleaner.
                 else if (type.equals(ActionManager.ACTION_TYPE_ANNOTATE_AND_RECORD)) {
 
                     JSONObject annotateJSON = actionJSON.getJSONObject(ActionManager.ACTION_PROPERTIES_ANNOTATE);
@@ -476,7 +470,7 @@ public class ConfigurationManager {
 
 
 
-				/**4. examine whether the action is contiuous or not**/
+				/**4. examine whether the action is continuous or not**/
 				if (actionJSON.has(ActionManager.ACTION_PROPERTIES_CONTINUITY)){
 					
 					JSONObject continuityJSON = actionJSON.getJSONObject(ActionManager.ACTION_PROPERTIES_CONTINUITY);
@@ -503,13 +497,15 @@ public class ConfigurationManager {
 				/**5. check whether there are notification of the action **/			
 				if (actionJSON.has(ActionManager.ACTION_PROPERTIES_NOTIFICATION)){
 
-                    //notification is an array
+                    //notification is an array. It may have a typical notification and a ongoing notifications
                     JSONArray notiJSONArray = actionJSON.getJSONArray(ActionManager.ACTION_PROPERTIES_NOTIFICATION);
 
                     for (int j=0; j<notiJSONArray.length(); j++){
 
                         JSONObject notiJSONObject  = notiJSONArray.getJSONObject(j);
 
+						//notification has type, launch style, title, and message.
+						//TODO: improve the notification style.
                         String notiType = notiJSONObject.getString(ActionManager.ACTION_PROPERTIES_NOTIFICATION_TYPE);
                         String notiLaunch = notiJSONObject.getString(ActionManager.ACTION_PROPERTIES_NOTIFICATION_LAUNCH);
                         String notiTitle = notiJSONObject.getString(ActionManager.ACTION_PROPERTIES_NOTIFICATION_TITLE);
@@ -517,14 +513,8 @@ public class ConfigurationManager {
 
                         Notification notification = new Notification(notiLaunch, notiType, notiTitle, notiMessage);
 
+						//add notification to the action
                         action.addNotification(notification);
-
-                        if ( action.getNotifications().size()>=1)
-                            Log.d(LOG_TAG, "[loadActionsFromJSON and notification] the action notification title: "+
-                                action.getNotifications().get( action.getNotifications().size()-1 ).getTitle() +
-                                action.getNotifications().get( action.getNotifications().size()-1 ).getMessage()
-                            );
-
                     }
 
 
@@ -532,7 +522,6 @@ public class ConfigurationManager {
 				
 				/** 6 load controls to actions**/					
 				loadActionControlsFromJSON (controlJSON, action);
-		
 
 			}catch (JSONException e1) {
 
@@ -566,53 +555,16 @@ public class ConfigurationManager {
 				
 				JSONObject conditionJSON = conditionJSONArray.getJSONObject(j);
 				
-				String conditionType = conditionJSON.getString(ConditionManager.CONDITION_PROPERTIES_TYPE);
-				String conditionRelationship = conditionJSON.getString(ConditionManager.CONDITION_PROPERTIES_RELATIONSHIP);
-				
-				Condition condition;
-				//if the target value is String 
-				if (conditionRelationship.equals(ConditionManager.CONDITION_RELATIONSHIP_STRING_EQUAL_TO) || 
-						conditionRelationship.equals(ConditionManager.CONDITION_RELATIONSHIP_STRING_NOT_EQUAL_TO) ||
-                        conditionRelationship.equals(ConditionManager.CONDITION_RELATIONSHIP_IS) ){
+				String stateValue = conditionJSON.getString(ConditionManager.CONDITION_PROPERTIES_STATE);
+				String source = conditionJSON.getString(ConditionManager.CONDITION_PROPERTIES_SOURCE);
+				JSONObject criterion = conditionJSON.getJSONObject(ConditionManager.CONDITION_PROPERTIES_CRITERION);
 
-					String targetValue = conditionJSON.getString(ConditionManager.CONDITION_PROPERTIES_TARGETVALUE);
-					//create condition object
-					condition = new Condition(
-							conditionType, 
-							conditionRelationship, 
-							targetValue);
-				}
+				//create condition object
+				Condition condition = new Condition(source,  stateValue, criterion);
 
-				//else is not String
-				else{
-					float targetValue = (float) conditionJSON.getDouble(ConditionManager.CONDITION_PROPERTIES_TARGETVALUE);
-					//create condition object
-					condition = new Condition(
-							conditionType, 
-							conditionRelationship, 
-							targetValue);	
-				}
-					
-			
-				
-				Log.d(LOG_TAG, "[loadConditionsFromJSON] get condition from the file:" + condition.getType() + " , " + condition.getRelationship());
-				
-				
-				//add addition fields to the condition 
-				if (conditionType.equals(ConditionManager.CONDITION_TYPE_DISTANCE_TO)){
-					
-					double lat = conditionJSON.getDouble(ConditionManager.CONDITION_PROPERTIES_LATITUDE);
-					double lng = conditionJSON.getDouble(ConditionManager.CONDITION_PROPERTIES_LONGITUDE);
-					condition.setLatLng(lat, lng);
-					/*
-					Log.d(LOG_TAG, "[loadConditionsFromJSON] condition of " + condition.getType() + 
-							" lat: " + condition.getLatLng().latitude + 
-							" lng: " + condition.getLatLng().longitude);
-					*/
-					
-					
-				}
-				
+				Log.d(LOG_TAG, "[loadConditionsFromJSON] get condition from the file: "
+						+ condition.getSource() + " , " + condition.getStateValue() + condition.getCriterion().toString());
+
 				
 				//get constraint from the condition
 				if (conditionJSON.has("Constraint")){
@@ -656,10 +608,9 @@ public class ConfigurationManager {
 			e.printStackTrace();
 		}
 		
-		Log.d(LOG_TAG, " the current event has " + conditions.size() + " condition");				
+		//Log.d(LOG_TAG, "[loadConditionsFromJSON] the current event has " + conditions.size() + " condition");
 		return conditions;
-		
-		
+
 	}
 
 

@@ -186,11 +186,6 @@ public class PhoneStatusManager extends ContextStateManager {
 
 
     @Override
-    public void stateChanged() {
-
-    }
-
-    @Override
     public void saveRecordsInLocalRecordPool() {
 
     }

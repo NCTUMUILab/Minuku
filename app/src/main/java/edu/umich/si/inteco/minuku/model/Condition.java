@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class Condition {
@@ -12,8 +14,13 @@ public class Condition {
     private static final String LOG_TAG = "Condition";
 
 	private int _id;
+	//Name is provided by ContextStateManager
 	protected String mStateName;
-	protected String mStateTargetValue;
+	//determined in the configuration file
+	protected String mSource;
+	//determined in the configuration file
+	protected String mStateValue;
+	protected JSONObject mCriterion;
     private ArrayList<TimeConstraint> mTimeConstraintList;
 
     private float[] mTargetValues;
@@ -25,12 +32,13 @@ public class Condition {
 
 	/**
 	 *
-	 * @param stateName
-	 * @param stateValue
+	 * @param source
+	 * @param criterion
 	 */
-	public Condition(String stateName, String stateValue) {
-		mStateName = stateName;
-		mStateTargetValue = stateValue;
+	public Condition(String source, String value, JSONObject criterion) {
+		mSource = source;
+		mStateValue  =value;
+		mCriterion = criterion;
 	}
 
 	/****
@@ -51,8 +59,16 @@ public class Condition {
 		return mStateName;
 	}
 
-	public String getStateTargetValue() {
-		return mStateTargetValue;
+	public JSONObject getCriterion() {
+		return mCriterion;
+	}
+
+	public String getSource() {
+		return mSource;
+	}
+
+	public String getStateValue() {
+		return mStateValue;
 	}
 
 	/**

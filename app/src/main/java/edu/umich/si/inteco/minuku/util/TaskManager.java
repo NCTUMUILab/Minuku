@@ -109,9 +109,9 @@ public class TaskManager {
 					JSONObject taskJSON = taskJSONArray.getJSONObject(j);		
 					
 					//extract values
-					int id = taskJSON.getInt(ConfigurationManager.TASK_PROPERTIES_ID);				
-					String name = taskJSON.getString(ConfigurationManager.TASK_PROPERTIES_NAME); 
-					String description = taskJSON.getString(ConfigurationManager.TASK_PROPERTIES_DESCRIPTION); 
+					int id = taskJSON.getInt(ConfigurationManager.CONFIGURATION_PROPERTIES_ID);
+					String name = taskJSON.getString(ConfigurationManager.CONFIGURATION_PROPERTIES_NAME);
+					String description = taskJSON.getString(ConfigurationManager.CONFIGURATION_PROPERTIES_DESCRIPTION);
 					long createdTime = taskJSON.getLong(ConfigurationManager.TASK_PROPERTIES_CREATED_TIME);
 					long startTime=  taskJSON.getLong(ConfigurationManager.TASK_PROPERTIES_START_TIME);
 					long endTime = taskJSON.getLong(ConfigurationManager.TASK_PROPERTIES_END_TIME);

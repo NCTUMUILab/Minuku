@@ -512,7 +512,7 @@ public class ActionManager {
 					//Log.d(LOG_TAG, " [ActionManager Execute] Ready to execute monitoring action" + a.getId() + ", which monitor events  " + evt_ids.toString());
 					
 
-					EventManager.examineEventConditions(evt_ids);
+					//EventManager.examineEventConditions(evt_ids);
 					
 				}
 				

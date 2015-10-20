@@ -52,6 +52,8 @@ public class EventManager {
 	/**
 	 * This function examines the conditions of each existing event. It interprets the conditions in each event, and call DataHandler to find the right table to query 
 	 */
+
+	/*
 	public static void examineEventConditions(ArrayList<Integer> monitored_event_ids){
 
 		//check the list of monitored event
@@ -174,7 +176,8 @@ public class EventManager {
 		}//event_index
 		
 	}
-	
+	*/
+
 	private static boolean eventPassTimeConstraint(ArrayList<String> results, ArrayList<TimeConstraint> timeconstraints){
 		
 		boolean pass = true; 
