@@ -14,16 +14,10 @@ public class ConditionManager {
 	private static final String LOG_TAG = "ConditionManager";
 	/**constant condition type**/	
 	
-	//properties 
-	public static final String CONDITION_PROPERTIES_STATE = "State";
-	public static final String CONDITION_PROPERTIES_SOURCE = "Source";
-	public static final String CONDITION_PROPERTIES_RELATIONSHIP = "Relationship";
-	public static final String CONDITION_PROPERTIES_TARGETVALUE ="TargetValue";
-	public static final String CONDITION_PROPERTIES_CRITERION ="Criterion";
+
 	public static final String CONDITION_PROPERTIES_LATITUDE = "Lat";
 	public static final String CONDITION_PROPERTIES_LONGITUDE = "Lng";
-	
-	
+
 	//activity
 	public static final String CONDITION_TYPE_ACTIVITY_TYPE = "activity_type";
 	public static final String CONDITION_TYPE_ACTIVITY_CONFIDENCE = "activity_confidence";
@@ -139,6 +133,9 @@ public class ConditionManager {
 		
 		return pass;
 	}
-	
-	
+
+
+
+
+
 }

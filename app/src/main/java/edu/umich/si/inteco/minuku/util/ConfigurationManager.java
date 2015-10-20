@@ -61,6 +61,14 @@ public class ConfigurationManager {
 
     public static final String SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT = "StopServiceDuringMidNight";
 
+	//properties
+	public static final String CONDITION_PROPERTIES_STATE = "State";
+	public static final String CONDITION_PROPERTIES_SOURCE = "Source";
+	public static final String CONDITION_PROPERTIES_RELATIONSHIP = "Relationship";
+	public static final String CONDITION_PROPERTIES_TARGETVALUE ="TargetValue";
+	public static final String CONDITION_PROPERTIES_MEASURE ="Measure";
+	public static final String CONDITION_PROPERTIES_CRITERION ="Criterion";
+
 
 	private static LocalDBHelper mLocalDBHelper;
 	private static Context mContext;
@@ -179,39 +187,6 @@ public class ConfigurationManager {
 	}
 
 
-	/**
-	 * this function is only loading conditions for the purpose of testing StateRule
-	 */
-	private void loadTestStateRule() {
-
-		//create stateRule and save it to ContextStateManagers.
-		//StateMappingRule(String source, String measure, String relationship, String targetValue, String stateName
-		StateMappingRule smr = new StateMappingRule(
-				ContextManager.CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION,
-				ActivityRecognitionManager.CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES,
-				ContextStateManager.CONTEXT_SOURCE_MEASURE_LATEST_ONE,
-				ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL,
-				ActivityRecognitionManager.TILTING_STRING,
-				"Check Phone"
-		);
-
-		ActivityRecognitionManager.addStateMappingRule(smr);
-
-
-		//add another rule to transportation manager
-		StateMappingRule smr2 = new StateMappingRule(
-				ContextManager.CONTEXT_STATE_MANAGER_TRANSPORTATION,
-				TransportationModeManager.CONTEXT_SOURCE_TRANSPORTATION,
-				ContextStateManager.CONTEXT_SOURCE_MEASURE_LATEST_ONE,
-				ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL,
-				TransportationModeManager.ON_FOOT_STRING,
-				"Walking"
-		);
-
-		TransportationModeManager.addStateMappingRule(smr2);
-
-	}
-	
 	
 	/**
 	 * The Configuration has a source in JSON format. The function takse a JSON and configurate the app
@@ -326,7 +301,7 @@ public class ConfigurationManager {
 			
 			/** after creating the event object, add event to eventList, and to the databasse..**/
 			//add to the list
-			EventManager.addEvent(event);
+			ContextManager.addEvent(event);
 
 		}//end of reading eventJSONArray
 	}

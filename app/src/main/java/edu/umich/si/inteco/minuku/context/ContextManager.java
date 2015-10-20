@@ -3,6 +3,8 @@ package edu.umich.si.inteco.minuku.context;
 import android.content.Context;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,6 +26,7 @@ import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Event;
 import edu.umich.si.inteco.minuku.model.ProbeObject;
 import edu.umich.si.inteco.minuku.model.State;
+import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.TriggerLink;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
@@ -66,6 +69,9 @@ public class ContextManager {
     public static final String CONTEXT_STATE_MANAGER_PHONE_STATUS = "PhoneStatus";
     public static final String CONTEXT_STATE_MANAGER_TRANSPORTATION = "Transportation";
     public static final String CONTEXT_STATE_MANAGER_USER_INTERACTION = "UserInteraction";
+
+
+    public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION = "ActivityRecognition";
 
 
     /*RECORD TYPE NAME*/
@@ -111,6 +117,8 @@ public class ContextManager {
 
     public static ArrayList<Integer> RECORD_TYPE_LIST;
 
+    private static ArrayList<Event> mEventList;
+
 
     //handle the local SQLite operation
   	private static LocalDBHelper mLocalDBHelpder;
@@ -142,6 +150,8 @@ public class ContextManager {
 	public ContextManager(Context context){
 
 		mContext = context;
+
+        mEventList = new ArrayList<Event>();
 
 		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
         //initiate the RecordPool
@@ -332,6 +342,77 @@ public class ContextManager {
     }
 
 
+    private static String getContextStateManagerName(String conditionSource) {
+
+        String name = null;
+
+        if (conditionSource.equals(CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
+            return CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION;
+        }
+
+        return name;
+    }
+
+    /**
+     * this function updates the tasks that each ContextStateManager need to
+     */
+    public static void updateTasksInContextStateManager() {
+
+
+        /**1. assign logging task to contextStateManager **/
+
+
+        /**2. assign monitoring task to contextStateManagers **/
+        for (int i=0; i<getEventList().size(); i++){
+
+            //creating StateMappingRule and add to related ContextStateManager
+            Event event = getEventList().get(i);
+
+            //get all conditions for the event
+            for (int j=0; j<event.getConditionList().size(); j++) {
+
+                Condition condition = event.getConditionList().get(j);
+
+                //for each condition, we need to know which ContextStateManager will need to generate a state
+                // for that condition.
+                String contextStateManagerName = getContextStateManagerName(condition.getSource());
+
+                //we tell the contextStateMAnager the value of the state if the criterion is met. ContextManager will
+                //use this value to monitor the state
+                String stateValue = condition.getStateValue();
+
+                //we give contextStateManager the criterion for changing the state to the value.
+                JSONObject criterion = condition.getCriterion();
+
+                StateMappingRule rule = new StateMappingRule(contextStateManagerName, stateValue, criterion);
+
+                assignMonitoringTasks(contextStateManagerName, rule);
+
+            }
+
+        }
+
+
+
+    }
+
+    /**
+     *
+     * ContextMAnager assigns  the task
+     * @param contextStateManagerName
+     */
+    private static void assignMonitoringTasks(String contextStateManagerName, StateMappingRule rule) {
+
+        if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
+            ActivityRecognitionManager.addStateMappingRule(rule);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))
+            PhoneStatusManager.addStateMappingRule(rule);
+
+        //TODO: add more contextStateManager
+
+    }
+
+
     /**
      * This function receives notifications from ContextSTateManager about a value change of a state,
      * It then examines any events of which conditions involve using the value of the state, and determines whether a
@@ -341,12 +422,14 @@ public class ContextManager {
     public static void examineEventConditions(State state) {
 
         /**get all the events that use the state **/
-        ArrayList <Event> evtList = state.getEventList();
+
+        ArrayList<Event> =
 
         //for each event, get all of the conditions, and check whether the condition has been met.
-        for (int i=0; i< evtList.size(); i++) {
+        for (int i=0; i< getEventList().size(); i++) {
 
-            Event event = evtList.get(i);
+            Event event = getEventList().get(i);
+
             /** an event is a list of conditions. An event occurs only when all conditions are met **/
             boolean pass = true;
 
@@ -385,6 +468,9 @@ public class ContextManager {
 
     }
 
+
+
+
     public void stopContextManagerMainThread() {
        // mScheduledExecutorService.shutdown();
     }
@@ -395,8 +481,6 @@ public class ContextManager {
             try{
 
                 testCount +=1;
-
-
                 Log.d(LOG_TAG, "[testCount]"  + testCount);
 
                 /** test transporation : feed datain to the datapool**/
@@ -420,6 +504,7 @@ public class ContextManager {
                 //Recording is one of the types of actions that users need to put into the configuration.
                 //However, now we want to enable background recording so that we can monitor events.
                 //eventually. If researachers do not monitor anything, this flag should be false.
+
                 if (sIsBackgroundRecordingEnabled){
                     DataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
                 }
@@ -469,6 +554,30 @@ public class ContextManager {
 
         }
     };
+
+
+    public static void addEvent(Event event){
+        if (mEventList==null){
+            mEventList = new ArrayList<Event>();
+        }
+        mEventList.add(event);
+    }
+
+    public static void removeEvent(Event event){
+        if (mEventList!=null){
+            mEventList.remove(event);
+        }
+    }
+
+    public static void removeEvent(int index){
+        if (mEventList!=null){
+            mEventList.remove(index);
+        }
+    }
+
+    public static ArrayList<Event> getEventList(){
+        return mEventList;
+    }
 
     public static String getSourceName(String contextStateManager, int sourceType){
 

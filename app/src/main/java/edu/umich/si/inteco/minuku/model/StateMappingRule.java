@@ -1,5 +1,8 @@
 package edu.umich.si.inteco.minuku.model;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 
@@ -35,9 +38,17 @@ public class StateMappingRule {
 
     private float mLower;
 
+    private JSONObject mCriterion;
+
+
     public StateMappingRule() {
 
+    }
 
+    public StateMappingRule(String contextStateManagerName, String stateValue, JSONObject crierion) {
+        mContextStateManagerName = contextStateManagerName;
+        mStateValue =  stateValue;
+        mCriterion = crierion;
     }
 
     //stringEqualTo
@@ -83,6 +94,27 @@ public class StateMappingRule {
         setName();
     }
 
+
+    public void setMeasure(int measure) {
+        this.mMeasure = measure;
+    }
+
+    public void setRelationship(int relationship) {
+        this.mRelationship = relationship;
+    }
+
+    public void setStringTargetValue(String stringTargetValue) {
+        this.mStringTargetValue = stringTargetValue;
+    }
+
+    public void setIsValueString(boolean isValueString) {
+        this.mIsValueString = isValueString;
+    }
+
+    public void setSource(int source) {
+        this.mSource = source;
+    }
+
     public boolean isValueString() {
         return mIsValueString;
     }
@@ -106,6 +138,8 @@ public class StateMappingRule {
     public String getName() {
         return mName;
     }
+
+    public JSONObject getCriterion () {return mCriterion;}
 
     public String getStateValue() {
         return mStateValue;

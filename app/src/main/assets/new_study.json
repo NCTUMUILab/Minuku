@@ -36,7 +36,7 @@
 								"Source": "ActivityRecognition",
 								"State":"Use Phone",								
 								"Criterion": {
-									"value": "tilting"
+									"TargetValue": "tilting"
 								},				
 								"Constraint": [
 									{
@@ -60,7 +60,7 @@
 								"Source": "ActivityRecognition",
 								"State": "Phone Still for a period",								
 								"Criterion": {
-									"value": "still"
+									"TargetValue": "still"
 								},					
 								"Constraint": [
 									{

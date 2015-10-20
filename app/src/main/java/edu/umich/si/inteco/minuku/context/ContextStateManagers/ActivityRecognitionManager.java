@@ -12,6 +12,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
@@ -20,6 +23,8 @@ import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
+import edu.umich.si.inteco.minuku.util.ConditionManager;
+import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 
 /**
  * Created by Armuro on 10/4/15.
@@ -410,6 +415,64 @@ public class ActivityRecognitionManager extends ContextStateManager
         boolean pass = false;
         return pass;
     }
+
+
+    /**
+     * the purpose of the this function is to translate the JSONObject criterion into parameters of the mappingrule.
+     * @param rule
+     * @return
+     */
+    private static StateMappingRule translateStateMappingRule(StateMappingRule rule) {
+
+
+        JSONObject criterion = rule.getCriterion();
+
+
+        //all the values for ActivityRecognition are strings
+        String targetValue;
+
+        try {
+            targetValue = criterion.getString(ConfigurationManager.CONDITION_PROPERTIES_TARGETVALUE);
+            rule.setStringTargetValue(targetValue);
+
+            if (criterion.has(ConfigurationManager.CONDITION_PROPERTIES_MEASURE)){
+                String measure = criterion.getString(ConfigurationManager.CONDITION_PROPERTIES_MEASURE);
+                rule.setMeasure(getMeasure(measure));
+            }
+            //the default is lastest value
+            else {
+                rule.setMeasure(CONTEXT_SOURCE_MEASURE_LATEST_ONE);
+            }
+
+            if (criterion.has(ConfigurationManager.CONDITION_PROPERTIES_RELATIONSHIP)){
+                String relationship = criterion.getString(ConfigurationManager.CONDITION_PROPERTIES_RELATIONSHIP);
+                //relationship is an integer
+                rule.setRelationship(getRelationship(relationship));
+            }
+            //the default is equal string (there's only equal string for Activity Recognition
+            else{
+                rule.setRelationship(getRelationship(STATE_MAPPING_RELATIONSHIP_EQUAL_STRING));
+            }
+
+            if (criterion.has(ConfigurationManager.CONDITION_PROPERTIES_SOURCE)){
+                String source = criterion.getString(ConfigurationManager.CONDITION_PROPERTIES_SOURCE);
+                //relationship is an integer
+                rule.setSource( getContextSourceTypeFromName(source));
+            }
+            else {
+                rule.setSource(CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES);
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //at this point, rule has been updated. return the rule
+        return rule;
+
+    }
+
 
     /**
      * This function examines StateMappingRule with the data and returns a boolean pass.

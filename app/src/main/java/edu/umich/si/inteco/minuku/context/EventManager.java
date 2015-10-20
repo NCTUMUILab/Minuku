@@ -32,7 +32,7 @@ public class EventManager {
 	private static ArrayList<Event> mEventList;
 	
 	private static ArrayList<SimpleGeofence> mMonitoredGeofences;
-	
+
 	private static LocalDBHelper mLocalDBHelper;
 	
 	public EventManager(Context context){
@@ -41,142 +41,7 @@ public class EventManager {
 		mEventList = new ArrayList<Event>();
 		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 	}
-	
-	public void updateEvents(){
-		
-		
-		
-	}
 
-	
-	/**
-	 * This function examines the conditions of each existing event. It interprets the conditions in each event, and call DataHandler to find the right table to query 
-	 */
-
-	/*
-	public static void examineEventConditions(ArrayList<Integer> monitored_event_ids){
-
-		//check the list of monitored event
-		for (int event_index = 0; event_index < monitored_event_ids.size(); event_index ++){
-			
-			//get the id of each monitored event
-			int monitored_event_id = monitored_event_ids.get(event_index);
-			Log.d(LOG_TAG,"[examineEventConditions] examine conditions of event " + monitored_event_id);
-			
-			
-			//get the event instance with the event id			
-			for (int i=0; i<mEventList.size(); i++){
-						
-				Event event = mEventList.get(i);	
-			//	Log.d(LOG_TAG,"[examineEventConditions] examining event " + event.getId());
-				
-				
-				//get the monitored event, then we get the condition of the event.
-				if (event.getId()==monitored_event_id) {
-					
-					//Log.d(LOG_TAG,"[examineEventConditions] the " + i + " event is  " + event.getName());
-					
-					//get conditions from the event
-					ArrayList<Condition> conditionSet = event.getConditionList();
-					//Log.d(LOG_TAG, "[examineEventConditions] currently there are " + conditionSet.size() + " conditions in the event " + event.getName());
-					
-
-					for (int j=0; j<conditionSet.size(); j++){
-						
-						Condition condition = conditionSet.get(j);
-
-
-                        //check if the condition is special type...such as TransportaionModeDetection
-                        if (condition.getStateName().equals(ConditionManager.CONDITION_TYPE_PROBE_TRANSPORTATION)) {
-
-
-
-                        }
-
-                        //normal type of condition, query database to examien conditions
-                        else {
-
-
-                            //get result from the DataHanlder
-                            ArrayList<String> res = DataHandler.getDataByCondition(condition);
-                            Log.d(LOG_TAG, "[examineEventConditions] got " + res.size() + " results,for event " + event.getId() + " : " +  event.getName() +  " need to examine timeconstraint ");
-
-                            //if got the result, i.e. having detected  the event, finally need to check its timeconstraint (duration)
-                            if (res.size() >0){
-
-                                //get timeconstraint...
-                                ArrayList<TimeConstraint> timeconstraints = condition.getTimeConstraints();
-
-                                boolean pass = eventPassTimeConstraint(res, timeconstraints);
-
-                                //if the event is detected
-                                if (pass){
-
-                                    //log when an event is detected
-                                    LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
-                                            LogManager.LOG_TAG_EVENT_DETECTED,
-                                            "Event detected:\t" + event.getId() + "\t" + event.getName());
-
-                                    //check the triggerlinks of the current event to see if it would trigger any ActionControl.
-                                    Log.d(LOG_TAG, "[examineEventConditions] The event " + event.getId() + "  condition is satisfied, check its triggerLinks! "+ " the event has " + event.getTriggerLinks().size() + " triggerlinks ");
-
-
-                                    //execute the triggeredObject
-                                    for (int k=0; k<event.getTriggerLinks().size(); k++){
-
-                                        TriggerLink tl = event.getTriggerLinks().get(k);
-
-                                        Log.d(LOG_TAG, "[examineEventConditions] the triggerdlinks's trigger is " + tl.getTriggerClass() + " " +
-                                                tl.getTrigger().getId() + " and it triggers object " + tl.getTriggeredProbeObject().getProbeObjectClass() + " " +  tl.getTriggeredProbeObject().getId() + " , of which the class is "
-                                                + tl.getTriggeredProbeObject().getProbeObjectClass());
-
-                                        ProbeObject triggeredObject = tl.getTriggeredProbeObject();
-
-                                        if (triggeredObject.getProbeObjectClass().equals(TriggerManager.PROBE_OBJECT_CLASS_ACTION_CONTROL)){
-                                            ActionControl ac = (ActionControl) triggeredObject;
-                                            //		Log.d(LOG_TAG, "[examineEventConditions] found the triggered probe object is action control" + ac.getId() + " of which the action is " + ac.getAction().getName()  );
-
-                                            //schedule the action control
-                                            ScheduleAndSampleManager.registerActionControl(ac);
-
-                                            //log triggering actioncontrol
-                                            LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
-                                                    LogManager.LOG_TAG_ACTION_TRIGGER,
-                                                    "Triggering ActionControl:\t" + ActionManager.getActionControlTypeName(ac.getType()) + "\t" + ac.getAction().getName());
-                                        }
-
-                                        else if (triggeredObject.getClass().equals(TriggerManager.PROBE_OBJECT_CLASS_EVENT)){
-
-
-                                        }
-
-                                        else if (triggeredObject.getClass().equals(TriggerManager.PROBE_OBJECT_CLASS_ACTION)){
-
-
-                                        }
-
-
-                                    }
-
-
-
-                                }	//if (pass)
-                            }
-
-
-
-                        }
-
-						
-					}//conditionSet
-					
-				}//if (event.getId()==monitored_event_id) 
-			}
-			
-		}//event_index
-		
-	}
-	*/
 
 	private static boolean eventPassTimeConstraint(ArrayList<String> results, ArrayList<TimeConstraint> timeconstraints){
 		
@@ -236,8 +101,7 @@ public class EventManager {
 		return pass;
 		
 	}
-	
-	
+
 	
 	public static void setEventList(ArrayList<Event> eventList){
 		mEventList = eventList;

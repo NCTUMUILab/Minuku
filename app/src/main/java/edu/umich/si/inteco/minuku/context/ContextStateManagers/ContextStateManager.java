@@ -10,6 +10,7 @@ import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.record.Record;
+import edu.umich.si.inteco.minuku.util.ConditionManager;
 
 
 public abstract class ContextStateManager {
@@ -281,9 +282,19 @@ public abstract class ContextStateManager {
         mStateMappingRules = rules;
     }
 
+    private static StateMappingRule translateStateMappingRule(StateMappingRule rule) {
+
+        return new StateMappingRule();
+
+    }
+
     public static void addStateMappingRule(StateMappingRule rule){
 
-        mStateMappingRules.add(rule);
+        //we know that there's some specific information in condition that needs to be translated in specific
+        //contextStateManager, so we need call translateStateMappingRule before we add the rule.
+        StateMappingRule translatedRule = translateStateMappingRule(rule);
+
+        mStateMappingRules.add(translatedRule);
         //Log.d(LOG_TAG, "[testing stateMappingRule] adding rule: " + rule.toString() + " to " + getName());
 
         //for each time we add a state, we update the list of State.
@@ -335,13 +346,11 @@ public abstract class ContextStateManager {
 
     }
 
-
-
     protected  static boolean satisfyCriterion(float value, int relationship, float targetValue ) {
 
         boolean pass=false;
 
-        if (relationship==STATE_MAPPING_RELATIONSHIP_EQUAL){
+        if (relationship== STATE_MAPPING_RELATIONSHIP_EQUAL){
             if (value==targetValue) pass = true;
         }else if (relationship==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL){
             if (value!=targetValue)  pass = true;
@@ -366,8 +375,61 @@ public abstract class ContextStateManager {
 
     }
 
+    public static String getMeasureName(int measure) {
+
+        if (measure == CONTEXT_SOURCE_MEASURE_LATEST_ONE) {
+            return CONTEXT_SOURCE_MEASURE_LATEST_ONE_STRING;
+        } else if (measure == CONTEXT_SOURCE_MEASURE_AVERAGE) {
+            return CONTEXT_SOURCE_MEASURE_AVERAGE_STRING;
+        } else
+            return null;
+    }
+
+    public static int getMeasure(String measureName) {
+
+        if (measureName.equals(CONTEXT_SOURCE_MEASURE_LATEST_ONE_STRING)) {
+            return CONTEXT_SOURCE_MEASURE_LATEST_ONE;
+        } else if (measureName.equals(CONTEXT_SOURCE_MEASURE_AVERAGE_STRING)) {
+            return CONTEXT_SOURCE_MEASURE_AVERAGE;
+        } else
+            return -1;
+    }
+
+
+
+
+    public static int getRelationship(String  relationshipName) {
+
+        if (relationshipName==STATE_MAPPING_RELATIONSHIP_EQUAL_STRING){
+            return STATE_MAPPING_RELATIONSHIP_EQUAL;
+        }
+        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_LARGER_STRING){
+            return STATE_MAPPING_RELATIONSHIP_LARGER;
+        }
+        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_SMALLER_STRING){
+            return STATE_MAPPING_RELATIONSHIP_SMALLER;
+        }
+        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL_STRING){
+            return STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL;
+        }
+        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL_STRING){
+            return STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL;
+        }
+        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING){
+            return STATE_MAPPING_RELATIONSHIP_BETWEEN;
+        }
+        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_STRING_EQUAL_STRING){
+            return STATE_MAPPING_RELATIONSHIP_STRING_EQUAL;
+        }
+        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING){
+            return STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN;
+        }
+        else
+            return -1;
+    }
+
     public static String getRelationshipName(int relationship) {
-        
+
         if (relationship==STATE_MAPPING_RELATIONSHIP_EQUAL){
             return STATE_MAPPING_RELATIONSHIP_EQUAL_STRING;
         }
@@ -396,13 +458,4 @@ public abstract class ContextStateManager {
             return null;
     }
 
-    public static String getMeasureName(int measure) {
-
-        if (measure == CONTEXT_SOURCE_MEASURE_LATEST_ONE) {
-            return CONTEXT_SOURCE_MEASURE_LATEST_ONE_STRING;
-        } else if (measure == CONTEXT_SOURCE_MEASURE_AVERAGE) {
-            return CONTEXT_SOURCE_MEASURE_AVERAGE_STRING;
-        } else
-            return null;
-    }
 }
