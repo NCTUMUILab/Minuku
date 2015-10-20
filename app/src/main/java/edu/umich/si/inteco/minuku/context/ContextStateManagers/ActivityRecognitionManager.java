@@ -398,137 +398,61 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     }
 
-
     /**
-     * Examine whether the context source is needed in order to monitor a state.
+     * there is no source in AR that the variable type is a float number
      * @param sourceType
+     * @param measure
+     * @param relationship
+     * @param targetValue
      * @return
      */
-    private static boolean isStateMonitored(int sourceType) {
-
-        Log.d(LOG_TAG, "examine statemappingrule: in isStateMonitored");
-        for (int i=0; i<getStateMappingRules().size(); i++){
-
-            if (getStateMappingRules().get(i).getSource()==sourceType){
-                return true;
-            }
-        }
-        return false;
+    private static boolean examineStateRule(int sourceType, int measure, int relationship, float targetValue) {
+        boolean pass = false;
+        return pass;
     }
 
     /**
-     *the timing for ActivityRecognitionManager to updateStateValues is whenever it's activity information
-     * is updated. We use the StateMappingRules to decide whether we should change the values of the states.
-     * To to do this,we first get the relevant state based on the type.
+     * This function examines StateMappingRule with the data and returns a boolean pass.
      * @param sourceType
+     * @param measure
+     * @param relationship
+     * @param targetValue
+     * @return
      */
-    public static void updateStateValues(int sourceType) {
+    private static boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
 
-
-        //1. we first make sure whether the sourceType is being monitored. If not, we don't need to update
-        //the state values
-        //Log.d(LOG_TAG, "examine statemappingrule, the state is being monitored: " + isStateMonitored(sourceType));
-        if (!isStateMonitored(sourceType)) {
-            return;
-        }
-
-        //2. if yes, we get the stateMappingRule by the type to see it's threshold
-        // source  = all probable activities
-
-        for (int i=0; i<getStateMappingRules().size(); i++) {
-            //get the rule
-            StateMappingRule rule = getStateMappingRules().get(i);
-            boolean pass= false;
-
-            //1. get the targer value and relaionship
-            int relationship = rule.getRelationship();
-            String targetValue = rule.getStringTargetValue();
-            int measure = rule.getMeasure();
-
-            //Log.d(LOG_TAG, "examine statemappingrule, now examine " + rule.getName() + " meausre: " +  rule.getMeasure()  + " sourceType: " + sourceType );
-
-            /** examine criteri on specified in the SateMappingRule **/
-            //1 first we need to get the right source based on the sourcetype.
-            //so that we know where the get the source value.
-            //
-            if (sourceType==CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES){
-
-
-            }
-
-            else if (sourceType==CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES){
-
-                String sourceValue=null;
-
-
-                /**2. get source value according to the measure type**/
-
-                //if the measure is "latest value", get the latest saved data**/
-                if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
-                    sourceValue= getActivityNameFromType(getMostProbableActivity().getType());
-                   // Log.d(LOG_TAG, "examine statemappingrule, now examine " + rule.getName() + " source : " +  sourceValue);
-                }
-                else if (measure==CONTEXT_SOURCE_MEASURE_AVERAGE) {
-                    //there is no average value for ACTIVITY_RECOGNITION
-                }
-
-
-
-                /**3. examine the criterion after we get the source value**/
-                if (sourceValue != null) {
-                   // Log.d(LOG_TAG, "examine statemappingrule " + rule.getName() + " with current source value " + sourceValue);
-                    pass = satisfyCriterion(sourceValue, relationship, targetValue);
-                }
-
-
-            }
-
-            Log.d(LOG_TAG, "examine statemappingrule, after the examination the criterion is " + pass);
-
-
-            /** 4. if the criterion is passed, we set the state value based on the mappingRule **/
-            if (pass){
-
-                for (int j=0; j<getStateList().size(); j++){
-                    //find the state corresponding to the StateMappingRule
-
-                    boolean valueChanged = false;
-
-                    if (getStateList().get(j).getName().equals(rule.getName())){
-
-                        String stateValue = rule.getStateValue();
-                        //change the value based on the mapping rule.
-
-                        /** 5. now we need to check whether the new value is different from its current value
-                         * if yes. we need to call StateChange Method later **/
-                        if (!getStateList().get(j).getValue().equals(stateValue) ){
-                            //the value is changed to the new value,
-                            valueChanged = true;
-                        }
-
-                        getStateList().get(j).setValue(stateValue);
-
-                        Log.d(LOG_TAG, "examine statemappingrule, the state " + getStateList().get(j).getName() + " value change to " + getStateList().get(j).getValue());
-
-                    }
-
-                    //if the state changes to a new value
-                    if (valueChanged){
-                        //we call this method to invoke ContextManager to inspect event conditions.
-                        stateChanged(getStateList().get(j));
-                    }
-
-                }
-            }
-
-
-
+        boolean pass = false;
+        //1 first we need to get the right source based on the sourcetype.
+        //so that we know where the get the source value.
+        //
+        if (sourceType==CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES){
 
 
         }
+
+        else if (sourceType==CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES){
+
+            String sourceValue=null;
+
+            /**get source value according to the measure type**/
+            //if the measure is "latest value", get the latest saved data**/
+            if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
+                sourceValue= getActivityNameFromType(getMostProbableActivity().getType());
+                // Log.d(LOG_TAG, "examine statemappingrule, now examine " + rule.getName() + " source : " +  sourceValue);
+            }
+
+            /** examine the criterion after we get the source value**/
+            if (sourceValue != null) {
+                // Log.d(LOG_TAG, "examine statemappingrule " + rule.getName() + " with current source value " + sourceValue);
+                pass = satisfyCriterion(sourceValue, relationship, targetValue);
+            }
+
+
+        }
+
+        return  pass;
 
     }
-
 
 
     public static int getContextSourceTypeFromName(String sourceName) {

@@ -334,8 +334,8 @@ public class ContextManager {
 
     /**
      * This function receives notifications from ContextSTateManager about a value change of a state,
-     * It then examines any events of which the conditions involve the state, detemrining whether the
-     * event occurs.
+     * It then examines any events of which conditions involve using the value of the state, and determines whether a
+     * specified event has occurred.
      * @param state
      */
     public static void examineEventConditions(State state) {

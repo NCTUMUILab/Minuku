@@ -502,7 +502,8 @@ public class ActionManager {
                 }
 
 
-				//if the action is to monitor events
+				/** if the action is to monitor events, ContextMAnager will inform ContextStateManagers
+                 * of relevance to convert raw data into states. **/
 				else if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){
 			
 					MonitoringEventAction a = (MonitoringEventAction) action;
@@ -517,7 +518,7 @@ public class ActionManager {
 				}
 				
 				
-				//if the action is to recording records  
+				/** if the action is to recording records, we save records in the public record pool in the local SQLLite database  **/
 				else if (action.getType().equals(ActionManager.ACTION_TYPE_SAVING_RECORD)){
 
 				    Log.d(LOG_TAG, "[participatory sensing] execute saving record action, this is the " + action.getExecutionCount() + "th time of this action");

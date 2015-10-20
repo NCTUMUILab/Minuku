@@ -2,6 +2,8 @@ package edu.umich.si.inteco.minuku.model;
 
 import java.util.ArrayList;
 
+import edu.umich.si.inteco.minuku.context.ContextManager;
+
 /**
  * Created by Armuro on 10/9/15.
  */
@@ -10,18 +12,17 @@ public class State {
     private int mId;
     private String mName;
     private String mValue = "default";
+    private StateMappingRule mMappingRule;
     private long mLatestUpdatedTime= -1;
+    /** by default a State is enabled. It may be disabled by a stopAction**/
+    private boolean mEnabled = true;
     /**this stores information about which event in Minuku is going to use this state**/
     private ArrayList<Event> mEventList;
 
-    public State(String name) {
-        mName = name;
-    }
-
-    public State(String name, String value) {
-        mName = name;
-        mValue = value;
-
+    public State(StateMappingRule rule) {
+        mMappingRule = rule;
+        mName = rule.getName();
+        mEnabled = true;
     }
 
     public ArrayList<Event> getEventList() {
@@ -30,6 +31,18 @@ public class State {
         }
 
         return mEventList;
+    }
+
+    public StateMappingRule getMappingRule() {
+        return mMappingRule;
+    }
+
+    public boolean isEnabled() {
+        return mEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.mEnabled = enabled;
     }
 
     public void addEvent(Event event) {
@@ -67,13 +80,11 @@ public class State {
 
     public void setValue(String value) {
         this.mValue = value;
+        mLatestUpdatedTime = ContextManager.getCurrentTimeInMillis();
     }
 
     public long getLatestUpdatedTime() {
         return mLatestUpdatedTime;
     }
 
-    public void setLatestUpdatedTime(long latestUpdatedTime) {
-        this.mLatestUpdatedTime = latestUpdatedTime;
-    }
 }
