@@ -6,29 +6,29 @@ public class MonitoringCircumstanceAction extends Action {
 
 	
 	private int _questionnaire_id = -1;
-	private ArrayList<Integer> mMonitoredEventIds;
+	private ArrayList<Integer> mMonitoredCircumstanceIds;
 	
 	public MonitoringCircumstanceAction(int id, String name, String type, String executionStyle, int study_id){
 		super(id, name, type, executionStyle, study_id);
 	}
 
 
-	public void addMonitoredEvent (int id){
+	public void addMonitoredCircumstance (int id){
 		
-		if (mMonitoredEventIds==null){
-			mMonitoredEventIds = new ArrayList<Integer> ();
+		if (mMonitoredCircumstanceIds==null){
+			mMonitoredCircumstanceIds = new ArrayList<Integer> ();
 		}
 		
-		mMonitoredEventIds.add(id);
+		mMonitoredCircumstanceIds.add(id);
 	}
 	
-	public ArrayList<Integer> getMonitoredEventIds (){
+	public ArrayList<Integer> getMonitoredCircumstanceIds (){
 		
-		if (mMonitoredEventIds==null){
-			mMonitoredEventIds = new ArrayList<Integer> ();
+		if (mMonitoredCircumstanceIds==null){
+			mMonitoredCircumstanceIds = new ArrayList<Integer> ();
 		}
 		
-		return mMonitoredEventIds;
+		return mMonitoredCircumstanceIds;
 	}
 	
 	

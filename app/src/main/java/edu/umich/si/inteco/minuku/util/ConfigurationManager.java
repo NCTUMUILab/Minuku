@@ -51,7 +51,7 @@ public class ConfigurationManager {
 	public static final String CONFIGURATION_CATEGORY_CONDITIONS = "Conditions";
 	public static final String CONFIGURATION_CATEGORY_ACTION = "Action";
 	public static final String CONFIGURATION_CATEGORY_TASK = "Task";
-	public static final String CONFIGURATION_CATEGORY_EVENT = "Circumstance";
+	public static final String CONFIGURATION_CATEGORY_EVENT = "Circumstances";
 	public static final String CONFIGURATION_CATEGORY_QUESTIONNAIRE = "Questionnaire";
 
     public static final String SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT = "StopServiceDuringMidNight";
@@ -62,7 +62,8 @@ public class ConfigurationManager {
 	public static final String CONDITION_PROPERTIES_RELATIONSHIP = "Relationship";
 	public static final String CONDITION_PROPERTIES_TARGETVALUE ="TargetValue";
 	public static final String CONDITION_PROPERTIES_MEASURE ="Measure";
-	public static final String CONDITION_PROPERTIES_CRITERION ="Criterion";
+	public static final String CONDITION_PROPERTIES_VALUE_CRITERION ="Value_Criteria";
+	public static final String CONDITION_PROPERTIES_TIME_CRITERION ="Value_Criteria";
 
 
 	private static LocalDBHelper mLocalDBHelper;
@@ -217,7 +218,7 @@ public class ConfigurationManager {
 		try {
 			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_EVENT)){
                 JSONArray circumstancesJSON = content.getJSONArray(ConfigurationManager.CONFIGURATION_CATEGORY_EVENT);
-				loadCircumstancesFromJSON (circumstancesJSON, config.getStudyId());
+				loadCircumstancesFromJSON(circumstancesJSON, config.getStudyId());
             }
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -525,9 +526,9 @@ public class ConfigurationManager {
 				
 				JSONObject conditionJSON = conditionJSONArray.getJSONObject(j);
 				
-				String stateValue = conditionJSON.getString(ConditionManager.CONDITION_PROPERTIES_STATE);
-				String source = conditionJSON.getString(ConditionManager.CONDITION_PROPERTIES_SOURCE);
-				JSONObject criterion = conditionJSON.getJSONObject(ConditionManager.CONDITION_PROPERTIES_CRITERION);
+				String stateValue = conditionJSON.getString(CONDITION_PROPERTIES_STATE);
+				String source = conditionJSON.getString(CONDITION_PROPERTIES_SOURCE);
+				JSONObject criterion = conditionJSON.getJSONObject(CONDITION_PROPERTIES_VALUE_CRITERION);
 
 				//create condition object
 				Condition condition = new Condition(source,  stateValue, criterion);

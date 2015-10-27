@@ -83,7 +83,7 @@ public abstract class ContextStateManager {
     /** if the value of the state is changed, we inform ContextManager about the change so that it can
      * examine the conditions of the events related to the state **/
     public static void stateChanged(State state){
-        ContextManager.examineEventConditions(state);
+        ContextManager.examineCircumstances(state);
     };
 
 

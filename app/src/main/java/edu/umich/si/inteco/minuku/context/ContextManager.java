@@ -423,7 +423,7 @@ public class ContextManager {
             }
         }
 
-        //at the end we returns a list of circumstances that involve using the state. 
+        //at the end we returns a list of circumstances that involve using the state.
         return circumstances;
 
     }
