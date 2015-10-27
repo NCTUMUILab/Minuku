@@ -16,8 +16,8 @@ public class Task {
 	/**Session List**/
 	public ArrayList<Session> mSessionList;
 	
-	/**Event List**/
-	public ArrayList<Event> mEventList;
+	/**Circumstance List**/
+	public ArrayList<Circumstance> mCircumstanceList;
 
 	public Task(int id ){
 		_id = id;
@@ -41,7 +41,7 @@ public class Task {
 		mName = name;
 		mDescription = description;
 		mSessionList = new ArrayList<Session>();
-		mEventList = new ArrayList<Event>();
+		mCircumstanceList = new ArrayList<Circumstance>();
 	}
 
 	public void setId(int id){
@@ -62,9 +62,9 @@ public class Task {
     	return mSessionList;
     }
 
-    public void setEventList(ArrayList<Event> EventList ){
+    public void setEventList(ArrayList<Circumstance> circumstanceList){
     	
-    	mEventList = EventList;
+    	mCircumstanceList = circumstanceList;
     }
     
     public void addSession(Session session){
@@ -73,13 +73,13 @@ public class Task {
     }
     
     
-    public ArrayList<Event> getEventList(){
+    public ArrayList<Circumstance> getEventList(){
     	
-    	return mEventList;
+    	return mCircumstanceList;
     }
 	
-    public void addEvent(Event event){
-    	mEventList.add(event);
+    public void addEvent(Circumstance circumstance){
+    	mCircumstanceList.add(circumstance);
     }
     
 	public void setStartTime(long t){

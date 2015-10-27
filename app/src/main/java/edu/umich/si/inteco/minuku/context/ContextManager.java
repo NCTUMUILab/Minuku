@@ -22,12 +22,10 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationMod
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.UserInteractionManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
+import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.Condition;
-import edu.umich.si.inteco.minuku.model.Event;
-import edu.umich.si.inteco.minuku.model.ProbeObject;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
-import edu.umich.si.inteco.minuku.model.TriggerLink;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -117,7 +115,7 @@ public class ContextManager {
 
     public static ArrayList<Integer> RECORD_TYPE_LIST;
 
-    private static ArrayList<Event> mEventList;
+    private static ArrayList<Circumstance> mCircumstanceList;
 
 
     //handle the local SQLite operation
@@ -151,7 +149,7 @@ public class ContextManager {
 
 		mContext = context;
 
-        mEventList = new ArrayList<Event>();
+        mCircumstanceList = new ArrayList<Circumstance>();
 
 		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
         //initiate the RecordPool
@@ -363,15 +361,15 @@ public class ContextManager {
 
 
         /**2. assign monitoring task to contextStateManagers **/
-        for (int i=0; i<getEventList().size(); i++){
+        for (int i=0; i<getCircumstanceList().size(); i++){
 
             //creating StateMappingRule and add to related ContextStateManager
-            Event event = getEventList().get(i);
+            Circumstance circumstance = getCircumstanceList().get(i);
 
-            //get all conditions for the event
-            for (int j=0; j<event.getConditionList().size(); j++) {
+            //get all conditions for the circumstance
+            for (int j=0; j< circumstance.getConditionList().size(); j++) {
 
-                Condition condition = event.getConditionList().get(j);
+                Condition condition = circumstance.getConditionList().get(j);
 
                 //for each condition, we need to know which ContextStateManager will need to generate a state
                 // for that condition.
@@ -413,27 +411,44 @@ public class ContextManager {
     }
 
 
+    private static ArrayList<Circumstance> getRelatedCircumstance(State state) {
+
+        ArrayList<Circumstance> circumstances = new ArrayList<Circumstance>();
+
+        //we find any circumstance that uses the state
+        for (int i=0; i<getCircumstanceList().size(); i++){
+            if (getCircumstanceList().get(i).isUsingState(state)){
+                //we find any condition in the circumstance using the state, so we add that circumstance.
+                circumstances.add(getCircumstanceList().get(i));
+            }
+        }
+
+        //at the end we returns a list of circumstances that involve using the state. 
+        return circumstances;
+
+    }
+
     /**
      * This function receives notifications from ContextSTateManager about a value change of a state,
-     * It then examines any events of which conditions involve using the value of the state, and determines whether a
-     * specified event has occurred.
+     * It then examines any circumstances of which conditions involve using the value of the state, and determines whether a
+     * specified circumstance has occurred.
      * @param state
      */
-    public static void examineEventConditions(State state) {
+    public static void examineCircumstances(State state) {
 
-        /**get all the events that use the state **/
+        /**get any conditions that use the state. **/
 
-        ArrayList<Event> =
+        ArrayList<Circumstance> relatedCircumstances = getRelatedCircumstance (state);
 
-        //for each event, get all of the conditions, and check whether the condition has been met.
-        for (int i=0; i< getEventList().size(); i++) {
+        //for each circumstance, get all of the conditions, and check whether the condition has been met.
+        for (int i=0; i < getCircumstanceList().size(); i++) {
 
-            Event event = getEventList().get(i);
+            Circumstance circumstance = getCircumstanceList().get(i);
 
-            /** an event is a list of conditions. An event occurs only when all conditions are met **/
+            /** an circumstance contains a set of conditions. An circumstance occurs only when all conditions are met **/
             boolean pass = true;
 
-            ArrayList<Condition> conditions = event.getConditionList();
+            ArrayList<Condition> conditions = circumstance.getConditionList();
 
             //we use "&" operation for all condition. As long as there is one false for one condition
             //pass is false.
@@ -443,23 +458,23 @@ public class ContextManager {
                     pass = pass & state.getValue().equals(condition.getStateValue());
                 }
 
-            /** for any event for which the conditions are true, we let TriggerManager to see which action/action control to trigger.**/
+            /** for any circumstance for which the conditions are true, we let TriggerManager to see which action/action control to trigger.**/
 
-            //if the conditions of the event is satisfied.
+            //if the conditions of the circumstance is satisfied.
             if (pass) {
 
-                //log when an event is detected
+                //log when an circumstance is detected
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_EVENT_DETECTED,
-                        "Event detected:\t" + event.getId() + "\t" + event.getName());
+                        "Circumstance detected:\t" + circumstance.getId() + "\t" + circumstance.getName());
 
-                //check the triggerlinks of the current event to see if it would trigger anything.
-                Log.d(LOG_TAG, "[examineEventConditions] The event " + event.getId() + "  condition is satisfied, check its triggerLinks! "
-                        + " the event has " + event.getTriggerLinks().size() + " triggerlinks ");
+                //check the triggerlinks of the current circumstance to see if it would trigger anything.
+                Log.d(LOG_TAG, "[examineCircumstanceConditions] The circumstance " + circumstance.getId() + "  condition is satisfied, check its triggerLinks! "
+                        + " the circumstance has " + circumstance.getTriggerLinks().size() + " triggerlinks ");
 
-                //the event will trigger something, we call TriggerManager to manage its trigger.
-                if (event.getTriggerLinks().size() > 0) {
-                    TriggerManager.executeTriggers(event.getTriggerLinks());
+                //the circumstance will trigger something, we call TriggerManager to manage its trigger.
+                if (circumstance.getTriggerLinks().size() > 0) {
+                    TriggerManager.executeTriggers(circumstance.getTriggerLinks());
                 }
             }
 
@@ -502,8 +517,8 @@ public class ContextManager {
                     testActivityRecordIndex+=1;
 */
                 //Recording is one of the types of actions that users need to put into the configuration.
-                //However, now we want to enable background recording so that we can monitor events.
-                //eventually. If researachers do not monitor anything, this flag should be false.
+                //However, now we want to enable background recording so that we can monitor circumstances.
+                //circumstanceually. If researachers do not monitor anything, this flag should be false.
 
                 if (sIsBackgroundRecordingEnabled){
                     DataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
@@ -556,27 +571,27 @@ public class ContextManager {
     };
 
 
-    public static void addEvent(Event event){
-        if (mEventList==null){
-            mEventList = new ArrayList<Event>();
+    public static void addCircumstance(Circumstance circumstance){
+        if (mCircumstanceList ==null){
+            mCircumstanceList = new ArrayList<Circumstance>();
         }
-        mEventList.add(event);
+        mCircumstanceList.add(circumstance);
     }
 
-    public static void removeEvent(Event event){
-        if (mEventList!=null){
-            mEventList.remove(event);
-        }
-    }
-
-    public static void removeEvent(int index){
-        if (mEventList!=null){
-            mEventList.remove(index);
+    public static void removeCircumstance(Circumstance circumstance){
+        if (mCircumstanceList !=null){
+            mCircumstanceList.remove(circumstance);
         }
     }
 
-    public static ArrayList<Event> getEventList(){
-        return mEventList;
+    public static void removeCircumstance(int index){
+        if (mCircumstanceList !=null){
+            mCircumstanceList.remove(index);
+        }
+    }
+
+    public static ArrayList<Circumstance> getCircumstanceList(){
+        return mCircumstanceList;
     }
 
     public static String getSourceName(String contextStateManager, int sourceType){

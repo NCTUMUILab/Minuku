@@ -10,27 +10,22 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
-import edu.umich.si.inteco.minuku.context.EventManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
 import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
-import edu.umich.si.inteco.minuku.model.Event;
+import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.model.QuestionnaireTemplate;
-import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.actions.Action;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateAction;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateRecordingAction;
 import edu.umich.si.inteco.minuku.model.actions.GenerateEmailQuestionnaireAction;
 import edu.umich.si.inteco.minuku.model.actions.GeneratingQuestionnaireAction;
-import edu.umich.si.inteco.minuku.model.actions.MonitoringEventAction;
+import edu.umich.si.inteco.minuku.model.actions.MonitoringCircumstanceAction;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;
 
 public class ConfigurationManager {
@@ -56,7 +51,7 @@ public class ConfigurationManager {
 	public static final String CONFIGURATION_CATEGORY_CONDITIONS = "Conditions";
 	public static final String CONFIGURATION_CATEGORY_ACTION = "Action";
 	public static final String CONFIGURATION_CATEGORY_TASK = "Task";
-	public static final String CONFIGURATION_CATEGORY_EVENT = "Event";
+	public static final String CONFIGURATION_CATEGORY_EVENT = "Circumstance";
 	public static final String CONFIGURATION_CATEGORY_QUESTIONNAIRE = "Questionnaire";
 
     public static final String SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT = "StopServiceDuringMidNight";
@@ -136,7 +131,7 @@ public class ConfigurationManager {
             Log.d(LOG_TAG, "[loadConfiguration] no configuration in the database, load file.." + filename);
             String study_str = new FileHelper(mContext).loadFileFromAsset(filename);
 			
-			//load events and conditions
+			//load circumstances and conditions
 			try {
 		
 				JSONArray studyJSONArray = new JSONArray(study_str);
@@ -218,11 +213,11 @@ public class ConfigurationManager {
         }
 
 
-		/** load events **/
+		/** load circumstances **/
 		try {
 			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_EVENT)){
-                JSONArray eventsJSON = content.getJSONArray(ConfigurationManager.CONFIGURATION_CATEGORY_EVENT);
-                loadEventsFromJSON (eventsJSON, config.getStudyId());
+                JSONArray circumstancesJSON = content.getJSONArray(ConfigurationManager.CONFIGURATION_CATEGORY_EVENT);
+				loadCircumstancesFromJSON (circumstancesJSON, config.getStudyId());
             }
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -258,40 +253,40 @@ public class ConfigurationManager {
 	
 	/**
 	 * 
-	 * @param eventsJSON
+	 * @param circumstancesJSON
 	 */
-	public static void loadEventsFromJSON (JSONArray eventsJSON, int study_id){	
+	public static void loadCircumstancesFromJSON (JSONArray circumstancesJSON, int study_id){
 
-		Log.d(LOG_TAG, "[loadEventsFromJSON] load the event content of study " + study_id);
+		Log.d(LOG_TAG, "[loadCircumstancesFromJSON] load the circumstance content of study " + study_id);
 		
 		
-		for (int i = 0; i < eventsJSON.length(); i++){
+		for (int i = 0; i < circumstancesJSON.length(); i++){
 			
-			Event event = null;
-			JSONObject eventJSON = null;
+			Circumstance circumstance = null;
+			JSONObject circumstanceJSON = null;
 			
 			try {
-				eventJSON = eventsJSON.getJSONObject(i);
+				circumstanceJSON = circumstancesJSON.getJSONObject(i);
 				
-				int id= eventJSON.getInt(CONFIGURATION_PROPERTIES_ID);
-				String name = eventJSON.getString(CONFIGURATION_PROPERTIES_NAME);
-				String description = eventJSON.getString(CONFIGURATION_PROPERTIES_DESCRIPTION);
+				int id= circumstanceJSON.getInt(CONFIGURATION_PROPERTIES_ID);
+				String name = circumstanceJSON.getString(CONFIGURATION_PROPERTIES_NAME);
+				String description = circumstanceJSON.getString(CONFIGURATION_PROPERTIES_DESCRIPTION);
 
-				//creat the event object
-				event = new Event(id, name, study_id);
+				//creat the circumstance object
+				circumstance = new Circumstance(id, name, study_id);
 				
-				//add the conditionJSON to the event
-				if (eventJSON.has(CONFIGURATION_CATEGORY_CONDITIONS)){
+				//add the conditionJSON to the circumstance
+				if (circumstanceJSON.has(CONFIGURATION_CATEGORY_CONDITIONS)){
 					
-					JSONArray conditionJSONArray = eventJSON.getJSONArray(CONFIGURATION_CATEGORY_CONDITIONS);
+					JSONArray conditionJSONArray = circumstanceJSON.getJSONArray(CONFIGURATION_CATEGORY_CONDITIONS);
 					
-					//get the list of condition from each event
+					//get the list of condition from each circumstance
 					ArrayList<Condition> conditions = loadConditionsFromJSON(conditionJSONArray);
 					
-					Log.d(LOG_TAG, "[ In loadEventsFromJSON] setting conditionJSONArray: " + conditionJSONArray);
+					Log.d(LOG_TAG, "[ In loadCircumstancesFromJSON] setting conditionJSONArray: " + conditionJSONArray);
 
-					//set the condition object arraylist to the event.
-					event.setConditionList(conditions);
+					//set the condition object arraylist to the circumstance.
+					circumstance.setConditionList(conditions);
 				}
 				
 			} catch (JSONException e1) {
@@ -299,11 +294,11 @@ public class ConfigurationManager {
 				e1.printStackTrace();
 			}
 			
-			/** after creating the event object, add event to eventList, and to the databasse..**/
+			/** after creating the circumstance object, add circumstance to circumstanceList, and to the databasse..**/
 			//add to the list
-			ContextManager.addEvent(event);
+			ContextManager.addCircumstance(circumstance);
 
-		}//end of reading eventJSONArray
+		}//end of reading circumstanceJSONArray
 	}
 	
 	
@@ -366,19 +361,19 @@ public class ConfigurationManager {
 
                 }
 				
-				////Action of monitoring events. We associate event ids with the action.
+				////Action of monitoring circumstances. We associate circumstance ids with the action.
 				else if (type.equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){						
 					
-					String monitor_event_ids = actionJSON.getString(ActionManager.ACTION_PROPERTIES_MONITORING_EVENTS);
-					String [] ids = monitor_event_ids.split(",");
+					String monitor_circumstance_ids = actionJSON.getString(ActionManager.ACTION_PROPERTIES_MONITORING_EVENTS);
+					String [] ids = monitor_circumstance_ids.split(",");
 					
-					MonitoringEventAction a = new MonitoringEventAction (action_id, name, type, execution_style, study_id);
+					MonitoringCircumstanceAction a = new MonitoringCircumstanceAction (action_id, name, type, execution_style, study_id);
 
-					//associate event ids to the monitoring action.
+					//associate circumstance ids to the monitoring action.
 					for (int j=0; j<ids.length; j++){
 						int id = Integer.parseInt(ids[j]);
-						a.addMonitoredEvent(id);
-						Log.d(LOG_TAG, " [loadActionsFromJSON] the aciton" + action.getId() + " monitors event:  "  +  id);
+						a.addMonitoredCircumstance(id);
+						Log.d(LOG_TAG, " [loadActionsFromJSON] the aciton" + action.getId() + " monitors circumstance:  "  +  id);
 
 					}
 					
@@ -524,7 +519,7 @@ public class ConfigurationManager {
 		
 		try {
 				
-			Log.d(LOG_TAG, "[loadConditionsFromJSON] the conditions of the current event is:  " +conditionJSONArray.toString());	
+			Log.d(LOG_TAG, "[loadConditionsFromJSON] the conditions of the current circumstance is:  " +conditionJSONArray.toString());	
 			
 			for (int j = 0; j < conditionJSONArray.length(); j++){
 				
@@ -583,7 +578,7 @@ public class ConfigurationManager {
 			e.printStackTrace();
 		}
 		
-		//Log.d(LOG_TAG, "[loadConditionsFromJSON] the current event has " + conditions.size() + " condition");
+		//Log.d(LOG_TAG, "[loadConditionsFromJSON] the current circumstance has " + conditions.size() + " condition");
 		return conditions;
 
 	}

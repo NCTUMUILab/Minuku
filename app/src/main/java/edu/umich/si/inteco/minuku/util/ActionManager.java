@@ -35,7 +35,7 @@ import edu.umich.si.inteco.minuku.model.actions.AnnotateAction;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateRecordingAction;
 import edu.umich.si.inteco.minuku.model.actions.GenerateEmailQuestionnaireAction;
 import edu.umich.si.inteco.minuku.model.actions.GeneratingQuestionnaireAction;
-import edu.umich.si.inteco.minuku.model.actions.MonitoringEventAction;
+import edu.umich.si.inteco.minuku.model.actions.MonitoringCircumstanceAction;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;
 
 public class ActionManager {
@@ -139,7 +139,7 @@ public class ActionManager {
     public static final String ACTION_PROPERTIES_NOTIFICATION_TYPE = "Type";
 
     /** ProbeObject Class**/
-    public static final String ACTION_TRIGGER_CLASS_EVENT= "Event";
+    public static final String ACTION_TRIGGER_CLASS_EVENT= "Circumstance";
     public static final String ACTION_TRIGGER_CLASS_ACTION_STOP= "Action.Stop";
     public static final String ACTION_TRIGGER_CLASS_ACTION_START= "Action.Start";
     public static final String ACTION_TRIGGER_CLASS_ACTION_PAUSE= "Action.Pause";
@@ -244,7 +244,7 @@ public class ActionManager {
 				if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){
 			
 					//instantiate a monitoring action first, and then put it into the runningAction list
-					MonitoringEventAction monitoringAction = (MonitoringEventAction) action;					
+					MonitoringCircumstanceAction monitoringAction = (MonitoringCircumstanceAction) action;
 					ArrayList<Integer> evtIds = monitoringAction.getMonitoredEventIds();
 					
 					Log.d(LOG_TAG, " [ActionManager startAction] Start a new monitoring action" + monitoringAction.getId() + ", which monitor events  " + evtIds.toString());
@@ -506,7 +506,7 @@ public class ActionManager {
                  * of relevance to convert raw data into states. **/
 				else if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){
 			
-					MonitoringEventAction a = (MonitoringEventAction) action;
+					MonitoringCircumstanceAction a = (MonitoringCircumstanceAction) action;
 					
 					ArrayList<Integer> evt_ids = a.getMonitoredEventIds();
 					

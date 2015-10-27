@@ -326,6 +326,13 @@ public abstract class ContextStateManager {
         mName = name;
     }
 
+    /**
+     *
+     * @param value
+     * @param relationship
+     * @param targetValue
+     * @return
+     */
     protected  static boolean satisfyCriterion(String value, int relationship, String targetValue ){
 
         boolean pass=false;

@@ -23,22 +23,25 @@
 			"Name": "Configuration1",
 			"Content":
 			{
-				"Event": 
+				"Circumstances":
 				[
+				  	//1st monitored circumstance
 					{
 						"Id": 1,
 						"Task_id": 1,
-						"Name": "Tilting event at NQ",
+						"Name": "Using the phone at NQ",
 						"Description":"NA",
-						"Conditions": 
-						[ 
-							{							
-								"Source": "ActivityRecognition",
-								"State":"Use Phone",								
-								"Criterion": {
+					    //a circumstance contains a set of conditions that, when happening together, create that circumstance.
+						"Conditions":
+						[
+						  //each condition specifies a state, value criteria, and time criteria
+							{
+							  	"Name":"Use Phone",
+							  	"Source": "ActivityRecognition",
+								"Value_Criteria": {
 									"TargetValue": "tilting"
 								},				
-								"Constraint": [
+								"Time_Criteria": [
 									{
 										"Type": "recency",
 										"Relationship": "<=", 
@@ -47,22 +50,23 @@
 								]
 							}						
 						]
-					}, 
+					},
+				  	//2nd monitored condition
 					{
 						"Id": 2,
 						"Task_id": 1,
 						"Name": "No attention on the phone",
 						"Description":"NA",
-						"Conditions": 
+						"Conditions":
 						[ 
 							{
-								
-								"Source": "ActivityRecognition",
-								"State": "Phone Still for a period",								
-								"Criterion": {
+
+							  	"Name": "Phone Still for a period",
+							  	"Source": "ActivityRecognition",
+								"Value_Criteria": {
 									"TargetValue": "still"
 								},					
-								"Constraint": [
+								"Time_Criteria": [
 									{
 										"Type": "duration",
 										"Relationship": ">", 

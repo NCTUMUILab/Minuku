@@ -11,15 +11,15 @@ import edu.umich.si.inteco.minuku.model.actions.Action;
 import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.TriggerManager;
 
-public class Event extends ProbeObject{
+public class Circumstance extends ProbeObject{
 	
-    private static final String LOG_TAG = "Event";
+    private static final String LOG_TAG = "Circumstance";
 	
     private String mName;
     private String mDescription="NA";
     private ArrayList<Condition> mConditionList;
 
-    public Event(String name){
+    public Circumstance(String name){
     	super();
     	mName = name;
     	mConditionList = new ArrayList<Condition>();
@@ -27,7 +27,7 @@ public class Event extends ProbeObject{
 
     }
     
-    public Event(int id, String name, int study_id){
+    public Circumstance(int id, String name, int study_id){
     	super();
     	_id = id;
     	mName = name;
@@ -37,7 +37,7 @@ public class Event extends ProbeObject{
     }
     
     
-    public Event(int id, String name, String description){
+    public Circumstance(int id, String name, String description){
     	super();
     	_id = id;
     	mName = name;
@@ -46,12 +46,32 @@ public class Event extends ProbeObject{
     	 _class = TriggerManager.PROBE_OBJECT_CLASS_EVENT;
     }    
 
-    public Event(String name, Task task){
+    public Circumstance(String name, Task task){
     	super();
     	mName = name;
     	mConditionList = new ArrayList<Condition>();
     	 _class = TriggerManager.PROBE_OBJECT_CLASS_EVENT;
     }
+
+	/**
+	 * this function checkes whether a circumstance to be detected involves a specific state.
+	 * If any of the conditions uses the value of the state, the function returns true.
+	 * @param state
+	 * @return
+	 */
+	public boolean isUsingState(State state){
+
+		for (int i=0; i<mConditionList.size(); i++){
+
+			Condition condition = mConditionList.get(i);
+			//find a condition that monitors the state
+			if (condition.getStateName().equals(state.getName())){
+				return true;
+			}
+		}
+
+		return false;
+	}
 
     public void setName(String name){
     	mName = name;

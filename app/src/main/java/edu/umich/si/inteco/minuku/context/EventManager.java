@@ -1,27 +1,17 @@
 package edu.umich.si.inteco.minuku.context;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
-import edu.umich.si.inteco.minuku.model.Condition;
-import edu.umich.si.inteco.minuku.model.Event;
-import edu.umich.si.inteco.minuku.model.ProbeObject;
-import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
+import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.SimpleGeofence;
 import edu.umich.si.inteco.minuku.model.TimeConstraint;
-import edu.umich.si.inteco.minuku.model.TriggerLink;
-import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
-import edu.umich.si.inteco.minuku.util.LogManager;
-import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
-import edu.umich.si.inteco.minuku.util.TriggerManager;
 
 public class EventManager {
 
@@ -29,7 +19,7 @@ public class EventManager {
 	
 	private static Context mContext;
 	
-	private static ArrayList<Event> mEventList;
+	private static ArrayList<Circumstance> mCircumstanceList;
 	
 	private static ArrayList<SimpleGeofence> mMonitoredGeofences;
 
@@ -38,7 +28,7 @@ public class EventManager {
 	public EventManager(Context context){
 		
 		mContext = context;
-		mEventList = new ArrayList<Event>();
+		mCircumstanceList = new ArrayList<Circumstance>();
 		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 	}
 
@@ -103,12 +93,12 @@ public class EventManager {
 	}
 
 	
-	public static void setEventList(ArrayList<Event> eventList){
-		mEventList = eventList;
+	public static void setEventList(ArrayList<Circumstance> circumstanceList){
+		mCircumstanceList = circumstanceList;
 	}
 	
-	public static ArrayList<Event> getEventList(){		
-		return mEventList;
+	public static ArrayList<Circumstance> getEventList(){
+		return mCircumstanceList;
 	}
 	
 	public static void addMonitoredGeofence(SimpleGeofence simpleGeofence){
@@ -137,39 +127,39 @@ public class EventManager {
 	}
 	
 	
-	public static void addEvent(Event event){
+	public static void addEvent(Circumstance circumstance){
 		
-		if (mEventList==null){
-			mEventList = new ArrayList<Event>();
+		if (mCircumstanceList ==null){
+			mCircumstanceList = new ArrayList<Circumstance>();
 		}
-		mEventList.add(event);
+		mCircumstanceList.add(circumstance);
 	}
 	
-	public static void removeEvent(Event event){
+	public static void removeEvent(Circumstance circumstance){
 		
-		if (mEventList!=null){
-			mEventList.remove(event);
+		if (mCircumstanceList !=null){
+			mCircumstanceList.remove(circumstance);
 		}
 		
 	}
 	
 	public static void removeEvent(int index){
 		
-		if (mEventList!=null){
-			mEventList.remove(index);
+		if (mCircumstanceList !=null){
+			mCircumstanceList.remove(index);
 		}
 		
 	}
 	
-	public static Event getEventById(int id){
+	public static Circumstance getEventById(int id){
 		
 		//connect the event object with the action object..
 		
-		for (int j= 0; j< mEventList.size(); j++){
+		for (int j= 0; j< mCircumstanceList.size(); j++){
 			
-			Event evt;
-			if (mEventList.get(j).getId()==id){
-				evt = mEventList.get(j); 
+			Circumstance evt;
+			if (mCircumstanceList.get(j).getId()==id){
+				evt = mCircumstanceList.get(j);
 				
 				return evt;
 			}

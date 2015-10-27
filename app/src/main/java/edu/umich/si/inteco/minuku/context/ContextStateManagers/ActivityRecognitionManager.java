@@ -491,6 +491,9 @@ public class ActivityRecognitionManager extends ContextStateManager
         if (sourceType==CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES){
 
 
+            if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
+
+            }
         }
 
         else if (sourceType==CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES){
@@ -501,13 +504,16 @@ public class ActivityRecognitionManager extends ContextStateManager
             //if the measure is "latest value", get the latest saved data**/
             if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
                 sourceValue= getActivityNameFromType(getMostProbableActivity().getType());
-                // Log.d(LOG_TAG, "examine statemappingrule, now examine " + rule.getName() + " source : " +  sourceValue);
             }
 
             /** examine the criterion after we get the source value**/
             if (sourceValue != null) {
-                // Log.d(LOG_TAG, "examine statemappingrule " + rule.getName() + " with current source value " + sourceValue);
+
                 pass = satisfyCriterion(sourceValue, relationship, targetValue);
+                Log.d(LOG_TAG, "examine statemappingrule, get measure "
+                        + getContextSourceNameFromType(sourceType) + " and get value : " +  sourceValue +
+                        "now examine target value : " + targetValue + " so the pass is : " + pass);
+
             }
 
 

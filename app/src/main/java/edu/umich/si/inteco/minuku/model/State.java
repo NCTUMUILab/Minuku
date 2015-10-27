@@ -17,7 +17,7 @@ public class State {
     /** by default a State is enabled. It may be disabled by a stopAction**/
     private boolean mEnabled = true;
     /**this stores information about which event in Minuku is going to use this state**/
-    private ArrayList<Event> mEventList;
+    private ArrayList<Circumstance> mCircumstanceList;
 
     public State(StateMappingRule rule) {
         mMappingRule = rule;
@@ -25,12 +25,12 @@ public class State {
         mEnabled = true;
     }
 
-    public ArrayList<Event> getEventList() {
-        if (mEventList ==null){
-            mEventList = new ArrayList<Event>();
+    public ArrayList<Circumstance> getEventList() {
+        if (mCircumstanceList ==null){
+            mCircumstanceList = new ArrayList<Circumstance>();
         }
 
-        return mEventList;
+        return mCircumstanceList;
     }
 
     public StateMappingRule getMappingRule() {
@@ -45,19 +45,19 @@ public class State {
         this.mEnabled = enabled;
     }
 
-    public void addEvent(Event event) {
-        if (mEventList ==null){
-            mEventList = new ArrayList<Event>();
+    public void addEvent(Circumstance circumstance) {
+        if (mCircumstanceList ==null){
+            mCircumstanceList = new ArrayList<Circumstance>();
         }
-        mEventList.add(event);
+        mCircumstanceList.add(circumstance);
     }
 
-    public void removeEvents(Event event) {
-        if (mEventList ==null){
+    public void removeEvents(Circumstance circumstance) {
+        if (mCircumstanceList ==null){
             return;
         }
 
-        mEventList.remove(event);
+        mCircumstanceList.remove(circumstance);
     }
 
     public int getId() {
