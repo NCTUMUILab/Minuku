@@ -245,7 +245,7 @@ public class ActionManager {
 			
 					//instantiate a monitoring action first, and then put it into the runningAction list
 					MonitoringCircumstanceAction monitoringAction = (MonitoringCircumstanceAction) action;
-					ArrayList<Integer> evtIds = monitoringAction.getMonitoredEventIds();
+					ArrayList<Integer> evtIds = monitoringAction.getMonitoredCircumstanceIds();
 					
 					Log.d(LOG_TAG, " [ActionManager startAction] Start a new monitoring action" + monitoringAction.getId() + ", which monitor events  " + evtIds.toString());
 					
@@ -508,7 +508,7 @@ public class ActionManager {
 			
 					MonitoringCircumstanceAction a = (MonitoringCircumstanceAction) action;
 					
-					ArrayList<Integer> evt_ids = a.getMonitoredEventIds();
+					ArrayList<Integer> ids = a.getMonitoredCircumstanceIds();
 					
 					//Log.d(LOG_TAG, " [ActionManager Execute] Ready to execute monitoring action" + a.getId() + ", which monitor events  " + evt_ids.toString());
 					

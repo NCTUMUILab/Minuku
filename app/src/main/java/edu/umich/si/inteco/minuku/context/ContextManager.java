@@ -189,11 +189,24 @@ public class ContextManager {
 
         Log.d(LOG_TAG, "[startContextManager]");
 
-        /**if extractign contextual information is enabled, extract information**/
+        /**
+         * The first thing in ContextManager is to setup the task in ContextStateManager, including
+         * determining what contextual information to record and monitor.
+         * According to the recording and the monitoring task, ContextManager determines which
+         * contextual information to extract
+         */
+        updateTasksInContextStateManager();
+
+        /**ContextManager has the control to start and stop extracting contextual information*/
         if (sIsExtractingContextEnabled) {
             startExtractingContext();
         }
 
+        /**the final task is to run the ContextManager mainthread
+         * Here it actively updates contextual information in contextStateManager that
+         * pull information from other contextStateManager, e.g. TransportationManager pulls information
+         * from ACtivityRecognition Manager.
+         * **/
         startContextManagerMainThread();
 
     }
@@ -356,17 +369,17 @@ public class ContextManager {
      */
     public static void updateTasksInContextStateManager() {
 
-
+        Log.d(LOG_TAG, "[updateTasksInContextStateManager] ");
         /**1. assign logging task to contextStateManager **/
 
 
         /**2. assign monitoring task to contextStateManagers **/
         for (int i=0; i<getCircumstanceList().size(); i++){
 
-            //creating StateMappingRule and add to related ContextStateManager
+            //creating StateMappingRule and add to the relevant ContextStateManagers
             Circumstance circumstance = getCircumstanceList().get(i);
 
-            //get all conditions for the circumstance
+            //get conditions in each circumstance
             for (int j=0; j< circumstance.getConditionList().size(); j++) {
 
                 Condition condition = circumstance.getConditionList().get(j);
@@ -382,7 +395,13 @@ public class ContextManager {
                 //we give contextStateManager the criterion for changing the state to the value.
                 JSONObject criterion = condition.getCriterion();
 
-                StateMappingRule rule = new StateMappingRule(contextStateManagerName, stateValue, criterion);
+                //TODO: fix this.
+                StateMappingRule rule = new StateMappingRule(contextStateManagerName, condition.getSource(), stateValue, criterion);
+
+                Log.d(LOG_TAG, "[updateTasksInContextStateManager] adding a rule:" +
+                        "the rule is: " + rule.toString() + " is for ContextStateManager: " + contextStateManagerName +
+                " to monitor source: " + condition.getSource() + " for state value is " + stateValue + " with criterion " +
+                rule.getCriterion().toString());
 
                 assignMonitoringTasks(contextStateManagerName, rule);
 

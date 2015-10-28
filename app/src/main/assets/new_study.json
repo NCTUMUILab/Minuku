@@ -36,16 +36,18 @@
 						[
 						  //each condition specifies a state, value criteria, and time criteria
 							{
-							  	"Name":"Use Phone",
+							  	"State":"Use Phone",
 							  	"Source": "ActivityRecognition",
-								"Value_Criteria": {
-									"TargetValue": "tilting"
-								},				
+								"Value_Criteria": [
+									{
+										"TargetValue": "tilting"
+									}
+								],				
 								"Time_Criteria": [
 									{
-										"Type": "recency",
+										"Measure": "recency",
 										"Relationship": "<=", 
-										"TargetValue": "5" 
+										"TargetValue": 5 
 									}
 								]
 							}						
@@ -61,16 +63,18 @@
 						[ 
 							{
 
-							  	"Name": "Phone Still for a period",
+							  	"State": "Phone Still for a period",
 							  	"Source": "ActivityRecognition",
-								"Value_Criteria": {
-									"TargetValue": "still"
-								},					
+								"Value_Criteria": [
+									{
+										"TargetValue": "still"
+									}
+								],					
 								"Time_Criteria": [
 									{
-										"Type": "duration",
+										"Measure": "duration",
 										"Relationship": ">", 
-										"TargetValue": "30" 
+										"TargetValue": 30 
 									}
 								]
 							} 

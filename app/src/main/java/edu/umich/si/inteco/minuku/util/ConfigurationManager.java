@@ -11,15 +11,19 @@ import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
+import edu.umich.si.inteco.minuku.model.Criterion;
 import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.model.QuestionnaireTemplate;
+import edu.umich.si.inteco.minuku.model.StateValueCriterion;
+import edu.umich.si.inteco.minuku.model.TimeCriterion;
 import edu.umich.si.inteco.minuku.model.actions.Action;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateAction;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateRecordingAction;
@@ -278,10 +282,11 @@ public class ConfigurationManager {
 				
 				//add the conditionJSON to the circumstance
 				if (circumstanceJSON.has(CONFIGURATION_CATEGORY_CONDITIONS)){
-					
+
+					//There could be multiple conditions. So it is a JSONArray
 					JSONArray conditionJSONArray = circumstanceJSON.getJSONArray(CONFIGURATION_CATEGORY_CONDITIONS);
 					
-					//get the list of condition from each circumstance
+					//get the list of conditions from each circumstance
 					ArrayList<Condition> conditions = loadConditionsFromJSON(conditionJSONArray);
 					
 					Log.d(LOG_TAG, "[ In loadCircumstancesFromJSON] setting conditionJSONArray: " + conditionJSONArray);
@@ -291,13 +296,13 @@ public class ConfigurationManager {
 				}
 				
 			} catch (JSONException e1) {
-
 				e1.printStackTrace();
 			}
 			
 			/** after creating the circumstance object, add circumstance to circumstanceList, and to the databasse..**/
 			//add to the list
 			ContextManager.addCircumstance(circumstance);
+			//TODO: add circumstance to the database (sharedpreference)
 
 		}//end of reading circumstanceJSONArray
 	}
@@ -514,70 +519,128 @@ public class ConfigurationManager {
 	 * @return
 	 */
 	public static ArrayList<Condition> loadConditionsFromJSON(JSONArray conditionJSONArray) {
-		
-		
+
+
 		 ArrayList<Condition> conditions = new  ArrayList<Condition>();
-		
-		try {
-				
-			Log.d(LOG_TAG, "[loadConditionsFromJSON] the conditions of the current circumstance is:  " +conditionJSONArray.toString());	
-			
-			for (int j = 0; j < conditionJSONArray.length(); j++){
-				
-				JSONObject conditionJSON = conditionJSONArray.getJSONObject(j);
-				
-				String stateValue = conditionJSON.getString(CONDITION_PROPERTIES_STATE);
-				String source = conditionJSON.getString(CONDITION_PROPERTIES_SOURCE);
-				JSONObject criterion = conditionJSON.getJSONObject(CONDITION_PROPERTIES_VALUE_CRITERION);
 
-				//create condition object
-				Condition condition = new Condition(source,  stateValue, criterion);
 
-				Log.d(LOG_TAG, "[loadConditionsFromJSON] get condition from the file: "
-						+ condition.getSource() + " , " + condition.getStateValue() + condition.getCriterion().toString());
+			Log.d(LOG_TAG, "[loadConditionsFromJSON] the conditions of the current circumstance is:  " + conditionJSONArray.toString());
 
-				
-				//get constraint from the condition
-				if (conditionJSON.has("Constraint")){
-					
-					try {
-						
-						JSONArray constraintJSONArray = conditionJSON.getJSONArray("Constraint");									
-						
-						
+			for (int i = 0; i < conditionJSONArray.length(); i++){
+
+				try {
+
+					JSONObject conditionJSON = conditionJSONArray.getJSONObject(i);
+
+					String stateValue = conditionJSON.getString(CONDITION_PROPERTIES_STATE);
+					String source = conditionJSON.getString(CONDITION_PROPERTIES_SOURCE);
+
+					/** 1 Read StateValueCriteria for Condition **/
+					JSONArray valueCriteria = conditionJSON.getJSONArray(CONDITION_PROPERTIES_VALUE_CRITERION);
+
+					//create a list of criterion (criteria) to save all the criteria
+					ArrayList<StateValueCriterion> critera  = new ArrayList<StateValueCriterion>();
+
+					//analyze criteria in the JSONArray and create objects to save them
+					for (int j=0; j<valueCriteria.length(); j++ ){
+
+						JSONObject valueCriterion = valueCriteria.getJSONObject(j);
+
+						//we specify default values for measures and relationships
+
+						/**get measure and relationship **/
+						//by default (if users don't specify any measure), we assume users want the latest value
+						int measure = ContextStateManager.CONTEXT_SOURCE_MEASURE_LATEST_ONE;
+						//by default, the user wants relationship be "equal."
+
+						int relationship = ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL;
+
+						//if the user does specify the measure, we use that measure
+						if (valueCriterion.has(CONDITION_PROPERTIES_MEASURE)){
+							//we conver the string into int
+							measure = ContextStateManager.getMeasure(valueCriterion.getString(CONDITION_PROPERTIES_MEASURE));
+						}
+
+						if (valueCriterion.has(CONDITION_PROPERTIES_RELATIONSHIP)){
+							//we conver the string into a int number
+							relationship = ContextStateManager.getRelationship(valueCriterion.getString(CONDITION_PROPERTIES_RELATIONSHIP));
+						}
+
+
+						/**create criterion object based on the type of target value**/
+						//if the target value is numeric, we use float number, otherwise we save it as a String value
+						if (isNumeric(valueCriterion.getString(CONDITION_PROPERTIES_TARGETVALUE))){
+							float targetValue = (float)valueCriterion.getDouble(CONDITION_PROPERTIES_TARGETVALUE);
+
+							//after we read all the properties of a citerion, we creat a criterion object
+							critera.add(new StateValueCriterion(measure, relationship,targetValue));
+
+						}
+						else{
+							String targetValue = valueCriterion.getString(CONDITION_PROPERTIES_TARGETVALUE);
+
+							//after we read all the properties of a citerion, we creat a criterion object
+							critera.add(new StateValueCriterion(measure, relationship,targetValue));
+						}
+					}
+
+
+					/** 2. add criteria to the Condition **/
+					Condition condition = new Condition(source,  stateValue, critera);
+
+					/** 3. Read TimeeCriteria for Condition **/
+					if (conditionJSON.has(CONDITION_PROPERTIES_TIME_CRITERION)){
+
+						ArrayList<TimeCriterion> timeCriteria = new ArrayList<TimeCriterion>();
+						try {
+
+							//time criterion specificies how recently Minuku observes that state and how long it observes the state.
+							JSONArray constraintJSONArray = conditionJSON.getJSONArray(CONDITION_PROPERTIES_TIME_CRITERION);
+
+
 							for (int k = 0; k < constraintJSONArray.length(); k++){
-								
-								JSONObject constraintJSON = constraintJSONArray.getJSONObject(k);
-								
-								String constraintType = constraintJSON.getString("Type");										
-								String constraintRelationship = constraintJSON.getString("Relationship");
-								float constraintValue = Float.parseFloat(constraintJSON.getString("TargetValue"))  ;
-								
-								//Log.d(LOG_TAG, "get constraint from the file:" + constraintType + " , " + constraintRelationship + " , " + constraintValue);
-	
-								condition.addTimeConstraint(
-										constraintType,
-										constraintValue, 
-										constraintRelationship);								
-							}
-							
-						}catch (JSONException e2) {
 
+								JSONObject timeCriterion = constraintJSONArray.getJSONObject(k);
+
+								int measure =  ContextStateManager.getRelationship(timeCriterion.getString(CONDITION_PROPERTIES_MEASURE));
+								int relationship = ContextStateManager.getRelationship(timeCriterion.getString(CONDITION_PROPERTIES_RELATIONSHIP));
+								float value = Float.parseFloat(timeCriterion.getString(CONDITION_PROPERTIES_TARGETVALUE))  ;
+
+								timeCriteria.add( new TimeCriterion(measure, relationship, value));
+							}
+						}catch (JSONException e2) {
 							e2.printStackTrace();
 						}
-						
+
+
+						//add timecriteria to the condition
+						condition.setTimeCriteria(timeCriteria);
+
+						Log.d(LOG_TAG, "[loadConditionsFromJSON] get condition from the file: "
+								+ condition.getSource() + " , " + condition.getStateValue() + condition.getCriterion().toString());
+
+
 					}
-					
+
+
+					//finally we add condition to the conditionlist
 					conditions.add(condition);
-					
+
+				}catch (JSONException e) {
+
+					e.printStackTrace();
+				}
+
+
+
+
+
 
 				}//end of reading conditionJSONArray
-						
 
-		}catch (JSONException e) {
-			
-			e.printStackTrace();
-		}
+
+
+
 		
 		//Log.d(LOG_TAG, "[loadConditionsFromJSON] the current circumstance has " + conditions.size() + " condition");
 		return conditions;
@@ -879,7 +942,7 @@ public class ConfigurationManager {
 				}
 
                 //if the questionnaire is through email
-                if (type.equals(QuestionnaireManager.QUESTIONNAIRE_TYPE_EMAIL)) {
+				if (type.equals(QuestionnaireManager.QUESTIONNAIRE_TYPE_EMAIL)) {
 
                     EmailQuestionnaireTemplate template = new EmailQuestionnaireTemplate (id, title, study_id, type);
 
@@ -924,6 +987,19 @@ public class ConfigurationManager {
 			
 		}
 
+	}
+
+	public static boolean isNumeric(String str)
+	{
+		try
+		{
+			double d = Double.parseDouble(str);
+		}
+		catch(NumberFormatException nfe)
+		{
+			return false;
+		}
+		return true;
 	}
 
 

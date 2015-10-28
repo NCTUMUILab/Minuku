@@ -21,10 +21,10 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecogniti
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Configuration;
+import edu.umich.si.inteco.minuku.model.Criterion;
 import edu.umich.si.inteco.minuku.model.Questionnaire;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.model.Task;
-import edu.umich.si.inteco.minuku.model.TimeConstraint;
 import edu.umich.si.inteco.minuku.model.UserResponse;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
@@ -1130,7 +1130,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     
     
     
-    private static String generateTimeConstraintSQL(ArrayList<TimeConstraint> timeconstraints){
+    private static String generateTimeConstraintSQL(ArrayList<Criterion> timeconstraints){
     	
     	String sql="";
     	float recency = -1;
@@ -1142,7 +1142,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	
     	for (int i = 0; i<timeconstraints.size(); i++){
     		
-    		TimeConstraint tc = timeconstraints.get(i);
+    		Criterion tc = timeconstraints.get(i);
     		
     		if (tc.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_RECENCY) ){
     			recency = tc.getInterval();
@@ -1298,7 +1298,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
     }
 
-    public static ArrayList<String> queryWithoutColumn(String table_name, int sessionId, ArrayList<TimeConstraint> timeconstraints){
+    public static ArrayList<String> queryWithoutColumn(String table_name, int sessionId, ArrayList<Criterion> timeconstraints){
 		
     	ArrayList<String> rows = new ArrayList<String>();
     	
@@ -1347,7 +1347,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     }
     
     
-    public static ArrayList<String> queryFromSingleColumn(String table_name, int sessionId, String column, String relation, String value, ArrayList<TimeConstraint> timeconstraints){
+    public static ArrayList<String> queryFromSingleColumn(String table_name, int sessionId, String column, String relation, String value, ArrayList<Criterion> timeconstraints){
     	
     	////Log.d(LOG_TAG, "entering  queryFromSingleRecordTableByValue" );			
     	
@@ -1403,7 +1403,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     }
     
     /**query result from multiple columns and values**/
-    public static ArrayList<String> queryFromMultipleColumns(String table_name, int sessionid, ArrayList<String> columns, ArrayList<String> relations, ArrayList<String> values, ArrayList<TimeConstraint> timeconstraints){
+    public static ArrayList<String> queryFromMultipleColumns(String table_name, int sessionid, ArrayList<String> columns, ArrayList<String> relations, ArrayList<String> values, ArrayList<Criterion> timeconstraints){
     	
    
     	ArrayList<String> rows = new ArrayList<String>();

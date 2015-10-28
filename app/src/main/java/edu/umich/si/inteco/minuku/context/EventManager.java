@@ -9,7 +9,7 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.SimpleGeofence;
-import edu.umich.si.inteco.minuku.model.TimeConstraint;
+import edu.umich.si.inteco.minuku.model.Criterion;
 import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 
@@ -33,7 +33,7 @@ public class EventManager {
 	}
 
 
-	private static boolean eventPassTimeConstraint(ArrayList<String> results, ArrayList<TimeConstraint> timeconstraints){
+	private static boolean eventPassTimeConstraint(ArrayList<String> results, ArrayList<Criterion> timeconstraints){
 		
 		boolean pass = true; 
     	
@@ -50,7 +50,7 @@ public class EventManager {
     	*/
     	for (int i = 0; i<timeconstraints.size(); i++){
 
-    		TimeConstraint tc = timeconstraints.get(i);
+    		Criterion tc = timeconstraints.get(i);
     		
     		
     		float recency_criteria = -1;

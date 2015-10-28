@@ -22,11 +22,11 @@ public class StateMappingRule {
 
     private int mSource;
 
-    private int mMeasure;
+    private int mMeasure = ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL; //0
 
     private boolean mIsValueString;
 
-    private int mRelationship;
+    private int mRelationship = ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL; //0
 
     private String mStateValue;
 
@@ -49,6 +49,8 @@ public class StateMappingRule {
         mContextStateManagerName = contextStateManagerName;
         mStateValue =  stateValue;
         mCriterion = crierion;
+
+        setName();
     }
 
     //stringEqualTo

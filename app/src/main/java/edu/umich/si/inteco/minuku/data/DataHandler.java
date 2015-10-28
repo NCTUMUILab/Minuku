@@ -3,7 +3,6 @@ package edu.umich.si.inteco.minuku.data;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.hardware.Sensor;
-import android.location.Location;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
@@ -17,15 +16,12 @@ import java.util.TimeZone;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
-import edu.umich.si.inteco.minuku.model.Condition;
-import edu.umich.si.inteco.minuku.model.TimeConstraint;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.LocationRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
-import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.FileHelper;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
@@ -481,7 +477,7 @@ public class DataHandler {
 		String tableName="", columnName1="", columnName2="", columnName3="" ;
 		
 		//get timeconstraint...
-		ArrayList<TimeConstraint> timeConstraintList = condition.getTimeConstraints();
+		ArrayList<Criterion> timeConstraintList = condition.getTimeConstraints();
 
 		
 		//get table and column names

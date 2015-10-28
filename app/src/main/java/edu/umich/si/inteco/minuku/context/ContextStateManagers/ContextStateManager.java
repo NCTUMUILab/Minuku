@@ -33,19 +33,17 @@ public abstract class ContextStateManager {
     public static final int STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL = 4;
     public static final int STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL = 5;
     public static final int STATE_MAPPING_RELATIONSHIP_BETWEEN = 6;
-    public static final int STATE_MAPPING_RELATIONSHIP_STRING_EQUAL = 7;
-    public static final int STATE_MAPPING_RELATIONSHIP_STRING_NOT_EQUAL = 8;
-    public static final int STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN = 9;
+    public static final int STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN = 7;
 
 
     /* relationship **/
     public static final String STATE_MAPPING_RELATIONSHIP_EQUAL_STRING = "Equal";
+    public static final String STATE_MAPPING_RELATIONSHIP_NOT_EQUAL_STRING = "Not_Equal";
     public static final String STATE_MAPPING_RELATIONSHIP_LARGER_STRING = "Larger";
     public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_STRING = "Smaller";
     public static final String STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL_STRING = "LargerEqual";
     public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL_STRING = "SmallerEqual";
     public static final String STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING = "Between";
-    public static final String STATE_MAPPING_RELATIONSHIP_STRING_EQUAL_STRING = "Equal";
     public static final String STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING = "Contain";
 
 
@@ -337,10 +335,10 @@ public abstract class ContextStateManager {
 
         boolean pass=false;
 
-        if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_EQUAL){
+        if (relationship==STATE_MAPPING_RELATIONSHIP_EQUAL){
             if (value.equals(targetValue)) pass = true;
         }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_NOT_EQUAL){
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL){
             if (!value.equals(targetValue)) pass = true;
         }
         else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN){
@@ -410,6 +408,9 @@ public abstract class ContextStateManager {
         if (relationshipName==STATE_MAPPING_RELATIONSHIP_EQUAL_STRING){
             return STATE_MAPPING_RELATIONSHIP_EQUAL;
         }
+        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL_STRING){
+            return STATE_MAPPING_RELATIONSHIP_NOT_EQUAL;
+        }
         else if (relationshipName==STATE_MAPPING_RELATIONSHIP_LARGER_STRING){
             return STATE_MAPPING_RELATIONSHIP_LARGER;
         }
@@ -425,9 +426,6 @@ public abstract class ContextStateManager {
         else if (relationshipName==STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING){
             return STATE_MAPPING_RELATIONSHIP_BETWEEN;
         }
-        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_STRING_EQUAL_STRING){
-            return STATE_MAPPING_RELATIONSHIP_STRING_EQUAL;
-        }
         else if (relationshipName==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING){
             return STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN;
         }
@@ -439,6 +437,9 @@ public abstract class ContextStateManager {
 
         if (relationship==STATE_MAPPING_RELATIONSHIP_EQUAL){
             return STATE_MAPPING_RELATIONSHIP_EQUAL_STRING;
+        }
+        else if (relationship ==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL){
+            return STATE_MAPPING_RELATIONSHIP_NOT_EQUAL_STRING;
         }
         else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER){
             return STATE_MAPPING_RELATIONSHIP_LARGER_STRING;
@@ -454,9 +455,6 @@ public abstract class ContextStateManager {
         }
         else if (relationship==STATE_MAPPING_RELATIONSHIP_BETWEEN){
             return STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING;
-        }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_EQUAL){
-            return STATE_MAPPING_RELATIONSHIP_STRING_EQUAL_STRING;
         }
         else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN){
             return STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING;
