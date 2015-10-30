@@ -9,8 +9,9 @@ public class StateValueCriterion extends Criterion{
 
     private int mMeasure = ContextStateManager.CONTEXT_SOURCE_MEASURE_LATEST_ONE;
     private int mRelationship=ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL;
-    private String mTargetStringValue=null;
+    private String mTargetStringValue="NA";
     private float mTargetFloatValue = 0;
+    private boolean isTargetString = false;
 
     public StateValueCriterion(){
         super();
@@ -21,6 +22,7 @@ public class StateValueCriterion extends Criterion{
         mMeasure = measure;
         mRelationship =relationship;
         mTargetFloatValue = targetValue;
+        isTargetString = false;
     }
 
     public StateValueCriterion(int measure, int relationship, String targetValue){
@@ -28,8 +30,16 @@ public class StateValueCriterion extends Criterion{
         mMeasure = measure;
         mRelationship =relationship;
         mTargetStringValue = targetValue;
+        isTargetString = true;
     }
 
+    public boolean isTargetString() {
+        return isTargetString;
+    }
+
+    public void setIsTargetString(boolean isTargetString) {
+        this.isTargetString = isTargetString;
+    }
 
     public void setRelationship(int relationship){
         mRelationship = relationship;
@@ -63,4 +73,13 @@ public class StateValueCriterion extends Criterion{
         mMeasure = m;
     }
 
+    @Override
+    public String toString() {
+        return "StateValueCriterion{" +
+                "mMeasure=" + mMeasure +
+                ", mRelationship=" + mRelationship +
+                ", mTargetStringValue='" + mTargetStringValue + '\'' +
+                ", mTargetFloatValue=" + mTargetFloatValue +
+                '}';
+    }
 }

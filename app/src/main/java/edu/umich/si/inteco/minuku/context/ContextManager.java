@@ -26,6 +26,7 @@ import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
+import edu.umich.si.inteco.minuku.model.StateValueCriterion;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -388,20 +389,24 @@ public class ContextManager {
                 // for that condition.
                 String contextStateManagerName = getContextStateManagerName(condition.getSource());
 
-                //we tell the contextStateMAnager the value of the state if the criterion is met. ContextManager will
-                //use this value to monitor the state
+                //we give contextStateManager a list of criteria for each state.
+                ArrayList<StateValueCriterion> criteria = condition.getStateValueCriteria();
+
+                //If the criteria are met, it changes the state to the value
                 String stateValue = condition.getStateValue();
 
-                //we give contextStateManager the criterion for changing the state to the value.
-                JSONObject criterion = condition.getCriterion();
+                //condition originall saves string of source, becuase it is specified by users. We need to
+                //find the corresponding source type.
+                int sourceType = getSourceTypeFromName(contextStateManagerName, condition.getSource());
 
-                //TODO: fix this.
-                StateMappingRule rule = new StateMappingRule(contextStateManagerName, condition.getSource(), stateValue, criterion);
+                //then we update condition so that it remembers source types in the future.
+                condition.setSourceType(sourceType);
+
+                //generate a sateMappingRule for the ContextStateManager to use to monitor the state
+                StateMappingRule rule = new StateMappingRule(contextStateManagerName, sourceType, criteria, stateValue);
 
                 Log.d(LOG_TAG, "[updateTasksInContextStateManager] adding a rule:" +
-                        "the rule is: " + rule.toString() + " is for ContextStateManager: " + contextStateManagerName +
-                " to monitor source: " + condition.getSource() + " for state value is " + stateValue + " with criterion " +
-                rule.getCriterion().toString());
+                        "the rule is: " + rule.toString() + " is for ContextStateManager");
 
                 assignMonitoringTasks(contextStateManagerName, rule);
 
@@ -613,7 +618,7 @@ public class ContextManager {
         return mCircumstanceList;
     }
 
-    public static String getSourceName(String contextStateManager, int sourceType){
+    public static String getSourceNameFromType (String contextStateManager, int sourceType){
 
         if (contextStateManager.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION)){
             return ActivityRecognitionManager.getContextSourceNameFromType(sourceType);
@@ -635,6 +640,31 @@ public class ContextManager {
         }
         else{
             return  null;
+        }
+    }
+
+    public static int getSourceTypeFromName (String contextStateManager, String sourceName){
+
+        if (contextStateManager.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION)){
+            return ActivityRecognitionManager.getContextSourceTypeFromName(sourceName);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION)){
+            return TransportationModeManager.getContextSourceTypeFromName(sourceName);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_LOCATION)){
+            return LocationManager.getContextSourceTypeFromName(sourceName);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR)){
+            return PhoneSensorManager.getContextSourceTypeFromName(sourceName);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS)){
+            return PhoneStatusManager.getContextSourceTypeFromName(sourceName);
+        }
+        else if (contextStateManager.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION)){
+            return UserInteractionManager.getContextSourceTypeFromName(sourceName);
+        }
+        else{
+            return -1;
         }
     }
 

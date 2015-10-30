@@ -422,6 +422,7 @@ public class ActivityRecognitionManager extends ContextStateManager
      * @param rule
      * @return
      */
+    /*
     private static StateMappingRule translateStateMappingRule(StateMappingRule rule) {
 
 
@@ -472,7 +473,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         return rule;
 
     }
-
+*/
 
     /**
      * This function examines StateMappingRule with the data and returns a boolean pass.

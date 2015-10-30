@@ -13,12 +13,13 @@ public class Condition {
 	//Name is provided by ContextStateManager
 	protected String mStateName;
 	//determined in the configuration file
-	protected String mSource;
+	protected String mSourceString;
 	//determined in the configuration file
 	protected String mStateValue;
 	protected JSONObject mCriterion;
     protected ArrayList<StateValueCriterion> mValueCriteria;
 	protected ArrayList<TimeCriterion> mTimeCriteria;
+	protected int mSourceType;
 
     
     public Condition (){
@@ -26,9 +27,17 @@ public class Condition {
     }
 
 	public Condition(String source, String value, ArrayList<StateValueCriterion> valueCriteria) {
-		mSource = source;
+		mSourceString = source;
 		mStateValue  =value;
 		mValueCriteria = valueCriteria;
+	}
+
+	public int getSourceType() {
+		return mSourceType;
+	}
+
+	public void setSourceType(int sourceType) {
+		this.mSourceType =sourceType;
 	}
 
 	public String getStateName() {
@@ -40,7 +49,7 @@ public class Condition {
 	}
 
 	public String getSource() {
-		return mSource;
+		return mSourceString;
 	}
 
 	public String getStateValue() {

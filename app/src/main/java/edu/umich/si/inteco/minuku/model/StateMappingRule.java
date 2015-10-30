@@ -3,6 +3,9 @@ package edu.umich.si.inteco.minuku.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 
@@ -22,91 +25,42 @@ public class StateMappingRule {
 
     private int mSource;
 
-    private int mMeasure = ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL; //0
-
     private boolean mIsValueString;
-
-    private int mRelationship = ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL; //0
 
     private String mStateValue;
 
     private String mStringTargetValue;
 
-    private float mFloatTargetValue;
-
-    private float mUpper;
-
-    private float mLower;
-
-    private JSONObject mCriterion;
+    private ArrayList<StateValueCriterion> mCriteria;
 
 
     public StateMappingRule() {
 
     }
 
-    public StateMappingRule(String contextStateManagerName, String stateValue, JSONObject crierion) {
+    public StateMappingRule(String contextStateManagerName,
+                            int source,
+                            ArrayList<StateValueCriterion> criteria,
+                            String stateValue) {
         mContextStateManagerName = contextStateManagerName;
         mStateValue =  stateValue;
-        mCriterion = crierion;
+        mCriteria = criteria;
+        mSource  = source;
 
         setName();
     }
 
-    //stringEqualTo
-    public StateMappingRule(String contextStateManagerName, int source, int measure, int relationship, String targetValue, String stateName){
-
-        mContextStateManagerName = contextStateManagerName;
-        mSource = source;
-        mMeasure = measure;
-        mRelationship = relationship;
-        mStringTargetValue = targetValue;
-        mStateValue = stateName;
-        mIsValueString = true;
-
-        setName();
-    }
-
-    //larger, equal, smaller
-    public StateMappingRule(String contextStateManagerName, int source, int measure, int relationship, float targetValue, String stateName){
-
-        mContextStateManagerName = contextStateManagerName;
-        mSource = source;
-        mMeasure = measure;
-        mRelationship = relationship;
-        mFloatTargetValue = targetValue;
-        mStateValue = stateName;
-        mIsValueString = false;
-
-        setName();
-
-    }
-
-    public StateMappingRule(String contextStateManagerName, int source, int measure, int relationship, float upper, float lower, String stateName){
-
-        mContextStateManagerName = contextStateManagerName;
-        mSource = source;
-        mMeasure = measure;
-        mRelationship = relationship;
-        mUpper = upper;
-        mLower = lower;
-        mStateValue = stateName;
-        mIsValueString = false;
-
-        setName();
-    }
-
-
-    public void setMeasure(int measure) {
-        this.mMeasure = measure;
-    }
-
-    public void setRelationship(int relationship) {
-        this.mRelationship = relationship;
-    }
 
     public void setStringTargetValue(String stringTargetValue) {
         this.mStringTargetValue = stringTargetValue;
+    }
+
+    public ArrayList<StateValueCriterion> getCriteria() {
+        return mCriteria;
+    }
+
+    public void setCriteria(ArrayList<StateValueCriterion> criteria) {
+        this.mCriteria = criteria;
     }
 
     public void setIsValueString(boolean isValueString) {
@@ -117,31 +71,28 @@ public class StateMappingRule {
         this.mSource = source;
     }
 
-    public boolean isValueString() {
-        return mIsValueString;
+    private String getCriteriaString() {
+        String s = "";
+        for (int i=0; i<mCriteria.size(); i++){
+            s += mCriteria.toString();
+            if (i<mCriteria.size()-1){
+                s+= Constants.DELIMITER;
+            }
+        }
+        return s;
     }
 
-    public float getFloatTargetValue() {
-        return mFloatTargetValue;
+    public boolean isValueString() {
+        return mIsValueString;
     }
 
     public String getStringTargetValue() {
         return mStringTargetValue;
     }
 
-    public int getRelationship(){
-        return mRelationship;
-    }
-
-    public int getMeasure() {
-        return mMeasure;
-    }
-
     public String getName() {
         return mName;
     }
-
-    public JSONObject getCriterion () {return mCriterion;}
 
     public String getStateValue() {
         return mStateValue;
@@ -152,11 +103,10 @@ public class StateMappingRule {
     }
 
     private void setName() {
-        mName = ContextManager.getSourceName(mContextStateManagerName, mSource)
-                + ContextStateManager.getMeasureName(mMeasure)
-                + ContextStateManager.getRelationshipName(mRelationship)
+        mName = ContextManager.getSourceNameFromType(mContextStateManagerName, mSource)
                 + mStringTargetValue
-                + mStateValue;
+                + mStateValue
+                +getCriteriaString();
     }
 
     public int getSource() {
@@ -167,14 +117,9 @@ public class StateMappingRule {
     public String toString() {
         return "StateMappingRule{" +
                 ", mName='" + mName + '\'' +
-                ", mSource='" + ContextManager.getSourceName(mContextStateManagerName, mSource) + '\'' +
-                ", mMeasure='" + mMeasure + '\'' +
-                ", mRelationship='" + mRelationship + '\'' +
+                ", mSource='" + ContextManager.getSourceNameFromType(mContextStateManagerName, mSource) + '\'' +
                 ", mStateValue='" + mStateValue + '\'' +
-                ", mStringTargetValue='" + mStringTargetValue + '\'' +
-                ", mFloatTargetValue=" + mFloatTargetValue +
-                ", mUpper=" + mUpper +
-                ", mLower=" + mLower +
+                ", mCriteria='" + getCriteriaString() + '\'' +
                 '}';
     }
 }

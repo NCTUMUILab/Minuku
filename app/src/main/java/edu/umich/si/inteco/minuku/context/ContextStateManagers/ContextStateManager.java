@@ -9,6 +9,7 @@ import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
+import edu.umich.si.inteco.minuku.model.StateValueCriterion;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.util.ConditionManager;
 
@@ -143,29 +144,40 @@ public abstract class ContextStateManager {
         }
 
         /** 2. if the state is currently monitored, we get the stateMappingRule by the type
-         * then we call examineStateRule() to examine the rule depeneding on the type of the target value
+         * then we call examineStateRule() to examine the rule depending on the type of the target value
          * Currently, it could be a string or a float number**/
         for (int i=0; i<getStateMappingRules().size(); i++) {
             //get the rule
             StateMappingRule rule = getStateMappingRules().get(i);
             boolean pass= false;
 
-            //1. get the targer value and relaionship
-            int relationship = rule.getRelationship();
-            int measure = rule.getMeasure();
+            //each rule can have more than one criterion, where each criterion has a measure,
+            // relationship and a targetvalue
+            ArrayList<StateValueCriterion> criteria = rule.getCriteria();
 
-            if (rule.isValueString()){
-                String targetValue = rule.getStringTargetValue();
-                pass = examineStateRule(sourceType, measure, relationship, targetValue);
-            }
-            //the target value is a number
-            else {
-                float targetValue = rule.getFloatTargetValue();
-                pass = examineStateRule(sourceType, measure, relationship, targetValue);
-            }
 
-            /** examine criterion specified in the SateMappingRule **/
-            Log.d(LOG_TAG, "examine statemappingrule, after the examination the criterion is " + pass);
+            for (int j=0; j<criteria.size(); j++){
+
+                //1. get the targer value and relaionship
+                int relationship = criteria.get(j).getRelationship();
+                int measure = criteria.get(j).getMeasureType();
+
+
+                //get values depending on whether the target value is a string or a float number
+                if (criteria.get(j).isTargetString()){
+                    String targetValue = criteria.get(j).getTargetStringValue();
+                    pass = examineStateRule(sourceType, measure, relationship, targetValue);
+                }
+                //the target value is a number
+                else {
+                    float targetValue = criteria.get(j).getTargetFloatValue();
+                    pass = examineStateRule(sourceType, measure, relationship, targetValue);
+                }
+
+                /** examine criterion specified in the SateMappingRule **/
+                Log.d(LOG_TAG, "examine statemappingrule, after the examination the criterion is " + pass);
+
+            }
 
 
             /** 3. if the criterion is passed, we set the state value based on the mappingRule **/

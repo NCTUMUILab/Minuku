@@ -32,7 +32,7 @@ public class EventManager {
 		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 	}
 
-
+/*
 	private static boolean eventPassTimeConstraint(ArrayList<String> results, ArrayList<Criterion> timeconstraints){
 		
 		boolean pass = true; 
@@ -44,10 +44,7 @@ public class EventManager {
     	long earliestTime = Long.parseLong( firstResult[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
     	long latestTime = Long.parseLong( lastResult[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
     	int duration = (int) (latestTime - earliestTime)/ Constants.MILLISECONDS_PER_SECOND ;
-    	/*
-    	Log.d (LOG_TAG, "[ eventPassTimeConstraint] the earliest time is " + getTimeString (earliestTime) 
-    			+ " the latest time is " + getTimeString (latestTime) + " the duration is " + duration + " seconds " );
-    	*/
+
     	for (int i = 0; i<timeconstraints.size(); i++){
 
     		Criterion tc = timeconstraints.get(i);
@@ -58,24 +55,15 @@ public class EventManager {
         	float duration_criteria = -1;
         	
     		if (tc.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_RECENCY) ){
-    		/*
-    			Log.d (LOG_TAG, "[ eventPassTimeConstraint] get constraint " + tc.getType() + " relationship " + tc.getRelationship()
-    					+ tc.getInterval());
-        		*/
+
     			recency_criteria = tc.getInterval();
     		}
     		else if (tc.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_EXACTTIME)){
-    			/*
-    			Log.d (LOG_TAG, "[ eventPassTimeConstraint] get constraint " + tc.getType() + " relationship " + tc.getRelationship()
-    					+ tc.getExactTime());
-    					*/
+
     			timestamp_criteria = tc.getExactTime();
     		}
     		else if (tc.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_DURATION)){
-    			/*
-    			Log.d (LOG_TAG, "[ eventPassTimeConstraint] get constraint " + tc.getType() + " relationship " + tc.getRelationship()
-    					+ tc.getInterval());
-    					*/
+
     			duration_criteria = tc.getInterval();
     		}
     		
@@ -91,7 +79,7 @@ public class EventManager {
 		return pass;
 		
 	}
-
+*/
 	
 	public static void setEventList(ArrayList<Circumstance> circumstanceList){
 		mCircumstanceList = circumstanceList;

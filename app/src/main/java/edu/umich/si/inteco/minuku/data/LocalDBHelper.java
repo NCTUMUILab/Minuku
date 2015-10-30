@@ -1129,7 +1129,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     }
     
     
-    
+    /*
     private static String generateTimeConstraintSQL(ArrayList<Criterion> timeconstraints){
     	
     	String sql="";
@@ -1172,7 +1172,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	return sql;
     	
     }
-
+*/
 
 
     public static ArrayList<String> queryLastRecord(String table_name, int sessionId) {
@@ -1298,6 +1298,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
     }
 
+	/*
     public static ArrayList<String> queryWithoutColumn(String table_name, int sessionId, ArrayList<Criterion> timeconstraints){
 		
     	ArrayList<String> rows = new ArrayList<String>();
@@ -1345,20 +1346,14 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	
     	
     }
-    
-    
+    */
+
+	/*
     public static ArrayList<String> queryFromSingleColumn(String table_name, int sessionId, String column, String relation, String value, ArrayList<Criterion> timeconstraints){
     	
     	////Log.d(LOG_TAG, "entering  queryFromSingleRecordTableByValue" );			
     	
     	ArrayList<String> rows = new ArrayList<String>();
-    	
-    	
-    	/**although we will check time constraint in the eventMonitor, it's a good idea to reduce the number of data by adding time constraints in the query
-    	 * Duration is a more complex calculation, because we need to find the first row (if any) and then check whether we have same data lasting for that duration.
-    	 * However, it's relatively easy to set time constraint using recency and exact timestamp**/
-    	
-    	
 
     	try{
 
@@ -1401,6 +1396,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
     	return rows;
     }
+	*/
     
     /**query result from multiple columns and values**/
     public static ArrayList<String> queryFromMultipleColumns(String table_name, int sessionid, ArrayList<String> columns, ArrayList<String> relations, ArrayList<String> values, ArrayList<Criterion> timeconstraints){

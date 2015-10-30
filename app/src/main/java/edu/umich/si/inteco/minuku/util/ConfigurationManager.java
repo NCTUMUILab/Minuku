@@ -535,6 +535,8 @@ public class ConfigurationManager {
 					String stateValue = conditionJSON.getString(CONDITION_PROPERTIES_STATE);
 					String source = conditionJSON.getString(CONDITION_PROPERTIES_SOURCE);
 
+					//need to convert source into integer
+
 					/** 1 Read StateValueCriteria for Condition **/
 					JSONArray valueCriteria = conditionJSON.getJSONArray(CONDITION_PROPERTIES_VALUE_CRITERION);
 
@@ -574,6 +576,7 @@ public class ConfigurationManager {
 
 							//after we read all the properties of a citerion, we creat a criterion object
 							critera.add(new StateValueCriterion(measure, relationship,targetValue));
+
 
 						}
 						else{
