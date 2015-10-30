@@ -25,16 +25,13 @@
 			{
 				"Circumstances":
 				[
-				  	//1st monitored circumstance
 					{
 						"Id": 1,
 						"Task_id": 1,
 						"Name": "Using the phone at NQ",
 						"Description":"NA",
-					    //a circumstance contains a set of conditions that, when happening together, create that circumstance.
 						"Conditions":
 						[
-						  //each condition specifies a state, value criteria, and time criteria
 							{
 							  	"State":"Use Phone",
 							  	"Source": "ActivityRecognition",
@@ -53,7 +50,6 @@
 							}						
 						]
 					},
-				  	//2nd monitored condition
 					{
 						"Id": 2,
 						"Task_id": 1,
@@ -97,7 +93,7 @@
 									"Launch": "triggered",
 									"Trigger": 
 									{
-										"Class":"Event",
+										"Class":"Circumstance",
 										"Id":2,
 										"Sampling_rate": 1
 									},
@@ -131,6 +127,7 @@
 						"Id": 1,
 						"Title": "Where do you place your phone?",
 						"Description":"Please answer the following questions.",
+						"Type":"activity",
 						"Questions":
 						[
 							{

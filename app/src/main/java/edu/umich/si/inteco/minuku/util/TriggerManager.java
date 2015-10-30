@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.ProbeObject;
@@ -123,6 +124,8 @@ public class TriggerManager {
         //for every trigger in mTriggerLinks, get the trigger id and class to find out its trigger
         //and connect the trigger object and the triggered object
 
+        Log.d(LOG_TAG, "[setUpTriggerLinks] there are " + TriggerManager.getTriggerLinks().size() + "trigger links");
+
         for (int i=0; i<TriggerManager.getTriggerLinks().size(); i++){
 
             TriggerLink tl =TriggerManager.getTriggerLinks().get(i);
@@ -137,25 +140,27 @@ public class TriggerManager {
             /**try to find the trigger of the triggeredObject**/
 
             //if the ProbeObject is triggered by an event
-            if ( trigger_class.equals(ActionManager.ACTION_TRIGGER_CLASS_EVENT)   ){
+            if ( trigger_class.equals(PROBE_OBJECT_CLASS_EVENT)   ){
 
                 //find the event as the trigger
-                for (int j = 0; j< EventManager.getEventList().size(); j++){
+                for (int j = 0; j< ContextManager.getCircumstanceList().size(); j++){
 
-                    Circumstance evt = EventManager.getEventList().get(j);
+                    Circumstance circumstance = ContextManager.getCircumstanceList().get(j);
 
                     //use the trigger id and study id to find the event ( different events in a different study may have a same event id in their own study)
                     //the eventlist in the eventMonitor stores the events in all studies. So we need to use event id and study id together to identify the correct event
-                    if (trigger_id == evt.getId() && study_id==evt.getStudyId() ) {
+                    if (trigger_id == circumstance.getId() && study_id==circumstance.getStudyId() ) {
 
                         /**connet the trigger and the trigger link**/
                         //1. set the triggerlink of the trigger
-                        tl.setTrigger(evt);
+                        tl.setTrigger(circumstance);
 
                         //2. add the current trigger link to the probe object
-                        evt.addTriggerLink(tl);
+                        circumstance.addTriggerLink(tl);
 
-                        Log.d(LOG_TAG, "[setUpTriggerLinks  the ProbeObject " + triggeredObject.getId() + " find is trigger event" + " the triggerlink now is linked to the trigger" + tl.getTriggerClass() + " " + tl.getTrigger().getId());
+                        Log.d(LOG_TAG, "[setUpTriggerLinks  the ProbeObject " + triggeredObject.getId() +
+                                " find is trigger event" + " the triggerlink now is linked to the trigger"
+                                + tl.getTriggerClass() + " " + tl.getTrigger().getId());
 
                     }
                 }

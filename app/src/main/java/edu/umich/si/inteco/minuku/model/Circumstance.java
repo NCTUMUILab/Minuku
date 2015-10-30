@@ -61,9 +61,11 @@ public class Circumstance extends ProbeObject{
 	 */
 	public boolean isUsingState(State state){
 
+		Log.d(LOG_TAG, "[isUsingState] check whether the circumstance monitors the state: ");
 		for (int i=0; i<mConditionList.size(); i++){
 
 			Condition condition = mConditionList.get(i);
+			Log.d(LOG_TAG, "[isUsingState] condition: " + condition.getStateName() + " state: " + state.getName());
 			//find a condition that monitors the state
 			if (condition.getStateName().equals(state.getName())){
 				return true;

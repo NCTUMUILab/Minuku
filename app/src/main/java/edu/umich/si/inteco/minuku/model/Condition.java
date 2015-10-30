@@ -44,6 +44,9 @@ public class Condition {
 		return mStateName;
 	}
 
+	public void setStateName (String name) {
+		mStateName = name;
+	}
 	public JSONObject getCriterion() {
 		return mCriterion;
 	}

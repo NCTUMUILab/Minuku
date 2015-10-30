@@ -25,11 +25,7 @@ public class StateMappingRule {
 
     private int mSource;
 
-    private boolean mIsValueString;
-
     private String mStateValue;
-
-    private String mStringTargetValue;
 
     private ArrayList<StateValueCriterion> mCriteria;
 
@@ -51,20 +47,12 @@ public class StateMappingRule {
     }
 
 
-    public void setStringTargetValue(String stringTargetValue) {
-        this.mStringTargetValue = stringTargetValue;
-    }
-
     public ArrayList<StateValueCriterion> getCriteria() {
         return mCriteria;
     }
 
     public void setCriteria(ArrayList<StateValueCriterion> criteria) {
         this.mCriteria = criteria;
-    }
-
-    public void setIsValueString(boolean isValueString) {
-        this.mIsValueString = isValueString;
     }
 
     public void setSource(int source) {
@@ -82,14 +70,6 @@ public class StateMappingRule {
         return s;
     }
 
-    public boolean isValueString() {
-        return mIsValueString;
-    }
-
-    public String getStringTargetValue() {
-        return mStringTargetValue;
-    }
-
     public String getName() {
         return mName;
     }
@@ -104,7 +84,6 @@ public class StateMappingRule {
 
     private void setName() {
         mName = ContextManager.getSourceNameFromType(mContextStateManagerName, mSource)
-                + mStringTargetValue
                 + mStateValue
                 +getCriteriaString();
     }

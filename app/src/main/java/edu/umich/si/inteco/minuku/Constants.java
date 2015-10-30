@@ -102,6 +102,7 @@ public class Constants {
 
 	/*Context Extracotr*/
 	public static int CONTEXTEXTRACTOR_SAMPLING_RATE = 1;
-	public static double NULL_SENSOR_VALUE = -9999;
+	public static float NULL_NUMERIC_VALUE = -9999;
+
 
 }

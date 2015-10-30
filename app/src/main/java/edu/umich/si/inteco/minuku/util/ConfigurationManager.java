@@ -67,7 +67,7 @@ public class ConfigurationManager {
 	public static final String CONDITION_PROPERTIES_TARGETVALUE ="TargetValue";
 	public static final String CONDITION_PROPERTIES_MEASURE ="Measure";
 	public static final String CONDITION_PROPERTIES_VALUE_CRITERION ="Value_Criteria";
-	public static final String CONDITION_PROPERTIES_TIME_CRITERION ="Value_Criteria";
+	public static final String CONDITION_PROPERTIES_TIME_CRITERION ="Time_Criteria";
 
 
 	private static LocalDBHelper mLocalDBHelper;
@@ -445,7 +445,6 @@ public class ConfigurationManager {
                 }
 
 
-
 				/**4. examine whether the action is continuous or not**/
 				if (actionJSON.has(ActionManager.ACTION_PROPERTIES_CONTINUITY)){
 					
@@ -598,14 +597,14 @@ public class ConfigurationManager {
 						try {
 
 							//time criterion specificies how recently Minuku observes that state and how long it observes the state.
-							JSONArray constraintJSONArray = conditionJSON.getJSONArray(CONDITION_PROPERTIES_TIME_CRITERION);
+							JSONArray timeCriteriaJSONArray = conditionJSON.getJSONArray(CONDITION_PROPERTIES_TIME_CRITERION);
 
 
-							for (int k = 0; k < constraintJSONArray.length(); k++){
+							for (int k = 0; k < timeCriteriaJSONArray.length(); k++){
 
-								JSONObject timeCriterion = constraintJSONArray.getJSONObject(k);
+								JSONObject timeCriterion = timeCriteriaJSONArray.getJSONObject(k);
 
-								int measure =  ContextStateManager.getRelationship(timeCriterion.getString(CONDITION_PROPERTIES_MEASURE));
+								int measure =  ContextStateManager.getMeasure(timeCriterion.getString(CONDITION_PROPERTIES_MEASURE));
 								int relationship = ContextStateManager.getRelationship(timeCriterion.getString(CONDITION_PROPERTIES_RELATIONSHIP));
 								float value = Float.parseFloat(timeCriterion.getString(CONDITION_PROPERTIES_TARGETVALUE))  ;
 
@@ -618,11 +617,6 @@ public class ConfigurationManager {
 
 						//add timecriteria to the condition
 						condition.setTimeCriteria(timeCriteria);
-
-						Log.d(LOG_TAG, "[loadConditionsFromJSON] get condition from the file: "
-								+ condition.getSource() + " , " + condition.getStateValue() + condition.getCriterion().toString());
-
-
 					}
 
 
@@ -929,9 +923,9 @@ public class ConfigurationManager {
 			ArrayList<Question> questions = new ArrayList<Question> ();
 			
 			try {
-				
+
 				questionnaireJSON = questionnaireJSONArray.getJSONObject(i);
-				
+
 				int id = questionnaireJSON.getInt(QuestionnaireManager.QUESTIONNAIRE_PROPERTIES_ID);
 				String title = questionnaireJSON.getString(QuestionnaireManager.QUESTIONNAIRE_PROPERTIES_TITLE);
                 String type = questionnaireJSON.getString(QuestionnaireManager.QUESTIONNAIRE_PROPERTIES_TYPE);

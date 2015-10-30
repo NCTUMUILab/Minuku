@@ -15,6 +15,7 @@ import com.google.android.gms.location.DetectedActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
@@ -22,6 +23,7 @@ import edu.umich.si.inteco.minuku.context.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
+import edu.umich.si.inteco.minuku.model.StateValueCriterion;
 import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
 import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.ConfigurationManager;
@@ -416,64 +418,93 @@ public class ActivityRecognitionManager extends ContextStateManager
         return pass;
     }
 
-
     /**
-     * the purpose of the this function is to translate the JSONObject criterion into parameters of the mappingrule.
-     * @param rule
-     * @return
+     * updateStates()
+     * ContextStateManager check the value for each countextual source and determine whether to
+     * change the value of the state for every 5 seconds When a ContextStateManager check the values and update states
+     * depends on the sampling rate and how it obtains the value (pull vs. push)
      */
-    /*
-    private static StateMappingRule translateStateMappingRule(StateMappingRule rule) {
+    protected static void updateStateValues(int sourceType) {
 
-
-        JSONObject criterion = rule.getCriterion();
-
-
-        //all the values for ActivityRecognition are strings
-        String targetValue;
-
-        try {
-            targetValue = criterion.getString(ConfigurationManager.CONDITION_PROPERTIES_TARGETVALUE);
-            rule.setStringTargetValue(targetValue);
-
-            if (criterion.has(ConfigurationManager.CONDITION_PROPERTIES_MEASURE)){
-                String measure = criterion.getString(ConfigurationManager.CONDITION_PROPERTIES_MEASURE);
-                rule.setMeasure(getMeasure(measure));
-            }
-            //the default is lastest value
-            else {
-                rule.setMeasure(CONTEXT_SOURCE_MEASURE_LATEST_ONE);
-            }
-
-            if (criterion.has(ConfigurationManager.CONDITION_PROPERTIES_RELATIONSHIP)){
-                String relationship = criterion.getString(ConfigurationManager.CONDITION_PROPERTIES_RELATIONSHIP);
-                //relationship is an integer
-                rule.setRelationship(getRelationship(relationship));
-            }
-            //the default is equal string (there's only equal string for Activity Recognition
-            else{
-                rule.setRelationship(getRelationship(STATE_MAPPING_RELATIONSHIP_EQUAL_STRING));
-            }
-
-            if (criterion.has(ConfigurationManager.CONDITION_PROPERTIES_SOURCE)){
-                String source = criterion.getString(ConfigurationManager.CONDITION_PROPERTIES_SOURCE);
-                //relationship is an integer
-                rule.setSource( getContextSourceTypeFromName(source));
-            }
-            else {
-                rule.setSource(CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES);
-            }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+        /** 1. we first make sure whether the sourceType is being monitored. If not, we don't need to update
+         //the state values. We call isStateMonitored(int SourceType) to do the examination. **/
+        //Log.d(LOG_TAG, "examine statemappingrule, the state is being monitored: " + isStateMonitored(sourceType));
+        if (!isStateMonitored(sourceType)) {
+            return;
         }
 
-        //at this point, rule has been updated. return the rule
-        return rule;
+        /** 2. if the state is currently monitored, we get the stateMappingRule by the type
+         * then we call examineStateRule() to examine the rule depending on the type of the target value
+         * Currently, it could be a string or a float number**/
+        for (int i=0; i<getStateMappingRules().size(); i++) {
+            //get the rule
+            StateMappingRule rule = getStateMappingRules().get(i);
+            boolean pass= false;
+
+            //each rule can have more than one criterion, where each criterion has a measure,
+            // relationship and a targetvalue
+            ArrayList<StateValueCriterion> criteria = rule.getCriteria();
+
+            for (int j=0; j<criteria.size(); j++){
+
+                //1. get the targer value and relaionship
+                int relationship = criteria.get(j).getRelationship();
+                int measure = criteria.get(j).getMeasureType();
+
+                //get values depending on whether the target value is a string or a float number
+                if (criteria.get(j).isTargetString()){
+                    String targetValue = criteria.get(j).getTargetStringValue();
+                    pass = examineStateRule(sourceType, measure, relationship, targetValue);
+                }
+                //the target value is a number
+                else {
+                    float targetValue = criteria.get(j).getTargetFloatValue();
+                    pass = examineStateRule(sourceType, measure, relationship, targetValue);
+                }
+
+                /** examine criterion specified in the SateMappingRule **/
+                Log.d(LOG_TAG, "examine statemappingrule, after the examination the criterion is " + pass);
+
+            }
+
+
+            /** 3. if the criterion is passed, we set the state value based on the mappingRule **/
+            if (pass){
+
+                for (int j=0; j<getStateList().size(); j++){
+                    //find the state corresponding to the StateMappingRule
+
+                    boolean valueChanged = false;
+
+                    if (getStateList().get(j).getName().equals(rule.getName())){
+
+                        String stateValue = rule.getStateValue();
+                        //change the value based on the mapping rule.
+
+                        /** 5. now we need to check whether the new value is different from its current value
+                         * if yes. we need to call StateChange, which will notify ContextManager about the change **/
+                        if (!getStateList().get(j).getValue().equals(stateValue) ){
+                            //the value is changed to the new value,
+                            valueChanged = true;
+                        }
+
+                        getStateList().get(j).setValue(stateValue);
+
+                        Log.d(LOG_TAG, "examine statemappingrule, the state " + getStateList().get(j).getName() + " value change to " + getStateList().get(j).getValue());
+
+                    }
+
+                    //if the state changes to a new value
+                    if (valueChanged){
+                        //we call this method to invoke ContextManager to inspect event conditions.
+                        stateChanged(getStateList().get(j));
+                    }
+
+                }
+            }
+        }
 
     }
-*/
 
     /**
      * This function examines StateMappingRule with the data and returns a boolean pass.
@@ -484,6 +515,10 @@ public class ActivityRecognitionManager extends ContextStateManager
      * @return
      */
     private static boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
+
+        Log.d(LOG_TAG, "examine statemappingrule, in examineStateRule. Going to test source: " + sourceType
+                + " measure : " + measure + " relationship " + relationship + " targevalue " + targetValue
+        );
 
         boolean pass = false;
         //1 first we need to get the right source based on the sourcetype.
@@ -524,7 +559,6 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     }
 
-
     public static int getContextSourceTypeFromName(String sourceName) {
 
         switch (sourceName){
@@ -533,8 +567,9 @@ public class ActivityRecognitionManager extends ContextStateManager
                 return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES;
             case CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING:
                 return CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES;
+            //the default is most probable activities
             default:
-                return -1;
+                return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES;
         }
     }
 
@@ -547,7 +582,7 @@ public class ActivityRecognitionManager extends ContextStateManager
             case CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES:
                 return CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING;
             default:
-                return "NA";
+                return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING;
 
         }
     }

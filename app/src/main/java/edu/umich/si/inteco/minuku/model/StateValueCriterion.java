@@ -1,5 +1,7 @@
 package edu.umich.si.inteco.minuku.model;
 
+import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 
 /**
@@ -10,7 +12,7 @@ public class StateValueCriterion extends Criterion{
     private int mMeasure = ContextStateManager.CONTEXT_SOURCE_MEASURE_LATEST_ONE;
     private int mRelationship=ContextStateManager.STATE_MAPPING_RELATIONSHIP_EQUAL;
     private String mTargetStringValue="NA";
-    private float mTargetFloatValue = 0;
+    private float mTargetFloatValue = Constants.NULL_NUMERIC_VALUE;
     private boolean isTargetString = false;
 
     public StateValueCriterion(){
@@ -75,11 +77,17 @@ public class StateValueCriterion extends Criterion{
 
     @Override
     public String toString() {
-        return "StateValueCriterion{" +
-                "mMeasure=" + mMeasure +
-                ", mRelationship=" + mRelationship +
-                ", mTargetStringValue='" + mTargetStringValue + '\'' +
-                ", mTargetFloatValue=" + mTargetFloatValue +
+
+        String target = "";
+        if (isTargetString())
+            target = mTargetStringValue;
+        else
+            target = ""+mTargetFloatValue;
+
+        return "Criterion{" +
+                ContextStateManager.getMeasureName(mMeasure) + "-" +
+                ContextStateManager.getRelationshipName(mRelationship) + "-" +
+                target+
                 '}';
     }
 }

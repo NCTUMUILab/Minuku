@@ -395,18 +395,28 @@ public class ContextManager {
                 //If the criteria are met, it changes the state to the value
                 String stateValue = condition.getStateValue();
 
-                //condition originall saves string of source, becuase it is specified by users. We need to
-                //find the corresponding source type.
+                Log.d(LOG_TAG, "[updateTasksInContextStateManager] condition for " + contextStateManagerName
+                        + " source: " + condition.getSource() );
+
                 int sourceType = getSourceTypeFromName(contextStateManagerName, condition.getSource());
 
-                //then we update condition so that it remembers source types in the future.
-                condition.setSourceType(sourceType);
+                //condition originall saves string of source, becuase it is specified by users. We need to
+                //find the corresponding source type.
+                Log.d(LOG_TAG, "[updateTasksInContextStateManager] condition for " + contextStateManagerName
+                        + " source: " + condition.getSource() + " soucetype: " +
+                        getSourceTypeFromName(contextStateManagerName, condition.getSource()));
 
                 //generate a sateMappingRule for the ContextStateManager to use to monitor the state
                 StateMappingRule rule = new StateMappingRule(contextStateManagerName, sourceType, criteria, stateValue);
 
+
+                //then we update condition so that it remembers source types in the future.
+                condition.setSourceType(sourceType);
+                //it also remembers which state is monitors.
+                condition.setStateName(rule.getName());
+
                 Log.d(LOG_TAG, "[updateTasksInContextStateManager] adding a rule:" +
-                        "the rule is: " + rule.toString() + " is for ContextStateManager");
+                        "the rule is: " + rule.toString() + " is for " + contextStateManagerName);
 
                 assignMonitoringTasks(contextStateManagerName, rule);
 
@@ -420,7 +430,7 @@ public class ContextManager {
 
     /**
      *
-     * ContextMAnager assigns  the task
+     * ContextMAnager assigns  the task to the right contextStateManagers
      * @param contextStateManagerName
      */
     private static void assignMonitoringTasks(String contextStateManagerName, StateMappingRule rule) {
@@ -462,12 +472,18 @@ public class ContextManager {
 
         /**get any conditions that use the state. **/
 
+        Log.d(LOG_TAG, "[examineCircumstanceConditions]");
+
         ArrayList<Circumstance> relatedCircumstances = getRelatedCircumstance (state);
 
-        //for each circumstance, get all of the conditions, and check whether the condition has been met.
-        for (int i=0; i < getCircumstanceList().size(); i++) {
+        Log.d(LOG_TAG, "[examineCircumstanceConditions] there are " + relatedCircumstances.size() + " circumstances monitoring the state");
 
-            Circumstance circumstance = getCircumstanceList().get(i);
+        //for each circumstance, get all of the conditions, and check whether the condition has been met.
+        for (int i=0; i < relatedCircumstances.size(); i++) {
+
+            Circumstance circumstance = relatedCircumstances.get(i);
+
+            Log.d(LOG_TAG, "[examineCircumstanceConditions] now check circumstance " + circumstance.getName());
 
             /** an circumstance contains a set of conditions. An circumstance occurs only when all conditions are met **/
             boolean pass = true;
@@ -480,6 +496,9 @@ public class ContextManager {
                     Condition condition = conditions.get(j);
                     //the final pass is true only when all the conditions are true.
                     pass = pass & state.getValue().equals(condition.getStateValue());
+                    Log.d(LOG_TAG, "[examineCircumstanceConditions] now the circumstance's condition:  " +condition.getStateName() +
+                    "-" +condition.getStateValue() + " pasS: " + pass);
+
                 }
 
             /** for any circumstance for which the conditions are true, we let TriggerManager to see which action/action control to trigger.**/

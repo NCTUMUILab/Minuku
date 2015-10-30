@@ -82,7 +82,8 @@ public abstract class ContextStateManager {
     /** if the value of the state is changed, we inform ContextManager about the change so that it can
      * examine the conditions of the events related to the state **/
     public static void stateChanged(State state){
-        ContextManager.examineCircumstances(state);
+        Log.d(LOG_TAG, "[stateChanged] state " + state.getName() + " is changed" );
+                ContextManager.examineCircumstances(state);
     };
 
 
@@ -92,20 +93,15 @@ public abstract class ContextStateManager {
      * We reset the current stateList, and then reconstruct it.
      * TODO: in the future we just update the list for the newly added ones and removed ones.
      */
-    public static void updateMonitoredStates() {
+    public static void updateMonitoredState(StateMappingRule rule) {
 
         //we reset the stateList
         mStateList.clear();
 
-        // for each StateMappingRule, we create a state, even if two rules use the same source. **/
-       for (int i=0; i <mStateMappingRules.size(); i++){
-           StateMappingRule rule = mStateMappingRules.get(i);
-           //we use the rule name as the name of the state
-           State state = new State(rule);
-           //we add the state into the StateList
-           mStateList.add(state);
-           //Log.d(LOG_TAG, "[testing stateMappingRule] creating state: " + state.getName() + " current value: " + state.getValue());
-        }
+        State state = new State(rule);
+        //we add the state into the StateList
+        mStateList.add(state);
+        Log.d(LOG_TAG, "[testing stateMappingRule] creating state: " + state.getName() + " current value: " + state.getValue());
     }
 
     /**
@@ -223,7 +219,7 @@ public abstract class ContextStateManager {
      * @param sourceType
      * @return
      */
-    private static boolean isStateMonitored(int sourceType) {
+    protected static boolean isStateMonitored(int sourceType) {
 
         Log.d(LOG_TAG, "examine statemappingrule: in isStateMonitored");
 
@@ -233,6 +229,7 @@ public abstract class ContextStateManager {
 
             //find any state that uses the source and that state is currently enabled.
             if (state.getMappingRule().getSource()==sourceType && state.isEnabled()){
+                Log.d(LOG_TAG, "examine statemappingrule: state " + state.getName() + " is monitored");
                 return true;
             }
         }
@@ -293,9 +290,7 @@ public abstract class ContextStateManager {
     }
 
     private static StateMappingRule translateStateMappingRule(StateMappingRule rule) {
-
-        return new StateMappingRule();
-
+        return rule;
     }
 
     public static void addStateMappingRule(StateMappingRule rule){
@@ -308,7 +303,7 @@ public abstract class ContextStateManager {
         //Log.d(LOG_TAG, "[testing stateMappingRule] adding rule: " + rule.toString() + " to " + getName());
 
         //for each time we add a state, we update the list of State.
-        updateMonitoredStates();
+        updateMonitoredState(rule);
     }
 
     public static void removeStateMappingRule(StateMappingRule rule) {

@@ -25,7 +25,7 @@ public class QuestionnaireTemplate extends ProbeObject{
 		mTitle = title;
 		_studyId = study_id;
         mType = type;
-		
+
 	}
 	
 	public ArrayList<Question> getQuestions(){
@@ -75,5 +75,14 @@ public class QuestionnaireTemplate extends ProbeObject{
 		return mDescription;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "QuestionnaireTemplate{" +
+				"mTitle='" + mTitle + '\'' +
+				", mDescription='" + mDescription + '\'' +
+				", mQuestionJSON='" + mQuestionJSON + '\'' +
+				", mType='" + mType + '\'' +
+				", mQuestionList=" + mQuestionList +
+				'}';
+	}
 }
