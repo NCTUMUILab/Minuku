@@ -2,7 +2,7 @@
 	{	
 		"Id":1,
 		"Name":"CrowdBased Labeling Study",
-		"Task":
+		"Tasks":
 			[
 		        {
 		            "Id": 1,
@@ -23,6 +23,43 @@
 			"Name": "Configuration1",
 			"Content":
 			{
+			  	"Logging":
+				[
+				  {
+					"Location":
+					{
+					  "Sampling_rate": "default"
+					}
+
+				  },
+				  {
+				  	"ActivityRecognition":
+					{
+					  "Sampling_rate": "default"
+					}
+				  },
+				  {
+					"Sensor.Proximity":{
+					  "Sampling_rate": "default"
+					}
+				  },
+				  {
+					"Sensor.Accelerometer":{
+					  "Sampling_rate": "default"
+					}
+				  },
+				  {
+					"Sensor.Light":{
+					  "Sampling_rate": "default"
+					}
+				  },
+				  {
+					"Sensor.Pressure":{
+					  "Sampling_rate": "default"
+					}
+				  }
+
+				],
 				"Circumstances":
 				[
 					{
@@ -78,7 +115,7 @@
 					}					
 				],
 			
-				"Action":
+				"Actions":
 				[
 					{
 						"Id": 1,
@@ -116,12 +153,72 @@
 								"Message": "Please tab to report what items you are carrying."
 							}
 						]
-					}  
+					},
+
+				  {
+					"Id": 2,
+					"Continuity":
+					{
+					  "Rate": 3,
+					  "Duration": -1
+					},
+					"Execution_style":"one_time",
+					"Type": "saving_record",
+					"Name": "recording context",
+					"Control":{
+					  "Start":
+					  [
+						{
+						  "Launch": "triggered",
+						  "Trigger":
+						  {
+							"Class":"Action.Start",
+							"Id":1,
+							"Sampling_rate": 1
+						  },
+						  "Schedule":
+						  {
+							"Sample_method":"simple_one_time",
+							"Sample_delay": 2
+						  }
+						}
+
+					  ],
+					  "Stop":
+					  [
+						{
+						  "Launch": "triggered",
+						  "Trigger":
+						  {
+							"Class":"Action.Resume",
+							"Id":2,
+							"Sampling_rate": 1
+						  },
+						  "Schedule":
+						  {
+							"Sample_method":"simple_one_time",
+							"Sample_delay": 0
+						  }
+						}
+
+
+					  ]
+					},
+					"Notification":
+					[
+					  {
+						"Launch":"when_start",
+						"Type":"normal",
+						"Title": "Minuku Recording....",
+						"Message": "Minuku is currently recording your information"
+					  }
+					]
+				  }
 				],
 
 
 
-				"Questionnaire":
+				"Questionnaires":
 				[
 					{
 						"Id": 1,

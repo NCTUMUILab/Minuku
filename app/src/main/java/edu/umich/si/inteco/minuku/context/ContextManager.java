@@ -24,6 +24,7 @@ import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.Condition;
+import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
@@ -118,6 +119,8 @@ public class ContextManager {
 
     private static ArrayList<Circumstance> mCircumstanceList;
 
+    private static ArrayList<LoggingTask> mLoggingTasKList;
+
 
     //handle the local SQLite operation
   	private static LocalDBHelper mLocalDBHelpder;
@@ -151,6 +154,8 @@ public class ContextManager {
 		mContext = context;
 
         mCircumstanceList = new ArrayList<Circumstance>();
+
+        mLoggingTasKList = new ArrayList<LoggingTask>();
 
 		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
         //initiate the RecordPool
@@ -366,12 +371,13 @@ public class ContextManager {
     }
 
     /**
-     * this function updates the tasks that each ContextStateManager need to
+     * this function updates the tasks that each ContextStateManager need to perform
      */
     public static void updateTasksInContextStateManager() {
 
         Log.d(LOG_TAG, "[updateTasksInContextStateManager] ");
-        /**1. assign logging task to contextStateManager **/
+
+        /**1. assign data recording task to contextStateManager **/
 
 
         /**2. assign monitoring task to contextStateManagers **/
@@ -621,6 +627,8 @@ public class ContextManager {
         mCircumstanceList.add(circumstance);
     }
 
+
+
     public static void removeCircumstance(Circumstance circumstance){
         if (mCircumstanceList !=null){
             mCircumstanceList.remove(circumstance);
@@ -630,6 +638,26 @@ public class ContextManager {
     public static void removeCircumstance(int index){
         if (mCircumstanceList !=null){
             mCircumstanceList.remove(index);
+        }
+    }
+
+    
+    public static void addLoggingTask(LoggingTask task){
+        if (mLoggingTasKList == null) {
+            mLoggingTasKList = new ArrayList<LoggingTask>();
+        }
+        mLoggingTasKList.add(task);
+    }
+
+    public static void removeLoggingTask(LoggingTask task) {
+        if (mLoggingTasKList != null) {
+            mLoggingTasKList.remove(task);
+        }
+    }
+
+    public static void removeLoggingTask(int index) {
+        if (mLoggingTasKList != null) {
+            mLoggingTasKList.remove(index);
         }
     }
 

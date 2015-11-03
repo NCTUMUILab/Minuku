@@ -24,7 +24,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     private static final String LOG_TAG = "PhoneSensorMnger";
 
     //TODO: we set this temporarily false because we want to test nother source first
-    private static boolean isExtractingPhoneSensorData = false;
+    private static boolean isExtractingPhoneSensorData = true;
 
     /**system components**/
     private static Context mContext;

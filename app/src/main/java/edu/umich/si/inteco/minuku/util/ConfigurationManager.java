@@ -53,10 +53,11 @@ public class ConfigurationManager {
 	public static final String TASK_PROPERTIES_END_TIME = "End_time";
 
 	public static final String CONFIGURATION_CATEGORY_CONDITIONS = "Conditions";
-	public static final String CONFIGURATION_CATEGORY_ACTION = "Action";
-	public static final String CONFIGURATION_CATEGORY_TASK = "Task";
-	public static final String CONFIGURATION_CATEGORY_EVENT = "Circumstances";
-	public static final String CONFIGURATION_CATEGORY_QUESTIONNAIRE = "Questionnaire";
+	public static final String CONFIGURATION_CATEGORY_ACTION = "Actions";
+	public static final String CONFIGURATION_CATEGORY_TASK = "Tasks";
+	public static final String CONFIGURATION_CATEGORY_CIRCUMSTANCE = "Circumstances";
+	public static final String CONFIGURATION_CATEGORY_LOGGING = "Logging";
+	public static final String CONFIGURATION_CATEGORY_QUESTIONNAIRE = "Questionnaires";
 
     public static final String SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT = "StopServiceDuringMidNight";
 
@@ -218,10 +219,21 @@ public class ConfigurationManager {
         }
 
 
+		/** load Logging **/
+		try {
+			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_LOGGING)){
+				JSONArray loggingJSON = content.getJSONArray(ConfigurationManager.CONFIGURATION_CATEGORY_LOGGING);
+				loadLoggingFromJSON(loggingJSON, config.getStudyId());
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		/** load circumstances **/
 		try {
-			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_EVENT)){
-                JSONArray circumstancesJSON = content.getJSONArray(ConfigurationManager.CONFIGURATION_CATEGORY_EVENT);
+			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_CIRCUMSTANCE)){
+                JSONArray circumstancesJSON = content.getJSONArray(ConfigurationManager.CONFIGURATION_CATEGORY_CIRCUMSTANCE);
 				loadCircumstancesFromJSON(circumstancesJSON, config.getStudyId());
             }
 		} catch (JSONException e) {
@@ -255,7 +267,35 @@ public class ConfigurationManager {
 		
 		
 	}
-	
+
+
+	public static void loadLoggingFromJSON(JSONArray loggingJSONArray, int study_id) {
+
+		Log.d(LOG_TAG, "[loadLoggingFromJSON] load the circumstance content of study " + study_id);
+
+		for (int i =0; i<loggingJSONArray.length(); i++) {
+
+			JSONObject loggingJSON = null;
+
+			try {
+
+				loggingJSON  = loggingJSONArray.getJSONObject(i);
+
+
+
+
+
+			}
+			catch (JSONException e1) {
+				e1.printStackTrace();
+			}
+
+
+		}
+
+	}
+
+
 	/**
 	 * 
 	 * @param circumstancesJSON
