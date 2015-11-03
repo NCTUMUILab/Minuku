@@ -166,7 +166,7 @@
 					"Execution_style":"one_time",
 					"Type": "saving_record",
 					"Name": "recording context",
-					"Logging_id":"1,2,3",
+					"Logging_tasks":"1,2,3",
 					"Control":{
 					  "Start":
 					  [

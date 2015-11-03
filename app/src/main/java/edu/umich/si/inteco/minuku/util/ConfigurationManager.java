@@ -15,9 +15,9 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManag
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
-import edu.umich.si.inteco.minuku.model.Criterion;
 import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Circumstance;
+import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.Question;
@@ -45,6 +45,7 @@ public class ConfigurationManager {
 	public static final String CONFIGURATION_PROPERTIES_VERSION = "Version";
 	public static final String CONFIGURATION_PROPERTIES_NAME = "Name";
 	public static final String CONFIGURATION_PROPERTIES_CONTENT = "Content";
+	public static final String CONFIGURATION_PROPERTIES_SOURCE = "Source";
 	public static final String CONFIGURATION_PROPERTIES_CONFIGURATION = "Configuration";
 	public static final String CONFIGURATION_PROPERTIES_DESCRIPTION = "Description";
 	public static final String TASK_PROPERTIES_TIMESTAMP_STRING = "Timestamp_string";
@@ -58,6 +59,7 @@ public class ConfigurationManager {
 	public static final String CONFIGURATION_CATEGORY_CIRCUMSTANCE = "Circumstances";
 	public static final String CONFIGURATION_CATEGORY_LOGGING = "Logging";
 	public static final String CONFIGURATION_CATEGORY_QUESTIONNAIRE = "Questionnaires";
+	public static final String CONFIGURATION_CATEGORY_CONTEXTSOURCE_SETTING = "ContextSourceSetting";
 
     public static final String SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT = "StopServiceDuringMidNight";
 
@@ -69,6 +71,60 @@ public class ConfigurationManager {
 	public static final String CONDITION_PROPERTIES_MEASURE ="Measure";
 	public static final String CONDITION_PROPERTIES_VALUE_CRITERION ="Value_Criteria";
 	public static final String CONDITION_PROPERTIES_TIME_CRITERION ="Time_Criteria";
+
+	//within content
+
+	/**ACTION PROPERTIES**/
+	public static final String ACTION_PROPERTIES_ID = "Id";
+	public static final String ACTION_PROPERTIES_TYPE= "Type";
+	public static final String ACTION_PROPERTIES_NAME= "Name";
+	public static final String ACTION_PROPERTIES_EXECUTION_STYLE= "Execution_style";
+	public static final String ACTION_PROPERTIES_CONTROL= "Control";
+	public static final String ACTION_PROPERTIES_CONTINUITY= "Continuity";
+	public static final String ACTION_PROPERTIES_MONITORING_EVENTS= "Monitoring_events";
+	public static final String ACTION_PROPERTIES_LOGGING_TASKS= "Logging_tasks";
+	public static final String ACTION_PROPERTIES_QUESTIONNAIRE_ID= "Questionnaire_id";
+	public static final String ACTION_PROPERTIES_NOTIFICATION = "Notification";
+	public static final String ACTION_PROPERTIES_LAUNCH= "Launch";
+
+	//for Annotate action
+	public static final String ACTION_PROPERTIES_ANNOTATE= "Annotate";
+	public static final String ACTION_PROPERTIES_ANNOTATE_MODE = "Mode";
+	public static final String ACTION_PROPERTIES_ANNOTATE_RECORDING_TYPE = "Recording_type";
+	public static final String ACTION_PROPERTIES_VIZUALIZATION_TYPE = "Viz_type";
+	public static final String ACTION_PROPERTIES_ANNOTATE_ALLOW_ANNOTATE_IN_PROCESS = "Allow_annotate_in_process";
+	public static final String ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING = "Review_recording";
+	//recording needs user's permission
+	public static final String ACTION_PROPERTIES_RECORDING_STARTED_BY_USER  = "Recording_started_by_user";
+	//continuity property
+	public static final String ACTION_CONTINUITY_PROPERTIES_RATE = "Rate";
+	public static final String ACTION_CONTINUITY_PROPERTIES_DURATION = "Duration";
+
+	//notificaiton property
+	public static final String ACTION_PROPERTIES_NOTIFICATION_TITLE = "Title";
+	public static final String ACTION_PROPERTIES_NOTIFICATION_MESSAGE = "Message";
+	public static final String ACTION_PROPERTIES_NOTIFICATION_LAUNCH = "Launch";
+	public static final String ACTION_PROPERTIES_NOTIFICATION_TYPE = "Type";
+
+	//within control:trigger
+	public static final String ACTION_PROPERTIES_TRIGGER= "Trigger";
+	public static final String ACTION_TRIGGER_CLASS_PROPERTIES= "Class";
+	public static final String ACTION_TRIGGER_PROPERTIES_SAMPLING_RATE= "Sampling_rate";
+
+
+	//within control: schedule
+	public static final String ACTION_PROPERTIES_SCHEDULE= "Schedule";
+
+	/** ProbeObject Class**/
+	public static final String ACTION_TRIGGER_CLASS_EVENT= "Circumstance";
+	public static final String ACTION_TRIGGER_CLASS_ACTION_STOP= "Action.Stop";
+	public static final String ACTION_TRIGGER_CLASS_ACTION_START= "Action.Start";
+	public static final String ACTION_TRIGGER_CLASS_ACTION_PAUSE= "Action.Pause";
+	public static final String ACTION_TRIGGER_CLASS_ACTION_RESUME= "Action.Resume";
+	public static final String ACTION_TRIGGER_CLASS_ACTION_CANCEL= "Action.Cancel";
+	public static final String ACTION_TRIGGER_CLASS_ACTIONCONTROL= "ActionControl";
+
+
 
 
 	private static LocalDBHelper mLocalDBHelper;
@@ -89,7 +145,7 @@ public class ConfigurationManager {
 	public void loadConfiguration() {
 		
 		Log.d(LOG_TAG, "[loadConfiguration]");
-		
+
 		//connect to the DB and load configuration from the DB
 		ArrayList<String> res = new ArrayList<String>();		
 	
@@ -271,7 +327,7 @@ public class ConfigurationManager {
 
 	public static void loadLoggingFromJSON(JSONArray loggingJSONArray, int study_id) {
 
-		Log.d(LOG_TAG, "[loadLoggingFromJSON] load the circumstance content of study " + study_id);
+		Log.d(LOG_TAG, "[loadLoggingFromJSON] load logging of study " + study_id);
 
 		for (int i =0; i<loggingJSONArray.length(); i++) {
 
@@ -280,6 +336,44 @@ public class ConfigurationManager {
 			try {
 
 				loggingJSON  = loggingJSONArray.getJSONObject(i);
+
+				//target source in the logging task
+				String source = loggingJSON.getString(CONFIGURATION_PROPERTIES_SOURCE);
+				int id = loggingJSON.getInt(CONFIGURATION_PROPERTIES_ID );
+
+				//create logging task object
+				LoggingTask loggingTask = new LoggingTask(id, source);
+
+				//
+
+				ContextManager.addLoggingTask(loggingTask);
+
+			}
+			catch (JSONException e1) {
+				e1.printStackTrace();
+			}
+
+
+		}
+
+	}
+
+	/**
+	 * users only list contextsources that are not using the default setting
+	 * @param settingJSONArray
+	 * @param study_id
+	 */
+	public static void loadContextSourceSettingFromJSON(JSONArray settingJSONArray, int study_id) {
+
+		Log.d(LOG_TAG, "[loadContextSourceSettingFromJSON] load the contextsourcesetting of study " + study_id);
+
+		for (int i =0; i<settingJSONArray.length(); i++) {
+
+			JSONObject loggingJSON = null;
+
+			try {
+
+				loggingJSON  = settingJSONArray.getJSONObject(i);
 
 				String source = loggingJSON.getString(CONDITION_PROPERTIES_SOURCE);
 
@@ -374,11 +468,11 @@ public class ConfigurationManager {
 				/** 1. first create action and schedule object based on the required field, then set propoerties based on the schedule type**/
 				
 				//get action required fields
-				int action_id= actionJSON.getInt(ActionManager.ACTION_PROPERTIES_ID);
-				String type = actionJSON.getString(ActionManager.ACTION_PROPERTIES_TYPE);
-				String execution_style = actionJSON.getString(ActionManager.ACTION_PROPERTIES_EXECUTION_STYLE);
-				controlJSON = actionJSON.getJSONObject(ActionManager.ACTION_PROPERTIES_CONTROL);
-				String name = actionJSON.getString(ActionManager.ACTION_PROPERTIES_NAME);
+				int action_id= actionJSON.getInt(ACTION_PROPERTIES_ID);
+				String type = actionJSON.getString(ACTION_PROPERTIES_TYPE);
+				String execution_style = actionJSON.getString(ACTION_PROPERTIES_EXECUTION_STYLE);
+				controlJSON = actionJSON.getJSONObject(ACTION_PROPERTIES_CONTROL);
+				String name = actionJSON.getString(ACTION_PROPERTIES_NAME);
 				
 				Log.d(LOG_TAG, "[loadActionsFromJSON] examine action" + " action: " + action_id + " , for type " + type
 						+ " execution style " + execution_style );
@@ -390,7 +484,7 @@ public class ConfigurationManager {
 				//Action of phone questionnaire
 				if (type.equals(ActionManager.ACTION_TYPE_QUESTIONNAIRE)){
 					
-					int questionnaire_id = actionJSON.getInt(ActionManager.ACTION_PROPERTIES_QUESTIONNAIRE_ID);
+					int questionnaire_id = actionJSON.getInt(ACTION_PROPERTIES_QUESTIONNAIRE_ID);
 					GeneratingQuestionnaireAction a = new GeneratingQuestionnaireAction (action_id, name, type,execution_style, study_id);
 					a.setQuestionnaireId(questionnaire_id);
 					action = a; 
@@ -400,7 +494,7 @@ public class ConfigurationManager {
 				//Action of email questionnaire
                 else if (type.equals(ActionManager.ACTION_TYPE_EMAIL_QUESTIONNAIRE)){
 
-                    int questionnaire_id = actionJSON.getInt(ActionManager.ACTION_PROPERTIES_QUESTIONNAIRE_ID);
+                    int questionnaire_id = actionJSON.getInt(ACTION_PROPERTIES_QUESTIONNAIRE_ID);
                     GenerateEmailQuestionnaireAction a = new GenerateEmailQuestionnaireAction (action_id, name, type,execution_style, study_id);
                     a.setQuestionnaireId(questionnaire_id);
                     action = a;
@@ -411,9 +505,9 @@ public class ConfigurationManager {
                 }
 				
 				////Action of monitoring circumstances. We associate circumstance ids with the action.
-				else if (type.equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){						
+				else if (type.equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){
 					
-					String monitor_circumstance_ids = actionJSON.getString(ActionManager.ACTION_PROPERTIES_MONITORING_EVENTS);
+					String monitor_circumstance_ids = actionJSON.getString(ACTION_PROPERTIES_MONITORING_EVENTS);
 					String [] ids = monitor_circumstance_ids.split(",");
 					
 					MonitoringCircumstanceAction a = new MonitoringCircumstanceAction (action_id, name, type, execution_style, study_id);
@@ -433,18 +527,33 @@ public class ConfigurationManager {
                 //Action of saving record
                 else if (type.equals(ActionManager.ACTION_TYPE_SAVING_RECORD)) {
 
+					String logging_task_ids = actionJSON.getString(ACTION_PROPERTIES_LOGGING_TASKS);
+					//find which logging task the action is associated with
+					String [] ids = logging_task_ids.split(",");
+
                     SavingRecordAction a = new SavingRecordAction(action_id,name, type,execution_style, study_id );
+
+					//associate circumstance ids to the monitoring action.
+					for (int j=0; j<ids.length; j++){
+						int id = Integer.parseInt(ids[j]);
+						a.addLoggingTask(id);
+						Log.d(LOG_TAG, " [loadActionsFromJSON] the aciton" + action.getId() + " is associated with loggin task  "  +  id);
+
+					}
+
+
+
                     action = a;
                 }
 
                 //Action of annotating data (no saving records)
                 else if (type.equals(ActionManager.ACTION_TYPE_ANNOTATE)) {
 
-                    JSONObject annotateJSON = actionJSON.getJSONObject(ActionManager.ACTION_PROPERTIES_ANNOTATE);
+                    JSONObject annotateJSON = actionJSON.getJSONObject(ACTION_PROPERTIES_ANNOTATE);
 
-                    String mode = annotateJSON.getString(ActionManager.ACTION_PROPERTIES_ANNOTATE_MODE);
-                    String vizType = annotateJSON.getString(ActionManager.ACTION_PROPERTIES_VIZUALIZATION_TYPE);
-                    String reviewRecordingMode = annotateJSON.getString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING);
+                    String mode = annotateJSON.getString(ACTION_PROPERTIES_ANNOTATE_MODE);
+                    String vizType = annotateJSON.getString(ACTION_PROPERTIES_VIZUALIZATION_TYPE);
+                    String reviewRecordingMode = annotateJSON.getString(ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING);
 
                     AnnotateAction a = new AnnotateAction (action_id, name, type, execution_style, study_id, mode, vizType, reviewRecordingMode);
                     action = a;
@@ -454,14 +563,14 @@ public class ConfigurationManager {
 				//TODO: check if we can make this cleaner.
                 else if (type.equals(ActionManager.ACTION_TYPE_ANNOTATE_AND_RECORD)) {
 
-                    JSONObject annotateJSON = actionJSON.getJSONObject(ActionManager.ACTION_PROPERTIES_ANNOTATE);
+                    JSONObject annotateJSON = actionJSON.getJSONObject(ACTION_PROPERTIES_ANNOTATE);
 
-                    String mode = annotateJSON.getString(ActionManager.ACTION_PROPERTIES_ANNOTATE_MODE);
-                    String recordingType = annotateJSON.getString(ActionManager.ACTION_PROPERTIES_ANNOTATE_RECORDING_TYPE);
-                    String vizType = annotateJSON.getString(ActionManager.ACTION_PROPERTIES_VIZUALIZATION_TYPE);
-                    boolean allowAnnotateInProcess = annotateJSON.getBoolean(ActionManager.ACTION_PROPERTIES_ANNOTATE_ALLOW_ANNOTATE_IN_PROCESS);
-                    String reviewRecordingMode = annotateJSON.getString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING);
-                    boolean recordingStartByUser = annotateJSON.getBoolean(ActionManager.ACTION_PROPERTIES_RECORDING_STARTED_BY_USER);
+                    String mode = annotateJSON.getString(ACTION_PROPERTIES_ANNOTATE_MODE);
+                    String recordingType = annotateJSON.getString(ACTION_PROPERTIES_ANNOTATE_RECORDING_TYPE);
+                    String vizType = annotateJSON.getString(ACTION_PROPERTIES_VIZUALIZATION_TYPE);
+                    boolean allowAnnotateInProcess = annotateJSON.getBoolean(ACTION_PROPERTIES_ANNOTATE_ALLOW_ANNOTATE_IN_PROCESS);
+                    String reviewRecordingMode = annotateJSON.getString(ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING);
+                    boolean recordingStartByUser = annotateJSON.getBoolean(ACTION_PROPERTIES_RECORDING_STARTED_BY_USER);
 
                     AnnotateRecordingAction annotateRecordingAction =
                             new AnnotateRecordingAction(
@@ -489,13 +598,13 @@ public class ConfigurationManager {
 
 
 				/**4. examine whether the action is continuous or not**/
-				if (actionJSON.has(ActionManager.ACTION_PROPERTIES_CONTINUITY)){
+				if (actionJSON.has(ACTION_PROPERTIES_CONTINUITY)){
 					
-					JSONObject continuityJSON = actionJSON.getJSONObject(ActionManager.ACTION_PROPERTIES_CONTINUITY);
+					JSONObject continuityJSON = actionJSON.getJSONObject(ACTION_PROPERTIES_CONTINUITY);
 					Log.d(LOG_TAG, "[loadActionsFromJSON] the continuityJSON:  " + continuityJSON.toString());
 					
-					float rate= (float) continuityJSON.getDouble(ActionManager.ACTION_CONTINUITY_PROPERTIES_RATE);
-					int duration = continuityJSON.getInt(ActionManager.ACTION_CONTINUITY_PROPERTIES_DURATION);
+					float rate= (float) continuityJSON.getDouble(ACTION_CONTINUITY_PROPERTIES_RATE);
+					int duration = continuityJSON.getInt(ACTION_CONTINUITY_PROPERTIES_DURATION);
 					
 					action.setActionDuration(duration);
 					action.setActionRate(rate);
@@ -513,10 +622,10 @@ public class ConfigurationManager {
 			
 				
 				/**5. check whether there are notification of the action **/			
-				if (actionJSON.has(ActionManager.ACTION_PROPERTIES_NOTIFICATION)){
+				if (actionJSON.has(ACTION_PROPERTIES_NOTIFICATION)){
 
                     //notification is an array. It may have a typical notification and a ongoing notifications
-                    JSONArray notiJSONArray = actionJSON.getJSONArray(ActionManager.ACTION_PROPERTIES_NOTIFICATION);
+                    JSONArray notiJSONArray = actionJSON.getJSONArray(ACTION_PROPERTIES_NOTIFICATION);
 
                     for (int j=0; j<notiJSONArray.length(); j++){
 
@@ -524,10 +633,10 @@ public class ConfigurationManager {
 
 						//notification has type, launch style, title, and message.
 						//TODO: improve the notification style.
-                        String notiType = notiJSONObject.getString(ActionManager.ACTION_PROPERTIES_NOTIFICATION_TYPE);
-                        String notiLaunch = notiJSONObject.getString(ActionManager.ACTION_PROPERTIES_NOTIFICATION_LAUNCH);
-                        String notiTitle = notiJSONObject.getString(ActionManager.ACTION_PROPERTIES_NOTIFICATION_TITLE);
-                        String notiMessage = notiJSONObject.getString(ActionManager.ACTION_PROPERTIES_NOTIFICATION_MESSAGE);
+                        String notiType = notiJSONObject.getString(ACTION_PROPERTIES_NOTIFICATION_TYPE);
+                        String notiLaunch = notiJSONObject.getString(ACTION_PROPERTIES_NOTIFICATION_LAUNCH);
+                        String notiTitle = notiJSONObject.getString(ACTION_PROPERTIES_NOTIFICATION_TITLE);
+                        String notiMessage = notiJSONObject.getString(ACTION_PROPERTIES_NOTIFICATION_MESSAGE);
 
                         Notification notification = new Notification(notiLaunch, notiType, notiTitle, notiMessage);
 
@@ -698,11 +807,11 @@ public class ConfigurationManager {
 	public static void loadActionControlsFromJSON (JSONObject controlJSON, Action action) {
 
 		//if the action control is to start an action. Most action controls belong to this type. 
-		if (controlJSON.has(ActionManager.ACTION_PROPERTIES_START)){
+		if (controlJSON.has(ActionManager.ACTION_CONTROL_TYPE_START_STRING)){
 			
 			JSONArray startJSONArray = null;
 			try {
-				startJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_PROPERTIES_START);
+				startJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_CONTROL_TYPE_START_STRING);
 
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -739,11 +848,11 @@ public class ConfigurationManager {
 			
 		}
 		//if the action control is to stop an action
-		if (controlJSON.has(ActionManager.ACTION_PROPERTIES_STOP)) {
+		if (controlJSON.has(ActionManager.ACTION_CONTROL_TYPE_STOP_STRING)) {
 			
 			JSONArray stopJSONArray;
 			try {
-				stopJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_PROPERTIES_STOP);
+				stopJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_CONTROL_TYPE_STOP_STRING);
 				
 				for (int i = 0; i < stopJSONArray.length(); i++){
 					
@@ -765,12 +874,12 @@ public class ConfigurationManager {
 			}
 		}
 		//if an action control is to pause an action 
-		if (controlJSON.has(ActionManager.ACTION_PROPERTIES_PAUSE)) {
+		if (controlJSON.has(ActionManager.ACTION_CONTROL_TYPE_PAUSE_STRING)) {
 			
 			JSONArray pauseJSONArray;		
 			
 			try {
-				pauseJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_PROPERTIES_PAUSE);
+				pauseJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_CONTROL_TYPE_PAUSE_STRING);
 				
 				Log.d(LOG_TAG, "[loadActionControlsFromJSON] found pause JSON " +  pauseJSONArray);
 				
@@ -795,11 +904,11 @@ public class ConfigurationManager {
 		}
 		
 		//if the action control is to resume an action 
-		if (controlJSON.has(ActionManager.ACTION_PROPERTIES_RESUME)) {
+		if (controlJSON.has(ActionManager.ACTION_CONTROL_TYPE_RESUME_STRING)) {
 			
 			JSONArray resumeJSONArray;
 			try {
-				resumeJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_PROPERTIES_RESUME);
+				resumeJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_CONTROL_TYPE_RESUME_STRING);
 				
 				Log.d(LOG_TAG, "[loadActionControlsFromJSON] found resume JSON " +  resumeJSONArray);
 				
@@ -823,11 +932,11 @@ public class ConfigurationManager {
 			}
 		}
 		//if the action control is to cancel an action
-		if (controlJSON.has(ActionManager.ACTION_PROPERTIES_CANCEL)) {
+		if (controlJSON.has(ActionManager.ACTION_CONTROL_TYPE_CANCEL_STRING)) {
 			
 			JSONArray cancelJSONArray;
 			try {
-				cancelJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_PROPERTIES_CANCEL);
+				cancelJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_CONTROL_TYPE_CANCEL_STRING);
 				
 				for (int i = 0; i < cancelJSONArray.length(); i++){
 					

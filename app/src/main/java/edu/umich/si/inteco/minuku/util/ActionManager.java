@@ -80,77 +80,29 @@ public class ActionManager {
     /*** Constants for the system recording for annotating ***/
     public static final String SYSTEM_GENERATED_RECORDING_BY_ANNOTATION_ACTION_NAME = "recording_generated_by_annotate_action";
 
-	
-	/**ACTION PROPERTIES**/
-	public static final String ACTION_PROPERTIES_ID = "Id";
-	public static final String ACTION_PROPERTIES_TYPE= "Type";
-	public static final String ACTION_PROPERTIES_NAME= "Name";
-	public static final String ACTION_PROPERTIES_EXECUTION_STYLE= "Execution_style"; 
-	public static final String ACTION_PROPERTIES_CONTROL= "Control"; 
-	public static final String ACTION_PROPERTIES_CONTINUITY= "Continuity";
-	
-	//within control
-	public static final String ACTION_PROPERTIES_START  = "Start";
-	public static final String ACTION_PROPERTIES_STOP = "Stop";
-	public static final String ACTION_PROPERTIES_PAUSE = "Pause";
-	public static final String ACTION_PROPERTIES_CANCEL = "Cancel";
-	public static final String ACTION_PROPERTIES_LAUNCH= "Launch";
-	public static final String ACTION_PROPERTIES_RESUME= "Resume";
+    public static final String ACTION_LAUNCH_STYLE_SCHEDULE= "schedule";
+    public static final String ACTION_LAUNCH_STYLE_TRIGGERED= "triggered";
+    public static final String ACTION_LAUNCH_STYLE_APP_START= "app_start";
+
+    public static final String ACTION_EXECUTION_STYLE_REPEATED= "repeated";
+    public static final String ACTION_EXECUTION_STYLE_ONETIME= "one_time";
+
+
+    //within control
+	public static final String ACTION_CONTROL_TYPE_START_STRING  = "Start";
+	public static final String ACTION_CONTROL_TYPE_STOP_STRING = "Stop";
+	public static final String ACTION_CONTROL_TYPE_PAUSE_STRING = "Pause";
+	public static final String ACTION_CONTROL_TYPE_CANCEL_STRING = "Cancel";
+	public static final String ACTION_CONTROL_TYPE_LAUNCH_STRING= "Launch";
+	public static final String ACTION_CONTROL_TYPE_RESUME_STRING= "Resume";
 	
 	public static final int ACTION_CONTROL_TYPE_START  = 1;
 	public static final int ACTION_CONTROL_TYPE_STOP = 2;
 	public static final int ACTION_CONTROL_TYPE_PAUSE = 3;
 	public static final int ACTION_CONTROL_TYPE_CANCEL = 4;
 	public static final int ACTION_CONTROL_TYPE_RESUME = 5;
-	
-	//within control:trigger
-	public static final String ACTION_PROPERTIES_TRIGGER= "Trigger";
-	public static final String ACTION_TRIGGER_CLASS_PROPERTIES= "Class"; 
-	public static final String ACTION_TRIGGER_PROPERTIES_SAMPLING_RATE= "Sampling_rate";
-	
-	//within control: schedule
-	public static final String ACTION_PROPERTIES_SCHEDULE= "Schedule";
-	public static final String ACTION_LAUNCH_STYLE_SCHEDULE= "schedule"; 
-	public static final String ACTION_LAUNCH_STYLE_TRIGGERED= "triggered"; 
-	public static final String ACTION_LAUNCH_STYLE_APP_START= "app_start";  
-	
-	public static final String ACTION_EXECUTION_STYLE_REPEATED= "repeated"; 
-	public static final String ACTION_EXECUTION_STYLE_ONETIME= "one_time";
-
-	//within content 
-	public static final String ACTION_PROPERTIES_MONITORING_EVENTS= "Monitoring_events"; 
-	public static final String ACTION_PROPERTIES_QUESTIONNAIRE_ID= "Questionnaire_id";
-    public static final String ACTION_PROPERTIES_NOTIFICATION = "Notification";
-
-    //for Annotate action
-    public static final String ACTION_PROPERTIES_ANNOTATE= "Annotate";
-    public static final String ACTION_PROPERTIES_ANNOTATE_MODE = "Mode";
-    public static final String ACTION_PROPERTIES_ANNOTATE_RECORDING_TYPE = "Recording_type";
-    public static final String ACTION_PROPERTIES_VIZUALIZATION_TYPE = "Viz_type";
-    public static final String ACTION_PROPERTIES_ANNOTATE_ALLOW_ANNOTATE_IN_PROCESS = "Allow_annotate_in_process";
-    public static final String ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING = "Review_recording";
-    //recording needs user's permission
-    public static final String ACTION_PROPERTIES_RECORDING_STARTED_BY_USER  = "Recording_started_by_user";
-
-	//notificaiton property
-	public static final String ACTION_PROPERTIES_NOTIFICATION_TITLE = "Title";
-	public static final String ACTION_PROPERTIES_NOTIFICATION_MESSAGE = "Message";
-    public static final String ACTION_PROPERTIES_NOTIFICATION_LAUNCH = "Launch";
-    public static final String ACTION_PROPERTIES_NOTIFICATION_TYPE = "Type";
-
-    /** ProbeObject Class**/
-    public static final String ACTION_TRIGGER_CLASS_EVENT= "Circumstance";
-    public static final String ACTION_TRIGGER_CLASS_ACTION_STOP= "Action.Stop";
-    public static final String ACTION_TRIGGER_CLASS_ACTION_START= "Action.Start";
-    public static final String ACTION_TRIGGER_CLASS_ACTION_PAUSE= "Action.Pause";
-    public static final String ACTION_TRIGGER_CLASS_ACTION_RESUME= "Action.Resume";
-    public static final String ACTION_TRIGGER_CLASS_ACTION_CANCEL= "Action.Cancel";
-    public static final String ACTION_TRIGGER_CLASS_ACTIONCONTROL= "ActionControl";
 
 
-	//continuity property
-	public static final String ACTION_CONTINUITY_PROPERTIES_RATE = "Rate";
-	public static final String ACTION_CONTINUITY_PROPERTIES_DURATION = "Duration";
 
     //for running the runningAction thread
     private static ScheduledExecutorService mRunningActionExecutor;
@@ -1258,9 +1210,9 @@ public class ActionManager {
         bundle.putInt(DatabaseNameManager.COL_SESSION_ID, sessionId);
 
         //indicate whether we should start a recording when entering the annotate activity
-        bundle.putBoolean(ACTION_PROPERTIES_RECORDING_STARTED_BY_USER, startRecording);
+        bundle.putBoolean(ConfigurationManager.ACTION_PROPERTIES_RECORDING_STARTED_BY_USER, startRecording);
         bundle.putInt("annotateRecordingActionId", annotateRecordingActionId);
-        bundle.putString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, reviewMode);
+        bundle.putString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, reviewMode);
 
         Intent intent = new Intent(mContext, AnnotateActivity.class);
         intent.putExtras(bundle);
@@ -1304,15 +1256,15 @@ public class ActionManager {
 
         switch(actionControlType) {
         case ActionManager.ACTION_CONTROL_TYPE_START:
-            return ActionManager.ACTION_PROPERTIES_START;
+            return ActionManager.ACTION_CONTROL_TYPE_START_STRING;
         case ActionManager.ACTION_CONTROL_TYPE_CANCEL:
-            return ActionManager.ACTION_PROPERTIES_CANCEL;
+            return ActionManager.ACTION_CONTROL_TYPE_CANCEL_STRING;
         case ActionManager.ACTION_CONTROL_TYPE_STOP:
-            return ActionManager.ACTION_PROPERTIES_STOP;
+            return ActionManager.ACTION_CONTROL_TYPE_STOP_STRING;
         case ActionManager.ACTION_CONTROL_TYPE_PAUSE:
-            return ActionManager.ACTION_PROPERTIES_PAUSE;
+            return ActionManager.ACTION_CONTROL_TYPE_PAUSE_STRING;
         case ActionManager.ACTION_CONTROL_TYPE_RESUME:
-            return ActionManager.ACTION_PROPERTIES_RESUME;
+            return ActionManager.ACTION_CONTROL_TYPE_RESUME_STRING;
         }
         return "unknown";
 	}
