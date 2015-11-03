@@ -5,8 +5,6 @@ package edu.umich.si.inteco.minuku.model;
  */
 public class LoggingTask {
 
-    private float mSamplingRate;
-    private boolean isSamplingDefault = true;
     private int mSource;
 
     public LoggingTask() {

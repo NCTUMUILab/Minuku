@@ -4,6 +4,7 @@ package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -21,6 +22,7 @@ import java.util.List;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
@@ -100,6 +102,38 @@ public class ActivityRecognitionManager extends ContextStateManager
         buildGoogleApiClient();
 
         sLatestDetectionTime = -1;
+    }
+
+    /** each ContextStateManager should override this static method
+     * it adds a list of ContextSource that it will manage **/
+    protected static void setUpContextSourceList(){
+
+        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager, adding two contextsource ");
+        boolean isAvailable;
+
+        // Google Play Service is available after api level 15
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            isAvailable = true;
+        }
+        else
+            isAvailable = false;
+
+
+        //add ActivityRecognition
+        mContextSourceList.add(
+                new ContextSource(
+                        CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING,
+                        CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES,
+                        isAvailable));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING,
+                        CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES,
+                        isAvailable));
+
+        return;
+
     }
 
 

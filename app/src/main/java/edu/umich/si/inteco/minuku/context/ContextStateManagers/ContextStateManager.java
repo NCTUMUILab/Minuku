@@ -2,11 +2,13 @@ package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Condition;
+import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
@@ -53,13 +55,20 @@ public abstract class ContextStateManager {
     protected static ArrayList<Condition> mConditions;
     protected static ArrayList<StateMappingRule> mStateMappingRules;
     protected static ArrayList<State> mStateList;
+    /**each contextStateManager has a list of ContextSource available for use**/
+    protected static ArrayList<ContextSource> mContextSourceList;
+
 //    protected static HashMap<Integer, Boolean>mSourceExtractTable
 
     //size of record pool. If the number of records exceed the size, we remove outdated
     //record pool or clear the record pool if we save it in the public record pool
     private int mSizeOfRecordPool = 300;
 
-
+    /** each ContextStateManager should override this static method
+     * it adds a list of ContextSource that it will manage **/
+    protected static void setUpContextSourceList(){
+        return;
+    }
 
     public abstract void saveRecordsInLocalRecordPool();
 
@@ -76,6 +85,8 @@ public abstract class ContextStateManager {
         mLocalRecordPool = new ArrayList<Record>();
         mStateMappingRules = new ArrayList<StateMappingRule>();
         mStateList = new ArrayList<State>();
+        mContextSourceList = new ArrayList<ContextSource>();
+        setUpContextSourceList();
     }
 
 

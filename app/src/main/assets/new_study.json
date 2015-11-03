@@ -23,40 +23,41 @@
 			"Name": "Configuration1",
 			"Content":
 			{
-			  	"Logging":
+
+			  "ContextSourceSetting":
+			  [
+				{
+				  "Source": "Location",
+				  "Sampling_rate": 10
+				}
+
+			  ],
+
+			  "Logging":
 				[
 				  {
-					"Location":
-					{
-					  "Sampling_rate": "default"
-					}
-
+					"Id": 1,
+					"Source": "Location"
 				  },
 				  {
-				  	"ActivityRecognition":
-					{
-					  "Sampling_rate": "default"
-					}
+					"Id": 2,
+				  	"Source": "ActivityRecognition"
 				  },
 				  {
-					"Sensor.Proximity":{
-					  "Sampling_rate": "default"
-					}
+					"Id": 3,
+					"Source": "Sensor.Proximity"
 				  },
 				  {
-					"Sensor.Accelerometer":{
-					  "Sampling_rate": "default"
-					}
+					"Id": 4,
+					"Source": "Sensor.Accelerometer"
 				  },
 				  {
-					"Sensor.Light":{
-					  "Sampling_rate": "default"
-					}
+					"Id": 5,
+					"Source": "Sensor.Light"
 				  },
 				  {
-					"Sensor.Pressure":{
-					  "Sampling_rate": "default"
-					}
+					"Id": 6,
+					"Source": "Sensor.Pressure"
 				  }
 
 				],
@@ -165,6 +166,7 @@
 					"Execution_style":"one_time",
 					"Type": "saving_record",
 					"Name": "recording context",
+					"Logging_id":"1,2,3",
 					"Control":{
 					  "Start":
 					  [

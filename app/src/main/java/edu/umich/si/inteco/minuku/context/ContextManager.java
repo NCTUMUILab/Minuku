@@ -119,7 +119,7 @@ public class ContextManager {
 
     private static ArrayList<Circumstance> mCircumstanceList;
 
-    private static ArrayList<LoggingTask> mLoggingTasKList;
+    private static ArrayList<LoggingTask> mLoggingTaskList;
 
 
     //handle the local SQLite operation
@@ -155,7 +155,7 @@ public class ContextManager {
 
         mCircumstanceList = new ArrayList<Circumstance>();
 
-        mLoggingTasKList = new ArrayList<LoggingTask>();
+        mLoggingTaskList = new ArrayList<LoggingTask>();
 
 		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
         //initiate the RecordPool
@@ -628,7 +628,6 @@ public class ContextManager {
     }
 
 
-
     public static void removeCircumstance(Circumstance circumstance){
         if (mCircumstanceList !=null){
             mCircumstanceList.remove(circumstance);
@@ -641,23 +640,23 @@ public class ContextManager {
         }
     }
 
-    
+
     public static void addLoggingTask(LoggingTask task){
-        if (mLoggingTasKList == null) {
-            mLoggingTasKList = new ArrayList<LoggingTask>();
+        if (mLoggingTaskList == null) {
+            mLoggingTaskList = new ArrayList<LoggingTask>();
         }
-        mLoggingTasKList.add(task);
+        mLoggingTaskList.add(task);
     }
 
     public static void removeLoggingTask(LoggingTask task) {
-        if (mLoggingTasKList != null) {
-            mLoggingTasKList.remove(task);
+        if (mLoggingTaskList != null) {
+            mLoggingTaskList.remove(task);
         }
     }
 
     public static void removeLoggingTask(int index) {
-        if (mLoggingTasKList != null) {
-            mLoggingTasKList.remove(index);
+        if (mLoggingTaskList != null) {
+            mLoggingTaskList.remove(index);
         }
     }
 

@@ -281,6 +281,9 @@ public class ConfigurationManager {
 
 				loggingJSON  = loggingJSONArray.getJSONObject(i);
 
+				String source = loggingJSON.getString(CONDITION_PROPERTIES_SOURCE);
+
+
 
 
 
