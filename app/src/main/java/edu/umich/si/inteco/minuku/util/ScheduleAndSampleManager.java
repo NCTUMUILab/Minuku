@@ -649,7 +649,7 @@ public class ScheduleAndSampleManager {
 
                 //add info to the intent, including triggered object id, and the request code.
                 //id
-                bundle.putInt(ActionManager.ACTION_PROPERTIES_ID, ac.getId());
+                bundle.putInt(ConfigurationManager.ACTION_PROPERTIES_ID, ac.getId());
                 //request code: use the time as its request code (so that it's kind of unique
                 bundle.putInt(ALARM_REQUEST_CODE, request_code);
 
@@ -951,7 +951,7 @@ public class ScheduleAndSampleManager {
     			Log.d(LOG_TAG, "In ActionAlarmReceiver ");
     			
     			//based on the action type, choose which action to do
-    			int acId = intent.getIntExtra(ActionManager.ACTION_PROPERTIES_ID, 0);
+    			int acId = intent.getIntExtra(ConfigurationManager.ACTION_PROPERTIES_ID, 0);
     			
     			/**retrieve action according to the action id**/
     			//int acId = bundle.getInt(ActionManager.ACTION_PROPERTIES_ID);

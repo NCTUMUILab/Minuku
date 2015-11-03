@@ -19,6 +19,7 @@ import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.ActionManager;
+import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
@@ -378,7 +379,7 @@ public class RecordSectionFragment extends Fragment{
         Bundle bundle = new Bundle();
         bundle.putInt(DatabaseNameManager.COL_SESSION_ID, sessionId);
         //if we enter the list recording interface by clicking the labeling button, the review mode should be "NA", i.e. users are returning to the recording fragment
-        bundle.putString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_NONE);
+        bundle.putString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_NONE);
 
         Intent intent = new Intent(getActivity(), AnnotateActivity.class);
         intent.putExtras(bundle);

@@ -102,6 +102,15 @@ public class ActionManager {
 	public static final int ACTION_CONTROL_TYPE_CANCEL = 4;
 	public static final int ACTION_CONTROL_TYPE_RESUME = 5;
 
+    /** ProbeObject Class**/
+    public static final String ACTION_TRIGGER_CLASS_EVENT= "Circumstance";
+    public static final String ACTION_TRIGGER_CLASS_ACTION_STOP= "Action.Stop";
+    public static final String ACTION_TRIGGER_CLASS_ACTION_START= "Action.Start";
+    public static final String ACTION_TRIGGER_CLASS_ACTION_PAUSE= "Action.Pause";
+    public static final String ACTION_TRIGGER_CLASS_ACTION_RESUME= "Action.Resume";
+    public static final String ACTION_TRIGGER_CLASS_ACTION_CANCEL= "Action.Cancel";
+    public static final String ACTION_TRIGGER_CLASS_ACTIONCONTROL= "ActionControl";
+
 
 
     //for running the runningAction thread

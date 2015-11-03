@@ -3,6 +3,7 @@ package edu.umich.si.inteco.minuku.model.actions;
 import android.util.Log;
 
 import edu.umich.si.inteco.minuku.util.ActionManager;
+import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
 
 /**
@@ -14,7 +15,7 @@ public class AnnotateRecordingAction extends  Action{
     private String mMode = RecordingAndAnnotateManager.ANNOTATE_MODE_MANUAL;
     //Recording Type: 1: new recording, 2: backgroudn recording. By default the recording type is new recording
     private String mRecordingType = RecordingAndAnnotateManager.ANNOTATE_RECORDING_NEW;
-    private String mVizType = ActionManager.ACTION_PROPERTIES_VIZUALIZATION_TYPE;
+    private String mVizType = ConfigurationManager.ACTION_PROPERTIES_VIZUALIZATION_TYPE;
     private boolean mAllowAnnotationInProcess = false;
     private String mReviewRecordingMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_NONE;
     private boolean mRecordingStartByUser  = false;

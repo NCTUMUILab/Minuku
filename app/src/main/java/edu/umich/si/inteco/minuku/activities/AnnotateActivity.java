@@ -33,6 +33,7 @@ import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.ActionManager;
+import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
@@ -74,9 +75,9 @@ public class AnnotateActivity extends Activity implements OnItemSelectedListener
         Bundle bundle = getIntent().getExtras();
 
         //know whether we should start a new recording if we haven't started one
-        boolean startRecording = bundle.getBoolean(ActionManager.ACTION_PROPERTIES_RECORDING_STARTED_BY_USER, false);
+        boolean startRecording = bundle.getBoolean(ConfigurationManager.ACTION_PROPERTIES_RECORDING_STARTED_BY_USER, false);
         Log.d(LOG_TAG, "[test start annotate recording] startRecording " + startRecording);
-        String reviewMode = bundle.getString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_NONE);
+        String reviewMode = bundle.getString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_NONE);
         mReviewMode =reviewMode;
 
         Log.d(LOG_TAG, "[test start annotate recording] review mode:" + mReviewMode);

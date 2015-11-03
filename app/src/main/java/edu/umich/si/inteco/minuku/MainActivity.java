@@ -20,6 +20,7 @@ import edu.umich.si.inteco.minuku.Fragments.RecordSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.TaskSectionFragment;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.ActionManager;
+import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
 
@@ -138,9 +139,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         if (bundle!=null ) {
 
-            if (bundle.containsKey(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING)) {
+            if (bundle.containsKey(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING)) {
 
-                String reviewMode = bundle.getString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING);
+                String reviewMode = bundle.getString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING);
                 if (reviewMode!=null){
                     mReviewMode = reviewMode;
                     //showRecordingList(mReviewMode);

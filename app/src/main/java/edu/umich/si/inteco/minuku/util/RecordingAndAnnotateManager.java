@@ -210,7 +210,7 @@ public class RecordingAndAnnotateManager {
             Bundle bundle = new Bundle();
 
             //indicate which session
-            bundle.putString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, reviewMode);
+            bundle.putString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, reviewMode);
             bundle.putString("launchTab", Constants.MAIN_ACTIVITY_TAB_RECORDINGS);
             Intent intent = new Intent(mContext, MainActivity.class);
             intent.putExtras(bundle);

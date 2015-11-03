@@ -22,6 +22,7 @@ import edu.umich.si.inteco.minuku.MainActivity;
 import edu.umich.si.inteco.minuku.adapters.RecordingListAdapter;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.util.ActionManager;
+import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
@@ -162,7 +163,7 @@ public class ListRecordingSectionFragment extends Fragment {
 
         Bundle bundle = new Bundle();
         bundle.putInt(DatabaseNameManager.COL_SESSION_ID, (int) session.getId());
-        bundle.putString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, mReviewMode);
+        bundle.putString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, mReviewMode);
         Intent intent = new Intent(getActivity(), AnnotateActivity.class);
         intent.putExtras(bundle);
 

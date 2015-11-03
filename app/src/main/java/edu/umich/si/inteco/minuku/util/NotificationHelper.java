@@ -103,7 +103,7 @@ public class NotificationHelper {
         Bundle bundle = new Bundle();
 
         //indicate which session
-        bundle.putString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, reviewMode);
+        bundle.putString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, reviewMode);
         Intent intent = new Intent(mContext, ListRecordingActivity.class);
         intent.putExtras(bundle);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -189,7 +189,7 @@ public class NotificationHelper {
 
         bundle.putInt(DatabaseNameManager.COL_SESSION_ID, sessionId);
         //indicate whether we should start a new recoridng
-        bundle.putBoolean(ActionManager.ACTION_PROPERTIES_RECORDING_STARTED_BY_USER, startRecording);
+        bundle.putBoolean(ConfigurationManager.ACTION_PROPERTIES_RECORDING_STARTED_BY_USER, startRecording);
         bundle.putInt("annotateRecordingActionId", annotateRecordingActionId);
         intent.putExtras(bundle);
 

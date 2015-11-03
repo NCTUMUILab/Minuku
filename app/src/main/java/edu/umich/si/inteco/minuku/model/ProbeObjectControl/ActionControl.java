@@ -10,6 +10,7 @@ import edu.umich.si.inteco.minuku.model.Schedule;
 import edu.umich.si.inteco.minuku.model.TriggerLink;
 import edu.umich.si.inteco.minuku.model.actions.Action;
 import edu.umich.si.inteco.minuku.util.ActionManager;
+import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 import edu.umich.si.inteco.minuku.util.TriggerManager;
 
@@ -44,17 +45,17 @@ public class ActionControl extends ProbeObject {
 		
 		
 		try {
-			_launch = jsonObject.getString(ActionManager.ACTION_PROPERTIES_LAUNCH);
+			_launch = jsonObject.getString(ConfigurationManager.ACTION_PROPERTIES_LAUNCH);
 			
 			//if the control is triggered by an ProbeObject
-			if (jsonObject.has(ActionManager.ACTION_PROPERTIES_TRIGGER)){
+			if (jsonObject.has(ConfigurationManager.ACTION_PROPERTIES_TRIGGER)){
 				
-				JSONObject triggerJSON = jsonObject.getJSONObject(ActionManager.ACTION_PROPERTIES_TRIGGER);
+				JSONObject triggerJSON = jsonObject.getJSONObject(ConfigurationManager.ACTION_PROPERTIES_TRIGGER);
 				
 				//1. get properties of the trigger
-				String trigger_class = triggerJSON.getString(ActionManager.ACTION_TRIGGER_CLASS_PROPERTIES);
-				int trigger_id = triggerJSON.getInt(ActionManager.ACTION_PROPERTIES_ID);
-				float sampling_rate = (float) triggerJSON.getDouble(ActionManager.ACTION_TRIGGER_PROPERTIES_SAMPLING_RATE);	
+				String trigger_class = triggerJSON.getString(ConfigurationManager.ACTION_TRIGGER_CLASS_PROPERTIES);
+				int trigger_id = triggerJSON.getInt(ConfigurationManager.ACTION_PROPERTIES_ID);
+				float sampling_rate = (float) triggerJSON.getDouble(ConfigurationManager.ACTION_TRIGGER_PROPERTIES_SAMPLING_RATE);
 				
 				//needs to know this action control is used in which study
 				int study_id = this.getAction().getStudyId();
@@ -76,9 +77,9 @@ public class ActionControl extends ProbeObject {
 			}
 			
 			//if the ActionControl has the schedule componen 
-			if (jsonObject.has(ActionManager.ACTION_PROPERTIES_SCHEDULE)){
+			if (jsonObject.has(ConfigurationManager.ACTION_PROPERTIES_SCHEDULE)){
 				
-				JSONObject scheduleJSON = jsonObject.getJSONObject(ActionManager.ACTION_PROPERTIES_SCHEDULE);
+				JSONObject scheduleJSON = jsonObject.getJSONObject(ConfigurationManager.ACTION_PROPERTIES_SCHEDULE);
 				
 				//each actionControl has one schedule and one trigger (to simplify the relationships between trigger and schedule...)
 				this.mSchedule = loadScheduleFromJSON(scheduleJSON);

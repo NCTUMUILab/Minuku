@@ -17,6 +17,7 @@ import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.adapters.RecordingListAdapter;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.util.ActionManager;
+import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
@@ -44,7 +45,7 @@ public class ListRecordingActivity extends Activity{
 
         Bundle bundle = new Bundle();
         bundle.putInt(DatabaseNameManager.COL_SESSION_ID, (int) session.getId());
-        bundle.putString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, mReviewMode);
+        bundle.putString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING, mReviewMode);
         Intent intent = new Intent(this, AnnotateActivity.class);
         intent.putExtras(bundle);
 
@@ -102,7 +103,7 @@ public class ListRecordingActivity extends Activity{
         super.onResume();  // Always call the superclass method first
 
         Bundle bundle = getIntent().getExtras();
-        String reviewMode = bundle.getString(ActionManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING);
+        String reviewMode = bundle.getString(ConfigurationManager.ACTION_PROPERTIES_ANNOTATE_REVIEW_RECORDING);
         if (reviewMode!=null)
             mReviewMode = reviewMode;
 
