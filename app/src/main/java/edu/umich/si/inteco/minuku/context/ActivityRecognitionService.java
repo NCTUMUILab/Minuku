@@ -70,7 +70,8 @@ public class ActivityRecognitionService extends IntentService {
                 //after we get activity information from Google's Play service, we update the activity information
                 //in ActitivityRecognition Manager
 
-                //ActivityRecognitionManager.setActivities(mProbableActivities, mMostProbableActivity);
+//                ActivityRecognitionManager.setActivities(mProbableActivities, mMostProbableActivity);
+                  ActivityRecognitionManager.setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
                 if (Constants.isTestingActivity) {
                 	sendNotification();

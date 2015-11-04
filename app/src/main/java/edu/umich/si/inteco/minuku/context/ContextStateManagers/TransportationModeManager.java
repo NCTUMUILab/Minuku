@@ -105,18 +105,16 @@ public class TransportationModeManager extends ContextStateManager {
         long detectionTime = record.getDetectionTime();
 
 
-        Log.d(LOG_TAG, "[testing transportation] before examineTransportation. at  " +
-                ScheduleAndSampleManager.getTimeString(detectionTime) + " the acitivty is: " +
-                getActivityNameFromType(probableActivities.get(0).getType()) + ":" +
-                probableActivities.get(0).getConfidence());
+        Log.d(LOG_TAG, "[examineTransportation] " + ScheduleAndSampleManager.getTimeString(detectionTime) + " the acitivty is: " +
+                probableActivities.toString());
 
 
         //if in the static state, we try to suspect new activity
         if (getCurrentState()==STATE_STATIC) {
             //getLatestActivityRecord();
 
-            //Log.d (LOG_TAG, " examineTransportation at STATE_STATIC " +
-            //        getActivityNameFromType(getSuspectedStartActivityType()) );
+            Log.d (LOG_TAG, " examineTransportation at STATE_STATIC " +
+                    getActivityNameFromType(getSuspectedStartActivityType()) );
 
 
             //if the detected activity is vehicle, bike or on foot, then we suspect the activity from now
@@ -133,7 +131,7 @@ public class TransportationModeManager extends ContextStateManager {
                 //set suspect time
                 setSuspectTime(detectionTime);
 
-           //     Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()) );
+                Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()));
 
                 LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                         LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -162,7 +160,7 @@ public class TransportationModeManager extends ContextStateManager {
                     //set the suspect time so that other class can access it.(startTime is when we think the transportation starts)
                     setSuspectTime(startTime);
 
-//                    Log.d (LOG_TAG, " examineTransportation [confiremd start activity]  " + getActivityNameFromType(getConfirmedActivityType()) + " entering state " + getStateName(getCurrentState()) );
+                    Log.d (LOG_TAG, " examineTransportation [confiremd start activity]  " + getActivityNameFromType(getConfirmedActivityType()) + " entering state " + getStateName(getCurrentState()));
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -180,7 +178,7 @@ public class TransportationModeManager extends ContextStateManager {
 
                     setSuspectTime(0);
 
-            //        Log.d (LOG_TAG, " examineTransportation [cancel activity suspection], back to state " + getStateName(getCurrentState()) );
+                    Log.d (LOG_TAG, " examineTransportation [cancel activity suspection], back to state " + getStateName(getCurrentState()));
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -207,7 +205,7 @@ public class TransportationModeManager extends ContextStateManager {
                 //set suspect time
                 setSuspectTime(detectionTime);
 
-           //     Log.d (LOG_TAG, " examineTransportation [detected stop possible activity] " + getActivityNameFromType(getSuspectedStopActivityType()) + " entering state " + getStateName(getCurrentState())  );
+                Log.d (LOG_TAG, " examineTransportation [detected stop possible activity] " + getActivityNameFromType(getSuspectedStopActivityType()) + " entering state " + getStateName(getCurrentState()));
 
 
                 LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
@@ -241,7 +239,7 @@ public class TransportationModeManager extends ContextStateManager {
                     //set the suspect time so that other class can access it.(startTime is when we think the transportation starts)
                     setSuspectTime(startTime);
 
-//                    Log.d (LOG_TAG, " examineTransportation [stop activity], entering state" + getStateName(getCurrentState()) );
+                    Log.d (LOG_TAG, " examineTransportation [stop activity], entering state" + getStateName(getCurrentState()));
 
 
                 }
@@ -253,7 +251,7 @@ public class TransportationModeManager extends ContextStateManager {
 
                     setSuspectedStartActivityType(NO_ACTIVITY_TYPE);
 
-         //           Log.d (LOG_TAG, " examineTransportation [still maintain confirmed]" + getActivityNameFromType(getConfirmedActivityType()) + " still in the state " + getStateName(getCurrentState()));
+                    Log.d (LOG_TAG, " examineTransportation [still maintain confirmed]" + getActivityNameFromType(getConfirmedActivityType()) + " still in the state " + getStateName(getCurrentState()));
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -281,8 +279,8 @@ public class TransportationModeManager extends ContextStateManager {
 
                 if (isTimeToConfirm) {
 
-     //               Log.d (LOG_TAG, " examineTransportation yes it's good time to confirm whether we can change the suspection for "
-       //                     + getActivityNameFromType(probableActivities.get(0).getType()));
+                    Log.d (LOG_TAG, " examineTransportation yes it's good time to confirm whether we can change the suspection for "
+                            + getActivityNameFromType(probableActivities.get(0).getType()));
 
                     long startTime = detectionTime - getWindowLengh(probableActivities.get(0).getType(), STATE_SUSPECTING_START) ;
                     long endTime = detectionTime;
@@ -306,7 +304,7 @@ public class TransportationModeManager extends ContextStateManager {
 
                         setSuspectedStartActivityType(probableActivities.get(0).getType());
 
-           //             Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()) );
+                        Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()));
 
                         //start suspecting new activity
                         setSuspectTime(detectionTime);

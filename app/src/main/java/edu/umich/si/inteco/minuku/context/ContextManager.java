@@ -561,8 +561,8 @@ public class ContextManager {
                         ActivityRecognitionManager.setLatestDetectionTime(
                                 TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getTimestamp());
                     }
-
                     testActivityRecordIndex+=1;
+
 
                 //Recording is one of the types of actions that users need to put into the configuration.
                 //However, now we want to enable background recording so that we can monitor circumstances.
