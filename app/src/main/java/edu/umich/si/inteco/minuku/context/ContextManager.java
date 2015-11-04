@@ -72,6 +72,11 @@ public class ContextManager {
 
 
     public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION = "ActivityRecognition";
+    public static final String CONTEXT_SOURCE_NAME_LOCATION = "Location";
+    public static final String CONTEXT_SOURCE_NAME_SENSOR = "Sensor";
+    public static final String CONTEXT_SOURCE_NAME_SENSOR_PROXIMITY = "Sensor.Proximity";
+    public static final String CONTEXT_SOURCE_NAME_SENSPR_ACCELEROMETER = "Sensor.Accelerometer";
+    public static final String CONTEXT_SOURCE_NAME_SENSPR_LIGHT = "Sensor.Light";
 
 
     /*RECORD TYPE NAME*/
@@ -120,7 +125,6 @@ public class ContextManager {
     private static ArrayList<Circumstance> mCircumstanceList;
 
     private static ArrayList<LoggingTask> mLoggingTaskList;
-
 
     //handle the local SQLite operation
   	private static LocalDBHelper mLocalDBHelpder;
@@ -359,13 +363,21 @@ public class ContextManager {
     }
 
 
-    private static String getContextStateManagerName(String conditionSource) {
+    private static String getContextStateManagerName(String source) {
 
         String name = null;
 
-        if (conditionSource.equals(CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
+        if (source.equals(CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
             return CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION;
         }
+        else if (source.equals(CONTEXT_SOURCE_NAME_LOCATION)){
+            return CONTEXT_STATE_MANAGER_LOCATION;
+        }
+        else if (source.contains("Sensor") ) {
+            return CONTEXT_STATE_MANAGER_PHONE_SENSOR;
+        }
+
+
 
         return name;
     }
@@ -550,7 +562,7 @@ public class ContextManager {
                 /** test transporation : feed datain to the datapool**/
 
                  //REPLAY ACTIIVITY LOG
-
+/**
                     if (testActivityRecordIndex<TransportationModeManager.getActivityRecords().size()){
                         Log.d(LOG_TAG, "[testing transportation] Feed the " + testActivityRecordIndex + " record :"
                         + TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
@@ -562,7 +574,7 @@ public class ContextManager {
                                 TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getTimestamp());
                     }
                     testActivityRecordIndex+=1;
-
+**/
 
                 //Recording is one of the types of actions that users need to put into the configuration.
                 //However, now we want to enable background recording so that we can monitor circumstances.

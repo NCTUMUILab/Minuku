@@ -19,7 +19,7 @@ import edu.umich.si.inteco.minuku.Constants;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class LocationManager implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
+public class LocationManager extends ContextStateManager implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 
 	/** Tag for logging. */
     private static final String LOG_TAG = "LocationManager";
@@ -304,6 +304,11 @@ public class LocationManager implements ConnectionCallbacks, OnConnectionFailedL
             requestLocationUpdate();
         }
 
+
+    }
+
+    @Override
+    public void saveRecordsInLocalRecordPool() {
 
     }
 

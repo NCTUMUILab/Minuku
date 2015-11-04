@@ -38,13 +38,12 @@ public class ActivityRecognitionManager extends ContextStateManager
 
 
     /**ContextSourceType**/
-    public static final int CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES = 0;
-    public static final int CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES = 1;
+    public static final int CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES = 0;
+    public static final int CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = 1;
 
-
-    public static final String CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING = "mostProbableActivities";
-    public static final String CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING = "allProbableActivities";
-
+    public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION = "ActivityRecognition";
+    public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING = "AR.MostProbableActivities";
+    public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES_STRING = "AR.AllProbableActivities";
 
     /**label **/
     public static final String IN_VEHICLE_STRING = "in_vehicle";
@@ -122,20 +121,38 @@ public class ActivityRecognitionManager extends ContextStateManager
         //add ActivityRecognition
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING,
-                        CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES,
+                        CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING,
+                        CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES,
                         isAvailable));
 
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING,
-                        CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES,
+                        CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES_STRING,
+                        CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES,
                         isAvailable));
 
         return;
 
     }
 
+
+    /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
+     * e.g sampling rate. */
+    public static void updateContextSourceList(String source, int samplingRate){
+
+        //update all sources if the source name is a general name (e.g. ActivityRecognition)
+        if (source.equals(CONTEXT_SOURCE_ACTIVITY_RECOGNITION)) {
+            getContextSourceBySourceName(CONTEXT_SOURCE_ACTIVITY_RECOGNITION).setSamplingRate(samplingRate);
+        }
+
+        //update individual sources by source name
+        else {
+            if (getContextSourceBySourceName(source)!=null){
+                getContextSourceBySourceName(source).setSamplingRate(samplingRate);
+            }
+
+        }
+    }
 
     /**
      * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the
@@ -337,12 +354,12 @@ public class ActivityRecognitionManager extends ContextStateManager
         setMostProbableActivity(mostProbableActivity);
 
         //after update activity information, update the values of the states
-        updateStateValues(CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES);
+        updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
     }
 
     public static void setProbableActivities(List<DetectedActivity> probableActivities) {
         sProbableActivities = probableActivities;
-        setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
+//        setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
         //store activityRecord
         ActivityRecord record = new ActivityRecord();
@@ -361,7 +378,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         sMostProbableActivity = mostProbableActivity;
 //        Log.d(LOG_TAG, "set most probsble: inside sMostProbableActivity: " + mostProbableActivity);
         //after update activity information, update the values of the states
-        updateStateValues(CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES);
+        updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
     }
 
     public static long getLatestDetectionTime() {
@@ -558,7 +575,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         //1 first we need to get the right source based on the sourcetype.
         //so that we know where the get the source value.
         //
-        if (sourceType==CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES){
+        if (sourceType==CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES){
 
 
             if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
@@ -566,7 +583,7 @@ public class ActivityRecognitionManager extends ContextStateManager
             }
         }
 
-        else if (sourceType==CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES){
+        else if (sourceType==CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES){
 
             String sourceValue=null;
 
@@ -597,13 +614,13 @@ public class ActivityRecognitionManager extends ContextStateManager
 
         switch (sourceName){
 
-            case CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING:
-                return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES;
-            case CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING:
-                return CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES;
+            case CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING:
+                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES;
+            case CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES_STRING:
+                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES;
             //the default is most probable activities
             default:
-                return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES;
+                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES;
         }
     }
 
@@ -611,12 +628,12 @@ public class ActivityRecognitionManager extends ContextStateManager
 
         switch (sourceType){
 
-            case CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES:
-                return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING;
-            case CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES:
-                return CONTEXT_SOURCE_ALL_PROBABLE_ACTIVITIES_STRING;
+            case CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES:
+                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING;
+            case CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES:
+                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES_STRING;
             default:
-                return CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES_STRING;
+                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING;
 
         }
     }

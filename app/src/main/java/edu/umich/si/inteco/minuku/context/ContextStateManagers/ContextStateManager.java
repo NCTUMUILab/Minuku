@@ -2,9 +2,7 @@ package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Condition;
@@ -13,7 +11,6 @@ import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
 import edu.umich.si.inteco.minuku.model.record.Record;
-import edu.umich.si.inteco.minuku.util.ConditionManager;
 
 
 public abstract class ContextStateManager {
@@ -54,7 +51,7 @@ public abstract class ContextStateManager {
     protected static ArrayList<Record> mLocalRecordPool;
     protected static ArrayList<Condition> mConditions;
     protected static ArrayList<StateMappingRule> mStateMappingRules;
-    protected static ArrayList<State> mStateList;
+    protected static ArrayList<State> mStates;
     /**each contextStateManager has a list of ContextSource available for use**/
     protected static ArrayList<ContextSource> mContextSourceList;
 
@@ -67,6 +64,16 @@ public abstract class ContextStateManager {
     /** each ContextStateManager should override this static method
      * it adds a list of ContextSource that it will manage **/
     protected static void setUpContextSourceList(){
+        return;
+    }
+
+    /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
+     * e.g sampling rate. */
+    public static void updateContextSourceList(String source, int samplingRate){
+
+        //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
+
+        //2. update individual source by souce name .
         return;
     }
 
@@ -84,7 +91,7 @@ public abstract class ContextStateManager {
     public ContextStateManager() {
         mLocalRecordPool = new ArrayList<Record>();
         mStateMappingRules = new ArrayList<StateMappingRule>();
-        mStateList = new ArrayList<State>();
+        mStates = new ArrayList<State>();
         mContextSourceList = new ArrayList<ContextSource>();
         setUpContextSourceList();
     }
@@ -107,11 +114,11 @@ public abstract class ContextStateManager {
     public static void updateMonitoredState(StateMappingRule rule) {
 
         //we reset the stateList
-        mStateList.clear();
+        mStates.clear();
 
         State state = new State(rule);
         //we add the state into the StateList
-        mStateList.add(state);
+        mStates.add(state);
         Log.d(LOG_TAG, "[testing stateMappingRule] creating state: " + state.getName() + " current value: " + state.getValue());
     }
 
@@ -281,15 +288,15 @@ public abstract class ContextStateManager {
     }
 
     public static ArrayList<State> getStateList() {
-        return mStateList;
+        return mStates;
     }
 
     public static void setStateList(ArrayList<State> stateList) {
-        ContextStateManager.mStateList = stateList;
+        ContextStateManager.mStates = stateList;
     }
 
     public static void addState(State state){
-        mStateList.add(state);
+        mStates.add(state);
     }
 
     public static ArrayList<StateMappingRule> getStateMappingRules() {
@@ -449,6 +456,17 @@ public abstract class ContextStateManager {
         }
         else
             return -1;
+    }
+
+
+    public static ContextSource getContextSourceBySourceName(String sourceName) {
+
+        for (int i=0; i<mContextSourceList.size(); i++){
+            if (mContextSourceList.get(i).getName().equals(sourceName))
+                return mContextSourceList.get(i);
+        }
+
+        return null;
     }
 
     public static String getRelationshipName(int relationship) {

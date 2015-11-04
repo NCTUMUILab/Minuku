@@ -11,10 +11,14 @@ import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
+import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
@@ -73,6 +77,9 @@ public class ConfigurationManager {
 	public static final String CONDITION_PROPERTIES_TIME_CRITERION ="Time_Criteria";
 
 	//within content
+
+	/**CONTEXT SOURCE PROPERTIES**/
+	public static final String CONTEXTSOURCE_SETTING_PROPERTIES_SAMPLING_RATE= "Sampling_rate";
 
 	/**ACTION PROPERTIES**/
 	public static final String ACTION_PROPERTIES_ID = "Id";
@@ -336,8 +343,7 @@ public class ConfigurationManager {
 				//create logging task object
 				LoggingTask loggingTask = new LoggingTask(id, source);
 
-				//
-
+				//add logging task to ContextManager.
 				ContextManager.addLoggingTask(loggingTask);
 
 			}
@@ -351,6 +357,27 @@ public class ConfigurationManager {
 	}
 
 	/**
+	 * according to the source name we go to each ContextStateManager to adjust the setting.
+	 * @param source
+	 * @param samplingRate
+	 */
+	private static void configureContextStateSource(String source, int samplingRate) {
+
+		if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
+			ActivityRecognitionManager.updateContextSourceList(source, samplingRate);
+		}
+		else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
+			PhoneSensorManager.updateContextSourceList(source, samplingRate);
+		}
+		else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
+			LocationManager.updateContextSourceList(source, samplingRate);;
+
+		}
+
+	}
+
+
+	/**
 	 * users only list contextsources that are not using the default setting
 	 * @param settingJSONArray
 	 * @param study_id
@@ -361,17 +388,24 @@ public class ConfigurationManager {
 
 		for (int i =0; i<settingJSONArray.length(); i++) {
 
-			JSONObject loggingJSON = null;
+			JSONObject settingJSON = null;
 
 			try {
 
-				loggingJSON  = settingJSONArray.getJSONObject(i);
+				settingJSON  = settingJSONArray.getJSONObject(i);
 
-				String source = loggingJSON.getString(CONDITION_PROPERTIES_SOURCE);
+				//every source setting should specify the source. If a source is not listed, we use the default
+				String source = settingJSON.getString(CONFIGURATION_PROPERTIES_SOURCE);
 
+				//the defaul is -1, i.e. using the default value.
+				int sampling_rate = -1;
 
+				if (settingJSON.has(CONTEXTSOURCE_SETTING_PROPERTIES_SAMPLING_RATE)){
+					sampling_rate = settingJSON.getInt(CONTEXTSOURCE_SETTING_PROPERTIES_SAMPLING_RATE);
+				}
 
-
+				//adjust the setting based on the source
+				configureContextStateSource(source, sampling_rate);
 
 
 			}
