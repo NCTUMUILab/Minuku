@@ -18,7 +18,6 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManage
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
-import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
@@ -357,7 +356,8 @@ public class ConfigurationManager {
 	}
 
 	/**
-	 * according to the source name we go to each ContextStateManager to adjust the setting.
+	 * according to the source name we go to each ContextStateManager to update each ContextSource.
+	 * A ContextManager will maintain a list of ContextSouce that it manages to get information.
 	 * @param source
 	 * @param samplingRate
 	 */
@@ -400,13 +400,13 @@ public class ConfigurationManager {
 				//the defaul is -1, i.e. using the default value.
 				int sampling_rate = -1;
 
+				//get sampling rate
 				if (settingJSON.has(CONTEXTSOURCE_SETTING_PROPERTIES_SAMPLING_RATE)){
 					sampling_rate = settingJSON.getInt(CONTEXTSOURCE_SETTING_PROPERTIES_SAMPLING_RATE);
 				}
 
-				//adjust the setting based on the source
+				//update the setting based on the name of the source
 				configureContextStateSource(source, sampling_rate);
-
 
 			}
 			catch (JSONException e1) {

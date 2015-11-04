@@ -42,8 +42,8 @@ public class ActivityRecognitionManager extends ContextStateManager
     public static final int CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = 1;
 
     public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION = "ActivityRecognition";
-    public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING = "AR.MostProbableActivities";
-    public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES_STRING = "AR.AllProbableActivities";
+    public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES = "AR.MostProbableActivities";
+    public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = "AR.AllProbableActivities";
 
     /**label **/
     public static final String IN_VEHICLE_STRING = "in_vehicle";
@@ -121,13 +121,13 @@ public class ActivityRecognitionManager extends ContextStateManager
         //add ActivityRecognition
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING,
+                        STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES,
                         CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES,
                         isAvailable));
 
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES_STRING,
+                        STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES,
                         CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES,
                         isAvailable));
 
@@ -614,9 +614,9 @@ public class ActivityRecognitionManager extends ContextStateManager
 
         switch (sourceName){
 
-            case CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING:
+            case STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES:
                 return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES;
-            case CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES_STRING:
+            case STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES:
                 return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES;
             //the default is most probable activities
             default:
@@ -629,11 +629,11 @@ public class ActivityRecognitionManager extends ContextStateManager
         switch (sourceType){
 
             case CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES:
-                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING;
+                return STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES;
             case CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES:
-                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES_STRING;
+                return STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES;
             default:
-                return CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES_STRING;
+                return STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES;
 
         }
     }

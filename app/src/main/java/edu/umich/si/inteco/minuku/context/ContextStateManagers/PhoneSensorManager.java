@@ -8,6 +8,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
 
 public class PhoneSensorManager extends ContextStateManager implements SensorEventListener {
@@ -28,7 +30,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     /**system components**/
     private static Context mContext;
-    private SensorManager mSensorManager ;
+    private static SensorManager mSensorManager ;
 
     /**Motion Sensors**/
     private static float mAccele_x, mAccele_y, mAccele_z;
@@ -77,6 +79,116 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mRegisteredSensorList = new ArrayList<>();
 
     }
+
+    /** each ContextStateManager should override this static method
+     * it adds a list of ContextSource that it will manage **/
+    protected static void setUpContextSourceList(){
+
+        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager, adding two contextsource ");
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_ACCELEROMETER,
+                        Sensor.TYPE_ACCELEROMETER,
+                        //if it is not null, return true, else, return false
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null));
+
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_LINEAR_ACCELERATION,
+                        Sensor.TYPE_LINEAR_ACCELERATION,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)!=null));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_ROTATION_VECTOR,
+                        Sensor.TYPE_ROTATION_VECTOR,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!=null));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_GRAVITY,
+                        Sensor.TYPE_GRAVITY,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)!=null));
+
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_GYROSCOPE,
+                        Sensor.TYPE_GYROSCOPE,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)!=null));
+
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_LIGHT,
+                        Sensor.TYPE_LIGHT,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)!=null));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_MAGNETIC_FIELD,
+                        Sensor.TYPE_MAGNETIC_FIELD,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null));
+
+
+        mContextSourceList.add(
+                new ContextSource(
+                Sensor.STRING_TYPE_PRESSURE,
+                Sensor.TYPE_PRESSURE,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)!=null));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_PROXIMITY,
+                        Sensor.TYPE_PROXIMITY,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)!=null));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_AMBIENT_TEMPERATURE,
+                        Sensor.TYPE_AMBIENT_TEMPERATURE,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)!=null));
+
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_RELATIVE_HUMIDITY,
+                        Sensor.TYPE_RELATIVE_HUMIDITY,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY)!=null));
+
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_ROTATION_VECTOR,
+                        Sensor.TYPE_ROTATION_VECTOR,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!=null));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_STEP_COUNTER,
+                        Sensor.TYPE_STEP_COUNTER,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)!=null));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_STEP_DETECTOR,
+                        Sensor.TYPE_STEP_DETECTOR,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)!=null));
+
+        mContextSourceList.add(
+                new ContextSource(
+                        Sensor.STRING_TYPE_HEART_RATE,
+                        Sensor.TYPE_HEART_RATE,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)!=null));
+
+
+
+        return;
+
+    }
+
 
     public boolean isExtractingPhoneSensorData() {
         return isExtractingPhoneSensorData;
