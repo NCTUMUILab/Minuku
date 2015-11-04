@@ -550,21 +550,20 @@ public class ContextManager {
                 /** test transporation : feed datain to the datapool**/
 
                  //REPLAY ACTIIVITY LOG
-/*
+
                     if (testActivityRecordIndex<TransportationModeManager.getActivityRecords().size()){
                         Log.d(LOG_TAG, "[testing transportation] Feed the " + testActivityRecordIndex + " record :"
                         + TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
                         + TransportationModeManager.getActivityNameFromType(TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities().get(0).getType())  );
 
-                        ActivityRecognitionManager.setProbableActivities(
-                                TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities());
+                        ActivityRecognitionManager.setProbableActivities(TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities());
 
                         ActivityRecognitionManager.setLatestDetectionTime(
                                 TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getTimestamp());
                     }
 
                     testActivityRecordIndex+=1;
-*/
+
                 //Recording is one of the types of actions that users need to put into the configuration.
                 //However, now we want to enable background recording so that we can monitor circumstances.
                 //circumstanceually. If researachers do not monitor anything, this flag should be false.

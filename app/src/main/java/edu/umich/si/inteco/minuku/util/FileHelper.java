@@ -133,7 +133,7 @@ public class FileHelper {
         //testing postfiles
 
 
-        String string = loadFileFromAsset("testData4.txt");
+        String string = loadFileFromAsset("testData.txt");
         String[] lines = string.split(System.getProperty("line.separator"));
         for (int i=0; i<lines.length; i++) {
 

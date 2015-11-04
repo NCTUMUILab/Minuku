@@ -340,7 +340,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         updateStateValues(CONTEXT_SOURCE_MOST_PROBABLE_ACTIVITIES);
     }
 
-    private static void setProbableActivities(List<DetectedActivity> probableActivities) {
+    public static void setProbableActivities(List<DetectedActivity> probableActivities) {
         sProbableActivities = probableActivities;
         setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
