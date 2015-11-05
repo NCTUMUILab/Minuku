@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
@@ -48,9 +49,6 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     private float mPressure;
     private float mRelativeHumidity;
 
-    /**Store a list of sensors that PhoneSensorManager is requrested to enable*/
-    private ArrayList<Integer> mRequestedSensorList;
-
     /**Store a list of sensosr that PhoneSensorManager has registered*/
     private ArrayList<Integer> mRegisteredSensorList;
 
@@ -65,15 +63,14 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mSensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
 
         //initiate values of sensors
-        mAccele_x = mAccele_y = mAccele_z = -9999;
-        mGyroscope_x = mGyroscope_y = mGyroscope_z = -9999;
-        mGravity_x = mGravity_y = mGravity_z = -9999;
-        mMagneticField_x = mMagneticField_y = mMagneticField_z = -9999;
-        mLinearAcceleration_x = mLinearAcceleration_y = mLinearAcceleration_z = -9999;
-        mRotationVector_x_sin = mRotationVector_y_sin =  mRotationVector_z_sin = mRotationVector_cos = -9999;
-
-        //initiate requested sensor list
-        mRequestedSensorList = new ArrayList<>();
+        mAccele_x = mAccele_y = mAccele_z = Constants.NULL_NUMERIC_VALUE; //-9999
+        mGyroscope_x = mGyroscope_y = mGyroscope_z = Constants.NULL_NUMERIC_VALUE;
+        mGravity_x = mGravity_y = mGravity_z = Constants.NULL_NUMERIC_VALUE;
+        mMagneticField_x = mMagneticField_y = mMagneticField_z = Constants.NULL_NUMERIC_VALUE;
+        mLinearAcceleration_x = mLinearAcceleration_y = mLinearAcceleration_z = Constants.NULL_NUMERIC_VALUE;
+        mRotationVector_x_sin = mRotationVector_y_sin =  mRotationVector_z_sin = mRotationVector_cos = Constants.NULL_NUMERIC_VALUE;
+        mHeartRate = mStepCount = mStepDetect =Constants.NULL_NUMERIC_VALUE;
+        mLight = mPressure = mRelativeHumidity = mProximity = Constants.NULL_NUMERIC_VALUE;
 
         //initiate registered sneosr list
         mRegisteredSensorList = new ArrayList<>();
@@ -212,6 +209,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         registerRequestedSensor();
     }
 
+    /*
     protected void removeRequestedSensors () {
         mRequestedSensorList.clear();
     }
@@ -245,6 +243,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mRequestedSensorList.add(sensorType);
 
     }
+    */
 
 
     @Override
@@ -274,13 +273,19 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     /**
      * register all the requested sensor list
      */
+
     protected  void registerRequestedSensor() {
+
+        /** If for some reason you do need to change the delay, you will have to unregister and reregister the sensor listener.
+         *
+         */
 
         //we don't register any sensor if isExtractingPhoneSensorData is false.
         if (!isExtractingPhoneSensorData){
             return;
         }
         else {
+            /*
             //register all of the sensors that are requested
             for (int i=0; i<mRequestedSensorList.size(); i++){
                 boolean result =registerSensorByType(mRequestedSensorList.get(i));
@@ -290,6 +295,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
                     mRegisteredSensorList.add(mRequestedSensorList.get(i));
                 }
             }
+            */
         }
 
     }
