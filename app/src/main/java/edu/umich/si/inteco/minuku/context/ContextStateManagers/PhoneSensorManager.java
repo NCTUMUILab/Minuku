@@ -29,6 +29,9 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     //TODO: we set this temporarily false because we want to test nother source first
     private static boolean isExtractingPhoneSensorData = true;
 
+
+    private static String CONTEXT_SOURCE_PHONE_SENSOR = "PhoneSensor";
+
     /**system components**/
     private static Context mContext;
     private static SensorManager mSensorManager ;
@@ -50,7 +53,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     private float mRelativeHumidity;
 
     /**Store a list of sensosr that PhoneSensorManager has registered*/
-    private ArrayList<Integer> mRegisteredSensorList;
+    private ArrayList<ContextSource> mRegisteredSensorList;
 
     public PhoneSensorManager(Context context) {
 
@@ -73,7 +76,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mLight = mPressure = mRelativeHumidity = mProximity = Constants.NULL_NUMERIC_VALUE;
 
         //initiate registered sneosr list
-        mRegisteredSensorList = new ArrayList<>();
+        mRegisteredSensorList = new ArrayList<ContextSource>();
 
     }
 
@@ -88,103 +91,155 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
                         Sensor.STRING_TYPE_ACCELEROMETER,
                         Sensor.TYPE_ACCELEROMETER,
                         //if it is not null, return true, else, return false
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null));
+                        (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null),
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_LINEAR_ACCELERATION,
                         Sensor.TYPE_LINEAR_ACCELERATION,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)!=null));
+                        (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)!=null),
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_ROTATION_VECTOR,
                         Sensor.TYPE_ROTATION_VECTOR,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!=null));
+                        (mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null),
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_GRAVITY,
                         Sensor.TYPE_GRAVITY,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_GYROSCOPE,
                         Sensor.TYPE_GYROSCOPE,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_LIGHT,
                         Sensor.TYPE_LIGHT,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_MAGNETIC_FIELD,
                         Sensor.TYPE_MAGNETIC_FIELD,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
 
         mContextSourceList.add(
                 new ContextSource(
                 Sensor.STRING_TYPE_PRESSURE,
                 Sensor.TYPE_PRESSURE,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_PROXIMITY,
                         Sensor.TYPE_PROXIMITY,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_AMBIENT_TEMPERATURE,
                         Sensor.TYPE_AMBIENT_TEMPERATURE,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_RELATIVE_HUMIDITY,
                         Sensor.TYPE_RELATIVE_HUMIDITY,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_ROTATION_VECTOR,
                         Sensor.TYPE_ROTATION_VECTOR,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_STEP_COUNTER,
                         Sensor.TYPE_STEP_COUNTER,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_STEP_DETECTOR,
                         Sensor.TYPE_STEP_DETECTOR,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
                         Sensor.STRING_TYPE_HEART_RATE,
                         Sensor.TYPE_HEART_RATE,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)!=null));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)!=null,
+                        SensorManager.SENSOR_DELAY_NORMAL));
 
 
 
         return;
 
     }
+
+    /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
+     * e.g sampling rate. */
+    public static void updateContextSourceList(String source, long samplingRate){
+
+        //update all sources if the source name is a general name (e.g. ActivityRecognition)
+        if (source.equals(CONTEXT_SOURCE_PHONE_SENSOR)) {
+            for (int i=0; i<mContextSourceList.size(); i++){
+                getContextSourceBySourceName(mContextSourceList.get(i).getName()).setSamplingRate(samplingRate);
+            }
+        }
+
+        //if not using a general name, update individual sources by source name
+        else {
+            if (getContextSourceBySourceName(source)!=null){
+                getContextSourceBySourceName(source).setSamplingRate(samplingRate);
+            }
+
+        }
+
+        return;
+    }
+
+
+    /** this takes samplingMode as a String value and then use SensorManager's four update delay
+     * Normal, UI, Game, and Fatest */
+    public static void updateContextSourceList(String source, String samplingMode){
+
+        //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
+
+        //2. update individual source by souce name .
+
+
+
+        return;
+    }
+
 
 
     public boolean isExtractingPhoneSensorData() {
@@ -285,17 +340,24 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
             return;
         }
         else {
-            /*
-            //register all of the sensors that are requested
-            for (int i=0; i<mRequestedSensorList.size(); i++){
-                boolean result =registerSensorByType(mRequestedSensorList.get(i));
 
-                //if registering the requested sensor succesfully, put it in the registered sensor list
-                if (result){
-                    mRegisteredSensorList.add(mRequestedSensorList.get(i));
+            for (int i=0; i<mContextSourceList.size(); i++){
+
+                ContextSource  sensor = mContextSourceList.get(i);
+                //only register sensor that is available and is requested.
+                if (sensor.isAvailable() && sensor.isRequested()) {
+
+                    //we register sensor using its name and samplingMode: Normal, UI, Game, or Fastest
+                    boolean result =registerSensorByName(sensor.getName(), sensor.getSamplingMode());
+
+                    //if registering the requested sensor succesfully, put it in the registered sensor list
+                    if (result){
+                        mRegisteredSensorList.add(sensor);
+                    }
+
                 }
+
             }
-            */
         }
 
     }
@@ -311,94 +373,95 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     }
 
 
-
-    protected boolean registerSensorByType(int type) {
+    /** we need to use the setting: use ContextSourceList to get the setting for each ContextSource**/
+    protected boolean registerSensorByName(String name, int mode) {
 
         boolean result = false;
 
-        switch (type){
+        switch (name){
 
             //accelerometer
-            case Sensor.TYPE_ACCELEROMETER:
+            case Sensor.STRING_TYPE_ACCELEROMETER:
                 result = mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
                 //gyriscope
-            case Sensor.TYPE_GYROSCOPE:
+            case Sensor.STRING_TYPE_GYROSCOPE:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
                 //gravity
-            case Sensor.TYPE_GRAVITY:
+            case Sensor.STRING_TYPE_GRAVITY:
                 result =mSensorManager.registerListener(this,
                             mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY),
-                            SensorManager.SENSOR_DELAY_NORMAL);
+                            mode);
                 return result;
-            case Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR:
+            case Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
-            case Sensor.TYPE_LINEAR_ACCELERATION:
+            case Sensor.STRING_TYPE_LINEAR_ACCELERATION:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
 
-            case Sensor.TYPE_PROXIMITY:
+            case Sensor.STRING_TYPE_PROXIMITY:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
 
 
             //ambient temperature
-            case Sensor.TYPE_AMBIENT_TEMPERATURE:
+            case Sensor.STRING_TYPE_AMBIENT_TEMPERATURE:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
             //light
-            case Sensor.TYPE_LIGHT:
+            case Sensor.STRING_TYPE_LIGHT:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
+
                 return result;
             //pressure
-            case Sensor.TYPE_PRESSURE:
+            case Sensor.STRING_TYPE_PRESSURE:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
 
             //humidity
-            case Sensor.TYPE_RELATIVE_HUMIDITY:
+            case Sensor.STRING_TYPE_RELATIVE_HUMIDITY:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
 
 
-            case Sensor.TYPE_HEART_RATE:
+            case Sensor.STRING_TYPE_HEART_RATE:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
 
 
-            case Sensor.TYPE_STEP_COUNTER:
+            case Sensor.STRING_TYPE_STEP_COUNTER:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
 
 
-            case Sensor.TYPE_STEP_DETECTOR:
+            case Sensor.STRING_TYPE_STEP_DETECTOR:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR),
-                        SensorManager.SENSOR_DELAY_NORMAL);
+                        mode);
                 return result;
             default:
                 return result;

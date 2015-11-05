@@ -62,10 +62,15 @@ public class ActivityRecognitionManager extends ContextStateManager
     public static final int NO_ACTIVITY_TYPE = -1;
 
     //the frequency of requesting google activity from the google play service
-    public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS = 5;
+    public static int ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL_IN_SECONDS = 5;
 
-    public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL =
-            ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
+    public static long ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL =
+            ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
+
+    private static long sActivityRecognitionUpdateIntervalInSeconds = ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL_IN_SECONDS;
+
+    private static long sActivityRecognitionUpdateIntervalInMilliseconds =
+            sActivityRecognitionUpdateIntervalInSeconds * Constants.MILLISECONDS_PER_SECOND;
 
 
     private Context mContext;
@@ -118,18 +123,22 @@ public class ActivityRecognitionManager extends ContextStateManager
             isAvailable = false;
 
 
-        //add ActivityRecognition
+        //add two context sources: most probable activity and all probable activities, with defaul sampling rate.
         mContextSourceList.add(
                 new ContextSource(
                         STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES,
                         CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES,
-                        isAvailable));
+                        isAvailable,
+                        sActivityRecognitionUpdateIntervalInMilliseconds
+                        ));
 
         mContextSourceList.add(
                 new ContextSource(
                         STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES,
                         CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES,
-                        isAvailable));
+                        isAvailable,
+                        sActivityRecognitionUpdateIntervalInMilliseconds
+                ));
 
         return;
 
@@ -138,17 +147,21 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
      * e.g sampling rate. */
-    public static void updateContextSourceList(String source, int samplingRate){
+    public static void updateContextSourceList(String source, long samplingRate){
+
+        sActivityRecognitionUpdateIntervalInMilliseconds = samplingRate;
 
         //update all sources if the source name is a general name (e.g. ActivityRecognition)
         if (source.equals(CONTEXT_SOURCE_ACTIVITY_RECOGNITION)) {
-            getContextSourceBySourceName(CONTEXT_SOURCE_ACTIVITY_RECOGNITION).setSamplingRate(samplingRate);
+            for (int i = 0; i < mContextSourceList.size(); i++) {
+                getContextSourceBySourceName(mContextSourceList.get(i).getName()).setSamplingRate(sActivityRecognitionUpdateIntervalInMilliseconds);
+            }
         }
 
-        //update individual sources by source name
+        //if not using a general category, update individual sources by source name
         else {
             if (getContextSourceBySourceName(source)!=null){
-                getContextSourceBySourceName(source).setSamplingRate(samplingRate);
+                getContextSourceBySourceName(source).setSamplingRate(sActivityRecognitionUpdateIntervalInMilliseconds);
             }
 
         }
@@ -269,7 +282,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         //request activity recognition update
         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 mGoogleApiClient,                    //GoogleApiClient client
-                ACTIVITY_RECOGNITION_UPDATE_INTERVAL,//detectionIntervalMillis
+                ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL,//detectionIntervalMillis
                 mActivityRecognitionPendingIntent);   //callbackIntent
 
     }

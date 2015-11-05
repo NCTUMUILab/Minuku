@@ -361,7 +361,7 @@ public class ConfigurationManager {
 	 * @param source
 	 * @param samplingRate
 	 */
-	private static void configureContextStateSource(String source, int samplingRate) {
+	private static void configureContextStateSource(String source, long samplingRate) {
 
 		if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
 			ActivityRecognitionManager.updateContextSourceList(source, samplingRate);
@@ -371,6 +371,21 @@ public class ConfigurationManager {
 		}
 		else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
 			LocationManager.updateContextSourceList(source, samplingRate);;
+
+		}
+
+	}
+
+	private static void configureContextStateSource(String source, String samplingMode) {
+
+		if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
+			ActivityRecognitionManager.updateContextSourceList(source, samplingMode);
+		}
+		else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
+			PhoneSensorManager.updateContextSourceList(source, samplingMode);
+		}
+		else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
+			LocationManager.updateContextSourceList(source, samplingMode);;
 
 		}
 
@@ -406,7 +421,7 @@ public class ConfigurationManager {
 				}
 
 				//update the setting based on the name of the source
-				configureContextStateSource(source, sampling_rate);
+				configureContextStateSource(source, sampling_rate * Constants.MILLISECONDS_PER_SECOND);
 
 			}
 			catch (JSONException e1) {

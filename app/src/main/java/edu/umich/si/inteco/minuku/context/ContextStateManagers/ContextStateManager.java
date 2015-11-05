@@ -67,15 +67,40 @@ public abstract class ContextStateManager {
         return;
     }
 
+
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
      * e.g sampling rate. */
-    public static void updateContextSourceList(String source, int samplingRate){
+
+    public static void updateContextSourceList(String source){
 
         //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
 
         //2. update individual source by souce name .
         return;
     }
+
+
+    public static void updateContextSourceList(String source, float samplingRate){
+
+        //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
+
+        //2. update individual source by souce name .
+        return;
+    }
+
+
+    /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
+     * e.g sampling rate. */
+    public static void updateContextSourceList(String source, String samplingMode){
+
+        //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
+
+        //2. update individual source by souce name .
+        return;
+    }
+
+
+
 
     public abstract void saveRecordsInLocalRecordPool();
 
