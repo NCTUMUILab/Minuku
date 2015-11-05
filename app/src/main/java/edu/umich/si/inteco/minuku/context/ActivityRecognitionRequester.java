@@ -30,7 +30,7 @@ public class ActivityRecognitionRequester implements ConnectionCallbacks, OnConn
     //the frequency of requesting google activity from the google play service
     public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS = 5;
 
-    public static int ACTIVITY_RECOGNITION_UPDATE_INTERVAL =
+    public static long ACTIVITY_RECOGNITION_UPDATE_INTERVAL =
             ACTIVITY_RECOGNITION_UPDATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
     
     // Store the current activity recognition client

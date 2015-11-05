@@ -55,10 +55,10 @@ public class MinukuMainService extends Service {
 
     public static int DEFAULT_ACTION_RATE_INTERVAL_IN_SECONDS = 5;
 
-    public static int DEFAULT_ACTION_RATE_INTERVAL =
+    public static long DEFAULT_ACTION_RATE_INTERVAL =
             DEFAULT_ACTION_RATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
 
-    public static int DEFAULT_APP_MONITOR_RATE_INTERVAL = DEFAULT_ACTION_RATE_INTERVAL;
+    public static long DEFAULT_APP_MONITOR_RATE_INTERVAL = DEFAULT_ACTION_RATE_INTERVAL;
 
 
     /**Google Play (Location & Activity) Services*/

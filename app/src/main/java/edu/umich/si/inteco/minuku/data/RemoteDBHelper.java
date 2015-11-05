@@ -55,7 +55,7 @@ public class RemoteDBHelper {
     /** The time it takes for client to timeout */
     public static final int HTTP_TIMEOUT = 10000; // millisecond
     public static final int SOCKET_TIMEOUT = 20000; // millisecond
-    public static final int MINIMUM_UPDATE_FREQUENCY = 20* Constants.MILLISECONDS_PER_MINUTE; // 30 minutes
+    public static final long MINIMUM_UPDATE_FREQUENCY = 20* Constants.MILLISECONDS_PER_MINUTE; // 30 minutes
 
     public static final int POST_DATA_TYPE_JSON = 0;
     public static final int POST_DATA_TYPE_STRING = 1;

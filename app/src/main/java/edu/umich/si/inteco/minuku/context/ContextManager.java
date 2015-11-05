@@ -60,7 +60,7 @@ public class ContextManager {
     private static ArrayList<Record> mRecordPool;
 
     //the threshold of life of a record
-    public static int RECORD_PRESERVATION_THRESHOLD_IN_MILLISECONDS = 2 *
+    public static long RECORD_PRESERVATION_THRESHOLD_IN_MILLISECONDS = 2 *
             Constants.MILLISECONDS_PER_SECOND * Constants.SECONDS_PER_MINUTE;   //2 minutes
 
     public static final String CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION = "ActivityRecognition";
