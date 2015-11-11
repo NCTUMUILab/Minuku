@@ -15,6 +15,8 @@ import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
@@ -44,6 +46,15 @@ public class CheckinSectionFragment extends Fragment{
     private Button stopButton;
     private LinearLayout checkpointLayout;
     private static SavingRecordAction mLastUserInitiatedSavingRecordingAction;
+    private ArrayList<String> CheckpointTimeStrings;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //store information of checkpoint views
+        CheckpointTimeStrings = new ArrayList<String>();
+    }
 
     @Override
     public void onResume() {
@@ -56,6 +67,7 @@ public class CheckinSectionFragment extends Fragment{
 
         View rootView = inflater.inflate(R.layout.fragment_checkin, container, false);
 
+
 /*
             if (MinukuMainService.getCentralChrometer()==null)
                 MinukuMainService.setCentralChrometer((Chronometer) rootView.findViewById(R.id.recording_chronometer));
@@ -66,11 +78,42 @@ public class CheckinSectionFragment extends Fragment{
         stopButton = (Button) rootView.findViewById(R.id.stop_Button);
         checkpointLayout  = (LinearLayout) rootView.findViewById(R.id.checkin_layout);
 
+        Log.d(LOG_TAG, "back to creatView the base is " + MinukuMainService.getBaseForChronometer() + " there are "
+                + CheckpointTimeStrings.size() + " in the arraylist");
+
+        //if there are existing views in the arraylist, we should add it in the layout.
+
+        if (CheckpointTimeStrings.size() >0 ){
+
+            for (int i=0; i<CheckpointTimeStrings.size(); i++){
+
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+
+                layoutParams.gravity = Gravity.LEFT;
+                TextView tv = new TextView(getContext());
+                tv.setPadding(20, 0, 0, 0);// in pixels (left, top, right, bottom)
+                tv.setTextSize(18);
+                tv.setTextColor(Color.YELLOW);
+                tv.setLayoutParams(layoutParams);
+
+                //we add the current elapse time
+                int numOfCheckpoints = checkpointLayout.getChildCount();
+
+                tv.setText("check point " + numOfCheckpoints + ". " + CheckpointTimeStrings.get(i));
+
+                checkpointLayout.addView(tv);
+
+            }
+        }
+
         //the textview is based on the task of which the recording is for. By default there should be a list of task that signs up for using this interface ( the recording function
         //can be used by multiple tasks, and the user would choose which task the current recording is for.
         //For the labeling study, we change the textview based on which condition they are in
 
-        Log.d(LOG_TAG, "back to creatView the base is " + MinukuMainService.getBaseForChronometer());
+        Log.d(LOG_TAG, "back to creatView the base is " + MinukuMainService.getBaseForChronometer() + " there are "
+         + checkpointLayout.getChildCount() + " subviews in  checkpointLayout");
 
 
         //if the chrometer was running when we leave the fragment, after coming back we should recover it
@@ -126,9 +169,6 @@ public class CheckinSectionFragment extends Fragment{
                 //When the button is shown "START" we start the stopwatch
                 if (checkinButton.getText().toString().equals(getString(R.string.start_btn))){
 
-                    if (checkpointLayout.getChildCount() > 0)
-                        checkpointLayout.removeAllViews();
-
                     Log.d(LOG_TAG, "[checkin] user clicking on the START action");
 
                     MinukuMainService.setBaseForChronometer(SystemClock.elapsedRealtime());
@@ -165,6 +205,10 @@ public class CheckinSectionFragment extends Fragment{
                     tv.setText("check point " + numOfCheckpoints + ". " + chronometer.getText());
 
                     checkpointLayout.addView(tv);
+
+                    //save the textView so that we can retrieve it when the screen is rotated
+                    //the CreatContentView will be called again.
+                    CheckpointTimeStrings.add(chronometer.getText().toString());
 
 
                 }
@@ -223,8 +267,11 @@ public class CheckinSectionFragment extends Fragment{
 
 
                 //remove all checkpoint views in the Layout
-                if (checkpointLayout.getChildCount() > 0)
+                if (checkpointLayout.getChildCount() > 0){
                     checkpointLayout.removeAllViews();
+                    CheckpointTimeStrings.clear();
+                }
+
 
                 /**stop the user-initiated recording action **/
 
