@@ -48,6 +48,19 @@
                 android:text="@string/stop_btn" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/checkin_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            >
+
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

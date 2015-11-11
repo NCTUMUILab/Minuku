@@ -1,15 +1,18 @@
 package edu.umich.si.inteco.minuku.Fragments;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import edu.umich.si.inteco.minuku.Constants;
@@ -39,6 +42,7 @@ public class CheckinSectionFragment extends Fragment{
     private Chronometer chronometer;
     private Button checkinButton;
     private Button stopButton;
+    private LinearLayout checkpointLayout;
     private static SavingRecordAction mLastUserInitiatedSavingRecordingAction;
 
     @Override
@@ -60,6 +64,7 @@ public class CheckinSectionFragment extends Fragment{
         chronometer = (Chronometer) rootView.findViewById(R.id.recording_chronometer);
         checkinButton = (Button) rootView.findViewById(R.id.checkin_Button);
         stopButton = (Button) rootView.findViewById(R.id.stop_Button);
+        checkpointLayout  = (LinearLayout) rootView.findViewById(R.id.checkin_layout);
 
         //the textview is based on the task of which the recording is for. By default there should be a list of task that signs up for using this interface ( the recording function
         //can be used by multiple tasks, and the user would choose which task the current recording is for.
@@ -120,7 +125,10 @@ public class CheckinSectionFragment extends Fragment{
                 //When the button is shown "START" we start the stopwatch
                 if (checkinButton.getText().toString().equals(getString(R.string.start_btn))){
 
-                    Log.d(LOG_TAG, "[checkin] user clicking on the check in action");
+                    if (checkpointLayout.getChildCount() > 0)
+                        checkpointLayout.removeAllViews();
+
+                    Log.d(LOG_TAG, "[checkin] user clicking on the START action");
 
                     MinukuMainService.setBaseForChronometer(SystemClock.elapsedRealtime());
 
@@ -131,6 +139,32 @@ public class CheckinSectionFragment extends Fragment{
                     MinukuMainService.setCentralChrometerPaused(false);
 
                     checkinButton.setText(getString(R.string.checkin_btn));
+
+                }
+
+                //if the button is checkin, add check point times
+                else if (checkinButton.getText().toString().equals(getString(R.string.checkin_btn))) {
+
+                    Log.d(LOG_TAG, "[checkin] user clicking on the CHECK IN action");
+
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+
+                    layoutParams.gravity = Gravity.LEFT;
+                    TextView tv = new TextView(getContext());
+                    tv.setPadding(20, 0, 0, 0);// in pixels (left, top, right, bottom)
+                    tv.setTextSize(18);
+                    tv.setTextColor(Color.YELLOW);
+                    tv.setLayoutParams(layoutParams);
+
+                    //we add the current elapse time
+                    int numOfCheckpoints = checkpointLayout.getChildCount();
+
+                    tv.setText("check point " + numOfCheckpoints + ". " + chronometer.getText());
+
+                    checkpointLayout.addView(tv);
+
 
                 }
 
@@ -186,6 +220,10 @@ public class CheckinSectionFragment extends Fragment{
                 //rememeber the text of the chrometer
                 MinukuMainService.setCentralChrometerText(chronometer.getText().toString());
 
+
+                //remove all checkpoint views in the Layout
+                if (checkpointLayout.getChildCount() > 0)
+                    checkpointLayout.removeAllViews();
 
                 /**stop the user-initiated recording action **/
 
