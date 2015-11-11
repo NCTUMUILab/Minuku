@@ -614,7 +614,7 @@ public class ContextManager {
                             LocationManager.getCurrentLocation().getAccuracy();
                 }
 
-                Log.d(LOG_TAG, "travel history message:" + travelHistoryMessage);
+                //Log.d(LOG_TAG, "travel history message:" + travelHistoryMessage);
 
                 //create travel history file
                 LogManager.log(LogManager.LOG_TYPE_TRAVEL_LOG,

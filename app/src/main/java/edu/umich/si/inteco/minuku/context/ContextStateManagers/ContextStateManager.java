@@ -61,6 +61,17 @@ public abstract class ContextStateManager {
     //record pool or clear the record pool if we save it in the public record pool
     private int mSizeOfRecordPool = 300;
 
+
+
+    public ContextStateManager() {
+        mLocalRecordPool = new ArrayList<Record>();
+        mStateMappingRules = new ArrayList<StateMappingRule>();
+        mStates = new ArrayList<State>();
+        mContextSourceList = new ArrayList<ContextSource>();
+        setUpContextSourceList();
+    }
+
+
     /** each ContextStateManager should override this static method
      * it adds a list of ContextSource that it will manage **/
     protected static void setUpContextSourceList(){
@@ -111,15 +122,6 @@ public abstract class ContextStateManager {
         return null;
     }
 
-
-
-    public ContextStateManager() {
-        mLocalRecordPool = new ArrayList<Record>();
-        mStateMappingRules = new ArrayList<StateMappingRule>();
-        mStates = new ArrayList<State>();
-        mContextSourceList = new ArrayList<ContextSource>();
-        setUpContextSourceList();
-    }
 
 
     /** if the value of the state is changed, we inform ContextManager about the change so that it can

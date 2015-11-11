@@ -14,6 +14,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 
+import edu.umich.si.inteco.minuku.Fragments.CheckinSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.DailyJournalSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.ListRecordingSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.RecordSectionFragment;
@@ -64,6 +65,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             Log.d(LOG_TAG, "[test service running]  going start the probe service isServiceRunning:" + MinukuMainService.isServiceRunning());
             Intent intent = new Intent();
             intent.setClass(MainActivity.this, MinukuMainService.class);
+            //start the Minuku service
             startService(intent);
         }
 
@@ -113,6 +115,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)) {
             mLaunchTab = Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT;
+            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
+        }
+        else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.HYRBID_LABELING_CONDITION)) {
+            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_RECORD;
+            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORD).setTabListener(this));
             actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
         }
 
@@ -243,6 +250,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         RecordSectionFragment recordSectionFragment = new RecordSectionFragment();
                         recordSectionFragment.setRetainInstance(true);
                         return recordSectionFragment;
+                    }
+                    else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.HYRBID_LABELING_CONDITION)){
+                        CheckinSectionFragment checkinSectionFragment = new CheckinSectionFragment();
+                        checkinSectionFragment.setRetainInstance(true);
+                        return checkinSectionFragment;
                     }
                     else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)) {
                         mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_RECENT;

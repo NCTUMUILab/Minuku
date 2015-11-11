@@ -20,6 +20,7 @@ public class LogManager {
     public static final String LOG_TYPE_SYSTEM_LOG = "System-Log";
     public static final String LOG_TYPE_USER_ACTION_LOG = "User-Action-Log";
     public static final String LOG_TYPE_TRAVEL_LOG = "User-Travel-Log";
+    public static final String LOG_TYPE_CHECKIN_LOG = "User-Checkin-Log";
 
     public static final String LOG_TAG_TRAVEL_HISTORY = "TRAVEL";
 	public static final String LOG_TAG_ACTIVITY_RECOGNITION = "AR";
@@ -44,6 +45,7 @@ public class LogManager {
     public static final String LOG_TAG_ACTIVITY_START = "ACTISTART";
 
     /** User action ***/
+    public static final String LOG_TAG_USER_CHECKIN = "UCHECKING";
     public static final String LOG_TAG_USER_SELECTING = "USELECTING";
     public static final String LOG_TAG_USER_CLICKING = "UCLICK";
     public static final String LOG_TAG_USER_TYPING = "UTYPE";
