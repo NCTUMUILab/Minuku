@@ -88,6 +88,7 @@ public class CheckinSectionFragment extends Fragment{
             chronometer.start();
             MinukuMainService.setCentralChrometerRunning(true);
 
+            checkinButton.setText(getString(R.string.checkin_btn));
         }
         else {
 
