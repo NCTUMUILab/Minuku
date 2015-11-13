@@ -16,6 +16,7 @@ import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
+import edu.umich.si.inteco.minuku.model.Checkpoint;
 import edu.umich.si.inteco.minuku.model.actions.Action;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
 import edu.umich.si.inteco.minuku.receivers.BatteryStatusReceiver;
@@ -128,6 +129,9 @@ public class MinukuMainService extends Service {
     private static boolean mCentralChrometerPaused;
     private static String mCentralChrometerText="00:00:00";
     private static long mTimeWhenStopped = 0;
+
+    //for testing checkpoint. this variable remember information of last checkpoint.
+    public static Checkpoint mPreviousCheckpoint;
 
 
     public static boolean isServiceRunning() {
@@ -498,5 +502,11 @@ public class MinukuMainService extends Service {
         MinukuMainService.baseForChronometer = baseForChronometer;
     }
 
+    public static Checkpoint getPreviousCheckpoint() {
+        return mPreviousCheckpoint;
+    }
 
+    public static void setPreviousCheckpoint(Checkpoint checkpoint) {
+        MinukuMainService.mPreviousCheckpoint = checkpoint;
+    }
 }

@@ -25,6 +25,7 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecogniti
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.context.MobilityManager;
+import edu.umich.si.inteco.minuku.model.Checkpoint;
 import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
@@ -33,6 +34,7 @@ import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
+import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 import edu.umich.si.inteco.minuku.util.TaskManager;
 
 /**
@@ -167,8 +169,22 @@ public class CheckinSectionFragment extends Fragment{
 
                 Log.d(LOG_TAG, "[checkin]" + checkinButton.getText().toString());
 
+
+                /***create checkpoint object**/
+                Checkpoint curCheckpoint = new Checkpoint(
+                        LocationManager.getCurrentLocation(),
+                        ActivityRecognitionManager.getProbableActivities(),
+                        TransportationModeManager.getConfirmedActvitiyString(),
+                        TransportationModeManager.getCurrentStateString(),
+                        ContextManager.getCurrentTimeInMillis()
+                        );
+
+
                 //When the button is shown "START" we start the stopwatch
                 if (checkinButton.getText().toString().equals(getString(R.string.start_btn))){
+
+                    //the first checkpoint (when clicking on the START button) should be set as the previous checkpoint
+                    MinukuMainService.setPreviousCheckpoint(curCheckpoint);
 
                     Log.d(LOG_TAG, "[checkin] user clicking on the START action");
 
@@ -187,6 +203,8 @@ public class CheckinSectionFragment extends Fragment{
                 //if the button is checkin, add check point times
                 else if (checkinButton.getText().toString().equals(getString(R.string.checkin_btn))) {
 
+
+                    /***1. create textView**/
                     Log.d(LOG_TAG, "[checkin] user clicking on the CHECK IN action");
 
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -211,28 +229,43 @@ public class CheckinSectionFragment extends Fragment{
                     //the CreatContentView will be called again.
                     CheckpointTimeStrings.add(tv.getText().toString());
 
+                    /***2. create checkpoint and log data of the two checkpoints **/
+                    Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
+                    String betweenCheckpointContentMessage =
+                            ScheduleAndSampleManager.getTimeString( previousCheckpoint.getTimestamp()) + "\t" +
+                            ScheduleAndSampleManager.getTimeString( curCheckpoint.getTimestamp()) + "\t" +
+                                    previousCheckpoint.getLocation().toString() + "\t" +
+                                    curCheckpoint.getLocation().toString();
+
+
+                    Log.d(LOG_TAG, "betweencheckpoint: " + betweenCheckpointContentMessage);
+
+                    /**for generate between check-point file**/
+                    LogManager.log(LogManager.LOG_TYPE_BETWEEN_CHECKPOINTS_LOG,
+                            LogManager.LOG_TAG_USER_CHECKIN,
+                            betweenCheckpointContentMessage);
+
+
+                    //after we log, we make replace Minuku's previousCheckpoint with the curCheckpoint
+                    MinukuMainService.setPreviousCheckpoint(curCheckpoint);
 
                 }
+
 
                 /*we create check in log whenever the button is pressed, regardless is is START or CHECK IN**/
-                String checkinContentMessage="NA";
+                String checkpointContentMessage=
 
-                if (ActivityRecognitionManager.getProbableActivities()!=null &&
-                        LocationManager.getCurrentLocation()!=null ){
-                    checkinContentMessage=
-                            LocationManager.getCurrentLocation().getLatitude() + "," +
-                                    LocationManager.getCurrentLocation().getLongitude() + "," +
-                                    LocationManager.getCurrentLocation().getAccuracy() + "\t" +
-                                    TransportationModeManager.getConfirmedActvitiyString() + "\t" +
-                                    "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
-                                    ActivityRecognitionManager.getProbableActivities().toString() + "\t" ;
-                }
+                        LocationManager.getCurrentLocation().getLatitude() + "," +
+                                LocationManager.getCurrentLocation().getLongitude() + "," +
+                                LocationManager.getCurrentLocation().getAccuracy() + "\t" +
+                                TransportationModeManager.getConfirmedActvitiyString() + "\t" +
+                                "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
+                                ActivityRecognitionManager.getProbableActivities().toString() + "\t" ;
 
-
-                /**for generate check-in file**/
-                LogManager.log(LogManager.LOG_TYPE_CHECKIN_LOG,
+                /**for generate check-point file**/
+                LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
                         LogManager.LOG_TAG_USER_CHECKIN,
-                        checkinContentMessage);
+                        checkpointContentMessage);
 
 
                 //Log user action
@@ -256,6 +289,17 @@ public class CheckinSectionFragment extends Fragment{
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+                /***create checkpoint object**/
+                Checkpoint curCheckpoint = new Checkpoint(
+                        LocationManager.getCurrentLocation(),
+                        ActivityRecognitionManager.getProbableActivities(),
+                        TransportationModeManager.getConfirmedActvitiyString(),
+                        TransportationModeManager.getCurrentStateString(),
+                        ContextManager.getCurrentTimeInMillis()
+                );
+
 
                 //stop recording and stop the stopwatch
                 chronometer.stop();
@@ -288,6 +332,30 @@ public class CheckinSectionFragment extends Fragment{
                 //changing the labee of the start button back to START
                 checkinButton.setText(getString(R.string.start_btn));
 
+
+
+
+
+                /***2. create checkpoint and log data of the two checkpoints **/
+                Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
+                String betweenCheckpointContentMessage =
+                        ScheduleAndSampleManager.getTimeString( previousCheckpoint.getTimestamp()) + "\t" +
+                                ScheduleAndSampleManager.getTimeString( curCheckpoint.getTimestamp()) + "\t" +
+                                previousCheckpoint.getLocation().toString() + "\t" +
+                                curCheckpoint.getLocation().toString();
+
+                Log.d(LOG_TAG, "betweencheckpoint: " + betweenCheckpointContentMessage);
+
+                /**for generate between check-point file**/
+                LogManager.log(LogManager.LOG_TYPE_BETWEEN_CHECKPOINTS_LOG,
+                        LogManager.LOG_TAG_USER_CHECKIN,
+                        betweenCheckpointContentMessage);
+
+
+                //after we log, we make replace Minuku's previousCheckpoint with the curCheckpoint
+                MinukuMainService.setPreviousCheckpoint(curCheckpoint);
+
+
                 /*we create check in log whenever the button is pressed, regardless is is START or CHECK IN**/
                 String checkinContentMessage="NA";
 
@@ -303,7 +371,7 @@ public class CheckinSectionFragment extends Fragment{
                 }
 
 
-                LogManager.log(LogManager.LOG_TYPE_CHECKIN_LOG,
+                LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
                         LogManager.LOG_TAG_USER_CHECKIN,
                         checkinContentMessage);
 
