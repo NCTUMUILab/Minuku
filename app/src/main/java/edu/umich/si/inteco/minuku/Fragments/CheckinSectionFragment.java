@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
@@ -263,7 +264,7 @@ public class CheckinSectionFragment extends Fragment{
                 //reset
                 chronometer.setText("00:00:00");
                 //rememeber the text of the chrometer
-                MinukuMainService.setCentralChrometerText(chronometer.getText().toString());
+                MinukuMainService.setCentralChrometerText(ContextManager.getCurrentTimeStringNoTimezone());
 
 
                 //remove all checkpoint views in the Layout
@@ -286,6 +287,25 @@ public class CheckinSectionFragment extends Fragment{
 
                 //changing the labee of the start button back to START
                 checkinButton.setText(getString(R.string.start_btn));
+
+                /*we create check in log whenever the button is pressed, regardless is is START or CHECK IN**/
+                String checkinContentMessage="NA";
+
+                if (ActivityRecognitionManager.getProbableActivities()!=null &&
+                        LocationManager.getCurrentLocation()!=null ){
+                    checkinContentMessage=
+                            LocationManager.getCurrentLocation().getLatitude() + "," +
+                                    LocationManager.getCurrentLocation().getLongitude() + "," +
+                                    LocationManager.getCurrentLocation().getAccuracy() + "\t" +
+                                    TransportationModeManager.getConfirmedActvitiyString() + "\t" +
+                                    "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
+                                    ActivityRecognitionManager.getProbableActivities().toString() + "\t" ;
+                }
+
+
+                LogManager.log(LogManager.LOG_TYPE_CHECKIN_LOG,
+                        LogManager.LOG_TAG_USER_CHECKIN,
+                        checkinContentMessage);
 
                 //Log user action
                 LogManager.log(LogManager.LOG_TYPE_USER_ACTION_LOG,

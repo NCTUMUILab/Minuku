@@ -765,4 +765,19 @@ public class ContextManager {
     }
 
 
+    /**get the current time in string (in the format of "yyyy-MM-dd HH:mm:ss" **/
+    public static String getCurrentTimeStringNoTimezone(){
+        //get timzone
+        TimeZone tz = TimeZone.getDefault();
+        Calendar cal = Calendar.getInstance(tz);
+
+        SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW_NO_ZONE);
+        String currentTimeString = sdf_now.format(cal.getTime());
+
+        return currentTimeString;
+    }
+
+
+
+
 }
