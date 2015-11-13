@@ -102,7 +102,7 @@ public class CheckinSectionFragment extends Fragment{
                 //we add the current elapse time
                 int numOfCheckpoints = checkpointLayout.getChildCount();
 
-                tv.setText("check point " + numOfCheckpoints + ". " + CheckpointTimeStrings.get(i));
+                tv.setText(numOfCheckpoints + ". " + CheckpointTimeStrings.get(i));
 
                 checkpointLayout.addView(tv);
 
@@ -203,13 +203,13 @@ public class CheckinSectionFragment extends Fragment{
                     //we add the current elapse time
                     int numOfCheckpoints = checkpointLayout.getChildCount();
 
-                    tv.setText("check point " + numOfCheckpoints + ". " + chronometer.getText());
+                    tv.setText(numOfCheckpoints + ". " + ContextManager.getCurrentTimeStringNoTimezone());
 
                     checkpointLayout.addView(tv);
 
                     //save the textView so that we can retrieve it when the screen is rotated
                     //the CreatContentView will be called again.
-                    CheckpointTimeStrings.add(chronometer.getText().toString());
+                    CheckpointTimeStrings.add(tv.getText().toString());
 
 
                 }
@@ -264,7 +264,7 @@ public class CheckinSectionFragment extends Fragment{
                 //reset
                 chronometer.setText("00:00:00");
                 //rememeber the text of the chrometer
-                MinukuMainService.setCentralChrometerText(ContextManager.getCurrentTimeStringNoTimezone());
+                MinukuMainService.setCentralChrometerText(chronometer.getText().toString());
 
 
                 //remove all checkpoint views in the Layout
