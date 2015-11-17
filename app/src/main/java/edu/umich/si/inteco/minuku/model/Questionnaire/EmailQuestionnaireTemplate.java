@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.model;
+package edu.umich.si.inteco.minuku.model.Questionnaire;
 
 /**
  * Created by Armuro on 7/3/14.

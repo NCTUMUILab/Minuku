@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.ContextSource;
+import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
@@ -47,13 +48,14 @@ public abstract class ContextStateManager {
     public static final String STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING = "Contain";
 
 
-    protected static String mName;
-    protected static ArrayList<Record> mLocalRecordPool;
-    protected static ArrayList<Condition> mConditions;
-    protected static ArrayList<StateMappingRule> mStateMappingRules;
-    protected static ArrayList<State> mStates;
+    protected String mName;
+    protected ArrayList<Record> mLocalRecordPool;
+    protected ArrayList<Condition> mConditions;
+    protected ArrayList<LoggingTask> mActiveLoggingTasks;
+    protected ArrayList<StateMappingRule> mStateMappingRules;
+    protected ArrayList<State> mStates;
     /**each contextStateManager has a list of ContextSource available for use**/
-    protected static ArrayList<ContextSource> mContextSourceList;
+    protected ArrayList<ContextSource> mContextSourceList;
 
 //    protected static HashMap<Integer, Boolean>mSourceExtractTable
 
@@ -66,23 +68,48 @@ public abstract class ContextStateManager {
     public ContextStateManager() {
         mLocalRecordPool = new ArrayList<Record>();
         mStateMappingRules = new ArrayList<StateMappingRule>();
+        mActiveLoggingTasks = new ArrayList<LoggingTask>();
         mStates = new ArrayList<State>();
         mContextSourceList = new ArrayList<ContextSource>();
-        setUpContextSourceList();
     }
 
 
     /** each ContextStateManager should override this static method
      * it adds a list of ContextSource that it will manage **/
-    protected static void setUpContextSourceList(){
+    protected void setUpContextSourceList(){
         return;
+    }
+
+
+    private void updateContextSourceListRequestStatus() {
+
+        Log.d(LOG_TAG, " [testing logging task and requested] in  updateContextSourceListRequestStatus " +
+                "there are " + mContextSourceList.size() + " context sources");
+
+        for (int i=0; i<mContextSourceList.size(); i++){
+            mContextSourceList.get(i).setIsRequested( updateContextSourceRequestStatus( mContextSourceList.get(i) ) );
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
+        }
+    }
+
+
+    private boolean updateContextSourceRequestStatus(ContextSource contextSource) {
+
+        boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
+
+        boolean isMonitored = isStateMonitored(contextSource.getSourceId());
+
+        boolean isRequested = isLogging | isMonitored;
+
+        return isRequested;
+
     }
 
 
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
      * e.g sampling rate. */
 
-    public static void updateContextSourceList(String source){
+    public void updateContextSourceList(String source){
 
         //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
 
@@ -91,7 +118,7 @@ public abstract class ContextStateManager {
     }
 
 
-    public static void updateContextSourceList(String source, float samplingRate){
+    public  void updateContextSourceList(String source, float samplingRate){
 
         //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
 
@@ -102,7 +129,7 @@ public abstract class ContextStateManager {
 
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
      * e.g sampling rate. */
-    public static void updateContextSourceList(String source, String samplingMode){
+    public void updateContextSourceList(String source, String samplingMode){
 
         //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
 
@@ -111,22 +138,15 @@ public abstract class ContextStateManager {
     }
 
 
-
-
-    public abstract void saveRecordsInLocalRecordPool();
-
-    public static int getContextSourceTypeFromName(String sourceName){
-        return 0;
-    }
-    public static String getContextSourceNameFromType(int sourceType){
-        return null;
-    }
+    abstract public void saveRecordsInLocalRecordPool();
+    public static int getContextSourceTypeFromName(String sourceName){return -1;};
+    public static String getContextSourceNameFromType(int sourceType){return null;};
 
 
 
     /** if the value of the state is changed, we inform ContextManager about the change so that it can
      * examine the conditions of the events related to the state **/
-    public static void stateChanged(State state){
+    public void stateChanged(State state){
         Log.d(LOG_TAG, "[stateChanged] state " + state.getName() + " is changed" );
                 ContextManager.examineCircumstances(state);
     };
@@ -138,7 +158,7 @@ public abstract class ContextStateManager {
      * We reset the current stateList, and then reconstruct it.
      * TODO: in the future we just update the list for the newly added ones and removed ones.
      */
-    public static void updateMonitoredState(StateMappingRule rule) {
+    public void updateMonitoredState(StateMappingRule rule) {
 
         //we reset the stateList
         mStates.clear();
@@ -158,12 +178,12 @@ public abstract class ContextStateManager {
      * @param targetValue
      * @return
      */
-    private static boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
+    private boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
         boolean pass = false;
         return pass;
     }
 
-    private static boolean examineStateRule(int sourceType, int measure, int relationship, float targetValue){
+    private boolean examineStateRule(int sourceType, int measure, int relationship, float targetValue){
         boolean pass = false;
         return pass;
     }
@@ -175,7 +195,7 @@ public abstract class ContextStateManager {
      * change the value of the state for every 5 seconds When a ContextStateManager check the values and update states
      * depends on the sampling rate and how it obtains the value (pull vs. push)
      */
-    protected static void updateStateValues(int sourceType) {
+    protected void updateStateValues(int sourceType) {
 
         /** 1. we first make sure whether the sourceType is being monitored. If not, we don't need to update
          //the state values. We call isStateMonitored(int SourceType) to do the examination. **/
@@ -184,25 +204,25 @@ public abstract class ContextStateManager {
             return;
         }
 
-        /** 2. if the state is currently monitored, we get the stateMappingRule by the type
+        /** 2. if a state using the source is currently monitored, we get the stateMappingRule by the type
          * then we call examineStateRule() to examine the rule depending on the type of the target value
          * Currently, it could be a string or a float number**/
         for (int i=0; i<getStateMappingRules().size(); i++) {
-            //get the rule
-            StateMappingRule rule = getStateMappingRules().get(i);
+
+            //get the rule based on the source type. We don't examine all MappingRule, but only the rule
+            //that are related to the source.
+            StateMappingRule rule = getStateMappingRules(sourceType).get(i);
             boolean pass= false;
 
             //each rule can have more than one criterion, where each criterion has a measure,
             // relationship and a targetvalue
             ArrayList<StateValueCriterion> criteria = rule.getCriteria();
 
-
             for (int j=0; j<criteria.size(); j++){
 
                 //1. get the targer value and relaionship
                 int relationship = criteria.get(j).getRelationship();
                 int measure = criteria.get(j).getMeasureType();
-
 
                 //get values depending on whether the target value is a string or a float number
                 if (criteria.get(j).isTargetString()){
@@ -259,12 +279,49 @@ public abstract class ContextStateManager {
 
     }
 
+
+    /**
+     * this function takes a ContextSource and examines whether the Contextsouce will be used by any
+     * StateMappingRule
+     * @return
+     */
+    protected boolean isRequestedByStateMapping(ContextSource contextSource) {
+
+        for (int i=0; i<mStateMappingRules.size(); i++){
+
+            if (contextSource.getSourceId()==mStateMappingRules.get(i).getSource()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * This function takes a ContextSource and examines whether it will used by a loggingTask
+     * @param contextSource
+     * @return
+     */
+    protected boolean isRequestedByActiveLoggingTasks(ContextSource contextSource) {
+
+        for (int i=0; i<mActiveLoggingTasks.size(); i++) {
+
+            //if contextsource is requested by an active logging task
+            if (contextSource.getSourceId()==mActiveLoggingTasks.get(i).getSourceType()){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     /**
      * Examine whether the context source is needed in order to monitor a state.
      * @param sourceType
      * @return
      */
-    protected static boolean isStateMonitored(int sourceType) {
+    protected boolean isStateMonitored(int sourceType) {
 
         Log.d(LOG_TAG, "examine statemappingrule: in isStateMonitored");
 
@@ -281,64 +338,136 @@ public abstract class ContextStateManager {
         return false;
     }
 
+
+
+
+
+
+    /*
+    protected static boolean isSourceRequested(int sourceId) {
+
+        Log.d(LOG_TAG, "examine statemappingrule: in isSourceRequested " + getContextSourceNameFromType(sourceId));
+
+        for (int i=0; i<mContextSourceList.size(); i++){
+
+            //we first find the source by id
+            if (mContextSourceList.get(i).getSourceId()== sourceId){
+
+                //we return true when the source is both available and requested
+                if (mContextSourceList.get(i).isRequested() & mContextSourceList.get(i).isAvailable()){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+*/
     public ContextStateManager(ArrayList<Record> mlocalRecordPool) {
         this.mLocalRecordPool = mlocalRecordPool;
     }
 
 
-    public static void addRecord(Record record){
+    public void addRecord(Record record){
         mLocalRecordPool.add(record);
     }
 
-    public static Record getLastSavedRecord() {
+    public Record getLastSavedRecord() {
         if (!mLocalRecordPool.isEmpty()){
             return mLocalRecordPool.get(mLocalRecordPool.size()-1);
         }
         return null;
     }
 
-    public static void removeRecord(Record record){
+    public void removeRecord(Record record){
         mLocalRecordPool.remove(record);
     }
 
-    public static void clearRecordPool(){
+    public void clearRecordPool(){
         mLocalRecordPool.clear();
     }
 
 
-    public static ArrayList<Condition> getConditions() {
+    public ArrayList<Condition> getConditions() {
         return mConditions;
     }
 
-    public static void setConditions(ArrayList<Condition> conditions) {
+    public void setConditions(ArrayList<Condition> conditions) {
         mConditions = conditions;
     }
 
-    public static ArrayList<State> getStateList() {
+    public ArrayList<State> getStateList() {
         return mStates;
     }
 
-    public static void setStateList(ArrayList<State> stateList) {
-        ContextStateManager.mStates = stateList;
+    public void setStateList(ArrayList<State> stateList) {
+        mStates = stateList;
     }
 
-    public static void addState(State state){
+    public void addState(State state){
         mStates.add(state);
     }
 
-    public static ArrayList<StateMappingRule> getStateMappingRules() {
+    public ArrayList<StateMappingRule> getStateMappingRules() {
         return mStateMappingRules;
     }
 
-    public static void setStateMappingRules(ArrayList<StateMappingRule> rules) {
+
+    /**
+     * return a list of stateMappingRule that use the source
+     * @param sourceType
+     * @return
+     */
+    protected ArrayList<StateMappingRule> getStateMappingRules(int sourceType) {
+
+        ArrayList<StateMappingRule> rules = new ArrayList<StateMappingRule>();
+
+       //get stateMapping rule that involves the sourceType
+        for (int i=0; i<getStateMappingRules().size(); i++){
+
+            StateMappingRule rule = getStateMappingRules().get(i);
+
+            //find any state that uses the source and that state is currently enabled.
+            if (rule.getSource()==sourceType){
+               rules.add(rule);
+            }
+        }
+        return rules;
+    }
+
+    public void setStateMappingRules(ArrayList<StateMappingRule> rules) {
         mStateMappingRules = rules;
     }
 
-    private static StateMappingRule translateStateMappingRule(StateMappingRule rule) {
+    private StateMappingRule translateStateMappingRule(StateMappingRule rule) {
         return rule;
     }
 
-    public static void addStateMappingRule(StateMappingRule rule){
+    /**
+     * the function add the logging task into the ActiveLoggingTask. Then it calls updateContextSourceListRequestStatus
+     * to update whether contextsource is requested.
+     * @param loggingTask
+     */
+    public void addActiveLoggingTask(LoggingTask loggingTask) {
+
+        Log.d(LOG_TAG, " [testing logging task and requested] in addActiveLoggingTask in CSM ");
+
+        mActiveLoggingTasks.add(loggingTask);
+
+        Log.d(LOG_TAG, " [testing logging task and requested] in addActiveLoggingTask in CSM there are "
+         + mActiveLoggingTasks.size() + " logging tasks " + this.mName  );
+
+        updateContextSourceListRequestStatus();
+
+    }
+
+
+    public void removeActiveLoggingTask (LoggingTask loggingTask) {
+        mActiveLoggingTasks.remove(loggingTask);
+    }
+
+    public void addStateMappingRule(StateMappingRule rule){
 
         //we know that there's some specific information in condition that needs to be translated in specific
         //contextStateManager, so we need call translateStateMappingRule before we add the rule.
@@ -351,28 +480,28 @@ public abstract class ContextStateManager {
         updateMonitoredState(rule);
     }
 
-    public static void removeStateMappingRule(StateMappingRule rule) {
+    public void removeStateMappingRule(StateMappingRule rule) {
         if (mStateMappingRules.contains(rule))
             mStateMappingRules.remove(rule);
     }
 
-    public static void removeAllStateMappingRules() {
+    public void removeAllStateMappingRules() {
         mStateMappingRules.clear();
     }
 
-    public static ArrayList<Record> getLocalRecordPool() {
+    public ArrayList<Record> getLocalRecordPool() {
         return mLocalRecordPool;
     }
 
-    public static void setLocalRecordPool(ArrayList<Record> localRecordPool) {
+    public void setLocalRecordPool(ArrayList<Record> localRecordPool) {
         mLocalRecordPool = localRecordPool;
     }
 
-    public static String getName() {
+    public String getName() {
         return mName;
     }
 
-    public static void setName(String name) {
+    public void setName(String name) {
         mName = name;
     }
 
@@ -383,7 +512,7 @@ public abstract class ContextStateManager {
      * @param targetValue
      * @return
      */
-    protected  static boolean satisfyCriterion(String value, int relationship, String targetValue ){
+    protected static boolean satisfyCriterion(String value, int relationship, String targetValue ){
 
         boolean pass=false;
 
@@ -403,7 +532,7 @@ public abstract class ContextStateManager {
 
     }
 
-    protected  static boolean satisfyCriterion(float value, int relationship, float targetValue ) {
+    protected static boolean satisfyCriterion(float value, int relationship, float targetValue ) {
 
         boolean pass=false;
 
@@ -454,7 +583,6 @@ public abstract class ContextStateManager {
 
 
 
-
     public static int getRelationship(String  relationshipName) {
 
         if (relationshipName==STATE_MAPPING_RELATIONSHIP_EQUAL_STRING){
@@ -485,14 +613,23 @@ public abstract class ContextStateManager {
             return -1;
     }
 
+    public ContextSource getContextSourceBySourceId(int sourceId) {
 
-    public static ContextSource getContextSourceBySourceName(String sourceName) {
+        for (int i=0; i<mContextSourceList.size(); i++){
+            if (mContextSourceList.get(i).getSourceId()==sourceId)
+                return mContextSourceList.get(i);
+        }
+        return null;
+    }
+
+
+
+    public ContextSource getContextSourceBySourceName(String sourceName) {
 
         for (int i=0; i<mContextSourceList.size(); i++){
             if (mContextSourceList.get(i).getName().equals(sourceName))
                 return mContextSourceList.get(i);
         }
-
         return null;
     }
 

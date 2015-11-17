@@ -23,6 +23,7 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.ContextSource;
+import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
@@ -79,7 +80,7 @@ public class ActivityRecognitionManager extends ContextStateManager
     private PendingIntent mActivityRecognitionPendingIntent;
 
     // Store the current activity recognition client
-    private GoogleApiClient mGoogleApiClient;
+    private static  GoogleApiClient mGoogleApiClient;
 
     private boolean mRequestingActivityRecognitionUpdates;
 
@@ -106,13 +107,17 @@ public class ActivityRecognitionManager extends ContextStateManager
         buildGoogleApiClient();
 
         sLatestDetectionTime = -1;
+
+        setUpContextSourceList();
+
     }
 
     /** each ContextStateManager should override this static method
      * it adds a list of ContextSource that it will manage **/
-    protected static void setUpContextSourceList(){
+    protected void setUpContextSourceList(){
 
-        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager, adding two contextsource ");
+        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager. mContextSource:  " + mContextSourceList);
+
         boolean isAvailable;
 
         // Google Play Service is available after api level 15
@@ -130,7 +135,7 @@ public class ActivityRecognitionManager extends ContextStateManager
                         CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES,
                         isAvailable,
                         sActivityRecognitionUpdateIntervalInMilliseconds
-                        ));
+                ));
 
         mContextSourceList.add(
                 new ContextSource(
@@ -144,10 +149,52 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     }
 
+    /**
+     * the function add the logging task into the ActiveLoggingTask. Then it calls updateContextSourceListRequestStatus
+     * to update whether contextsource is requested.
+     * @param loggingTask
+     */
+    public void addActiveLoggingTask(LoggingTask loggingTask) {
+
+        Log.d(LOG_TAG, " [testing logging task and requested] in addActiveLoggingTask in CSM ");
+
+        mActiveLoggingTasks.add(loggingTask);
+
+        Log.d(LOG_TAG, " [testing logging task and requested] in addActiveLoggingTask in CSM there are "
+                + mActiveLoggingTasks.size() + " logging tasks " + this.mName);
+
+        updateContextSourceListRequestStatus();
+
+    }
+
+
+    private void updateContextSourceListRequestStatus() {
+
+        Log.d(LOG_TAG, " [testing logging task and requested] in  updateContextSourceListRequestStatus " +
+                "there are " + mContextSourceList.size() + " context sources");
+
+        for (int i=0; i<mContextSourceList.size(); i++){
+            mContextSourceList.get(i).setIsRequested( updateContextSourceRequestStatus( mContextSourceList.get(i) ) );
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
+        }
+    }
+
+    private boolean updateContextSourceRequestStatus(ContextSource contextSource) {
+
+        boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
+
+        boolean isMonitored = isStateMonitored(contextSource.getSourceId());
+
+        boolean isRequested = isLogging | isMonitored;
+
+        return isRequested;
+
+    }
+
 
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
      * e.g sampling rate. */
-    public static void updateContextSourceList(String source, long samplingRate){
+    public void updateContextSourceList(String source, long samplingRate){
 
         sActivityRecognitionUpdateIntervalInMilliseconds = samplingRate;
 
@@ -173,12 +220,16 @@ public class ActivityRecognitionManager extends ContextStateManager
      */
     protected synchronized void buildGoogleApiClient() {
 
-        mGoogleApiClient =
-                new GoogleApiClient.Builder(mContext)
-                        .addApi(ActivityRecognition.API)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .build();
+        if (mGoogleApiClient==null){
+
+            mGoogleApiClient =
+                    new GoogleApiClient.Builder(mContext)
+                            .addApi(ActivityRecognition.API)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .build();
+        }
+
     }
 
 
@@ -357,9 +408,9 @@ public class ActivityRecognitionManager extends ContextStateManager
         return sProbableActivities;
     }
 
-    public static void setActivities (List<DetectedActivity> probableActivities, DetectedActivity mostProbableActivity ) {
+    public void setActivities (List<DetectedActivity> probableActivities, DetectedActivity mostProbableActivity ) {
         //set activities
-        //Log.d(LOG_TAG, "set most probsble: inside setActivities : " + mostProbableActivity + " and " + probableActivities);
+        Log.d(LOG_TAG, "set most probsble: inside setActivities : " + mostProbableActivity + " and " + probableActivities);
 
         //set a list of probable activities
         setProbableActivities(probableActivities);
@@ -370,7 +421,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
     }
 
-    public static void setProbableActivities(List<DetectedActivity> probableActivities) {
+    public void setProbableActivities(List<DetectedActivity> probableActivities) {
         sProbableActivities = probableActivities;
 //        setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
@@ -387,7 +438,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         return sMostProbableActivity;
     }
 
-    public static void setMostProbableActivity(DetectedActivity mostProbableActivity) {
+    public void setMostProbableActivity(DetectedActivity mostProbableActivity) {
         sMostProbableActivity = mostProbableActivity;
 //        Log.d(LOG_TAG, "set most probsble: inside sMostProbableActivity: " + mostProbableActivity);
         //after update activity information, update the values of the states
@@ -488,7 +539,7 @@ public class ActivityRecognitionManager extends ContextStateManager
      * change the value of the state for every 5 seconds When a ContextStateManager check the values and update states
      * depends on the sampling rate and how it obtains the value (pull vs. push)
      */
-    protected static void updateStateValues(int sourceType) {
+    protected void updateStateValues(int sourceType) {
 
         /** 1. we first make sure whether the sourceType is being monitored. If not, we don't need to update
          //the state values. We call isStateMonitored(int SourceType) to do the examination. **/
@@ -578,7 +629,7 @@ public class ActivityRecognitionManager extends ContextStateManager
      * @param targetValue
      * @return
      */
-    private static boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
+    private boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
 
         Log.d(LOG_TAG, "examine statemappingrule, in examineStateRule. Going to test source: " + sourceType
                 + " measure : " + measure + " relationship " + relationship + " targevalue " + targetValue

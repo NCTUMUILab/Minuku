@@ -55,6 +55,9 @@ public class PhoneStatusManager extends ContextStateManager {
         mContext = context;
         mActivityManager = (ActivityManager) mContext.getSystemService(mContext.ACTIVITY_SERVICE);
         mPowerManager = (PowerManager) mContext.getSystemService(mContext.POWER_SERVICE);
+
+        setUpContextSourceList();
+
     }
 
     public static String getAndroiVersion() {
@@ -179,7 +182,7 @@ public class PhoneStatusManager extends ContextStateManager {
         //save into record
         PhoneActivityRecord record = new PhoneActivityRecord(mLastestForegroundPackage,  mLastestForegroundActivity);
         record.setTimestamp(ContextManager.getCurrentTimeInMillis());
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
 
         Log.d(LOG_TAG, "[setCurrentForegroundActivityAndPackage] the current running package is " + mLastestForegroundActivity + " and the activity is " + mLastestForegroundPackage);
     }
@@ -218,7 +221,7 @@ public class PhoneStatusManager extends ContextStateManager {
 
 
 
-    public static void updateStateValues() {
+    public void updateStateValues() {
 
         /** get the relevant rule to the source. **/
         for (int i=0; i <mStateMappingRules.size(); i++){

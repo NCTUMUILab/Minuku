@@ -28,7 +28,7 @@
 			  [
 				{
 				  "Source": "Location",
-				  "Sampling_rate": 10
+				  "Sampling_rate": 5
 				}
 
 			  ],
@@ -45,21 +45,8 @@
 				  },
 				  {
 					"Id": 3,
-					"Source": "Sensor.Proximity"
-				  },
-				  {
-					"Id": 4,
-					"Source": "Sensor.Accelerometer"
-				  },
-				  {
-					"Id": 5,
-					"Source": "Sensor.Light"
-				  },
-				  {
-					"Id": 6,
-					"Source": "Sensor.Pressure"
+					"Source": "Transportation"
 				  }
-
 				],
 				"Circumstances":
 				[
@@ -168,41 +155,12 @@
 					"Name": "recording context",
 					"Logging_tasks":"1,2,3",
 					"Control":{
+
 					  "Start":
 					  [
 						{
-						  "Launch": "triggered",
-						  "Trigger":
-						  {
-							"Class":"Action.Start",
-							"Id":1,
-							"Sampling_rate": 1
-						  },
-						  "Schedule":
-						  {
-							"Sample_method":"simple_one_time",
-							"Sample_delay": 2
-						  }
+						  "Launch": "app_start"
 						}
-
-					  ],
-					  "Stop":
-					  [
-						{
-						  "Launch": "triggered",
-						  "Trigger":
-						  {
-							"Class":"Action.Resume",
-							"Id":2,
-							"Sampling_rate": 1
-						  },
-						  "Schedule":
-						  {
-							"Sample_method":"simple_one_time",
-							"Sample_delay": 0
-						  }
-						}
-
 
 					  ]
 					},

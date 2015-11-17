@@ -50,7 +50,11 @@ public class SavingRecordAction extends Action {
 	}
 
 
-    public boolean isAllowAnnotationInProcess() {
+	public ArrayList<Integer> getLoggingTasks() {
+		return mLoggingTasks;
+	}
+
+	public boolean isAllowAnnotationInProcess() {
         return mAllowAnnotationInProcess;
     }
 

@@ -24,11 +24,12 @@ import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
-import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
+import edu.umich.si.inteco.minuku.model.LoggingTask;
+import edu.umich.si.inteco.minuku.model.Questionnaire.EmailQuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.Question;
-import edu.umich.si.inteco.minuku.model.Questionnaire;
+import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.model.actions.Action;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateAction;
@@ -48,6 +49,7 @@ public class ActionManager {
 	private static ArrayList<Action> mRunningActionList;
 	private static LocalDBHelper mLocalDBHelper; 
 	private static DataHandler mDataHandler;
+    private static ContextManager mContextManager;
 	
 	/**Even Monitor**/
 	private static EventManager mEventManager;
@@ -116,10 +118,11 @@ public class ActionManager {
     //for running the runningAction thread
     private static ScheduledExecutorService mRunningActionExecutor;
 
-	public ActionManager(Context context){
+	public ActionManager(Context context, ContextManager contextManager){
 		
 		mContext = context;
 		mActionList = new ArrayList<Action> ();
+        mContextManager = contextManager;
 		mActionControlList = new ArrayList<ActionControl>();
 		mRunningActionList = new ArrayList<Action> ();
 		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
@@ -136,7 +139,7 @@ public class ActionManager {
 	 */
 	public static void startAction(int id){
 		
-		Log.d(LOG_TAG, " [ActionManager Execute] the action id is  " + id +" find actions...");
+		Log.d(LOG_TAG, " [in startAction] the action id is  " + id +" find actions...");
 		
 		Action action =getAction(id);
 		
@@ -156,17 +159,17 @@ public class ActionManager {
             public void run() {
                 try{
 
-                    Log.d(LOG_TAG, "[test pause resume]running in  recordContextRunnable  ");
+                    Log.d(LOG_TAG, "[startRunningActionThread]running in  recordContextRunnable  ");
 
                     for (int i=0; i < ActionManager.getRunningActionList().size(); i++){
 
                         Action action = ActionManager.getRunningActionList().get(i);
 
-                        Log.d(LOG_TAG, "examineTransportation [test pause resume]running continuous actions: pause " + action.getId() + action.isPaused());
+                        Log.d(LOG_TAG, "startRunningActionThread running continuous actions: pause " + action.getId() + action.isPaused());
                         //if the action is not paused, run the action
                         if (!action.isPaused()){
 
-                            Log.d(LOG_TAG, "examineTransportation [test pause resume]running continuous and non-paused actions" + action.getId());
+                            Log.d(LOG_TAG, "startRunningActionThread running continuous and non-paused actions" + action.getId());
                             ActionManager.executeAction(action);
                         }
                     }
@@ -192,15 +195,35 @@ public class ActionManager {
 	 * @param action
 	 */
 	public static void startAction (Action action) {
-		
+
+        Log.d(LOG_TAG, "in startAction, going to execute action " + action.getName() + " " + action.getId() +  " continuous: " + action.isContinuous());
+
 		//if found the action, execute the action
 		if (action!=null){
 
-			//First check whether the action is continuous. If the action is continuous, instantiate the action and put the action into the runninActionList.
+			/** 1. First check whether the action is continuous. If the action is continuous, instantiate the action and put the action into the runninActionList.
 			//if the action is not continuous, then directly execute it. Usually a continuous action is either a monitoring action or a saving record action. 
-			if (action.isContinuous()){
-				
-				
+			**/
+             if (action.isContinuous()){
+
+
+                /**2. for savingRecord action or monitoring event, we first need to check whether the ContextSource has been
+                 * enabled in the correspoonding ContextStateManager. If not, we will need to enable it. A ContextSource is said to be
+                 * enabled if its "isRequested" is True.
+                 */
+
+                if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)
+                        || action.getType().equals(ActionManager.ACTION_TYPE_SAVING_RECORD)) {
+
+                    //TODO: update ContextSource in the ContextSourceManager
+
+
+
+
+                }
+
+
+                /** 3. Then according to whetehr it's monitoring or saving record we do different things**/
 				//if the action is to monitor events
 				if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){
 			
@@ -208,7 +231,7 @@ public class ActionManager {
 					MonitoringCircumstanceAction monitoringAction = (MonitoringCircumstanceAction) action;
 					ArrayList<Integer> evtIds = monitoringAction.getMonitoredCircumstanceIds();
 					
-					Log.d(LOG_TAG, " [ActionManager startAction] Start a new monitoring action" + monitoringAction.getId() + ", which monitor events  " + evtIds.toString());
+					//Log.d(LOG_TAG, " [ActionManager startAction] Start a new monitoring action" + monitoringAction.getId() + ", which monitor events  " + evtIds.toString());
 					
 					addRunningAction(monitoringAction);
 
@@ -224,33 +247,35 @@ public class ActionManager {
 				else if (action.getType().equals(ActionManager.ACTION_TYPE_SAVING_RECORD)){
 
 					Log.d(LOG_TAG, "start saving record action ");
-					
-					SavingRecordAction savingRecordAction = (SavingRecordAction) action;
-					
-					//when start a new recorind action, we need to start a new session, and add the session id into the action
-					//so that Probe knows where to store records associated with this action. 
-					//So we need to first know how many sessions have been stored in the database
-					int sessionId  = (int) mLocalDBHelper.querySessionCount()+1;
 
-                    Log.d(LOG_TAG, " [ActionManager startAction] we start recording session " + sessionId);
+                    /**1. create a SavingRecordAction **/
+					SavingRecordAction savingRecordAction = (SavingRecordAction) action;
+
+                    /**2.  get associated logging tasks**/
+                    ArrayList<Integer> loggingTaskIds = savingRecordAction.getLoggingTasks();
+
+                    /**3. call ConteLtManagT to assign logging task to appropropriates ContextSTateManager**/
+                    mContextManager.assignLoggingTasks(loggingTaskIds);
+
+					
+					/** when start a new recorind action, we need to start a new session, and add the session id io the action
+					//so that Probe knows where to store records associatd withhis action.
+					//So we need to first know how many sessions have been stored in the database
+                     **/
+					int sessionId  = (int) mLocalDBHelper.querySessionCount()+1;
 
                     //save the session info to the saveRecord action
 					savingRecordAction.setSessionId(sessionId);
 					
 					//create a session and insert the session into the session table
 					Session session = new Session(ContextManager.getCurrentTimeInMillis(), savingRecordAction.getTaskId());
-                    session.setId(sessionId);
 
                     //if not specified otherwise, record all types of records (specify that the session record all types of records)
+                    //TODO: modify this line. Record types in a session should be defined by LoggingTasks
                     session.setRecordTypes(ContextManager.RECORD_TYPE_LIST);
-
 
                     //add session to the curRecordingSession
                     RecordingAndAnnotateManager.addCurRecordingSession(session);
-
-					//Log.d(LOG_TAG, " [ActionManager startAction] we start recording session " + savingRecordAction.getSessionId());
-                	
-					
 					
 					//TODO: get a list of record to save and put it into the recording list. 
 
@@ -486,10 +511,15 @@ public class ActionManager {
 
 					SavingRecordAction savingRecordAction = (SavingRecordAction) action;
 					
-					//TODO: get a list of record to save and put it into the recording list. 
+					//TODO: get a list of record to save and put it into the recording list.
 
-					//save records in the record pool
-					mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), savingRecordAction.getSessionId() );
+					/** we call ContextManager to move data records from local record pool to publid record pool
+                     * by passing which logging task the action is associated with
+                     * ContextMAnageer will know which ContextStateMAnager will have data in localRecordPool
+                     * **/
+                    ContextManager.moveRecordFromLocalRecordPoolToPublicRecordPool(savingRecordAction.getLoggingTasks());
+
+					mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), savingRecordAction.getSessionId() );
 
                     //check if the recording allows users to add annotation in process. If yes, we add an
                     //"ongoing notification" to indicate that there is an ongoing recording
@@ -1024,7 +1054,7 @@ public class ActionManager {
 			Action action = mActionControlList.get(i).getAction();
 			
 					
-			Log.d(LOG_TAG, "[ registerActionControls] examine action control " + mActionControlList.get(i).getId() + 
+			Log.d(LOG_TAG, "[ registerActionControls] examine action control " + mActionControlList.get(i).getId() + mActionControlList.get(i).getType() +
 					" of action " + action.getId() + " of which the type is " + action.getType() + " and the continuity is " + action.isContinuous()
 					+" the rate is " + action.getActionRate()
 					);
@@ -1035,8 +1065,11 @@ public class ActionManager {
 				
 				Log.d(LOG_TAG, "[ registerActionControls] action control " + mActionControlList.get(i).getId() + 
 						" needs to start at the beginning, it continuity is " + action.isContinuous());
-				
-				//if the action is contibuous, the action is put into the runningAction list instead of starting them.
+
+
+                startAction(mActionControlList.get(i).getAction());
+                /*
+                //if the action is contibuous, the action is put into the runningAction list instead of starting them.
 				if (action.isContinuous()){
 					//put into the runningActionList
 					mRunningActionList.add(action);					
@@ -1045,7 +1078,7 @@ public class ActionManager {
 					//start the action
 					startAction(mActionControlList.get(i).getAction());					
 				}
-				
+				*/
 				
 			}
 			//get the actionContorl which belongs to scheduled type	

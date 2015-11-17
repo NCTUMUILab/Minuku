@@ -85,6 +85,8 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
     public LocationManager(Context c){
 
+        super();
+
     	mContext = c;
 
         //when the app starts we don't request location.

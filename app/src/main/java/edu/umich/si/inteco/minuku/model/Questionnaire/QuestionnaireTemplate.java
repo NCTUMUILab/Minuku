@@ -1,10 +1,12 @@
-package edu.umich.si.inteco.minuku.model;
+package edu.umich.si.inteco.minuku.model.Questionnaire;
 
 import java.util.ArrayList;
 
+import edu.umich.si.inteco.minuku.model.ProbeObject;
+import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.util.QuestionnaireManager;
 
-public class QuestionnaireTemplate extends ProbeObject{
+public class QuestionnaireTemplate extends ProbeObject {
 
 	private String mTitle = "Questionnaire";
 	private String mDescription = "Please answer the following questions";

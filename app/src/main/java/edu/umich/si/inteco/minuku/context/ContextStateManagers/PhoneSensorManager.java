@@ -8,7 +8,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     //TODO: we set this temporarily false because we want to test nother source first
     private static boolean isExtractingPhoneSensorData = true;
-
 
     private static String CONTEXT_SOURCE_PHONE_SENSOR = "PhoneSensor";
 
@@ -78,13 +76,24 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         //initiate registered sneosr list
         mRegisteredSensorList = new ArrayList<ContextSource>();
 
+        setUpContextSourceList();
+
     }
 
     /** each ContextStateManager should override this static method
      * it adds a list of ContextSource that it will manage **/
-    protected static void setUpContextSourceList(){
+    @Override
+    protected void setUpContextSourceList(){
 
-        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager, adding two contextsource ");
+        Log.d(LOG_TAG, "setUpContextSourceList in PhoneSensorManager. mContextSource:  " + mContextSourceList);
+
+        Log.d(LOG_TAG, "setUpContextSourceList in PhoneSensorManager. mContextSource:  " + mContextSourceList.size());
+
+        Log.d(LOG_TAG, "setUpContextSourceList in PhoneSensorManager. mContextSource:  " + mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+
+
+
+        mContextSourceList.add(new ContextSource());
 
         mContextSourceList.add(
                 new ContextSource(
@@ -206,7 +215,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
      * e.g sampling rate. */
-    public static void updateContextSourceList(String source, long samplingRate){
+    public void updateContextSourceList(String source, long samplingRate){
 
         //update all sources if the source name is a general name (e.g. ActivityRecognition)
         if (source.equals(CONTEXT_SOURCE_PHONE_SENSOR)) {
@@ -229,7 +238,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     /** this takes samplingMode as a String value and then use SensorManager's four update delay
      * Normal, UI, Game, and Fatest */
-    public static void updateContextSourceList(String source, String samplingMode){
+    public void updateContextSourceList(String source, String samplingMode){
 
         //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
 
@@ -548,7 +557,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_ACCELEROMETER);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
 
@@ -566,7 +575,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_GYROSCOPE);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
 
@@ -584,7 +593,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_GRAVITY);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
     /**get linear acceleration values**/
     private void getLinearAcceleration(SensorEvent event) {
@@ -600,7 +609,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_LINEAR_ACCELERATION);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
     /**get rotation vector values**/
@@ -618,7 +627,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_ROTATION_VECTOR);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
     /**get magnetic field values**/
@@ -645,7 +654,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_PROXIMITY);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
     private void getAmbientTemperature(SensorEvent event){
@@ -658,7 +667,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_AMBIENT_TEMPERATURE);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
 
     }
 
@@ -671,7 +680,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_LIGHT);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
     private void getPressure(SensorEvent event){
@@ -683,7 +692,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_PRESSURE);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
     private void getRelativeHumidity(SensorEvent event){
@@ -694,7 +703,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_RELATIVE_HUMIDITY);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
     private void getHeartRate (SensorEvent event) {
@@ -705,7 +714,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_HEART_RATE);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
     private void getStepCounter (SensorEvent event) {
@@ -716,7 +725,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_STEP_COUNTER);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
 
     }
 
@@ -728,7 +737,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         record.setTimestamp(getCurrentTimeInMillis());
         record.setSensorSource(Sensor.TYPE_STEP_DETECTOR);
 
-        ContextManager.addRecordToPool(record);
+        ContextManager.addRecordToPublicRecordPool(record);
     }
 
     /**get the current time in milliseconds**/

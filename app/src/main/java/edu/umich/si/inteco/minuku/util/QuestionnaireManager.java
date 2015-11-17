@@ -26,10 +26,10 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Annotation;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
-import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
+import edu.umich.si.inteco.minuku.model.Questionnaire.EmailQuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Question;
-import edu.umich.si.inteco.minuku.model.Questionnaire;
-import edu.umich.si.inteco.minuku.model.QuestionnaireTemplate;
+import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
+import edu.umich.si.inteco.minuku.model.Questionnaire.QuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Session;
 
 public class QuestionnaireManager {

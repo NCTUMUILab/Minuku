@@ -82,13 +82,20 @@ public class TransportationModeManager extends ContextStateManager {
 
     private static ArrayList<ActivityRecord> mActivityRecords;
 
+    private ActivityRecognitionManager mActivityRecognitionManager;
+
     /** Tag for logging. */
     private static final String LOG_TAG = "TransModeDetector";
 
-    public TransportationModeManager(Context context) {
+    public TransportationModeManager(Context context, ActivityRecognitionManager activityRecognitionManager) {
         super();
+
+        mActivityRecognitionManager = activityRecognitionManager;
         setName(ContextManager.CONTEXT_STATE_MANAGER_TRANSPORTATION);
         mContext = context;
+
+        setUpContextSourceList();
+
     }
 
     /**
@@ -384,7 +391,7 @@ public class TransportationModeManager extends ContextStateManager {
      * @param endTime
      * @return
      */
-    private static ArrayList<ActivityRecord> getWindowData(long startTime, long endTime) {
+    private ArrayList<ActivityRecord> getWindowData(long startTime, long endTime) {
 
         ArrayList<ActivityRecord> windowData = new ArrayList<ActivityRecord>();
 
@@ -393,7 +400,7 @@ public class TransportationModeManager extends ContextStateManager {
 
         ///for testing: get data from the testData
 
-        ArrayList<Record> recordPool = ActivityRecognitionManager.getLocalRecordPool();
+        ArrayList<Record> recordPool = mActivityRecognitionManager.getLocalRecordPool();
 
   //      Log.d(LOG_TAG, " examineTransportation you find " + recordPool.size() + " records in the activity recognition pool");
 

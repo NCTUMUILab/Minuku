@@ -29,14 +29,16 @@ public class ActivityRecognitionService extends IntentService {
 	private DetectedActivity mMostProbableActivity;
 
 	private List<DetectedActivity> mProbableActivities;
+
+    private ActivityRecognitionManager mActivityRecognitionManager;
 	
 	// Store the app's shared preferences repository
 	private SharedPreferences mPrefs;
 	
 	public ActivityRecognitionService() {
-
 		super("ActivityRecognitionService");
 		mMostProbableActivity = null;
+        mActivityRecognitionManager = new ActivityRecognitionManager(this);
 	}
 
     /*
@@ -70,8 +72,8 @@ public class ActivityRecognitionService extends IntentService {
                 //after we get activity information from Google's Play service, we update the activity information
                 //in ActitivityRecognition Manager
 
-                ActivityRecognitionManager.setActivities(mProbableActivities, mMostProbableActivity);
-                ActivityRecognitionManager.setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
+                mActivityRecognitionManager.setActivities(mProbableActivities, mMostProbableActivity);
+                mActivityRecognitionManager.setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
                 if (Constants.isTestingActivity) {
                 	sendNotification();

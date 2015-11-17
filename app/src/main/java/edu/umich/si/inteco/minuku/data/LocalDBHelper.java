@@ -22,7 +22,7 @@ import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Configuration;
 import edu.umich.si.inteco.minuku.model.Criterion;
-import edu.umich.si.inteco.minuku.model.Questionnaire;
+import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.UserResponse;
@@ -31,7 +31,6 @@ import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
 import edu.umich.si.inteco.minuku.model.record.LocationRecord;
 import edu.umich.si.inteco.minuku.model.record.Record;
 import edu.umich.si.inteco.minuku.model.record.SensorRecord;
-import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 
 public class LocalDBHelper extends SQLiteOpenHelper{

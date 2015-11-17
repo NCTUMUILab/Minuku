@@ -199,7 +199,7 @@ public class MinukuMainService extends Service {
         mEventManager = new EventManager(this);
 
         //initiate the Action Manager
-        mActionManager = new ActionManager(this);
+        mActionManager = new ActionManager(this, mContextManager);
 
         //initiate the utiliy classes
         mNotificationHelper = new NotificationHelper(this);
@@ -207,13 +207,10 @@ public class MinukuMainService extends Service {
         //initiate the schedule Manager
         mScheduleAndAlarmManager = new ScheduleAndSampleManager(this);
 
-        //initiate the Context Manager
-        mContextManager = new ContextManager(this);
-
         //initiate the Questionnaire Manager
         mQuestionnaireManager = new QuestionnaireManager(this);
 
-        mConfigurationManager = new ConfigurationManager(this);
+        mConfigurationManager = new ConfigurationManager(this, mContextManager);
 
         //initiate the DataHandler
         mDataHandler = new DataHandler (this);
@@ -257,7 +254,7 @@ public class MinukuMainService extends Service {
         //register actions that should launch when the service starts, and schedule actions that need to be scheduled.
         mActionManager.registerActionControls();
 
-        startProbeService();
+        startMinukuService();
 
         //register receiver
         registerAlarmReceivers();
@@ -349,9 +346,9 @@ public class MinukuMainService extends Service {
 
 
     //TODO: fix this
-    public void startProbeService(){
+    public void startMinukuService(){
 
-        Log.d(LOG_TAG, "[testing start service]  [startProbeService] star the probe service");
+        Log.d(LOG_TAG, "[testing start service]  [startMinukuService] star the probe service");
         //TODO: checking updated configurations
 
 
@@ -384,7 +381,7 @@ public class MinukuMainService extends Service {
             //Periodically the main thread call ActionManager to execute the contibuous actions.
             try{
 
-                //Log.d(LOG_TAG, "[test pause resume] examineTransportation running in  recordContextRunnable  ");
+                Log.d(LOG_TAG, "[test pause resume]  running in  recordContextRunnable  ");
 
                 for (int i=0; i < ActionManager.getRunningActionList().size(); i++){
 
@@ -393,7 +390,7 @@ public class MinukuMainService extends Service {
                     //if the action is not paused, run the action
                     if (!action.isPaused()){
 
-               //         Log.d(LOG_TAG, "[test pause resume] examineTransportation running continuous and non-paused actions " + action.getId() + " " + action.getName() );
+                        Log.d(LOG_TAG, "[test pause resume]running continuous and non-paused actions " + action.getId() + " " + action.getName() );
                         ActionManager.executeAction(action);
                     }
                 }
@@ -437,10 +434,10 @@ public class MinukuMainService extends Service {
 
 
                         //TODO: make writing to database an Action
-                        mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
+                        mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
 
                         //after writing the records into files or databases, clear the record pools
-                        //ContextManager.getRecordPool().clear();
+                        //ContextManager.getPublicRecordPool().clear();
                     }
 
                     //send recrod to DataHandler

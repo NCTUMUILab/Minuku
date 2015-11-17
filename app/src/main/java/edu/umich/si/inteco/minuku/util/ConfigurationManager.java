@@ -18,13 +18,13 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManage
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
-import edu.umich.si.inteco.minuku.model.EmailQuestionnaireTemplate;
+import edu.umich.si.inteco.minuku.model.Questionnaire.EmailQuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.Question;
-import edu.umich.si.inteco.minuku.model.QuestionnaireTemplate;
+import edu.umich.si.inteco.minuku.model.Questionnaire.QuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
 import edu.umich.si.inteco.minuku.model.TimeCriterion;
 import edu.umich.si.inteco.minuku.model.actions.Action;
@@ -122,14 +122,13 @@ public class ConfigurationManager {
 	public static final String ACTION_PROPERTIES_SCHEDULE= "Schedule";
 
 
-
-
-
 	private static LocalDBHelper mLocalDBHelper;
 	private static Context mContext;
+	private static ContextManager mContextManager;
 	
-	public ConfigurationManager(Context context){		
-		
+	public ConfigurationManager(Context context, ContextManager contextManager){
+
+		mContextManager = contextManager;
 		mContext = context;
 		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 		loadConfiguration();
@@ -355,41 +354,6 @@ public class ConfigurationManager {
 
 	}
 
-	/**
-	 * according to the source name we go to each ContextStateManager to update each ContextSource.
-	 * A ContextManager will maintain a list of ContextSouce that it manages to get information.
-	 * @param source
-	 * @param samplingRate
-	 */
-	private static void configureContextStateSource(String source, long samplingRate) {
-
-		if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
-			ActivityRecognitionManager.updateContextSourceList(source, samplingRate);
-		}
-		else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
-			PhoneSensorManager.updateContextSourceList(source, samplingRate);
-		}
-		else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
-			LocationManager.updateContextSourceList(source, samplingRate);;
-
-		}
-
-	}
-
-	private static void configureContextStateSource(String source, String samplingMode) {
-
-		if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
-			ActivityRecognitionManager.updateContextSourceList(source, samplingMode);
-		}
-		else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
-			PhoneSensorManager.updateContextSourceList(source, samplingMode);
-		}
-		else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
-			LocationManager.updateContextSourceList(source, samplingMode);;
-
-		}
-
-	}
 
 
 	/**
@@ -397,7 +361,7 @@ public class ConfigurationManager {
 	 * @param settingJSONArray
 	 * @param study_id
 	 */
-	public static void loadContextSourceSettingFromJSON(JSONArray settingJSONArray, int study_id) {
+	public void loadContextSourceSettingFromJSON(JSONArray settingJSONArray, int study_id) {
 
 		Log.d(LOG_TAG, "[loadContextSourceSettingFromJSON] load the contextsourcesetting of study " + study_id);
 
@@ -421,7 +385,7 @@ public class ConfigurationManager {
 				}
 
 				//update the setting based on the name of the source
-				configureContextStateSource(source, sampling_rate * Constants.MILLISECONDS_PER_SECOND);
+				mContextManager.configureContextStateSource(source, sampling_rate * Constants.MILLISECONDS_PER_SECOND);
 
 			}
 			catch (JSONException e1) {
@@ -581,8 +545,6 @@ public class ConfigurationManager {
 						Log.d(LOG_TAG, " [loadActionsFromJSON] the aciton" + action.getId() + " is associated with loggin task  "  +  id);
 
 					}
-
-
 
                     action = a;
                 }

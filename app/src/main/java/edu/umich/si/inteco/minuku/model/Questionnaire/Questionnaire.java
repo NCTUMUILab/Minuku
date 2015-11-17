@@ -1,4 +1,4 @@
-package edu.umich.si.inteco.minuku.model;
+package edu.umich.si.inteco.minuku.model.Questionnaire;
 
 public class Questionnaire extends QuestionnaireTemplate {
 

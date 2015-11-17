@@ -32,6 +32,7 @@ public class LoggingTask {
         return mSourceString;
     }
 
-
-
+    public int getId() {
+        return mId;
+    }
 }

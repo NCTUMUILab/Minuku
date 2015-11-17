@@ -16,6 +16,10 @@ public class ContextSource {
     //by default request is false. We set this true if we see it in the configuration file
     protected boolean isRequested = false;
 
+    public ContextSource(){
+
+    }
+
     public ContextSource(String name, int id) {
 
 
@@ -35,6 +39,9 @@ public class ContextSource {
         this.mSamplingMode = samplingMode;
     }
 
+    public int getSourceId() {
+        return mSourceId;
+    }
 
     public void setName(String name){
         mName = name;
