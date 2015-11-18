@@ -21,20 +21,26 @@ public class ContextSource {
     }
 
     public ContextSource(String name, int id) {
-
-
+        this.mName = name;
+        this.mSourceId = id;
     }
 
     public ContextSource(String name, int id, boolean isAvailable) {
+        this.mName = name;
+        this.mSourceId = id;
         this.isAvailable = isAvailable;
     }
 
-    public ContextSource(String name, int id, boolean isAvailable, long samplingMode) {
+    public ContextSource(String name, int id, boolean isAvailable, long samplingRate) {
+        this.mName = name;
+        this.mSourceId = id;
         this.isAvailable = isAvailable;
-        this.mSamplingRate = samplingMode;
+        this.mSamplingRate = samplingRate;
     }
 
     public ContextSource(String name, int id, boolean isAvailable, int samplingMode) {
+        this.mName = name;
+        this.mSourceId = id;
         this.isAvailable = isAvailable;
         this.mSamplingMode = samplingMode;
     }

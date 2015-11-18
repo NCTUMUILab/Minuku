@@ -43,7 +43,7 @@ public class ActivityRecognitionManager extends ContextStateManager
     public static final int CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = 1;
 
     public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION = "ActivityRecognition";
-    public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES = "AR.MostProbableActivities";
+    public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES = "AR.MostProbableActivity";
     public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = "AR.AllProbableActivities";
 
     /**label **/
@@ -74,7 +74,7 @@ public class ActivityRecognitionManager extends ContextStateManager
             sActivityRecognitionUpdateIntervalInSeconds * Constants.MILLISECONDS_PER_SECOND;
 
 
-    private Context mContext;
+    private static Context mContext;
 
     /***Activity Recognition Requester**/
     private PendingIntent mActivityRecognitionPendingIntent;
@@ -114,6 +114,7 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     /** each ContextStateManager should override this static method
      * it adds a list of ContextSource that it will manage **/
+    @Override
     protected void setUpContextSourceList(){
 
         Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager. mContextSource:  " + mContextSourceList);
@@ -149,70 +150,6 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     }
 
-    /**
-     * the function add the logging task into the ActiveLoggingTask. Then it calls updateContextSourceListRequestStatus
-     * to update whether contextsource is requested.
-     * @param loggingTask
-     */
-    public void addActiveLoggingTask(LoggingTask loggingTask) {
-
-        Log.d(LOG_TAG, " [testing logging task and requested] in addActiveLoggingTask in CSM ");
-
-        mActiveLoggingTasks.add(loggingTask);
-
-        Log.d(LOG_TAG, " [testing logging task and requested] in addActiveLoggingTask in CSM there are "
-                + mActiveLoggingTasks.size() + " logging tasks " + this.mName);
-
-        updateContextSourceListRequestStatus();
-
-    }
-
-
-    private void updateContextSourceListRequestStatus() {
-
-        Log.d(LOG_TAG, " [testing logging task and requested] in  updateContextSourceListRequestStatus " +
-                "there are " + mContextSourceList.size() + " context sources");
-
-        for (int i=0; i<mContextSourceList.size(); i++){
-            mContextSourceList.get(i).setIsRequested( updateContextSourceRequestStatus( mContextSourceList.get(i) ) );
-            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
-        }
-    }
-
-    private boolean updateContextSourceRequestStatus(ContextSource contextSource) {
-
-        boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
-
-        boolean isMonitored = isStateMonitored(contextSource.getSourceId());
-
-        boolean isRequested = isLogging | isMonitored;
-
-        return isRequested;
-
-    }
-
-
-    /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
-     * e.g sampling rate. */
-    public void updateContextSourceList(String source, long samplingRate){
-
-        sActivityRecognitionUpdateIntervalInMilliseconds = samplingRate;
-
-        //update all sources if the source name is a general name (e.g. ActivityRecognition)
-        if (source.equals(CONTEXT_SOURCE_ACTIVITY_RECOGNITION)) {
-            for (int i = 0; i < mContextSourceList.size(); i++) {
-                getContextSourceBySourceName(mContextSourceList.get(i).getName()).setSamplingRate(sActivityRecognitionUpdateIntervalInMilliseconds);
-            }
-        }
-
-        //if not using a general category, update individual sources by source name
-        else {
-            if (getContextSourceBySourceName(source)!=null){
-                getContextSourceBySourceName(source).setSamplingRate(sActivityRecognitionUpdateIntervalInMilliseconds);
-            }
-
-        }
-    }
 
     /**
      * Builds a GoogleApiClient. Uses the {@code #addApi} method to request the
@@ -412,6 +349,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         //set activities
         Log.d(LOG_TAG, "set most probsble: inside setActivities : " + mostProbableActivity + " and " + probableActivities);
 
+
         //set a list of probable activities
         setProbableActivities(probableActivities);
         //set the most probable activity
@@ -422,16 +360,23 @@ public class ActivityRecognitionManager extends ContextStateManager
     }
 
     public void setProbableActivities(List<DetectedActivity> probableActivities) {
-        sProbableActivities = probableActivities;
-//        setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
-        //store activityRecord
-        ActivityRecord record = new ActivityRecord();
-        record.setProbableActivities(sProbableActivities);
-        record.setTimestamp(sLatestDetectionTime);
-        record.setDetectionTime(sLatestDetectionTime);
-        //add record to local record pool of ActivityRecognitionManager
-        addRecord(record);
+        sProbableActivities = probableActivities;
+
+        /**we only store record in memory if it is requested**/
+        boolean isRequested = checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES);
+//        Log.d(LOG_TAG, "[check saving data] setProbableActivities" + CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES +
+//                " requested is " + isRequested + " save data!");
+        if (isRequested){
+            //store activityRecord
+            ActivityRecord record = new ActivityRecord();
+            record.setProbableActivities(sProbableActivities);
+            record.setTimestamp(sLatestDetectionTime);
+            record.setDetectionTime(sLatestDetectionTime);
+            //add record to local record pool of ActivityRecognitionManager
+            addRecord(record);
+        }
+
     }
 
     public static DetectedActivity getMostProbableActivity() {
@@ -459,59 +404,6 @@ public class ActivityRecognitionManager extends ContextStateManager
         // attempt to re-establish the connection.
         Log.i(LOG_TAG, "Connection suspended");
         mGoogleApiClient.connect();
-    }
-
-
-    /**
-     * Map detected activity types to strings
-     */
-    public static String getActivityNameFromType(int activityType) {
-        switch(activityType) {
-            case DetectedActivity.IN_VEHICLE:
-                return IN_VEHICLE_STRING;
-            case DetectedActivity.ON_BICYCLE:
-                return ON_BiCYCLE_STRING;
-            case DetectedActivity.ON_FOOT:
-                return ON_FOOT_STRING;
-            case DetectedActivity.STILL:
-                return STILL_STRING;
-            case DetectedActivity.RUNNING:
-                return RUNNING_STRING;
-            case DetectedActivity.WALKING:
-                return WALKING_STRING;
-            case DetectedActivity.UNKNOWN:
-                return UNKNOWN_STRING;
-            case DetectedActivity.TILTING:
-                return TILTING_STRING;
-            case NO_ACTIVITY_TYPE:
-                return NA_STRING;
-        }
-        return "NA";
-    }
-
-
-    public static int getActivityTypeFromName(String activityName) {
-
-        if (activityName.equals(IN_VEHICLE_STRING)) {
-            return DetectedActivity.IN_VEHICLE;
-        }else if(activityName.equals(ON_BiCYCLE_STRING)) {
-            return DetectedActivity.ON_BICYCLE;
-        }else if(activityName.equals(ON_FOOT_STRING)) {
-            return DetectedActivity.ON_FOOT;
-        }else if(activityName.equals(STILL_STRING)) {
-            return DetectedActivity.STILL;
-        }else if(activityName.equals(UNKNOWN_STRING)) {
-            return DetectedActivity.UNKNOWN ;
-        }else if(activityName.equals(RUNNING_STRING)) {
-            return DetectedActivity.RUNNING ;
-        }else if (activityName.equals(WALKING_STRING)){
-            return DetectedActivity.WALKING;
-        }else if(activityName.equals(TILTING_STRING)) {
-            return DetectedActivity.TILTING;
-        }else {
-            return NO_ACTIVITY_TYPE;
-        }
-
     }
 
 
@@ -551,9 +443,13 @@ public class ActivityRecognitionManager extends ContextStateManager
         /** 2. if the state is currently monitored, we get the stateMappingRule by the type
          * then we call examineStateRule() to examine the rule depending on the type of the target value
          * Currently, it could be a string or a float number**/
-        for (int i=0; i<getStateMappingRules().size(); i++) {
-            //get the rule
-            StateMappingRule rule = getStateMappingRules().get(i);
+        ArrayList<StateMappingRule> relevantStateMappingRules = getStateMappingRules(sourceType);
+
+        for (int i=0; i<relevantStateMappingRules.size(); i++) {
+
+            //get the rule based on the source type. We don't examine all MappingRule, but only the rule
+            //that are related to the source.
+            StateMappingRule rule = relevantStateMappingRules.get(i);
             boolean pass= false;
 
             //each rule can have more than one criterion, where each criterion has a measure,
@@ -674,6 +570,29 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     }
 
+    /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
+     * e.g sampling rate. */
+    public void updateContextSourceList(String source, long samplingRate){
+
+        sActivityRecognitionUpdateIntervalInMilliseconds = samplingRate;
+
+        //update all sources if the source name is a general name (e.g. ActivityRecognition)
+        if (source.equals(CONTEXT_SOURCE_ACTIVITY_RECOGNITION)) {
+            for (int i = 0; i < mContextSourceList.size(); i++) {
+                getContextSourceBySourceName(mContextSourceList.get(i).getName()).setSamplingRate(sActivityRecognitionUpdateIntervalInMilliseconds);
+            }
+        }
+
+        //if not using a general category, update individual sources by source name
+        else {
+            if (getContextSourceBySourceName(source)!=null){
+                getContextSourceBySourceName(source).setSamplingRate(sActivityRecognitionUpdateIntervalInMilliseconds);
+            }
+
+        }
+    }
+
+
     public static int getContextSourceTypeFromName(String sourceName) {
 
         switch (sourceName){
@@ -701,5 +620,60 @@ public class ActivityRecognitionManager extends ContextStateManager
 
         }
     }
+
+
+
+    /**
+     * Map detected activity types to strings
+     */
+    public static String getActivityNameFromType(int activityType) {
+        switch(activityType) {
+            case DetectedActivity.IN_VEHICLE:
+                return IN_VEHICLE_STRING;
+            case DetectedActivity.ON_BICYCLE:
+                return ON_BiCYCLE_STRING;
+            case DetectedActivity.ON_FOOT:
+                return ON_FOOT_STRING;
+            case DetectedActivity.STILL:
+                return STILL_STRING;
+            case DetectedActivity.RUNNING:
+                return RUNNING_STRING;
+            case DetectedActivity.WALKING:
+                return WALKING_STRING;
+            case DetectedActivity.UNKNOWN:
+                return UNKNOWN_STRING;
+            case DetectedActivity.TILTING:
+                return TILTING_STRING;
+            case NO_ACTIVITY_TYPE:
+                return NA_STRING;
+        }
+        return "NA";
+    }
+
+
+    public static int getActivityTypeFromName(String activityName) {
+
+        if (activityName.equals(IN_VEHICLE_STRING)) {
+            return DetectedActivity.IN_VEHICLE;
+        }else if(activityName.equals(ON_BiCYCLE_STRING)) {
+            return DetectedActivity.ON_BICYCLE;
+        }else if(activityName.equals(ON_FOOT_STRING)) {
+            return DetectedActivity.ON_FOOT;
+        }else if(activityName.equals(STILL_STRING)) {
+            return DetectedActivity.STILL;
+        }else if(activityName.equals(UNKNOWN_STRING)) {
+            return DetectedActivity.UNKNOWN ;
+        }else if(activityName.equals(RUNNING_STRING)) {
+            return DetectedActivity.RUNNING ;
+        }else if (activityName.equals(WALKING_STRING)){
+            return DetectedActivity.WALKING;
+        }else if(activityName.equals(TILTING_STRING)) {
+            return DetectedActivity.TILTING;
+        }else {
+            return NO_ACTIVITY_TYPE;
+        }
+
+    }
+
 
 }

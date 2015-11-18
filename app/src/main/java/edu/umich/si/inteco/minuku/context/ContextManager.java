@@ -132,24 +132,24 @@ public class ContextManager {
     /***sensor values***/
     private float mAccelationSquareRoot;
 
-    private ActivityRecognitionManager mActivityRecognitionManager;
+    private static ActivityRecognitionManager mActivityRecognitionManager;
 
     //inspect transportation mode of the user
-    private TransportationModeManager mTransportationModeManager;
+    private static TransportationModeManager mTransportationModeManager;
 
-    private GeofenceManager mGeofenceManager;
+    private static GeofenceManager mGeofenceManager;
 
     // the location update manager
-    private LocationManager mLocationManager;
+    private static LocationManager mLocationManager;
 
     //the manager that manages the status of the phone (network, battery)
-    private PhoneStatusManager mPhoneStatusManager;
+    private static PhoneStatusManager mPhoneStatusManager;
 
-    private PhoneSensorManager mPhoneSensorManager;
+    private static PhoneSensorManager mPhoneSensorManager;
 
-    private UserInteractionManager mUserInteractionManager;
+    private static UserInteractionManager mUserInteractionManager;
 
-    private MobilityManager mMobilityManager;
+    private static MobilityManager mMobilityManager;
 
     private int testCount = 0;
 
@@ -417,8 +417,12 @@ public class ContextManager {
             return CONTEXT_STATE_MANAGER_LOCATION;
         }
 
-        else if (source.contains("Sensor") ) {
+        else if (source.contains("Sensor.") ) {
             return CONTEXT_STATE_MANAGER_PHONE_SENSOR;
+        }
+
+        else if (source.contains("AR.") ) {
+            return CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION;
         }
 
 
@@ -562,8 +566,8 @@ public class ContextManager {
      */
     private void assignLoggingTasks(String contextStateManagerName, LoggingTask loggingTask) {
 
-        Log.d(LOG_TAG, " [testing logging task and requested] in assignLoggingTasks (CSM) " + "logging task: " +
-                loggingTask.getSource() );
+        Log.d(LOG_TAG, " [testing logging task and requested] assign  logging task: " +
+                loggingTask.getSource() + " to " + contextStateManagerName);
 
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
             mActivityRecognitionManager.addActiveLoggingTask(loggingTask);
@@ -601,6 +605,7 @@ public class ContextManager {
             assignLoggingTasks(contextStateManagerName, loggingTask);
 
         }
+
 
     }
 
@@ -793,12 +798,7 @@ public class ContextManager {
         }
     }
 
-/*
-    public static ArrayList<ContextStateManager> getContextStateManager(ArrayList<Integer> loggingTaskIds) {
 
-
-    }
-  */
 
     public static void addLoggingTask(LoggingTask task){
         if (mLoggingTaskList == null) {
@@ -834,6 +834,13 @@ public class ContextManager {
     public static ArrayList<Circumstance> getCircumstanceList(){
         return mCircumstanceList;
     }
+
+
+    public static ActivityRecognitionManager getActivityRecognitionManager() {
+
+        return mActivityRecognitionManager;
+    }
+
 
     public static String getSourceNameFromType (String contextStateManager, int sourceType){
 

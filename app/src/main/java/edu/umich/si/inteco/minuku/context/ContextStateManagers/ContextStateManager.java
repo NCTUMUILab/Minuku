@@ -81,29 +81,75 @@ public abstract class ContextStateManager {
     }
 
 
-    private void updateContextSourceListRequestStatus() {
 
-        Log.d(LOG_TAG, " [testing logging task and requested] in  updateContextSourceListRequestStatus " +
-                "there are " + mContextSourceList.size() + " context sources");
+
+
+    /**
+     * the function add the logging task into the ActiveLoggingTask.
+     * Then it calls updateContextSourceListRequestStatus to update whether contextsource is requested.
+     * @param loggingTask
+     */
+    public void addActiveLoggingTask(LoggingTask loggingTask) {
+
+        //add ActiveLoggingTask
+        mActiveLoggingTasks.add(loggingTask);
+
+        //after add a logging task, we need to update the Request Status of the ContextSourceList
+        updateContextSourceListRequestStatus();
+
+
+    }
+
+    /**
+     *For each ContextSource we check whether it is requested and update its request status
+     */
+    protected void updateContextSourceListRequestStatus() {
 
         for (int i=0; i<mContextSourceList.size(); i++){
-            mContextSourceList.get(i).setIsRequested( updateContextSourceRequestStatus( mContextSourceList.get(i) ) );
-            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
+            mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
+           // Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
         }
     }
 
 
-    private boolean updateContextSourceRequestStatus(ContextSource contextSource) {
+    /**
+     * We check whether a ContextSource is requested by checking whether it is in the ActiveLoggingTask List or in a StateMappingRuleList
+     * @param contextSource
+     * @return
+     */
+    protected boolean updateContextSourceRequestStatus(ContextSource contextSource) {
 
         boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
-
         boolean isMonitored = isStateMonitored(contextSource.getSourceId());
-
         boolean isRequested = isLogging | isMonitored;
+//
+//        Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] the contextSource " + contextSource.getName() +
+//                " Logging " + isLogging + " monitored : " + isMonitored + " isRequested: " + isRequested);
 
         return isRequested;
 
     }
+
+    /**
+     * Check whether a ContextSource is requested
+     * @param sourceName
+     * @return
+     */
+    protected  boolean checkRequestStatusOfContextSource(String sourceName) {
+
+        for (int i=0; i<mContextSourceList.size(); i++){
+
+            Log.d(LOG_TAG, "check saving data  compare source Name " + sourceName + " with ContextSource" + mContextSourceList.get(i).getName()
+             + " is requested: " + mContextSourceList.get(i).isRequested());
+
+            if (sourceName.equals(mContextSourceList.get(i).getName())) {
+                return mContextSourceList.get(i).isRequested();
+            }
+        }
+
+        return false;
+    }
+
 
 
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
@@ -147,7 +193,7 @@ public abstract class ContextStateManager {
     /** if the value of the state is changed, we inform ContextManager about the change so that it can
      * examine the conditions of the events related to the state **/
     public void stateChanged(State state){
-        Log.d(LOG_TAG, "[stateChanged] state " + state.getName() + " is changed" );
+        Log.d(LOG_TAG, "[stateChanged] state " + state.getName() + " is changed");
                 ContextManager.examineCircumstances(state);
     };
 
@@ -207,11 +253,13 @@ public abstract class ContextStateManager {
         /** 2. if a state using the source is currently monitored, we get the stateMappingRule by the type
          * then we call examineStateRule() to examine the rule depending on the type of the target value
          * Currently, it could be a string or a float number**/
-        for (int i=0; i<getStateMappingRules().size(); i++) {
+        ArrayList<StateMappingRule> relevantStateMappingRules = getStateMappingRules(sourceType);
+
+        for (int i=0; i<relevantStateMappingRules.size(); i++) {
 
             //get the rule based on the source type. We don't examine all MappingRule, but only the rule
             //that are related to the source.
-            StateMappingRule rule = getStateMappingRules(sourceType).get(i);
+            StateMappingRule rule = relevantStateMappingRules.get(i);
             boolean pass= false;
 
             //each rule can have more than one criterion, where each criterion has a measure,
@@ -304,10 +352,15 @@ public abstract class ContextStateManager {
      */
     protected boolean isRequestedByActiveLoggingTasks(ContextSource contextSource) {
 
+        Log.d(LOG_TAG, "isRequestedByActiveLoggingTasks There are " + mActiveLoggingTasks.size() + " loggin tacks in  "  + this.getName() +
+                "[updateContextSourceListRequestStatus] is in activeLogging Task " );
+
         for (int i=0; i<mActiveLoggingTasks.size(); i++) {
 
+            Log.d(LOG_TAG, "isRequestedByActiveLoggingTasks checking ContextSource " + contextSource.getName() + " with logging task" +  mActiveLoggingTasks.get(i).getSource());
+
             //if contextsource is requested by an active logging task
-            if (contextSource.getSourceId()==mActiveLoggingTasks.get(i).getSourceType()){
+            if (contextSource.getName().equals( mActiveLoggingTasks.get(i).getSource())){
                 return true;
             }
         }
@@ -370,7 +423,10 @@ public abstract class ContextStateManager {
 
 
     public void addRecord(Record record){
+
         mLocalRecordPool.add(record);
+
+        Log.d(LOG_TAG, "[check saving data]" + "add data to local pool, now there are " + mLocalRecordPool.size() + " records");
     }
 
     public Record getLastSavedRecord() {
@@ -442,24 +498,6 @@ public abstract class ContextStateManager {
 
     private StateMappingRule translateStateMappingRule(StateMappingRule rule) {
         return rule;
-    }
-
-    /**
-     * the function add the logging task into the ActiveLoggingTask. Then it calls updateContextSourceListRequestStatus
-     * to update whether contextsource is requested.
-     * @param loggingTask
-     */
-    public void addActiveLoggingTask(LoggingTask loggingTask) {
-
-        Log.d(LOG_TAG, " [testing logging task and requested] in addActiveLoggingTask in CSM ");
-
-        mActiveLoggingTasks.add(loggingTask);
-
-        Log.d(LOG_TAG, " [testing logging task and requested] in addActiveLoggingTask in CSM there are "
-         + mActiveLoggingTasks.size() + " logging tasks " + this.mName  );
-
-        updateContextSourceListRequestStatus();
-
     }
 
 
@@ -559,6 +597,10 @@ public abstract class ContextStateManager {
 
         return pass;
 
+    }
+
+    public ArrayList<ContextSource> getContextSourceList() {
+        return mContextSourceList;
     }
 
     public static String getMeasureName(int measure) {

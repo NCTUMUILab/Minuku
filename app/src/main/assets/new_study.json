@@ -41,7 +41,7 @@
 				  },
 				  {
 					"Id": 2,
-				  	"Source": "ActivityRecognition"
+				  	"Source": "AR.AllProbableActivities"
 				  },
 				  {
 					"Id": 3,

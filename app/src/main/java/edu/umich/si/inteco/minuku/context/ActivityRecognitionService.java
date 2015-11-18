@@ -30,7 +30,7 @@ public class ActivityRecognitionService extends IntentService {
 
 	private List<DetectedActivity> mProbableActivities;
 
-    private ActivityRecognitionManager mActivityRecognitionManager;
+    private static ActivityRecognitionManager mActivityRecognitionManager;
 	
 	// Store the app's shared preferences repository
 	private SharedPreferences mPrefs;
@@ -38,7 +38,7 @@ public class ActivityRecognitionService extends IntentService {
 	public ActivityRecognitionService() {
 		super("ActivityRecognitionService");
 		mMostProbableActivity = null;
-        mActivityRecognitionManager = new ActivityRecognitionManager(this);
+        mActivityRecognitionManager = ContextManager.getActivityRecognitionManager();
 	}
 
     /*

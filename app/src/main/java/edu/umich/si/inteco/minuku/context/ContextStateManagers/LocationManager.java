@@ -2,6 +2,7 @@ package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,6 +16,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.model.ContextSource;
+import edu.umich.si.inteco.minuku.model.LoggingTask;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -48,6 +52,9 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
     //initial value
     private static long sUpdateIntervalInMilliSeconds = UPDATE_INTERVAL_IN_MILLISECONDS;
+
+    public static final String STRING_CONTEXT_SOURCE_LOCATION = "Location";
+    public static final int CONTEXT_SOURCE_LOCATION = 0;
 
     // Keys for storing activity state in the Bundle.
     protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
@@ -89,6 +96,8 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
     	mContext = c;
 
+        setName(ContextManager.CONTEXT_STATE_MANAGER_LOCATION);
+
         //when the app starts we don't request location.
         mRequestingLocationUpdates = false;
 
@@ -98,15 +107,57 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         // API.
         buildGoogleApiClient();
 
+        setUpContextSourceList();
+
     }
 
+    /** each ContextStateManager should override this static method
+     * it adds a list of ContextSource that it will manage **/
+    protected void setUpContextSourceList(){
+
+        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager. mContextSource:  " + mContextSourceList);
+
+        boolean isAvailable;
+
+        // Google Play Service is available after api level 15
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            isAvailable = true;
+        }
+        else
+            isAvailable = false;
+
+
+        //add two context sources: most probable activity and all probable activities, with defaul sampling rate.
+        mContextSourceList.add(
+                new ContextSource(
+                        STRING_CONTEXT_SOURCE_LOCATION,
+                        CONTEXT_SOURCE_LOCATION,
+                        isAvailable,
+                        sUpdateIntervalInMilliSeconds
+                ));
+
+        return;
+
+    }
+
+    @Override
+    protected boolean updateContextSourceRequestStatus(ContextSource contextSource) {
+
+        boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
+
+        boolean isMonitored = isStateMonitored(contextSource.getSourceId());
+
+        boolean isRequested = isLogging | isMonitored;
+
+        return isRequested;
+    }
     /**
      * Start the activity recognition update request process by
      * getting a connection.
      */
     public void requestLocationUpdate() {
 
-        Log.d(LOG_TAG,"[testLocationUpdate] going to request location update ");
+        Log.d(LOG_TAG, "[testLocationUpdate] going to request location update ");
         //we need to get location. Set this true
         mRequestingLocationUpdates = true;
 
