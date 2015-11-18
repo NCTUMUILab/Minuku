@@ -138,15 +138,10 @@ public abstract class ContextStateManager {
     protected  boolean checkRequestStatusOfContextSource(String sourceName) {
 
         for (int i=0; i<mContextSourceList.size(); i++){
-
-            Log.d(LOG_TAG, "check saving data  compare source Name " + sourceName + " with ContextSource" + mContextSourceList.get(i).getName()
-             + " is requested: " + mContextSourceList.get(i).isRequested());
-
             if (sourceName.equals(mContextSourceList.get(i).getName())) {
                 return mContextSourceList.get(i).isRequested();
             }
         }
-
         return false;
     }
 
@@ -224,14 +219,19 @@ public abstract class ContextStateManager {
      * @param targetValue
      * @return
      */
-    private boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
+    protected boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
         boolean pass = false;
         return pass;
     }
 
-    private boolean examineStateRule(int sourceType, int measure, int relationship, float targetValue){
+    protected boolean examineStateRule(int sourceType, int measure, int relationship, float targetValue){
         boolean pass = false;
         return pass;
+    }
+
+
+    protected void updateStateValues(String sourceName) {
+        updateStateValues( getContextSourceTypeFromName(sourceName) );
     }
 
 
@@ -250,7 +250,7 @@ public abstract class ContextStateManager {
             return;
         }
 
-        /** 2. if a state using the source is currently monitored, we get the stateMappingRule by the type
+        /** 2. if the state is currently monitored, we get the stateMappingRule by the type
          * then we call examineStateRule() to examine the rule depending on the type of the target value
          * Currently, it could be a string or a float number**/
         ArrayList<StateMappingRule> relevantStateMappingRules = getStateMappingRules(sourceType);

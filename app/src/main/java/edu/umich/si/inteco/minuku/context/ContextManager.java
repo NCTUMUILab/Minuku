@@ -438,21 +438,6 @@ public class ContextManager {
 
         Log.d(LOG_TAG, "[updateTasksInContextStateManager] ");
 
-        /**1. assign data recording task to contextStateManager **/
-
-        /*
-        for (int i=0; i<mLoggingTaskList.size(); i++) {
-
-            LoggingTask loggingTask = mLoggingTaskList.get(i);
-
-            //for each logging task, we need tknow which ContextStateManager perform the logging task.
-            String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
-
-
-            //
-
-        }
-*/
         /**assign monitoring task to contextStateManagers **/
         for (int i=0; i<getCircumstanceList().size(); i++){
 
@@ -502,8 +487,6 @@ public class ContextManager {
             }
 
         }
-
-
 
     }
 

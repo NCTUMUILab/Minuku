@@ -59,7 +59,7 @@
 						[
 							{
 							  	"State":"Use Phone",
-							  	"Source": "ActivityRecognition",
+							  	"Source": "AR.MostProbableActivity",
 								"Value_Criteria": [
 									{
 										"TargetValue": "tilting"
@@ -85,7 +85,7 @@
 							{
 
 							  	"State": "Phone Still for a period",
-							  	"Source": "ActivityRecognition",
+							  	"Source": "AR.MostProbableActivity",
 								"Value_Criteria": [
 									{
 										"TargetValue": "still"

@@ -355,8 +355,6 @@ public class ActivityRecognitionManager extends ContextStateManager
         //set the most probable activity
         setMostProbableActivity(mostProbableActivity);
 
-        //after update activity information, update the values of the states
-        updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
     }
 
     public void setProbableActivities(List<DetectedActivity> probableActivities) {
@@ -377,6 +375,10 @@ public class ActivityRecognitionManager extends ContextStateManager
             addRecord(record);
         }
 
+        //after update activity information, we try to update the values of the states.
+        //in that function, it will double check whether a state is being monitored.
+        updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES);
+
     }
 
     public static DetectedActivity getMostProbableActivity() {
@@ -387,7 +389,24 @@ public class ActivityRecognitionManager extends ContextStateManager
         sMostProbableActivity = mostProbableActivity;
 //        Log.d(LOG_TAG, "set most probsble: inside sMostProbableActivity: " + mostProbableActivity);
         //after update activity information, update the values of the states
+
+        /**we only store record in memory if it is requested**/
+        boolean isRequested = checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
+
+        if (isRequested){
+            //store activityRecord
+            ActivityRecord record = new ActivityRecord();
+            record.setProbableActivities(sProbableActivities);
+            record.setTimestamp(sLatestDetectionTime);
+            record.setDetectionTime(sLatestDetectionTime);
+            //add record to local record pool of ActivityRecognitionManager
+            addRecord(record);
+        }
+
+        //after update activity information, we try to update the values of the states.
+        //in that function, it will double check whether a state is being monitored.
         updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
+
     }
 
     public static long getLatestDetectionTime() {
@@ -412,110 +431,6 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     }
 
-    /**
-     * there is no source in AR that the variable type is a float number
-     * @param sourceType
-     * @param measure
-     * @param relationship
-     * @param targetValue
-     * @return
-     */
-    private static boolean examineStateRule(int sourceType, int measure, int relationship, float targetValue) {
-        boolean pass = false;
-        return pass;
-    }
-
-    /**
-     * updateStates()
-     * ContextStateManager check the value for each countextual source and determine whether to
-     * change the value of the state for every 5 seconds When a ContextStateManager check the values and update states
-     * depends on the sampling rate and how it obtains the value (pull vs. push)
-     */
-    protected void updateStateValues(int sourceType) {
-
-        /** 1. we first make sure whether the sourceType is being monitored. If not, we don't need to update
-         //the state values. We call isStateMonitored(int SourceType) to do the examination. **/
-        //Log.d(LOG_TAG, "examine statemappingrule, the state is being monitored: " + isStateMonitored(sourceType));
-        if (!isStateMonitored(sourceType)) {
-            return;
-        }
-
-        /** 2. if the state is currently monitored, we get the stateMappingRule by the type
-         * then we call examineStateRule() to examine the rule depending on the type of the target value
-         * Currently, it could be a string or a float number**/
-        ArrayList<StateMappingRule> relevantStateMappingRules = getStateMappingRules(sourceType);
-
-        for (int i=0; i<relevantStateMappingRules.size(); i++) {
-
-            //get the rule based on the source type. We don't examine all MappingRule, but only the rule
-            //that are related to the source.
-            StateMappingRule rule = relevantStateMappingRules.get(i);
-            boolean pass= false;
-
-            //each rule can have more than one criterion, where each criterion has a measure,
-            // relationship and a targetvalue
-            ArrayList<StateValueCriterion> criteria = rule.getCriteria();
-
-            for (int j=0; j<criteria.size(); j++){
-
-                //1. get the targer value and relaionship
-                int relationship = criteria.get(j).getRelationship();
-                int measure = criteria.get(j).getMeasureType();
-
-                //get values depending on whether the target value is a string or a float number
-                if (criteria.get(j).isTargetString()){
-                    String targetValue = criteria.get(j).getTargetStringValue();
-                    pass = examineStateRule(sourceType, measure, relationship, targetValue);
-                }
-                //the target value is a number
-                else {
-                    float targetValue = criteria.get(j).getTargetFloatValue();
-                    pass = examineStateRule(sourceType, measure, relationship, targetValue);
-                }
-
-                /** examine criterion specified in the SateMappingRule **/
-                Log.d(LOG_TAG, "examine statemappingrule, after the examination the criterion is " + pass);
-
-            }
-
-
-            /** 3. if the criterion is passed, we set the state value based on the mappingRule **/
-            if (pass){
-
-                for (int j=0; j<getStateList().size(); j++){
-                    //find the state corresponding to the StateMappingRule
-
-                    boolean valueChanged = false;
-
-                    if (getStateList().get(j).getName().equals(rule.getName())){
-
-                        String stateValue = rule.getStateValue();
-                        //change the value based on the mapping rule.
-
-                        /** 5. now we need to check whether the new value is different from its current value
-                         * if yes. we need to call StateChange, which will notify ContextManager about the change **/
-                        if (!getStateList().get(j).getValue().equals(stateValue) ){
-                            //the value is changed to the new value,
-                            valueChanged = true;
-                        }
-
-                        getStateList().get(j).setValue(stateValue);
-
-                        Log.d(LOG_TAG, "examine statemappingrule, the state " + getStateList().get(j).getName() + " value change to " + getStateList().get(j).getValue());
-
-                    }
-
-                    //if the state changes to a new value
-                    if (valueChanged){
-                        //we call this method to invoke ContextManager to inspect event conditions.
-                        stateChanged(getStateList().get(j));
-                    }
-
-                }
-            }
-        }
-
-    }
 
     /**
      * This function examines StateMappingRule with the data and returns a boolean pass.
@@ -525,7 +440,8 @@ public class ActivityRecognitionManager extends ContextStateManager
      * @param targetValue
      * @return
      */
-    private boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
+    @Override
+    protected boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
 
         Log.d(LOG_TAG, "examine statemappingrule, in examineStateRule. Going to test source: " + sourceType
                 + " measure : " + measure + " relationship " + relationship + " targevalue " + targetValue
@@ -589,6 +505,32 @@ public class ActivityRecognitionManager extends ContextStateManager
                 getContextSourceBySourceName(source).setSamplingRate(sActivityRecognitionUpdateIntervalInMilliseconds);
             }
 
+        }
+    }
+
+
+    /**
+     *For each ContextSource we check whether it is requested and update its request status.
+     * Each ContextStateManager should override this function because they will need to determine
+     * whether to stop or start extracting certain data source, depending on its Request Status
+     */
+    @Override
+    protected void updateContextSourceListRequestStatus() {
+
+        boolean isRequested = false;
+        for (int i=0; i<mContextSourceList.size(); i++){
+            mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
+
+            //if any of two is requested, we still receive ActivityRecognitionUpdate
+            isRequested = isRequested | mContextSourceList.get(i).isRequested();
+
+        }
+        //If neither AllProbableActivities nor MostProbableActivity are requested, we should stop requesting activity information
+        if (!isRequested){
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting AR informatoin because it is not needed anymore");
+            //TODO: need to create this in the study json to test (triggered logging AR)
+            stopActivityRecognitionUpdates();
         }
     }
 
