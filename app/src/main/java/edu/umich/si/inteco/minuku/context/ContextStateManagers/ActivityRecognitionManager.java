@@ -13,23 +13,18 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.ContextSource;
-import edu.umich.si.inteco.minuku.model.LoggingTask;
-import edu.umich.si.inteco.minuku.model.State;
-import edu.umich.si.inteco.minuku.model.StateMappingRule;
-import edu.umich.si.inteco.minuku.model.StateValueCriterion;
-import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
-import edu.umich.si.inteco.minuku.util.ConditionManager;
-import edu.umich.si.inteco.minuku.util.ConfigurationManager;
+import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
+import edu.umich.si.inteco.minuku.model.Record.Record;
 
 /**
  * Created by Armuro on 10/4/15.
@@ -43,6 +38,7 @@ public class ActivityRecognitionManager extends ContextStateManager
     public static final int CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = 1;
 
     public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION = "ActivityRecognition";
+    public static final String RECORD_DATA_PROPERTY_NAME = "Activities";
     public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES = "AR.MostProbableActivity";
     public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = "AR.AllProbableActivities";
 
@@ -349,65 +345,71 @@ public class ActivityRecognitionManager extends ContextStateManager
         //set activities
         Log.d(LOG_TAG, "set most probsble: inside setActivities : " + mostProbableActivity + " and " + probableActivities);
 
-
         //set a list of probable activities
         setProbableActivities(probableActivities);
         //set the most probable activity
         setMostProbableActivity(mostProbableActivity);
+
+        //either Most probable or all probable activities is requested should we setactivities, and put activites in localPool
+        boolean isRequested =
+                checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES)
+                 | checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
+
+        if (isRequested){
+            //store activityRecord
+            JSONObject data = new JSONObject();
+            ActivityRecognitionRecord record = new ActivityRecognitionRecord();
+            record.setProbableActivities(sProbableActivities);
+
+            //also set data:
+            JSONArray activitiesJSON = new JSONArray();
+
+            //add all activity to JSONArray
+            for (int i=0; i<sProbableActivities.size(); i++){
+
+                DetectedActivity detectedActivity =  sProbableActivities.get(i);
+                String activityAndConfidence = getActivityNameFromType(detectedActivity.getType()) + Constants.ACTIVITY_DELIMITER + detectedActivity.getConfidence();
+                activitiesJSON.put(activityAndConfidence);
+
+            }
+
+            //add activityJSON Array to data
+            try {
+                data.put(RECORD_DATA_PROPERTY_NAME, activitiesJSON);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d(LOG_TAG, "[test json data] the JSON obejct activity data is " + data);
+
+            //add data to records
+            record.setData(data);
+            record.setTimestamp(sLatestDetectionTime);
+            //add record to local record pool of ActivityRecognitionManager
+            addRecord(record);
+        }
 
     }
 
     public void setProbableActivities(List<DetectedActivity> probableActivities) {
 
         sProbableActivities = probableActivities;
-
-        /**we only store record in memory if it is requested**/
-        boolean isRequested = checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES);
-//        Log.d(LOG_TAG, "[check saving data] setProbableActivities" + CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES +
-//                " requested is " + isRequested + " save data!");
-        if (isRequested){
-            //store activityRecord
-            ActivityRecord record = new ActivityRecord();
-            record.setProbableActivities(sProbableActivities);
-            record.setTimestamp(sLatestDetectionTime);
-            record.setDetectionTime(sLatestDetectionTime);
-            //add record to local record pool of ActivityRecognitionManager
-            addRecord(record);
-        }
-
-        //after update activity information, we try to update the values of the states.
-        //in that function, it will double check whether a state is being monitored.
         updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES);
 
     }
+
+    public void setMostProbableActivity(DetectedActivity mostProbableActivity) {
+
+        sMostProbableActivity = mostProbableActivity;
+        updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
+
+    }
+
 
     public static DetectedActivity getMostProbableActivity() {
         return sMostProbableActivity;
     }
 
-    public void setMostProbableActivity(DetectedActivity mostProbableActivity) {
-        sMostProbableActivity = mostProbableActivity;
-//        Log.d(LOG_TAG, "set most probsble: inside sMostProbableActivity: " + mostProbableActivity);
-        //after update activity information, update the values of the states
-
-        /**we only store record in memory if it is requested**/
-        boolean isRequested = checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
-
-        if (isRequested){
-            //store activityRecord
-            ActivityRecord record = new ActivityRecord();
-            record.setProbableActivities(sProbableActivities);
-            record.setTimestamp(sLatestDetectionTime);
-            record.setDetectionTime(sLatestDetectionTime);
-            //add record to local record pool of ActivityRecognitionManager
-            addRecord(record);
-        }
-
-        //after update activity information, we try to update the values of the states.
-        //in that function, it will double check whether a state is being monitored.
-        updateStateValues(CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
-
-    }
 
     public static long getLatestDetectionTime() {
         return sLatestDetectionTime;
@@ -424,13 +426,6 @@ public class ActivityRecognitionManager extends ContextStateManager
         Log.i(LOG_TAG, "Connection suspended");
         mGoogleApiClient.connect();
     }
-
-
-    @Override
-    public void saveRecordsInLocalRecordPool() {
-
-    }
-
 
     /**
      * This function examines StateMappingRule with the data and returns a boolean pass.

@@ -270,9 +270,8 @@ public class ActionManager {
 					//create a session and insert the session into the session table
 					Session session = new Session(ContextManager.getCurrentTimeInMillis(), savingRecordAction.getTaskId());
 
-                    //if not specified otherwise, record all types of records (specify that the session record all types of records)
-                    //TODO: modify this line. Record types in a session should be defined by LoggingTasks
-                    session.setRecordTypes(ContextManager.RECORD_TYPE_LIST);
+                    //a session is associate with a list of ContextSource names, and put it in the metadata.
+                    session.setContextSourceTypes(ContextManager.getSourceNamesFromLoggingTasks(savingRecordAction.getLoggingTasks()));
 
                     //add session to the curRecordingSession
                     RecordingAndAnnotateManager.addCurRecordingSession(session);
@@ -517,7 +516,7 @@ public class ActionManager {
                      * by passing which logging task the action is associated with
                      * ContextMAnageer will know which ContextStateMAnager will have data in localRecordPool
                      * **/
-                    ContextManager.moveRecordFromLocalRecordPoolToPublicRecordPool(savingRecordAction.getLoggingTasks());
+                    ContextManager.copyRecordFromLocalRecordPoolToPublicRecordPool(savingRecordAction.getLoggingTasks());
 
 					mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), savingRecordAction.getSessionId() );
 

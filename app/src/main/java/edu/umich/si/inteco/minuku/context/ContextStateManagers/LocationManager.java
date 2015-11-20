@@ -360,10 +360,6 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
     }
 
-    @Override
-    public void saveRecordsInLocalRecordPool() {
-
-    }
 
     public static int getContextSourceTypeFromName(String sourceName) {
         return -1;

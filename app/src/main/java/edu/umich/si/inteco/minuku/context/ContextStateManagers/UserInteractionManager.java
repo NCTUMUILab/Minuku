@@ -13,11 +13,6 @@ public class UserInteractionManager extends ContextStateManager {
 	}
 
 
-	@Override
-	public void saveRecordsInLocalRecordPool() {
-
-	}
-
 	public static int getContextSourceTypeFromName(String sourceName) {
 		return -1;
 	}

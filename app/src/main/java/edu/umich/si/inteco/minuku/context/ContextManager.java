@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManager;
@@ -24,11 +23,11 @@ import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
+import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
-import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
-import edu.umich.si.inteco.minuku.model.record.Record;
+import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.TriggerManager;
 
@@ -95,7 +94,7 @@ public class ContextManager {
     public static final String RECORD_SHORTNAME_APPLICATION_PACKAGE = "appPackage";
 
 //TODO: this should be defind in each ContextStateMAnager. Need to replace this.
-    public static final int CONTEXT_RECORD_TYPE_LOCATION = 1;
+
     public static final int CONTEXT_RECORD_TYPE_ACTIVITY = 2;
     public static final int CONTEXT_RECORD_TYPE_SENSOR= 3;
     public static final int CONTEXT_RECORD_TYPE_GEOFENCE= 4;
@@ -171,9 +170,6 @@ public class ContextManager {
 
         RECORD_TYPE_LIST = new ArrayList<Integer>();
 
-        //add the record types into the list
-        initiateRecordTypeList();
-
         //initiate Context Source Managers
         mLocationManager = new LocationManager(mContext);
 
@@ -241,71 +237,6 @@ public class ContextManager {
         sIsExtractingContextEnabled = flag;
     }
 
-
-    public static void initiateRecordTypeList() {
-
-        RECORD_TYPE_LIST.add(CONTEXT_RECORD_TYPE_LOCATION);
-        RECORD_TYPE_LIST.add(CONTEXT_RECORD_TYPE_ACTIVITY);
-        RECORD_TYPE_LIST.add(CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY);
-
-
-        //TODO: add more record type
-    }
-
-    public static void addRecordToPublicRecordPool(Record record){
-
-        if(mRecordPool!=null){
-            mRecordPool.add(record);
-            //Log.d(LOG_TAG, "In the RecordPool, there are currently " + mRecordPool.size() + "records");
-        }else
-            return;
-    }
-
-    public static ArrayList<Record> getPublicRecordPool(){
-        return mRecordPool;
-    }
-
-
-    /**
-     * Based on the logging task, ContextManager will call appropriate ContextSTateMAnager to move
-     * its data record in the local data record pool to ContextManager's public record pool
-     * @param loggingTaskIds
-     */
-    public static void moveRecordFromLocalRecordPoolToPublicRecordPool(ArrayList<Integer> loggingTaskIds) {
-
-        //1. find the corresponding contextStateManager based on the loggingTask Id
-
-
-
-        ArrayList<ContextStateManager> contextStateManagers = new ArrayList<ContextStateManager>();
-
-        for (int i=0; i<loggingTaskIds.size();i++){
-
-            //get loggingTask by id
-            LoggingTask  loggingTask = getLoggingTask(loggingTaskIds.get(i));
-
-
-
-            //get Logging Task from ContextManager.getLoggintTask
-
-            //for each LoggingTask get it's corresponding ContextStateMAnager
-
-
-
-        }
-
-
-
-    }
-
-
-
-    public LocationManager getLocationManager(){
-        if (mLocationManager==null){
-            mLocationManager = new LocationManager(mContext);
-        }
-        return mLocationManager;
-    }
 
 
     public void requesLocationUpdate () {
@@ -402,33 +333,293 @@ public class ContextManager {
     }
 
 
-    private static String getContextStateManagerName(String source) {
+    /**
+     * according to the source name we go to each ContextStateManager to update each ContextSource.
+     * A ContextManager will maintain a list of ContextSouce that it manages to get information.
+     * @param source
+     * @param samplingRate
+     */
+    public void configureContextStateSource(String source, long samplingRate) {
 
-        String name = null;
-
-        if (source.equals(CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
-            return CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION;
+        if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
+            mActivityRecognitionManager.updateContextSourceList(source, samplingRate);
         }
-        else if (source.equals(CONTEXT_SOURCE_NAME_TRANSPORTATION)){
-            return CONTEXT_STATE_MANAGER_TRANSPORTATION;
+        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
+            mPhoneSensorManager.updateContextSourceList(source, samplingRate);
         }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
+            mLocationManager.updateContextSourceList(source, samplingRate);;
 
-        else if (source.equals(CONTEXT_SOURCE_NAME_LOCATION)){
-            return CONTEXT_STATE_MANAGER_LOCATION;
-        }
-
-        else if (source.contains("Sensor.") ) {
-            return CONTEXT_STATE_MANAGER_PHONE_SENSOR;
-        }
-
-        else if (source.contains("AR.") ) {
-            return CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION;
         }
 
-
-
-        return name;
     }
+
+    public void configureContextStateSource(String source, String samplingMode) {
+
+        if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
+            mActivityRecognitionManager.updateContextSourceList(source, samplingMode);
+        } else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
+            mPhoneSensorManager.updateContextSourceList(source, samplingMode);
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
+            mLocationManager.updateContextSourceList(source, samplingMode);;
+
+        }
+
+    }
+
+
+    /*******************************************************************************************/
+    /************************************** Main Thread ****************************************/
+    /*******************************************************************************************/
+
+    public void stopContextManagerMainThread() {
+        // mScheduledExecutorService.shutdown();
+    }
+
+    Runnable ContextManagerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            try{
+
+                testCount +=1;
+                Log.d(LOG_TAG, "[testCount]"  + testCount);
+
+                /** test transporation : feed datain to the datapool**/
+
+                //REPLAY ACTIIVITY LOG
+
+                /**
+                 if (testActivityRecordIndex<TransportationModeManager.getActivityRecords().size()){
+                 Log.d(LOG_TAG, "[testing transportation] Feed the " + testActivityRecordIndex + " record :"
+                 + TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
+                 + TransportationModeManager.getActivityNameFromType(TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities().get(0).getType())  );
+
+                 ActivityRecognitionManager.setProbableActivities(TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities());
+
+                 ActivityRecognitionManager.setLatestDetectionTime(
+                 TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getTimestamp());
+                 }
+                 testActivityRecordIndex+=1;
+                 **/
+
+                //Recording is one of the types of actions that users need to put into the configuration.
+                //However, now we want to enable background recording so that we can monitor circumstances.
+                //circumstanceually. If researachers do not monitor anything, this flag should be false.
+
+                if (sIsBackgroundRecordingEnabled){
+                    DataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
+                }
+
+
+                /* update transportation mode. Transporation Manager will use the latet activity label
+                 * saved in the ActivityRecognitionManager to infer the user's current transportation mode
+                 * **/
+
+                ActivityRecognitionRecord record = (ActivityRecognitionRecord) mActivityRecognitionManager.getLastSavedRecord();
+                if (record!=null){
+                    int transportationMode= mTransportationModeManager.examineTransportation(record);
+                }
+
+                /* after the transportationModeManager generate a transportation label, we update Mobility
+                 * of the user. The mobility information, right now,  will be used to control the
+                 * frequency of location udpate to save battery life**/
+                MobilityManager.updateMobility();
+
+
+                String travelHistoryMessage="NA";
+                /*we create a travel log here*/
+
+                if (ActivityRecognitionManager.getProbableActivities()!=null &&
+                        LocationManager.getCurrentLocation()!=null ){
+                    travelHistoryMessage= MobilityManager.getMobility() + "\t" +
+                            TransportationModeManager.getConfirmedActvitiyString() + "\t" +
+                            "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
+                            ActivityRecognitionManager.getProbableActivities().toString() + "\t" +
+                            LocationManager.getCurrentLocation().getLatitude() + "," +
+                            LocationManager.getCurrentLocation().getLongitude() + "," +
+                            LocationManager.getCurrentLocation().getAccuracy();
+                }
+
+                //Log.d(LOG_TAG, "travel history message:" + travelHistoryMessage);
+
+                //create travel history file
+                LogManager.log(LogManager.LOG_TYPE_TRAVEL_LOG,
+                        LogManager.LOG_TAG_TRAVEL_HISTORY,
+                        //content of the log
+                        travelHistoryMessage
+                );
+
+            }catch (IllegalArgumentException e){
+                //Log.e(LOG_TAG, "Could not unregister receiver " + e.getMessage()+"");
+            }
+
+        }
+    };
+
+
+
+    /*******************************************************************************************/
+    /********************************* Logging Task Related ************************************/
+    /*******************************************************************************************/
+
+
+
+    public static void addRecordToPublicRecordPool(Record record){
+
+        if(mRecordPool!=null){
+            mRecordPool.add(record);
+            //Log.d(LOG_TAG, "In the RecordPool, there are currently " + mRecordPool.size() + "records");
+        }else
+            return;
+    }
+
+    public static ArrayList<Record> getPublicRecordPool(){
+        return mRecordPool;
+    }
+
+
+    /**
+     * Based on the logging task, ContextManager will call appropriate ContextSTateMAnager to move
+     * its data record in the local data record pool to ContextManager's public record pool
+     * @param loggingTaskIds
+     */
+    public static void copyRecordFromLocalRecordPoolToPublicRecordPool(ArrayList<Integer> loggingTaskIds) {
+
+        Log.d(LOG_TAG, "testing saving records [moveRecordFromLocalRecordPoolToPublicRecordPool] for logging tasks" + loggingTaskIds.toString());
+        //1. find the corresponding contextStateManager based on the loggingTask Id
+        for (int i=0; i<loggingTaskIds.size();i++){
+            //get loggingTask by id
+            LoggingTask  loggingTask = getLoggingTask(loggingTaskIds.get(i));
+
+            String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
+
+            copyRecordFromLocalRecordPoolToPublicRecordPool(contextStateManagerName, loggingTask);
+        }
+
+    }
+
+
+    /**
+     * This function copy records from the specified ContextStateManager to ContextManager's Public Data Pool
+     * @param contextStateManagerName
+     * @param loggingTask
+     */
+    private static void copyRecordFromLocalRecordPoolToPublicRecordPool(String contextStateManagerName, LoggingTask loggingTask) {
+
+        Log.d(LOG_TAG, "testing saving records moving records in " + contextStateManagerName + " for logging tasks" + loggingTask.getSource());
+
+        //1.
+        if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
+            mActivityRecognitionManager.copyRecordsToPublicRecordPool();
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))
+            mPhoneStatusManager.copyRecordsToPublicRecordPool();
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_LOCATION))
+            mLocationManager.copyRecordsToPublicRecordPool();
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR))
+            mPhoneSensorManager.copyRecordsToPublicRecordPool();
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION))
+            mTransportationModeManager.copyRecordsToPublicRecordPool();
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION))
+            mUserInteractionManager.copyRecordsToPublicRecordPool();
+
+    }
+
+
+    /**
+   *
+   * ContextMAnager assigns loggingTask to the right contextStateManagers with the LoggingTaskIDs.
+   * @param loggingTaskIds
+   */
+    public void assignLoggingTasks(ArrayList<Integer> loggingTaskIds) {
+
+        Log.d(LOG_TAG, " [testing logging task and requested] in assignLoggingTasks ");
+
+        //for each loggingTask ids, we first locate the LoggingTask from ContextManager
+        for (int i=0; i<loggingTaskIds.size(); i++){
+
+            LoggingTask loggingTask= getLoggingTask(loggingTaskIds.get(i));
+
+            //then we find the ContextStateManager for the sourceType
+            String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
+
+            //then we add the loggingTask to the right ContextStateManager's active Logging Task
+            assignLoggingTasks(contextStateManagerName, loggingTask);
+
+        }
+
+
+    }
+
+    /**
+     * add the input loggingTask to the activeLoggingTaskList of the corresponding ContextStateManasger
+     * @param contextStateManagerName
+     * @param loggingTask
+     */
+    private void assignLoggingTasks(String contextStateManagerName, LoggingTask loggingTask) {
+
+        Log.d(LOG_TAG, " [testing logging task and requested] assign  logging task: " +
+                loggingTask.getSource() + " to " + contextStateManagerName);
+
+        if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
+            mActivityRecognitionManager.addActiveLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))
+            mPhoneStatusManager.addActiveLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_LOCATION))
+            mLocationManager.addActiveLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR))
+            mPhoneSensorManager.addActiveLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION))
+            mTransportationModeManager.addActiveLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION))
+            mUserInteractionManager.addActiveLoggingTask(loggingTask);
+
+    }
+
+    /**
+     * Add Logging Task
+     * @param task
+     */
+    public static void addLoggingTask(LoggingTask task){
+        if (mLoggingTaskList == null) {
+            mLoggingTaskList = new ArrayList<LoggingTask>();
+        }
+        mLoggingTaskList.add(task);
+    }
+
+    /**
+     * Remove Logging Task
+     * @param task
+     */
+    public static void removeLoggingTask(LoggingTask task) {
+        if (mLoggingTaskList != null) {
+            mLoggingTaskList.remove(task);
+        }
+    }
+
+    public static void removeLoggingTask(int index) {
+        if (mLoggingTaskList != null) {
+            mLoggingTaskList.remove(index);
+        }
+    }
+
+    public static LoggingTask getLoggingTask (int id) {
+
+        for (int i=0; i<mLoggingTaskList.size(); i++){
+            if (mLoggingTaskList.get(i).getId()==id){
+
+                return mLoggingTaskList.get(i);
+            }
+        }
+
+        return null;
+    }
+
+
+    /*******************************************************************************************/
+    /********************************* Monitoring Related** ************************************/
+    /*******************************************************************************************/
+
 
 
     /**
@@ -503,92 +694,6 @@ public class ContextManager {
             mPhoneStatusManager.addStateMappingRule(rule);
 
         //TODO: add more contextStateManager
-
-    }
-
-    /**
-     * according to the source name we go to each ContextStateManager to update each ContextSource.
-     * A ContextManager will maintain a list of ContextSouce that it manages to get information.
-     * @param source
-     * @param samplingRate
-     */
-    public void configureContextStateSource(String source, long samplingRate) {
-
-        if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
-            mActivityRecognitionManager.updateContextSourceList(source, samplingRate);
-        }
-        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
-            mPhoneSensorManager.updateContextSourceList(source, samplingRate);
-        }
-        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
-            mLocationManager.updateContextSourceList(source, samplingRate);;
-
-        }
-
-    }
-
-    public void configureContextStateSource(String source, String samplingMode) {
-
-        if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
-            mActivityRecognitionManager.updateContextSourceList(source, samplingMode);
-        }
-        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
-            mPhoneSensorManager.updateContextSourceList(source, samplingMode);
-        }
-        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
-            mLocationManager.updateContextSourceList(source, samplingMode);;
-
-        }
-
-    }
-
-    /**
-     * add the input loggingTask to the activeLoggingTaskList of the corresponding ContextStateManasger
-     * @param contextStateManagerName
-     * @param loggingTask
-     */
-    private void assignLoggingTasks(String contextStateManagerName, LoggingTask loggingTask) {
-
-        Log.d(LOG_TAG, " [testing logging task and requested] assign  logging task: " +
-                loggingTask.getSource() + " to " + contextStateManagerName);
-
-        if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
-            mActivityRecognitionManager.addActiveLoggingTask(loggingTask);
-        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))
-            mPhoneStatusManager.addActiveLoggingTask(loggingTask);
-        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_LOCATION))
-            mLocationManager.addActiveLoggingTask(loggingTask);
-        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR))
-            mPhoneSensorManager.addActiveLoggingTask(loggingTask);
-        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION))
-            mTransportationModeManager.addActiveLoggingTask(loggingTask);
-        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION))
-            mUserInteractionManager.addActiveLoggingTask(loggingTask);
-
-    }
-
-  /**
-   *
-   * ContextMAnager assigns loggingTask to the right contextStateManagers with the LoggingTaskIDs.
-   * @param loggingTaskIds
-   */
-    public void assignLoggingTasks(ArrayList<Integer> loggingTaskIds) {
-
-        Log.d(LOG_TAG, " [testing logging task and requested] in assignLoggingTasks ");
-
-        //for each loggingTask ids, we first locate the LoggingTask from ContextManager
-        for (int i=0; i<loggingTaskIds.size(); i++){
-
-            LoggingTask loggingTask= getLoggingTask(loggingTaskIds.get(i));
-
-            //then we find the ContextStateManager for the sourceType
-            String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
-
-            //then we add the loggingTask to the right ContextStateManager's active Logging Task
-            assignLoggingTasks(contextStateManagerName, loggingTask);
-
-        }
-
 
     }
 
@@ -676,91 +781,6 @@ public class ContextManager {
 
 
 
-
-    public void stopContextManagerMainThread() {
-       // mScheduledExecutorService.shutdown();
-    }
-
-    Runnable ContextManagerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            try{
-
-                testCount +=1;
-                Log.d(LOG_TAG, "[testCount]"  + testCount);
-
-                /** test transporation : feed datain to the datapool**/
-
-                 //REPLAY ACTIIVITY LOG
-/**
-                    if (testActivityRecordIndex<TransportationModeManager.getActivityRecords().size()){
-                        Log.d(LOG_TAG, "[testing transportation] Feed the " + testActivityRecordIndex + " record :"
-                        + TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities()
-                        + TransportationModeManager.getActivityNameFromType(TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities().get(0).getType())  );
-
-                        ActivityRecognitionManager.setProbableActivities(TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getProbableActivities());
-
-                        ActivityRecognitionManager.setLatestDetectionTime(
-                                TransportationModeManager.getActivityRecords().get(testActivityRecordIndex).getTimestamp());
-                    }
-                    testActivityRecordIndex+=1;
-**/
-
-                //Recording is one of the types of actions that users need to put into the configuration.
-                //However, now we want to enable background recording so that we can monitor circumstances.
-                //circumstanceually. If researachers do not monitor anything, this flag should be false.
-
-                if (sIsBackgroundRecordingEnabled){
-                    DataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
-                }
-
-
-                /* update transportation mode. Transporation Manager will use the latet activity label
-                 * saved in the ActivityRecognitionManager to infer the user's current transportation mode
-                 * **/
-
-                ActivityRecord record = (ActivityRecord) mActivityRecognitionManager.getLastSavedRecord();
-                if (record!=null){
-                    int transportationMode= mTransportationModeManager.examineTransportation(record);
-                }
-
-                /* after the transportationModeManager generate a transportation label, we update Mobility
-                 * of the user. The mobility information, right now,  will be used to control the
-                 * frequency of location udpate to save battery life**/
-                MobilityManager.updateMobility();
-
-
-                String travelHistoryMessage="NA";
-                /*we create a travel log here*/
-
-                if (ActivityRecognitionManager.getProbableActivities()!=null &&
-                        LocationManager.getCurrentLocation()!=null ){
-                    travelHistoryMessage= MobilityManager.getMobility() + "\t" +
-                            TransportationModeManager.getConfirmedActvitiyString() + "\t" +
-                            "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
-                            ActivityRecognitionManager.getProbableActivities().toString() + "\t" +
-                            LocationManager.getCurrentLocation().getLatitude() + "," +
-                            LocationManager.getCurrentLocation().getLongitude() + "," +
-                            LocationManager.getCurrentLocation().getAccuracy();
-                }
-
-                //Log.d(LOG_TAG, "travel history message:" + travelHistoryMessage);
-
-                //create travel history file
-                LogManager.log(LogManager.LOG_TYPE_TRAVEL_LOG,
-                        LogManager.LOG_TAG_TRAVEL_HISTORY,
-                        //content of the log
-                        travelHistoryMessage
-                        );
-
-            }catch (IllegalArgumentException e){
-                //Log.e(LOG_TAG, "Could not unregister receiver " + e.getMessage()+"");
-            }
-
-        }
-    };
-
-
     public static void addCircumstance(Circumstance circumstance){
         if (mCircumstanceList ==null){
             mCircumstanceList = new ArrayList<Circumstance>();
@@ -782,46 +802,76 @@ public class ContextManager {
     }
 
 
-
-    public static void addLoggingTask(LoggingTask task){
-        if (mLoggingTaskList == null) {
-            mLoggingTaskList = new ArrayList<LoggingTask>();
-        }
-        mLoggingTaskList.add(task);
-    }
-
-    public static void removeLoggingTask(LoggingTask task) {
-        if (mLoggingTaskList != null) {
-            mLoggingTaskList.remove(task);
-        }
-    }
-
-    public static void removeLoggingTask(int index) {
-        if (mLoggingTaskList != null) {
-            mLoggingTaskList.remove(index);
-        }
-    }
-
-    public static LoggingTask getLoggingTask (int id) {
-
-        for (int i=0; i<mLoggingTaskList.size(); i++){
-            if (mLoggingTaskList.get(i).getId()==id){
-
-                return mLoggingTaskList.get(i);
-            }
-        }
-
-        return null;
-    }
-
     public static ArrayList<Circumstance> getCircumstanceList(){
         return mCircumstanceList;
     }
 
+    /**
+     * This function returns list of SourceNames by loggingTaskIds (it is used by Session, because a Session
+     * needs to know which ContextSources it is associated with. It will put the information in the metadata.
+     * @param loggingTaskIds
+     * @return
+     */
+    public static ArrayList<String> getSourceNamesFromLoggingTasks(ArrayList<Integer> loggingTaskIds) {
+
+        ArrayList<String> names = new ArrayList<String>();
+        for (int i=0; i<loggingTaskIds.size(); i++) {
+
+            //first get LoggingTask
+            LoggingTask loggingTask = getLoggingTask(loggingTaskIds.get(i));
+
+            names.add(loggingTask.getSource());
+        }
+        return names;
+    }
+
+
+
+    /*******************************************************************************************/
+    /************************************** ContextSource ****************************************/
+    /*******************************************************************************************/
+
+
+    /**
+     * For ActivityRecognitionService to get the ActivityRecognitionManager from ContextManager
+     * @return
+     */
+    public LocationManager getLocationManager(){
+        if (mLocationManager==null){
+            mLocationManager = new LocationManager(mContext);
+        }
+        return mLocationManager;
+    }
+
 
     public static ActivityRecognitionManager getActivityRecognitionManager() {
-
         return mActivityRecognitionManager;
+    }
+
+
+    private static String getContextStateManagerName(String source) {
+
+        String name = null;
+
+        if (source.equals(CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
+            return CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION;
+        }
+        else if (source.equals(CONTEXT_SOURCE_NAME_TRANSPORTATION)){
+            return CONTEXT_STATE_MANAGER_TRANSPORTATION;
+        }
+
+        else if (source.equals(CONTEXT_SOURCE_NAME_LOCATION)){
+            return CONTEXT_STATE_MANAGER_LOCATION;
+        }
+
+        else if (source.contains("Sensor.") ) {
+            return CONTEXT_STATE_MANAGER_PHONE_SENSOR;
+        }
+
+        else if (source.contains("AR.") ) {
+            return CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION;
+        }
+        return name;
     }
 
 
@@ -850,6 +900,8 @@ public class ContextManager {
         }
     }
 
+
+
     public static int getSourceTypeFromName (String contextStateManager, String sourceName){
 
         if (contextStateManager.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION)){
@@ -875,23 +927,11 @@ public class ContextManager {
         }
     }
 
-    public static String getSensorTypeName(int recordType){
 
-        switch(recordType){
+    /*******************************************************************************************/
+    /************************************** Utility Funditons ****************************************/
+    /*******************************************************************************************/
 
-            case CONTEXT_RECORD_TYPE_LOCATION:
-                return CONTEXT_RECORD_TYPE_LOCATION_NAME;
-            case CONTEXT_RECORD_TYPE_ACTIVITY:
-                return CONTEXT_RECORD_TYPE_ACTIVITY_NAME;
-            case CONTEXT_RECORD_TYPE_SENSOR:
-                return CONTEXT_RECORD_TYPE_SENSOR_NAME;
-            case CONTEXT_RECORD_TYPE_GEOFENCE:
-                return CONTEXT_RECORD_TYPE_SENSOR_NAME;
-            case CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY:
-                return CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY_NAME;
-        }
-        return "unknown";
-    }
 
     /**get the current time in milliseconds**/
     public static long getCurrentTimeInMillis(){

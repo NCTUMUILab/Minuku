@@ -17,7 +17,7 @@ import java.util.List;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
-import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
+import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
 
 public class FileHelper {
 
@@ -157,13 +157,13 @@ public class FileHelper {
                   Log.d(LOG_TAG, "[readTestFile] activity " + activity + " : " + confidence);
             }
 
-            ActivityRecord record = new ActivityRecord();
+            ActivityRecognitionRecord record = new ActivityRecognitionRecord();
             record.setProbableActivities(activityList);
             record.setTimestamp(time);
             //  Log.d(LOG_TAG, "[readTestFile] readline " + lines[i]);
 
             //also add to the transportationModeDetector
-            TransportationModeManager.addActivityRecord(record);
+            TransportationModeManager.addActivityRecognitionRecord(record);
 
         }
 

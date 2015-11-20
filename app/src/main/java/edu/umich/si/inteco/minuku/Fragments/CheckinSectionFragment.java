@@ -232,8 +232,10 @@ public class CheckinSectionFragment extends Fragment{
                     /***2. create checkpoint and log data of the two checkpoints **/
                     Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
                     String betweenCheckpointContentMessage =
-                            ScheduleAndSampleManager.getTimeString( previousCheckpoint.getTimestamp()) + "\t" +
-                            ScheduleAndSampleManager.getTimeString( curCheckpoint.getTimestamp()) + "\t" +
+                            ScheduleAndSampleManager.getTimeString(previousCheckpoint.getTimestamp()) + "\t" +
+                                    previousCheckpoint.getTimestamp() + "\t" +
+                                    ScheduleAndSampleManager.getTimeString(curCheckpoint.getTimestamp()) + "\t" +
+                                    curCheckpoint.getTimestamp()+ "\t" +
                                     previousCheckpoint.getLocation().toString() + "\t" +
                                     curCheckpoint.getLocation().toString();
 
@@ -339,8 +341,10 @@ public class CheckinSectionFragment extends Fragment{
                 /***2. create checkpoint and log data of the two checkpoints **/
                 Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
                 String betweenCheckpointContentMessage =
-                        ScheduleAndSampleManager.getTimeString( previousCheckpoint.getTimestamp()) + "\t" +
-                                ScheduleAndSampleManager.getTimeString( curCheckpoint.getTimestamp()) + "\t" +
+                        ScheduleAndSampleManager.getTimeString(previousCheckpoint.getTimestamp()) + "\t" +
+                                previousCheckpoint.getTimestamp() + "\t" +
+                                ScheduleAndSampleManager.getTimeString(curCheckpoint.getTimestamp()) + "\t" +
+                                curCheckpoint.getTimestamp()+ "\t" +
                                 previousCheckpoint.getLocation().toString() + "\t" +
                                 curCheckpoint.getLocation().toString();
 

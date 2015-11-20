@@ -196,7 +196,6 @@ public class AnnotateActivity extends Activity implements OnItemSelectedListener
         ArrayList<LatLng> points = new ArrayList<LatLng>();
 
 
-
         //get data from the database
         ArrayList<String> data = DataHandler.getDataBySession(sessionId,RecordingAndAnnotateManager.ANNOTATION_VISUALIZATION_TYPE_LOCATION);
 
@@ -205,9 +204,16 @@ public class AnnotateActivity extends Activity implements OnItemSelectedListener
 
             String[] record = data.get(i).split(Constants.DELIMITER);
 
+
+            //TODO: need to get lat and lng from the Data JSON Object from LocationRecord
+
             //get location parameters
-            double lat = Double.parseDouble(record[DatabaseNameManager.COL_INDEX_RECORD_LOC_LATITUDE_] );
-            double lng = Double.parseDouble(record[DatabaseNameManager.COL_INDEX_RECORD_LOC_LONGITUDE] );
+            //double lat = Double.parseDouble(record[DatabaseNameManager.COL_INDEX_RECORD_LOC_LATITUDE_] );
+            //double lng = Double.parseDouble(record[DatabaseNameManager.COL_INDEX_RECORD_LOC_LONGITUDE] );
+
+            double lat = 45.5;
+            double lng = 80.5;
+
             points.add(new LatLng(lat, lng));
            // Log.d(LOG_TAG, "[showRecordingVizualization] lat ( " + lat + ", " + lng + " )"  );
 

@@ -18,7 +18,6 @@ import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
 import edu.umich.si.inteco.minuku.model.Checkpoint;
 import edu.umich.si.inteco.minuku.model.actions.Action;
-import edu.umich.si.inteco.minuku.model.record.SensorRecord;
 import edu.umich.si.inteco.minuku.receivers.BatteryStatusReceiver;
 import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.BatteryHelper;
@@ -72,7 +71,6 @@ public class MinukuMainService extends Service {
 
     /**Context Records**/
     // each Record object is uniqute to the ContextExtractor. The ContextExtractor updates each of the Record based on the RecordFrequency
-    private SensorRecord mSensorRecord;
 
     /**Handle repeating recoridng**/
     private Handler mRecordingHandler;

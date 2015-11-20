@@ -91,6 +91,7 @@ public class Constants {
 	public static final int DATA_FORMAT_TYPE_DAY=1;
 	public static final int DATA_FORMAT_TYPE_HOUR=2;
 	public static final String DELIMITER = ";;;";
+	public static final String ACTIVITY_DELIMITER = ":";
 	public static final String DELIMITER_IN_COLUMN = "::";
 
 	/**File Path **/

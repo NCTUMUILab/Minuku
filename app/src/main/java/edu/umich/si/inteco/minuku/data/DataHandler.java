@@ -14,16 +14,10 @@ import java.util.List;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
-import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
-import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
-import edu.umich.si.inteco.minuku.model.record.LocationRecord;
-import edu.umich.si.inteco.minuku.model.record.Record;
-import edu.umich.si.inteco.minuku.model.record.SensorRecord;
+import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
+import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
-import edu.umich.si.inteco.minuku.util.FileHelper;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
 
 public class DataHandler {
@@ -52,7 +46,22 @@ public class DataHandler {
 		mAlarmManager  = (AlarmManager)mContext.getSystemService( mContext.ALARM_SERVICE );
 
 	}
- 
+
+
+    /**
+     * based on the source of the Record we determine which table the record should be inserted into
+     * @param source
+     * @return
+     */
+    public static String getTableNameByRecordType(String source) {
+
+        String tableName = "";
+
+
+
+
+        return tableName;
+    }
 
 	
 	 
@@ -102,41 +111,8 @@ public class DataHandler {
 
             try{
 
-                if (recordpool.get(i).getType()==ContextManager.CONTEXT_RECORD_TYPE_SENSOR){
-
-                    SensorRecord sr = (SensorRecord) recordpool.get(i);
-
-                    //get table names according to the sensor source.
-                    LocalDBHelper.insertRecordTable(sr, getTableNameBySensorSourceNumber(sr.getSensorSource()), session_id );
-
-                }
-
-                else if (recordpool.get(i).getType()==ContextManager.CONTEXT_RECORD_TYPE_LOCATION  ){
-
-                    LocationRecord lr = (LocationRecord) recordpool.get(i);
-
-                    //insert record into the Location Record Table
-                    LocalDBHelper.insertRecordTable(lr, DatabaseNameManager.RECORD_TABLE_NAME_LOCATION, session_id );
-
-                }
-
-                else if (recordpool.get(i).getType()==ContextManager.CONTEXT_RECORD_TYPE_ACTIVITY  ){
-
-                    ActivityRecord ar = (ActivityRecord) recordpool.get(i);
-
-                    //insert record into the Activity Record Table
-                    LocalDBHelper.insertRecordTable(ar, DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY, session_id );
-
-                }else if (recordpool.get(i).getType()==ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY){
-
-                    PhoneActivityRecord ar = (PhoneActivityRecord) recordpool.get(i);
-
-                    //insert record into the Activity Record Table
-                    LocalDBHelper.insertRecordTable(ar, DatabaseNameManager.RECORD_TABLE_NAME_APPLICATION_ACTIVITY, session_id );
-
-                }
-
-
+                //LocalDBHelper will save the record according to the type of the record
+                LocalDBHelper.insertRecordTable ( recordpool.get(i), getTableNameByRecordType(recordpool.get(i).getSource()), session_id);
 
                 if (!recordpool.get(i).getSavedSessionIds().contains(session_id))
                     recordpool.get(i).getSavedSessionIds().add(session_id);
@@ -195,13 +171,8 @@ public class DataHandler {
 
 
     }
-	
-	
-	/**
-	 * write the record in the RecordPool to the local drive
-	 * @param recordpool
-	 */
-	
+
+	/*
 	public static void WriteRecordsToFile(ArrayList<Record> recordpool){		
 		
 		//write each record to files based on their source; each source is written to a separate file
@@ -247,16 +218,20 @@ public class DataHandler {
 		}		
 		//		
 	}
+*/
 
 
-    public static ArrayList<String> getDataBySession(int sessionId, int recordType, long startTime, long endTime) {
+    public static ArrayList<String> getDataBySession(int sessionId, String sourceNames, long startTime, long endTime) {
 
 
         //for each record type get data
 
         ArrayList<String> resultList = new ArrayList<String>();
 
+
+        //TODO: get data from database
         //first know which table and column to query..
+        /*
         ArrayList<String> tableAndColumns = getTableAndColumnByRecordType(recordType);
 
         String tableName="", columnName1="", columnName2="", columnName3="" ;
@@ -278,6 +253,7 @@ public class DataHandler {
 
 
         }
+        */
 
 
 
@@ -286,17 +262,20 @@ public class DataHandler {
 
 
 
-    public static ArrayList<String> getDataBySession(int sessionId, int recordType) {
+
+    public static ArrayList<String> getDataBySession(int sessionId, String sourceName) {
 
 
         //for each record type get data
 
         ArrayList<String> resultList = new ArrayList<String>();
 
+        //TODO: get data from database
+        /*
         //first know which table and column to query..
         ArrayList<String> tableAndColumns = getTableAndColumnByRecordType(recordType);
 
-        String tableName="", columnName1="", columnName2="", columnName3="" ;
+        String tableName="" ;
 
         //get table and column names
         if (tableAndColumns!=null && tableAndColumns.size()>0){
@@ -315,14 +294,14 @@ public class DataHandler {
 
 
         }
-
+*/
 
 
         return resultList;
     }
 
 
-	public static ArrayList<String> getDataBySession(int sessionId, String annotationVizType) {
+	public static ArrayList<String> getDataBySession(int sessionId, String sourceName, String annotationVizType) {
 
         ArrayList<String> resultList = new ArrayList<String>();
 
@@ -353,15 +332,21 @@ public class DataHandler {
     }
 
 
-    public static ActivityRecord parseDBResultToActivityRecord(String recordStr) {
+    /**
+     * this function parse the activity data from DB and create activity Record
+     * @param recordStr
+     * @return
+     */
+    public static Record parseDBResultToActivityRecord(String recordStr) {
 
-        ActivityRecord activityRecord = new ActivityRecord();
+        ActivityRecognitionRecord activityRecord = new ActivityRecognitionRecord();
         List<DetectedActivity> probableActivities= new ArrayList<DetectedActivity>();
 
         String[] separated = recordStr.split(Constants.DELIMITER);
 
         long timestamp = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG]);
 
+        /*
         //activity 1
         String activityType1 = separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_LABEL_1];
         int activityConf1 = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_CONFIDENCE_1]);
@@ -382,6 +367,7 @@ public class DataHandler {
             DetectedActivity detectedActivity3 = new DetectedActivity(TransportationModeManager.getActivityTypeFromName(activityType3), activityConf3);
             probableActivities.add(detectedActivity3);
         }
+*/
 
         activityRecord.setProbableActivities(probableActivities);
         activityRecord.setTimestamp(timestamp);
@@ -391,14 +377,16 @@ public class DataHandler {
 
     }
 
-    public static ArrayList<ActivityRecord> getActivityRecordsBetweenTimes(long starTime, long endTime) {
+
+    /*
+    public static ArrayList<ActivityRecord> getRecordBetweenTimes(long starTime, long endTime) {
 
         ArrayList<ActivityRecord> records = new ArrayList<ActivityRecord>();
 
         ArrayList<String> res = new ArrayList<String>();
 
         res = LocalDBHelper.queryRecordsInSession(
-                DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY,
+                DatabaseNameManager.RECORD_TABLE_NAME_XYZ,
                 RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID,
                 starTime,
                 endTime
@@ -420,6 +408,7 @@ public class DataHandler {
         return records;
 
     }
+    */
 
     public static String getLastSavedRecordInSession(int sessionId) {
 
@@ -439,28 +428,6 @@ public class DataHandler {
     }
 
 
-    public static ActivityRecord getLastSavedActivityRecord() {
-
-        ActivityRecord activityRecord = null;
-
-        ArrayList<String> res = new ArrayList<String>();
-
-        res = LocalDBHelper.queryLastRecord(
-                DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY,
-                RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID);
-
-        Log.d(LOG_TAG, "[getLastSavedActivityRecord] the last record is " + res);
-
-
-        for (int j=0; j<res.size(); j++) {
-            //each record
-            String recordStr = res.get(j);
-            activityRecord =parseDBResultToActivityRecord(recordStr);
-        }
-
-        return activityRecord;
-
-    }
 
 
 	/**
@@ -608,31 +575,6 @@ public class DataHandler {
 		
 	}*/
 
-    public static ArrayList<String> getTableAndColumnByRecordType(int recordType) {
-
-        ArrayList<String> TableAndColumns = new ArrayList<String>();
-
-
-        if (recordType==ContextManager.CONTEXT_RECORD_TYPE_LOCATION) {
-
-            TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_LOCATION);
-
-        }
-        else if (recordType==ContextManager.CONTEXT_RECORD_TYPE_ACTIVITY){
-
-            TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY);
-
-        }
-        else if (recordType==ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY){
-
-            TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_APPLICATION_ACTIVITY);
-
-        }
-
-        return TableAndColumns;
-
-    }
-
 
     public static ArrayList<String> getTableAndColumnByVizType(String annotationVizType) {
 
@@ -704,14 +646,36 @@ public class DataHandler {
 		
 		return s;
 	}
-	
-	
+
+
+    /**
+     * this function inquire ContextManager to get ContextStateManager, and then get their defined tableNames.
+     * @param sourceName
+     * @return
+     */
+    //not sure yet this should be in ContextMAnager or in DBHandler
+    private static String getTableNameByContextSource(String sourceName) {
+
+
+        String tableName = null;
+
+
+
+
+
+
+        return tableName;
+    }
+
 	
 	/**
 	 * 
 	 * @param number
 	 * @return
 	 */
+
+    //TODO: getTableNameByContextSource
+    /*
 	private static String getTableNameBySensorSourceNumber(int number){
 		
 		String tableName = "";
@@ -754,7 +718,7 @@ public class DataHandler {
 		
 		return tableName; 
 	}
-
+*/
 	
 	
 	

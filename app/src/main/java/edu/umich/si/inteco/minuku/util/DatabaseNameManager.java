@@ -21,37 +21,26 @@ public class DatabaseNameManager {
 	public static final String QUESTIONNAIRE_TABLE_NAME = "Questionnaire_Table";
 	
 	public static final String USER_RESPONSE_TABLE_NAME = "UserResponse_Table";
-	
+
+
+
+    /**Record Table**/
 	public static final String RECORD_TABLE_NAME_LOCATION = "Record_Table_Location";
-	
-	public static final String RECORD_TABLE_NAME_ACTIVITY = "Record_Table_Activity";
-
+	public static final String RECORD_TABLE_NAME_ACTIVITY_RECOGNITION = "Record_Table_ActivityRecognition";
+    public static final String RECORD_TABLE_NAME_TRANSPORTATION = "Record_Table_Transportation";
     public static final String RECORD_TABLE_NAME_APPLICATION_ACTIVITY = "Record_Table_AppActivity";
-
-	public static final String RECORD_TABLE_NAME_ACCELEROMETER = "Record_Table_Accelerometer";
-	
-	public static final String RECORD_TABLE_NAME_GRAVITY  = "Record_Table_Gravity";
-	
-	public static final String RECORD_TABLE_NAME_GYRSCOPE = "Record_Table_Gyroscope";
-	
-	public static final String RECORD_TABLE_NAME_ACCELERATION = "Record_Table_Linear_Acceleration";
-	
-	public static final String RECORD_TABLE_NAME_ROTATION_VECTOR = "Record_Table_Rotation_Vector";
-	
-	public static final String RECORD_TABLE_NAME_MAGNETIC_FIELD = "Record_Table_Magnetic_Field";
-	
-	public static final String RECORD_TABLE_NAME_ORIENTATION = "Record_Table_Orientation";
-	
-	public static final String RECORD_TABLE_NAME_PROXIMITY = "Record_Table_Proximity";
-	
-	public static final String RECORD_TABLE_NAME_AMBIENT_TEMPERATURE = "Record_Table_Ambient_Temperature";
-	
-	public static final String RECORD_TABLE_NAME_LIGHT = "Record_Table_Light";
-	
-	public static final String RECORD_TABLE_NAME_PRESSURE = "Record_Table_Pressure";
-	
-	public static final String RECORD_TABLE_NAME_HUMIDITY = "Record_Table_Humidity";
-
+	public static final String RECORD_TABLE_NAME_SENSOR_ACCELEROMETER = "Record_Table_Accelerometer";
+	public static final String RECORD_TABLE_NAME_SENSOR_GRAVITY  = "Record_Table_Sensor_Gravity";
+	public static final String RECORD_TABLE_NAME_SENSOR_GYRSCOPE = "Record_Table_Sensor_Gyroscope";
+	public static final String RECORD_TABLE_NAME_SENSOR_ACCELERATION = "Record_Table_Sensor_Linear_Acceleration";
+	public static final String RECORD_TABLE_NAME_SENSOR_ROTATION_VECTOR = "Record_Table_Sensor_Rotation_Vector";
+	public static final String RECORD_TABLE_NAME_SENSOR_MAGNETIC_FIELD = "Record_Table_Sensor_Magnetic_Field";
+	public static final String RECORD_TABLE_NAME_SENSOR_ORIENTATION = "Record_Table_Sensor_Orientation";
+	public static final String RECORD_TABLE_NAME_SENSOR_PROXIMITY = "Record_Table_Sensor_Proximity";
+	public static final String RECORD_TABLE_NAME_SENSOR_AMBIENT_TEMPERATURE = "Record_Table_Sensor_Ambient_Temperature";
+	public static final String RECORD_TABLE_NAME_SENSOR_LIGHT = "Record_Table_Sensor_Light";
+	public static final String RECORD_TABLE_NAME_SENSOR_PRESSURE = "Record_Table_Sensor_Pressure";
+	public static final String RECORD_TABLE_NAME_SENSOR_HUMIDITY = "Record_Table_Sensor_Humidity";
 	public static final String COL_ID = "_id";
 	
 	
@@ -214,87 +203,17 @@ public class DatabaseNameManager {
 	
 	public static final String COL_TIMESTAMP_LONG = "timestamp_long";
 
+    public static final String COL_DATA = "data";
+
     public static final int COL_INDEX_RECORD_ID = 0;
 
     public static final int COL_INDEX_RECORD_SESSION_ID = 1;
 
-	public static final int COL_INDEX_RECORD_TIMESTAMP_STRING = 2;
-	
-	public static final int COL_INDEX_RECORD_TIMESTAMP_LONG = 3;
-	
-	//Location Record Table
-	public static final String COL_LOC_LATITUDE = "loc_latitude";	
-	
-	public static final String COL_LOC_LONGITUDE = "loc_longitude";	
-	
-	public static final String COL_LOC_ACCURACY = "loc_accuracy";
-	
-	public static final String COL_LOC_ALTITUDE = "loc_altitude";
-	
-	public static final String COL_LOC_PROVIDER = "loc_provider";
-	
-	public static final String COL_LOC_BEARING = "loc_bearing";
-	
-	public static final String COL_LOC_SPEED = "loc_speed";	
-    
-	public static final int COL_INDEX_RECORD_LOC_LATITUDE_ = 4;
+    public static final int COL_INDEX_RECORD_DATA = 2;
 
-	public static final int COL_INDEX_RECORD_LOC_LONGITUDE = 5;
+	public static final int COL_INDEX_RECORD_TIMESTAMP_STRING = 3;
 	
-	public static final int COL_INDEX_RECORD_LOC_ACCURACY = 6;
-	
-	public static final int COL_INDEX_RECORD_LOC_ALTITUDE = 7;
-	
-	public static final int COL_INDEX_RECORD_LOC_PROVIDER = 8;
-	
-	public static final int COL_INDEX_RECORD_LOC_BEARING = 9;
-	
-	public static final int COL_INDEX_RECORD_LOC_SPEED = 10;
-
-    public static final int COL_INDEX_RECORD_ACTIVITY_LABEL_1 = 4;
-    public static final int COL_INDEX_RECORD_ACTIVITY_LABEL_2 = 5;
-    public static final int COL_INDEX_RECORD_ACTIVITY_LABEL_3 = 6;
-
-    public static final int COL_INDEX_RECORD_ACTIVITY_CONFIDENCE_1 = 7;
-    public static final int COL_INDEX_RECORD_ACTIVITY_CONFIDENCE_2 = 8;
-    public static final int COL_INDEX_RECORD_ACTIVITY_CONFIDENCE_3 = 9;
-
-    public static final int COL_INDEX_RECORD_APPLICATION_ACTIVITY = 4;
-    public static final int COL_INDEX_RECORD_APPLICATION_ACTIVITY_PACKAGE = 5;
-
-
-    public static final int COL_INDEX_RECORD_ACTIVITY_DETECTIONTIME = 10;
-
-	
-	//Activity Record Table
-	public static final String COL_ACTIVITY_1 = "activity_1";    
-    
-	public static final String COL_ACTIVITY_2 = "activity_2";
-    
-	public static final String COL_ACTIVITY_3 = "activity_3";
-	
-	public static final String COL_ACTIVITY_CONF_1 = "activity_conf_1";    
-    
-	public static final String COL_ACTIVITY_CONF_2 = "activity_conf_2";
-    
-	public static final String COL_ACTIVITY_CONF_3 = "activity_conf_3";
-
-    public static final String COL_ACTIVITY_DETECTION_TIME = "detection_time";
-
-    //App Activity Record Table
-    public static final String COL_APPLICATION_ACTIVITY_PACKAGE = "package";
-
-    public static final String COL_APPLICATION_ACTIVITY = "activity";
-
-	
-    //Sensor Record Table
-    public static final String COL_SENSOR_VALUE_1 = "sensor_value_1";    
-    
-    public static final String COL_SENSOR_VALUE_2 = "sensor_value_2";
-    
-    public static final String COL_SENSOR_VALUE_3 = "sensor_value_3";
-    
-    public static final String COL_SENSOR_VALUE_4 = "sensor_value_4";
+	public static final int COL_INDEX_RECORD_TIMESTAMP_LONG = 4;
 
 
 

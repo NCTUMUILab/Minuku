@@ -5,20 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.hardware.Sensor;
 import android.util.Log;
-
-import com.google.android.gms.location.DetectedActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
-import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Configuration;
 import edu.umich.si.inteco.minuku.model.Criterion;
@@ -26,11 +20,7 @@ import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.UserResponse;
-import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
-import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
-import edu.umich.si.inteco.minuku.model.record.LocationRecord;
-import edu.umich.si.inteco.minuku.model.record.Record;
-import edu.umich.si.inteco.minuku.model.record.SensorRecord;
+import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 
 public class LocalDBHelper extends SQLiteOpenHelper{
@@ -232,10 +222,8 @@ public class LocalDBHelper extends SQLiteOpenHelper{
      * 
      * @param db
      * @param table_name
-     * @param RecordType
-     * @param SensorSource
      */
-    public void createRecordTable(SQLiteDatabase db, String table_name, int RecordType, int SensorSource){
+    public void createRecordTable(SQLiteDatabase db, String table_name){
     	
     	////Log.d(LOG_TAG, " enter createSessionTable()");
     	
@@ -243,11 +231,9 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     				table_name + " ( "+
     				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
     				DatabaseNameManager.COL_SESSION_ID + " INTEGER NOT NULL, " +
+					DatabaseNameManager.COL_DATA + " INTEGER NOT NULL, " +
     				DatabaseNameManager.COL_TIMESTAMP_STRING+ " TEXT NOT NULL, " + 
-    				DatabaseNameManager.COL_TIMESTAMP_LONG+ " INTEGER NOT NULL, " +
-    				
-					getExtraSQLStatementByRecordType(SQL_TYPE_CREATE_TABLE, RecordType, SensorSource) + 
-    				
+    				DatabaseNameManager.COL_TIMESTAMP_LONG+ " INTEGER NOT NULL " +
     				");" ;
 
     	db.execSQL(cmd);
@@ -261,11 +247,20 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     private void createRecordTables (SQLiteDatabase db){
     	
     	//Location
-    	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_LOCATION, ContextManager.CONTEXT_RECORD_TYPE_LOCATION, -1);
-    	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY, ContextManager.CONTEXT_RECORD_TYPE_ACTIVITY, -1);
-        createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_APPLICATION_ACTIVITY, ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY, -1);
-    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_ACCELEROMETER, ContextManager.CONTEXT_RECORD_TYPE_SENSOR, Sensor.TYPE_ACCELEROMETER);
+    	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_LOCATION);
+    	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY_RECOGNITION);
+		createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_TRANSPORTATION);
+        createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_APPLICATION_ACTIVITY);
 
+		/**Sensor**/
+    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_ACCELEROMETER);
+    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_ACCELERATION);
+    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_AMBIENT_TEMPERATURE);
+    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_PRESSURE);
+    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_PROXIMITY);
+    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_LIGHT);
+
+		//TODO: to add more tables
     }
     
     
@@ -615,9 +610,8 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             values.put(DatabaseNameManager.COL_SESSION_ID, session_id);
             values.put(DatabaseNameManager.COL_TIMESTAMP_STRING, getTimeString(record.getTimestamp()));
             values.put(DatabaseNameManager.COL_TIMESTAMP_LONG, record.getTimestamp());
-
-            //we need to add values based on the record type, because different types of record have different fields in the database.
-            addExtraContentValuesByRecordType(values, record);
+			//data is JSON String
+			values.put(DatabaseNameManager.COL_DATA, record.getData().toString(0));
 
             //Log.d(LOG_TAG, "[insertRecordTable] Inserting record " + ContextManager.getSensorTypeName(record.getType()) + ": at-" + record.getTimestamp() + " : " + record.getTimeString() + " in session " + session_id );
             //" to the record table " + table_name);
@@ -645,185 +639,11 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	return s;
     }
 
-    
-    
-    /**
-     * This function will add extra values into the ContentValues, which is later inserted into a corresponding record table, based on the type of the record. 
-     * 
-     * @param values:  existing values already contain required fields such as session id, timestamp
-     * @param record:  the record that is going to be inserted into the record tables.
-     * @return
-     */
-    private static ContentValues addExtraContentValuesByRecordType(ContentValues values, Record record){
-
-    	
-    	if (record.getType() == ContextManager.CONTEXT_RECORD_TYPE_LOCATION){
-    		
-    		LocationRecord locationRecord = (LocationRecord) record;
-    		
-    		values.put(DatabaseNameManager.COL_LOC_LATITUDE, locationRecord.getLocation().getLatitude());
-    		values.put(DatabaseNameManager.COL_LOC_LONGITUDE, locationRecord.getLocation().getLongitude());
-			values.put(DatabaseNameManager.COL_LOC_ACCURACY, locationRecord.getLocation().getAccuracy());
-			values.put(DatabaseNameManager.COL_LOC_ALTITUDE, locationRecord.getLocation().getAltitude());	
-			values.put(DatabaseNameManager.COL_LOC_PROVIDER, locationRecord.getLocation().getProvider());
-			values.put(DatabaseNameManager.COL_LOC_BEARING, locationRecord.getLocation().getBearing());
-			values.put(DatabaseNameManager.COL_LOC_SPEED, locationRecord.getLocation().getSpeed());
-
-    		
-    	}else if(record.getType() == ContextManager.CONTEXT_RECORD_TYPE_ACTIVITY) {
-    		
-    		ActivityRecord activityRecord = (ActivityRecord) record;
-    		
-    		List<DetectedActivity> activities = activityRecord.getProbableActivities();
-    		
-    		//examine whether the Top1, 2, and 3 activity exist. Put the activity into the ContentValues..
-    		try{
-    			if(activities.get(0)!=null){
-        			values.put(DatabaseNameManager.COL_ACTIVITY_1, ActivityRecognitionManager.getActivityNameFromType(activities.get(0).getType()));
-        			values.put(DatabaseNameManager.COL_ACTIVITY_CONF_1, activities.get(0).getConfidence());
-
-                    //detection time
-                    values.put(DatabaseNameManager.COL_ACTIVITY_DETECTION_TIME, activityRecord.getDetectionTime());
-        		}
-    			if(activities.size() ==2 && activities.get(1)!=null){
-    				values.put(DatabaseNameManager.COL_ACTIVITY_2, ActivityRecognitionManager.getActivityNameFromType(activities.get(1).getType()));
-        			values.put(DatabaseNameManager.COL_ACTIVITY_CONF_2, activities.get(1).getConfidence());
-    			}
-    			if(activities.size() ==3 && activities.get(2)!=null){
-    				values.put(DatabaseNameManager.COL_ACTIVITY_3, ActivityRecognitionManager.getActivityNameFromType(activities.get(2).getType()));
-        			values.put(DatabaseNameManager.COL_ACTIVITY_CONF_3, activities.get(2).getConfidence());
-    			}
-
-    			
-    		}catch (Exception e){
-    			e.printStackTrace();
-    		}
-
-			
-		}
-        else if(record.getType() == ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY) {
-
-            PhoneActivityRecord appActivityRecord = (PhoneActivityRecord) record;
-
-            //examine whether the Top1, 2, and 3 activity exist. Put the activity into the ContentValues..
-            try{
-                values.put(DatabaseNameManager.COL_APPLICATION_ACTIVITY, appActivityRecord.getAppActivityName());
-                values.put(DatabaseNameManager.COL_APPLICATION_ACTIVITY_PACKAGE, appActivityRecord.getAppPackageName());
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-
-        else if(record.getType() == ContextManager.CONTEXT_RECORD_TYPE_SENSOR){
-						
-			SensorRecord sensorRecord = (SensorRecord) record;
-			
-    		try{
-    			
-    			if(sensorRecord.sensorValues.get(0)!=null){
-        			values.put(DatabaseNameManager.COL_SENSOR_VALUE_1, sensorRecord.sensorValues.get(0).toString());
-        		}
-    			if(sensorRecord.sensorValues.get(1)!=null){
-    				values.put(DatabaseNameManager.COL_SENSOR_VALUE_2, sensorRecord.sensorValues.get(1).toString());
-    			}
-    			if(sensorRecord.sensorValues.get(2)!=null){
-    				values.put(DatabaseNameManager.COL_SENSOR_VALUE_3, sensorRecord.sensorValues.get(2).toString());
-    			}
-    			if(sensorRecord.sensorValues.get(3)!=null){
-    				values.put(DatabaseNameManager.COL_SENSOR_VALUE_4, sensorRecord.sensorValues.get(3).toString());
-    			}
-
-    			
-    		}catch (Exception e){
-    			e.printStackTrace();
-    		}
-   	
-		}
-    	
-    	return values;
-    }
-    
-    
-    
-    
-    
-    /**
-     * this function generates sql for creating tables, based on the record type.
-     * 
-     * @param recordType
-     * @param sensorSource
-     */
-    private static String getExtraSQLStatementByRecordType(int sqlType, int recordType, int sensorSource){
-    	
-    	String sql = "";
-    	
-    	
-    	if (sqlType==SQL_TYPE_CREATE_TABLE){
-
-    		if (recordType == ContextManager.CONTEXT_RECORD_TYPE_LOCATION){    			
-    			
-    			sql +=    					
-    					DatabaseNameManager.COL_LOC_LATITUDE+ " REAL NOT NULL, " +
-    					DatabaseNameManager.COL_LOC_LONGITUDE+ " REAL NOT NULL, " +
-    					DatabaseNameManager.COL_LOC_ACCURACY + " REAL NOT NULL, " +
-    					DatabaseNameManager.COL_LOC_ALTITUDE + " REAL NOT NULL, " +
-    					DatabaseNameManager.COL_LOC_PROVIDER + " TEXT NOT NULL, " +
-    					DatabaseNameManager.COL_LOC_BEARING + " REAL NOT NULL, " +
-    					DatabaseNameManager.COL_LOC_SPEED+ " REAL NOT NULL "; 
-
-    		}   		
-    		
-    		else if(recordType == ContextManager.CONTEXT_RECORD_TYPE_ACTIVITY) {
-    			
-    			sql += 
-    					DatabaseNameManager.COL_ACTIVITY_1 + " TEXT, " +
-    					DatabaseNameManager.COL_ACTIVITY_2 + " TEXT, " +
-    					DatabaseNameManager.COL_ACTIVITY_3 + " TEXT, " +
-    					DatabaseNameManager.COL_ACTIVITY_CONF_1 + " NUMERIC, " +
-    					DatabaseNameManager.COL_ACTIVITY_CONF_2 + " NUMERIC, " +
-    					DatabaseNameManager.COL_ACTIVITY_CONF_3 + " NUMERIC, " +
-                        DatabaseNameManager.COL_ACTIVITY_DETECTION_TIME + " NUMERIC ";
-    					
-    			////Log.d(LOG_TAG, " the created SQL statement is " + sql);
-    		}
-
-            else if(recordType == ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY) {
-
-                sql +=
-                        DatabaseNameManager.COL_APPLICATION_ACTIVITY + " TEXT, " +
-                        DatabaseNameManager.COL_APPLICATION_ACTIVITY_PACKAGE + " TEXT " ;
-
-                ////Log.d(LOG_TAG, " the created SQL statement is " + sql);
-            }
-    		
-    		
-    		else if(recordType == ContextManager.CONTEXT_RECORD_TYPE_SENSOR){
-
-    			sql +=
-    					DatabaseNameManager.COL_SENSOR_VALUE_1 + " REAL NOT NULL, " +
-    					DatabaseNameManager.COL_SENSOR_VALUE_2 + " REAL NOT NULL, " +
-    					DatabaseNameManager.COL_SENSOR_VALUE_3 + " REAL NOT NULL, " +
-    					DatabaseNameManager.COL_SENSOR_VALUE_4 + " REAL NOT NULL " ;   					
-    							
-    			////Log.d(LOG_TAG, " the created SQL statement is " + sql);			
-    			
-    		}
-    		
-    	}
-
-    	
-    	////Log.d(LOG_TAG, " the created SQL statement is " + sql);
-    	
-    	return sql;
-    }
 
 
     /*****
      *
      * Remove data
-     *
-     *
      */
 
 
@@ -1297,105 +1117,6 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
     }
 
-	/*
-    public static ArrayList<String> queryWithoutColumn(String table_name, int sessionId, ArrayList<Criterion> timeconstraints){
-		
-    	ArrayList<String> rows = new ArrayList<String>();
-    	
-    	try{
-
-            SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-    		String sql = "SELECT *"  +" FROM " + table_name + " where " +
-                    DatabaseNameManager.COL_SESSION_ID + " = " + sessionId + " and " ;
-
-    		//generate timeconstraint sql
-    		String timeconstraintSQL = generateTimeConstraintSQL (timeconstraints);
-    		
-    		//if there's no column to specify value, timeconstrain is the first column. So we put the Where only when there's a constraint to 
-    		//put in the sql
-    		if (timeconstraintSQL!=null){
-    			sql += timeconstraintSQL;
-    		}
-
-    		
-    		//Log.d(LOG_TAG, "[queryWithoutColumn] the query statement is " +sql);
-    		
-    		//execute the query
-    		Cursor cursor = db.rawQuery(sql, null);   		
-    		int columnCount = cursor.getColumnCount();
-			while(cursor.moveToNext()){
-				String curRow = "";
-				for (int i=0; i<columnCount; i++){
-					curRow += cursor.getString(i)+ Constants.DELIMITER;
-				}
-				//Log.d(LOG_TAG, "[queryWithoutColumn] get result row " +curRow);
-	    		
-				rows.add(curRow);
-			}
-			cursor.close();
-
-            DatabaseManager.getInstance().closeDatabase();
-    		
-    	}catch (Exception e){
-    		
-    	}
-
-
-    	return rows;
-    	
-    	
-    }
-    */
-
-	/*
-    public static ArrayList<String> queryFromSingleColumn(String table_name, int sessionId, String column, String relation, String value, ArrayList<Criterion> timeconstraints){
-    	
-    	////Log.d(LOG_TAG, "entering  queryFromSingleRecordTableByValue" );			
-    	
-    	ArrayList<String> rows = new ArrayList<String>();
-
-    	try{
-
-            SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-    		String sql = "SELECT *"  +" FROM " + table_name + " where " +
-                    DatabaseNameManager.COL_SESSION_ID + " = " + sessionId + " and ";
-
-    		
-    		//generate sql statement based on the value
-    		if (relation.equals(ConditionManager.CONDITION_RELATIONSHIP_STRING_EQUAL_TO) ){
-    			 sql += column + " = '" + value + "'";
-    		}
-    		
-    		//generate timeconstraint sql
-    		String timeconstraintSQL = generateTimeConstraintSQL (timeconstraints);
-    		if (timeconstraintSQL!=null){
-    			sql += " and " + timeconstraintSQL;
-    		}
-
-    		
-    		//Log.d(LOG_TAG, "[queryFromSingleColumn] the query statement is " +sql);
-    		
-    		//execute the query
-    		Cursor cursor = db.rawQuery(sql, null);   		
-    		int columnCount = cursor.getColumnCount();
-			while(cursor.moveToNext()){
-				String curRow = "";
-				for (int i=0; i<columnCount; i++){
-					curRow += cursor.getString(i)+ Constants.DELIMITER;
-				}
-				rows.add(curRow);
-			}
-			cursor.close();
-
-            DatabaseManager.getInstance().closeDatabase();
-    		
-    	}catch (Exception e){
-    		
-    	}
-
-    	return rows;
-    }
-	*/
     
     /**query result from multiple columns and values**/
     public static ArrayList<String> queryFromMultipleColumns(String table_name, int sessionid, ArrayList<String> columns, ArrayList<String> relations, ArrayList<String> values, ArrayList<Criterion> timeconstraints){

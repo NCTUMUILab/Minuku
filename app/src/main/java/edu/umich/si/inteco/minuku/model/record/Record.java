@@ -1,4 +1,6 @@
-package edu.umich.si.inteco.minuku.model.record;
+package edu.umich.si.inteco.minuku.model.Record;
+
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,19 +13,14 @@ public class Record {
  
 	protected long _id;
 	protected long _timestamp;
-	protected int _type;
+	protected String _source;
 	protected Session _session;
     protected ArrayList<Integer> mSavedBySessionIds;
-
-	
+	protected JSONObject mData;
 	protected String mTimestring;
-
-	//by default each record should store values (integer). But subclasses of Record can have different types of values such as DoubleValues, StringValues
-	public ArrayList<Integer> _values;
 
 	
 	public Record(){
-        _values = new ArrayList<Integer>();
         mSavedBySessionIds = new ArrayList<Integer>();
 	}
 
@@ -37,7 +34,20 @@ public class Record {
 
     }
 
-    public void setID(int id){
+	@Override
+	public String toString() {
+		return "Record{" +
+				"_id=" + _id +
+				", _timestamp=" + _timestamp +
+				", _source='" + _source + '\'' +
+				", _session=" + _session +
+				", mSavedBySessionIds=" + mSavedBySessionIds +
+				", mData=" + mData +
+				", mTimestring='" + mTimestring + '\'' +
+				'}';
+	}
+
+	public void setID(int id){
 		_id = id;
 	}
 
@@ -52,7 +62,14 @@ public class Record {
 	public long getTimestamp(){
 		return _timestamp;
 	}
-	
+
+	public JSONObject getData() {
+		return mData;
+	}
+
+	public void setData(JSONObject data) {
+		this.mData = data;
+	}
 
 	public String getTimeString(){
 		
@@ -62,12 +79,12 @@ public class Record {
 		return mTimestring;
 	}
 	
-	public int getType(){
-		return _type;
+	public String getSource(){
+		return _source;
 	} 
 	
-	public void setType(int t){
-		_type = t;
+	public void setSource(String source){
+		_source = source;
 	} 
 	
 	public Session getSession(){

@@ -10,8 +10,8 @@ import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.model.record.ActivityRecord;
-import edu.umich.si.inteco.minuku.model.record.Record;
+import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
+import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
@@ -80,7 +80,7 @@ public class TransportationModeManager extends ContextStateManager {
 
     private Context mContext;
 
-    private static ArrayList<ActivityRecord> mActivityRecords;
+    private static ArrayList<ActivityRecognitionRecord> mActivityRecognitionRecords;
 
     private ActivityRecognitionManager mActivityRecognitionManager;
 
@@ -103,13 +103,13 @@ public class TransportationModeManager extends ContextStateManager {
      * @return transportation mode. We make this synchronized because we don't want other classes
      * to use the transportation label before this function generates a new label
      */
-    public int examineTransportation(ActivityRecord record) {
+    public int examineTransportation(ActivityRecognitionRecord record) {
 
    //     Log.d(LOG_TAG, "[examineTransportation] enter" );
 //        Log.d(LOG_TAG, "[examineTransportation] enter" + ActivityRecognitionManager.getProbableActivities() );
 
         List<DetectedActivity> probableActivities = record.getProbableActivities();
-        long detectionTime = record.getDetectionTime();
+        long detectionTime = record.getTimestamp();
 
 
         Log.d(LOG_TAG, "[examineTransportation] " + ScheduleAndSampleManager.getTimeString(detectionTime) + " the acitivty is: " +
@@ -118,7 +118,7 @@ public class TransportationModeManager extends ContextStateManager {
 
         //if in the static state, we try to suspect new activity
         if (getCurrentState()==STATE_STATIC) {
-            //getLatestActivityRecord();
+            //getLatestActivityRecognitionRecord();
 
             Log.d (LOG_TAG, " examineTransportation at STATE_STATIC " +
                     getActivityNameFromType(getSuspectedStartActivityType()) );
@@ -391,22 +391,22 @@ public class TransportationModeManager extends ContextStateManager {
      * @param endTime
      * @return
      */
-    private ArrayList<ActivityRecord> getWindowData(long startTime, long endTime) {
+    private ArrayList<ActivityRecognitionRecord> getWindowData(long startTime, long endTime) {
 
-        ArrayList<ActivityRecord> windowData = new ArrayList<ActivityRecord>();
+        ArrayList<ActivityRecognitionRecord> windowData = new ArrayList<ActivityRecognitionRecord>();
 
         //TODO: get activity records from the database
-        //windowData = DataHandler.getActivityRecordsBetweenTimes(startTime, endTime);
+        //windowData = DataHandler.getActivityRecognitionRecordsBetweenTimes(startTime, endTime);
 
         ///for testing: get data from the testData
 
         ArrayList<Record> recordPool = mActivityRecognitionManager.getLocalRecordPool();
 
-  //      Log.d(LOG_TAG, " examineTransportation you find " + recordPool.size() + " records in the activity recognition pool");
+        Log.d(LOG_TAG, " examineTransportation you find " + recordPool.size() + " records in the activity recognition pool");
 
         for (int i=0; i<recordPool.size(); i++) {
 
-            ActivityRecord record = (ActivityRecord) recordPool.get(i);
+            ActivityRecognitionRecord record = (ActivityRecognitionRecord) recordPool.get(i);
 
      //       Log.d(LOG_TAG, " record.getTimestamp() " + record.getTimestamp() +
        //             " windwo startTime " + startTime + " windwo endTime " + endTime);
@@ -420,7 +420,7 @@ public class TransportationModeManager extends ContextStateManager {
         return windowData;
     }
 
-    private static boolean confirmStopPossibleTransportation(int activityType, ArrayList<ActivityRecord> windowData) {
+    private static boolean confirmStopPossibleTransportation(int activityType, ArrayList<ActivityRecognitionRecord> windowData) {
 
         float threshold = getConfirmStopThreshold(activityType);
 
@@ -473,7 +473,7 @@ public class TransportationModeManager extends ContextStateManager {
 
     }
 
-    private static boolean changeSuspectingTransportation(int activityType, ArrayList<ActivityRecord> windowData) {
+    private static boolean changeSuspectingTransportation(int activityType, ArrayList<ActivityRecognitionRecord> windowData) {
 
         float threshold = getConfirmStartThreshold(activityType);
 
@@ -514,7 +514,7 @@ public class TransportationModeManager extends ContextStateManager {
     }
 
 
-    private static boolean confirmStartPossibleTransportation(int activityType, ArrayList<ActivityRecord> windowData) {
+    private static boolean confirmStartPossibleTransportation(int activityType, ArrayList<ActivityRecognitionRecord> windowData) {
 
         float threshold = getConfirmStartThreshold(activityType);
 
@@ -613,11 +613,11 @@ public class TransportationModeManager extends ContextStateManager {
 
         //  Log.d(LOG_TAG, "[examineEventConditions] got " + ConditionManager.CONDITION_TYPE_PROBE_TRANSPORTATION );
 
-        //** get ActivityRecord and examine the current transportation mode **/
+        //** get ActivityRecognitionRecord and examine the current transportation mode **/
 
         //we onlt detect transportation mdoe when users are not indoors (now we can only use Wifi..)
 
-       // ActivityRecord record = DataHandler.getLastSavedActivityRecord();
+       // ActivityRecognitionRecord record = DataHandler.getLastSavedActivityRecognitionRecord();
 
         /*
         Log.d(LOG_TAG, "[examineEventConditions] new activit label " + TransportationModeManager.getActivityNameFromType(record.getProbableActivities().get(0).getType())
@@ -676,12 +676,12 @@ public class TransportationModeManager extends ContextStateManager {
         return getActivityNameFromType(mConfirmedActivityType);
     }
 
-    public static ArrayList<ActivityRecord> getActivityRecords() {
+    public static ArrayList<ActivityRecognitionRecord> getActivityRecognitionRecords() {
 
-        if (mActivityRecords==null){
-            mActivityRecords = new ArrayList<ActivityRecord>();
+        if (mActivityRecognitionRecords==null){
+            mActivityRecognitionRecords = new ArrayList<ActivityRecognitionRecord>();
         }
-        return mActivityRecords;
+        return mActivityRecognitionRecords;
 
     }
 
@@ -689,8 +689,8 @@ public class TransportationModeManager extends ContextStateManager {
         return getStateName(getCurrentState());
     }
 
-    public static void addActivityRecord(ActivityRecord record) {
-        getActivityRecords().add(record);
+    public static void addActivityRecognitionRecord(ActivityRecognitionRecord record) {
+        getActivityRecognitionRecords().add(record);
     }
 
 
@@ -760,11 +760,6 @@ public class TransportationModeManager extends ContextStateManager {
         }else {
             return NO_ACTIVITY_TYPE;
         }
-    }
-
-    @Override
-    public void saveRecordsInLocalRecordPool() {
-
     }
 
 

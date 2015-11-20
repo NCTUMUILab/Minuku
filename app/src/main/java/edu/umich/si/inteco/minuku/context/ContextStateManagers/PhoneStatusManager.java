@@ -14,8 +14,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
-import edu.umich.si.inteco.minuku.model.record.PhoneActivityRecord;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 
 /**
@@ -180,19 +180,12 @@ public class PhoneStatusManager extends ContextStateManager {
         mLastestForegroundPackage=curForegroundPackage;
 
         //save into record
-        PhoneActivityRecord record = new PhoneActivityRecord(mLastestForegroundPackage,  mLastestForegroundActivity);
+        Record record = new Record();
         record.setTimestamp(ContextManager.getCurrentTimeInMillis());
         ContextManager.addRecordToPublicRecordPool(record);
 
         Log.d(LOG_TAG, "[setCurrentForegroundActivityAndPackage] the current running package is " + mLastestForegroundActivity + " and the activity is " + mLastestForegroundPackage);
     }
-
-
-    @Override
-    public void saveRecordsInLocalRecordPool() {
-
-    }
-
 
 
     //TODO: complete the source type table

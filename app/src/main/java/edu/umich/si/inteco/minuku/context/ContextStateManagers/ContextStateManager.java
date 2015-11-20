@@ -11,7 +11,7 @@ import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
 import edu.umich.si.inteco.minuku.model.StateValueCriterion;
-import edu.umich.si.inteco.minuku.model.record.Record;
+import edu.umich.si.inteco.minuku.model.Record.Record;
 
 
 public abstract class ContextStateManager {
@@ -56,6 +56,7 @@ public abstract class ContextStateManager {
     protected ArrayList<State> mStates;
     /**each contextStateManager has a list of ContextSource available for use**/
     protected ArrayList<ContextSource> mContextSourceList;
+    protected Record mLastSavedRecord;
 
 //    protected static HashMap<Integer, Boolean>mSourceExtractTable
 
@@ -63,6 +64,8 @@ public abstract class ContextStateManager {
     //record pool or clear the record pool if we save it in the public record pool
     private int mSizeOfRecordPool = 300;
 
+    public static int getContextSourceTypeFromName(String sourceName){return -1;};
+    public static String getContextSourceNameFromType(int sourceType){return null;};
 
 
     public ContextStateManager() {
@@ -73,88 +76,19 @@ public abstract class ContextStateManager {
         mContextSourceList = new ArrayList<ContextSource>();
     }
 
+    public ContextStateManager(ArrayList<Record> mlocalRecordPool) {
+        this.mLocalRecordPool = mlocalRecordPool;
+    }
+
+
+    /*******************************************************************************************/
+    /************************************** ContextSource ****************************************/
+    /*******************************************************************************************/
+
 
     /** each ContextStateManager should override this static method
      * it adds a list of ContextSource that it will manage **/
     protected void setUpContextSourceList(){
-        return;
-    }
-
-
-
-
-
-    /**
-     * the function add the logging task into the ActiveLoggingTask.
-     * Then it calls updateContextSourceListRequestStatus to update whether contextsource is requested.
-     * @param loggingTask
-     */
-    public void addActiveLoggingTask(LoggingTask loggingTask) {
-
-        //add ActiveLoggingTask
-        mActiveLoggingTasks.add(loggingTask);
-
-        //after add a logging task, we need to update the Request Status of the ContextSourceList
-        updateContextSourceListRequestStatus();
-
-
-    }
-
-    /**
-     *For each ContextSource we check whether it is requested and update its request status
-     */
-    protected void updateContextSourceListRequestStatus() {
-
-        for (int i=0; i<mContextSourceList.size(); i++){
-            mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
-           // Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
-        }
-    }
-
-
-    /**
-     * We check whether a ContextSource is requested by checking whether it is in the ActiveLoggingTask List or in a StateMappingRuleList
-     * @param contextSource
-     * @return
-     */
-    protected boolean updateContextSourceRequestStatus(ContextSource contextSource) {
-
-        boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
-        boolean isMonitored = isStateMonitored(contextSource.getSourceId());
-        boolean isRequested = isLogging | isMonitored;
-//
-//        Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] the contextSource " + contextSource.getName() +
-//                " Logging " + isLogging + " monitored : " + isMonitored + " isRequested: " + isRequested);
-
-        return isRequested;
-
-    }
-
-    /**
-     * Check whether a ContextSource is requested
-     * @param sourceName
-     * @return
-     */
-    protected  boolean checkRequestStatusOfContextSource(String sourceName) {
-
-        for (int i=0; i<mContextSourceList.size(); i++){
-            if (sourceName.equals(mContextSourceList.get(i).getName())) {
-                return mContextSourceList.get(i).isRequested();
-            }
-        }
-        return false;
-    }
-
-
-
-    /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
-     * e.g sampling rate. */
-
-    public void updateContextSourceList(String source){
-
-        //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
-
-        //2. update individual source by souce name .
         return;
     }
 
@@ -178,11 +112,99 @@ public abstract class ContextStateManager {
         return;
     }
 
+    /**
+     *For each ContextSource we check whether it is requested and update its request status
+     */
+    protected void updateContextSourceListRequestStatus() {
 
-    abstract public void saveRecordsInLocalRecordPool();
-    public static int getContextSourceTypeFromName(String sourceName){return -1;};
-    public static String getContextSourceNameFromType(int sourceType){return null;};
+        for (int i=0; i<mContextSourceList.size(); i++){
+            mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
+           // Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
+        }
+    }
 
+    /**
+     * We check whether a ContextSource is requested by checking whether it is in the ActiveLoggingTask List or in a StateMappingRuleList
+     * @param contextSource
+     * @return
+     */
+    protected boolean updateContextSourceRequestStatus(ContextSource contextSource) {
+
+        boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
+        boolean isMonitored = isStateMonitored(contextSource.getSourceId());
+        boolean isRequested = isLogging | isMonitored;
+//
+//        Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] the contextSource " + contextSource.getName() +
+//                " Logging " + isLogging + " monitored : " + isMonitored + " isRequested: " + isRequested);
+        return isRequested;
+
+    }
+
+    /**
+     * Check whether a ContextSource is requested
+     * @param sourceName
+     * @return
+     */
+    protected  boolean checkRequestStatusOfContextSource(String sourceName) {
+
+        for (int i=0; i<mContextSourceList.size(); i++){
+            if (sourceName.equals(mContextSourceList.get(i).getName())) {
+                return mContextSourceList.get(i).isRequested();
+            }
+        }
+        return false;
+    }
+
+
+    /*******************************************************************************************/
+    /********************************* Logging Task Related ************************************/
+    /*******************************************************************************************/
+
+
+    /**
+     * the function add the logging task into the ActiveLoggingTask.
+     * Then it calls updateContextSourceListRequestStatus to update whether contextsource is requested.
+     * @param loggingTask
+     */
+    public void addActiveLoggingTask(LoggingTask loggingTask) {
+
+        //add ActiveLoggingTask
+        mActiveLoggingTasks.add(loggingTask);
+
+        //after add a logging task, we need to update the Request Status of the ContextSourceList
+        updateContextSourceListRequestStatus();
+
+
+    }
+
+    //copy records from LocalRecordPool to PublicRecordPool
+    public void copyRecordsToPublicRecordPool() {
+        for (int i=0; i<mLocalRecordPool.size(); i++ ) {
+            ContextManager.getPublicRecordPool().add(mLocalRecordPool.get(i));
+        }
+    }
+
+
+    public ArrayList<Record> getLocalRecordPool() {
+        return mLocalRecordPool;
+    }
+
+
+    protected void addRecord (Record record) {
+        mLocalRecordPool.add(record);
+    }
+
+    public Record getLastSavedRecord (){
+        return mLastSavedRecord;
+    }
+
+    public void setLastSavedRecord (Record record) {
+        mLastSavedRecord = record;
+    }
+
+    /*******************************************************************************************/
+    /********************************* Monitoring Related** ************************************/
+    /*******************************************************************************************/
 
 
     /** if the value of the state is changed, we inform ContextManager about the change so that it can
@@ -191,7 +213,6 @@ public abstract class ContextStateManager {
         Log.d(LOG_TAG, "[stateChanged] state " + state.getName() + " is changed");
                 ContextManager.examineCircumstances(state);
     };
-
 
 
     /*** given the current StetMappingRules, ContextStateManager needs to create the states for
@@ -229,9 +250,8 @@ public abstract class ContextStateManager {
         return pass;
     }
 
-
     protected void updateStateValues(String sourceName) {
-        updateStateValues( getContextSourceTypeFromName(sourceName) );
+        updateStateValues(getContextSourceTypeFromName(sourceName) );
     }
 
 
@@ -364,7 +384,6 @@ public abstract class ContextStateManager {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -389,59 +408,6 @@ public abstract class ContextStateManager {
             }
         }
         return false;
-    }
-
-
-
-
-
-
-    /*
-    protected static boolean isSourceRequested(int sourceId) {
-
-        Log.d(LOG_TAG, "examine statemappingrule: in isSourceRequested " + getContextSourceNameFromType(sourceId));
-
-        for (int i=0; i<mContextSourceList.size(); i++){
-
-            //we first find the source by id
-            if (mContextSourceList.get(i).getSourceId()== sourceId){
-
-                //we return true when the source is both available and requested
-                if (mContextSourceList.get(i).isRequested() & mContextSourceList.get(i).isAvailable()){
-                    return true;
-                }
-            }
-        }
-
-        return false;
-
-    }
-*/
-    public ContextStateManager(ArrayList<Record> mlocalRecordPool) {
-        this.mLocalRecordPool = mlocalRecordPool;
-    }
-
-
-    public void addRecord(Record record){
-
-        mLocalRecordPool.add(record);
-
-        Log.d(LOG_TAG, "[check saving data]" + "add data to local pool, now there are " + mLocalRecordPool.size() + " records");
-    }
-
-    public Record getLastSavedRecord() {
-        if (!mLocalRecordPool.isEmpty()){
-            return mLocalRecordPool.get(mLocalRecordPool.size()-1);
-        }
-        return null;
-    }
-
-    public void removeRecord(Record record){
-        mLocalRecordPool.remove(record);
-    }
-
-    public void clearRecordPool(){
-        mLocalRecordPool.clear();
     }
 
 
@@ -527,13 +493,6 @@ public abstract class ContextStateManager {
         mStateMappingRules.clear();
     }
 
-    public ArrayList<Record> getLocalRecordPool() {
-        return mLocalRecordPool;
-    }
-
-    public void setLocalRecordPool(ArrayList<Record> localRecordPool) {
-        mLocalRecordPool = localRecordPool;
-    }
 
     public String getName() {
         return mName;

@@ -2,8 +2,6 @@ package edu.umich.si.inteco.minuku.model;
 
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.context.ContextManager;
-
 public class Session {
 
 	private long mStartTime=0;
@@ -16,7 +14,7 @@ public class Session {
     private int mOngoingNotificationId=-1;
 	protected AnnotationSet mAnnotationSet;
     //TODO: this should be defined based on what's being activated.
-    ArrayList<Integer> mRecordTypes= ContextManager.RECORD_TYPE_LIST;
+    ArrayList<String> mContextSourceNames;
 
 	public Session (int taskId){
         mTaskId = taskId;
@@ -41,13 +39,15 @@ public class Session {
         mAnnotationSet = new AnnotationSet();
     }
 
-    public ArrayList<Integer> getRecordTypes() {
-        return mRecordTypes;
+    public ArrayList<String> getContextSourceNames() {
+        return mContextSourceNames;
     }
 
-    public void setRecordTypes(ArrayList<Integer> recordTypes) {
-        this.mRecordTypes = recordTypes;
+    public void setContextSourceTypes(ArrayList<String> sourceTypes) {
+        this.mContextSourceNames = sourceTypes;
     }
+
+
 
     public boolean isPaused() {
         return mPaused;

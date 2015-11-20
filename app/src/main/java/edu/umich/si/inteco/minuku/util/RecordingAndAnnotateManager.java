@@ -838,6 +838,7 @@ public class RecordingAndAnnotateManager {
     }
 
 
+    //TODO: we should get background document based on the logging task.
      public static JSONObject getBackgroundRecordingDocument(long startTime, long endTime) {
 
          Log.d (LOG_TAG, "[getBackgroundRecordingDocument] going to get background recording from " + ScheduleAndSampleManager.getTimeString(startTime) + " to " + ScheduleAndSampleManager.getTimeString(endTime));
@@ -862,11 +863,14 @@ public class RecordingAndAnnotateManager {
              e.printStackTrace();
          }
 
-         for (int i=0; i<ContextManager.RECORD_TYPE_LIST.size(); i++) {
+         Session session = getSession(RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID);
+
+         for (int i=0; i<session.getContextSourceNames().size(); i++) {
+
 
              //get data from the database
              ArrayList<String> res = DataHandler.getDataBySession(RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID,
-                     ContextManager.RECORD_TYPE_LIST.get(i), startTime, endTime);
+                     session.getContextSourceNames().get(i), startTime, endTime);
 
              //so far we're not sure what "minute" key will be used later. So we just create sixty JSONObject. Later we will only add the JSONObjects that are not null
              //to the final JSONObject
@@ -904,7 +908,7 @@ public class RecordingAndAnnotateManager {
                  }
 
                  //create "second" key
-                 JSONObject secondRecordJSON = createSecondRecordJSONByRecordType(separated, ContextManager.RECORD_TYPE_LIST.get(i));
+                 JSONObject secondRecordJSON = createSecondRecordJSONByRecordType(separated, session.getContextSourceNames().get(i));
 
                  //add the secondJSON to the minuteJSON
                  try {
@@ -932,7 +936,7 @@ public class RecordingAndAnnotateManager {
 
              //HourJSOn add recordTypeJSON
              try {
-                 hourJSON.put(ContextManager.getSensorTypeName(ContextManager.RECORD_TYPE_LIST.get(i)), recordTypeJSON );
+                 hourJSON.put(session.getContextSourceNames().get(i), recordTypeJSON );
                 // Log.d (LOG_TAG, "getBackgroundRecordingDocument the hourJSON is " + hourJSON);
 
 
@@ -992,14 +996,14 @@ public class RecordingAndAnnotateManager {
 
 
            //for each hour we get session data in that hour
-           for (int i=0; i<session.getRecordTypes().size(); i++) {
+           for (int i=0; i<session.getContextSourceNames().size(); i++) {
 
-               Log.d (LOG_TAG, "[getSessionDocument] the" + i + " record type is ======================" + ContextManager.getSensorTypeName(session.getRecordTypes().get(i)) + "==============================");
+               Log.d (LOG_TAG, "[getSessionDocument] the" + i + " sourcename is ======================" + session.getContextSourceNames().get(i) + "==============================");
               Log.d (LOG_TAG, "[getSessionDocument] get session " + sessionId + "'s records between" +  ScheduleAndSampleManager.getTimeString(startTime) + " - " +   ScheduleAndSampleManager.getTimeString(endTime)
                + " the battery life is " + session.getBatteryLife());
 
                //get result of the record type in the session given a startTime and an endTime of each hour
-               ArrayList<String> res = DataHandler.getDataBySession(sessionId,session.getRecordTypes().get(i),startTime, endTime );
+               ArrayList<String> res = DataHandler.getDataBySession(sessionId,session.getContextSourceNames().get(i),startTime, endTime );
 
                //so far we're not sure what "minute" key will be used later. So we just create sixty JSONObject. Later we will only add the JSONObjects that are not null
                //to the final JSONObject
@@ -1038,7 +1042,7 @@ public class RecordingAndAnnotateManager {
                    }
 
                    //create "second" key
-                   JSONObject secondRecordJSON = createSecondRecordJSONByRecordType(separated, session.getRecordTypes().get(i));
+                   JSONObject secondRecordJSON = createSecondRecordJSONByRecordType(separated, session.getContextSourceNames().get(i));
 
                    //add the secondJSON to the minuteJSON
                    try {
@@ -1071,7 +1075,7 @@ public class RecordingAndAnnotateManager {
 
                //HourJSOn add recordTypeJSON
                try {
-                   hourJSON.put(ContextManager.getSensorTypeName(session.getRecordTypes().get(i)), recordTypeJSON );
+                   hourJSON.put(session.getContextSourceNames().get(i), recordTypeJSON );
 
                } catch (JSONException e) {
                    e.printStackTrace();
@@ -1134,53 +1138,11 @@ public class RecordingAndAnnotateManager {
 
     }
 
-    private static JSONObject createSecondRecordJSONByRecordType(String[] separated, int recordType) {
+    private static JSONObject createSecondRecordJSONByRecordType(String[] separated, String sourceName) {
 
         JSONObject recordJSON = new JSONObject();
 
-        switch(recordType){
-
-            case ContextManager.CONTEXT_RECORD_TYPE_LOCATION:
-
-                double lat = Double.parseDouble(separated[DatabaseNameManager.COL_INDEX_RECORD_LOC_LATITUDE_]);
-                double lng = Double.parseDouble(separated[DatabaseNameManager.COL_INDEX_RECORD_LOC_LONGITUDE]);
-                double accuracy = Double.parseDouble(separated[DatabaseNameManager.COL_INDEX_RECORD_LOC_ACCURACY]);
-
-                try {
-                    recordJSON.put(ContextManager.RECORD_SHORTNAME_LOCATION_LATITUDE, lat);
-                    recordJSON.put(ContextManager.RECORD_SHORTNAME_LOCATION_LONGITUDE, lng);
-                    recordJSON.put(ContextManager.RECORD_SHORTNAME_LOCATION_ACCURACY, accuracy);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-
-            case ContextManager.CONTEXT_RECORD_TYPE_ACTIVITY:
-
-                String activity = separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_LABEL_1];
-                int confidence  = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_RECORD_ACTIVITY_CONFIDENCE_1]);
-                try {
-                    recordJSON.put(ContextManager.RECORD_SHORTNAME_ACTIVITY_ACTIVITY, activity);
-                    recordJSON.put(ContextManager.RECORD_SHORTNAME_ACTIVITY_CONFIDENCE, confidence);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case ContextManager.CONTEXT_RECORD_TYPE_SENSOR:
-                break;
-            case ContextManager.CONTEXT_RECORD_TYPE_GEOFENCE:
-                break;
-            case ContextManager.CONTEXT_RECORD_TYPE_APPLICATION_ACTIVITY:
-                String appActivity = separated[DatabaseNameManager.COL_INDEX_RECORD_APPLICATION_ACTIVITY];
-                String appPackage  = separated[DatabaseNameManager.COL_INDEX_RECORD_APPLICATION_ACTIVITY_PACKAGE];
-                try {
-                    recordJSON.put(ContextManager.RECORD_SHORTNAME_APPLICATION_ACTIVITY, appActivity);
-                    recordJSON.put(ContextManager.RECORD_SHORTNAME_APPLICATION_PACKAGE, appPackage);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                break;
-        }
+        //TODO: create dataRecord based on the data from database.
 
 
         return recordJSON;
