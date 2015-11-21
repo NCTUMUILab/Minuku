@@ -407,10 +407,11 @@ public class ContextManager {
                 //However, now we want to enable background recording so that we can monitor circumstances.
                 //circumstanceually. If researachers do not monitor anything, this flag should be false.
 
+                /*
                 if (sIsBackgroundRecordingEnabled){
                     DataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
                 }
-
+*/
 
                 /* update transportation mode. Transporation Manager will use the latet activity label
                  * saved in the ActivityRecognitionManager to infer the user's current transportation mode
@@ -510,7 +511,7 @@ public class ContextManager {
      */
     private static void copyRecordFromLocalRecordPoolToPublicRecordPool(String contextStateManagerName, LoggingTask loggingTask) {
 
-        Log.d(LOG_TAG, "testing saving records moving records in " + contextStateManagerName + " for logging tasks" + loggingTask.getSource());
+        Log.d(LOG_TAG, "testing saving records moving records in " + contextStateManagerName + " for logging tasks " + loggingTask.getSource());
 
         //1.
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))

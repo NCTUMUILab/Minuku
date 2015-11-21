@@ -379,7 +379,7 @@ public class ActivityRecognitionManager extends ContextStateManager
 
 
         /**add it to the LocalRecordPool**/
-        mLocalRecordPool.add(record);
+        addRecord(record);
 
     }
 

@@ -185,9 +185,21 @@ public abstract class ContextStateManager {
 
     //copy records from LocalRecordPool to PublicRecordPool
     public void copyRecordsToPublicRecordPool() {
+
         for (int i=0; i<mLocalRecordPool.size(); i++ ) {
-            ContextManager.getPublicRecordPool().add(mLocalRecordPool.get(i));
+
+            Record record = mLocalRecordPool.get(i);
+
+            /** we only copied records that have not been copied to the PublicPool **/
+            if (!record.isCopiedToPublicPool()){
+                ContextManager.getPublicRecordPool().add(mLocalRecordPool.get(i));
+                //after the record has been copied, we need to mark it "copie", so that we won't copied again
+                record.setIsCopiedToPublicPool(true);
+            }
         }
+
+        Log.d(LOG_TAG, this.getName() + " finished copying records, it has " + mLocalRecordPool.size() + " records.  Now contextmangaer have "
+                + ContextManager.getPublicRecordPool().size() + "records");
     }
 
 
@@ -219,10 +231,34 @@ public abstract class ContextStateManager {
         record.setData(data);
 
         /** Save Record**/
-        mLocalRecordPool.add(record);
+        addRecord(record);
 
     }
 
+
+    /**
+     * this function remove old record (depending on the maximum size of the local pool)
+     */
+    protected void removeOutDatedRecord() {
+
+        //TODO: implement this.
+
+    }
+
+    /**
+     * this function add record and also remove old record (depending on the maximum size of the local pool)
+     * @param record
+     */
+    protected void addRecord(Record record) {
+
+        /**1. add record to the local pool **/
+        mLocalRecordPool.add(record);
+
+        /**2. check whether we should remove old record **/
+        removeOutDatedRecord();
+
+
+    }
 
     public Record getLastSavedRecord (){
         if (mLocalRecordPool.size()>0)

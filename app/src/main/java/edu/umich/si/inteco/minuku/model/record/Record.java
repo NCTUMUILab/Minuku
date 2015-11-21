@@ -16,6 +16,7 @@ public class Record {
 	protected String _source;
 	protected Session _session;
     protected ArrayList<Integer> mSavedBySessionIds;
+	protected boolean isCopiedToPublicPool;
 	protected JSONObject mData;
 	protected String mTimestring;
 
@@ -45,6 +46,14 @@ public class Record {
 				", mData=" + mData +
 				", mTimestring='" + mTimestring + '\'' +
 				'}';
+	}
+
+	public boolean isCopiedToPublicPool() {
+		return isCopiedToPublicPool;
+	}
+
+	public void setIsCopiedToPublicPool(boolean isCopiedToPublicPool) {
+		this.isCopiedToPublicPool = isCopiedToPublicPool;
 	}
 
 	public void setID(int id){

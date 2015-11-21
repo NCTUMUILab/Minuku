@@ -680,7 +680,7 @@ public class TransportationModeManager extends ContextStateManager {
         Log.d(LOG_TAG, "testing saving records at " + record.getTimeString() + " data: " + record.getData());
 
         /**add it to the LocalRecordPool**/
-        mLocalRecordPool.add(record);
+        addRecord(record);
 
     }
 

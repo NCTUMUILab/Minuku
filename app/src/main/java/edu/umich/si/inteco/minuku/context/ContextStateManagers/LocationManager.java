@@ -264,7 +264,7 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         record.setTimestamp(ContextManager.getCurrentTimeInMillis());
 
         /**add it to the LocalRecordPool**/
-        mLocalRecordPool.add(record);
+        addRecord(record);
 
     }
 
