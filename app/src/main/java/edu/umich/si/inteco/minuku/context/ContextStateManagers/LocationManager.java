@@ -11,14 +11,22 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
+import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
+import edu.umich.si.inteco.minuku.model.Record.LocationRecord;
+import edu.umich.si.inteco.minuku.model.Record.Record;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -54,6 +62,19 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
     private static long sUpdateIntervalInMilliSeconds = UPDATE_INTERVAL_IN_MILLISECONDS;
 
     public static final String STRING_CONTEXT_SOURCE_LOCATION = "Location";
+
+
+    /**Properties for Record**/
+    public static final String RECORD_DATA_PROPERTY_LATITUDE = "Latitude";
+    public static final String RECORD_DATA_PROPERTY_LONGITUDE = "Longitude";
+    public static final String RECORD_DATA_PROPERTY_ACCURACY = "Accuracy";
+    public static final String RECORD_DATA_PROPERTY_ALTITUDE = "Altitude";
+    public static final String RECORD_DATA_PROPERTY_PROVIDER = "Provider";
+    public static final String RECORD_DATA_PROPERTY_SPEED = "Speed";
+    public static final String RECORD_DATA_PROPERTY_BEARING = "Bearing";
+    public static final String RECORD_DATA_PROPERTY_EXTRAS = "Extras";
+
+
     public static final int CONTEXT_SOURCE_LOCATION = 0;
 
     // Keys for storing activity state in the Bundle.
@@ -140,17 +161,6 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
     }
 
-    @Override
-    protected boolean updateContextSourceRequestStatus(ContextSource contextSource) {
-
-        boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
-
-        boolean isMonitored = isStateMonitored(contextSource.getSourceId());
-
-        boolean isRequested = isLogging | isMonitored;
-
-        return isRequested;
-    }
     /**
      * Start the activity recognition update request process by
      * getting a connection.
@@ -173,6 +183,91 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
             disconnectClient();
         }
     }
+
+
+    /**
+     *For each ContextSource we check whether it is requested and update its request status.
+     * Each ContextStateManager should override this function because they will need to determine
+     * whether to stop or start extracting certain data source, depending on its Request Status
+     */
+    @Override
+    protected void updateContextSourceListRequestStatus() {
+
+        boolean isRequested = false;
+
+        //for each contextSource we need to check its requeststatus
+        for (int i=0; i<mContextSourceList.size(); i++){
+            mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
+
+            //if any source needing location is requested, we still receive location update
+            isRequested = isRequested | mContextSourceList.get(i).isRequested();
+
+        }
+
+        //If no location is requested, we should stop requesting location update
+        if (!isRequested){
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting AR informatoin because it is not needed anymore");
+            //TODO: need to create this in the study json to test (triggered logging location)
+
+            //if there's an location update going on, we should remove it. Otherwise, we don't need to do anything
+            if (mRequestingLocationUpdates)
+                removeLocationUpdate();
+        }
+
+        else {
+            //if we haven't started a location update, now start to update. Otherwise, we don't need to do anything.
+            if (!mRequestingLocationUpdates)
+                requestLocationUpdate();
+        }
+    }
+
+    /**
+     * ContextStateMAnager needs to override this fundtion to implement writing a Record and save it to the LocalDataPool
+     */
+    public void saveRecordToLocalRecordPool() {
+
+        /** create a Record to save timestamp, session it belongs to, and Data**/
+
+        //we create LocationRecord instead of record because we expect to use some of these data later in memory
+        LocationRecord record = new LocationRecord(
+                mCurrentLocation.getLatitude(),
+                mCurrentLocation.getLongitude(),
+                mCurrentLocation.getAccuracy());
+
+
+        /** create data in a JSON Object. Each CotnextSource will have different formats.
+         * So we need each ContextSourceMAnager to implement this part**/
+        JSONObject data = new JSONObject();
+
+        //add location to data
+        try {
+            data.put(RECORD_DATA_PROPERTY_LATITUDE, mCurrentLocation.getLatitude());
+            data.put(RECORD_DATA_PROPERTY_LONGITUDE, mCurrentLocation.getLongitude());
+            data.put(RECORD_DATA_PROPERTY_ALTITUDE, mCurrentLocation.getAltitude());
+            data.put(RECORD_DATA_PROPERTY_ACCURACY, mCurrentLocation.getAccuracy());
+            data.put(RECORD_DATA_PROPERTY_SPEED, mCurrentLocation.getSpeed());
+            data.put(RECORD_DATA_PROPERTY_BEARING, mCurrentLocation.getBearing());
+            data.put(RECORD_DATA_PROPERTY_PROVIDER, mCurrentLocation.getProvider());
+            data.put(RECORD_DATA_PROPERTY_EXTRAS, mCurrentLocation.getExtras());
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(LOG_TAG, "testing saving records at " + record.getTimeString() + " data: " + record.getData());
+
+
+        /**we set data in Record**/
+        record.setData(data);
+        record.setTimestamp(ContextManager.getCurrentTimeInMillis());
+
+        /**add it to the LocalRecordPool**/
+        mLocalRecordPool.add(record);
+
+    }
+
 
     public void removeLocationUpdate() {
         //stop requesting location udpates
@@ -273,6 +368,15 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
                 mCurrentLocation.getLongitude() + " , " +
                 mCurrentLocation.getAccuracy());
 
+        //if location is requested, save location
+        boolean isRequested = checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_LOCATION);
+
+        if (isRequested){
+            saveRecordToLocalRecordPool();
+        }
+
+
+        //TODO: we remove this after we don't need tthis anymore,
         Toast.makeText(mContext, mCurrentLocation.getLatitude() + " , " + mCurrentLocation.getLongitude()
                         + " , " + mCurrentLocation.getAccuracy(),
                 Toast.LENGTH_SHORT).show();

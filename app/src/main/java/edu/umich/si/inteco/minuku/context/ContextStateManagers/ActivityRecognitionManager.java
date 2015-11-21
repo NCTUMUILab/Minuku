@@ -38,20 +38,23 @@ public class ActivityRecognitionManager extends ContextStateManager
     public static final int CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = 1;
 
     public static final String CONTEXT_SOURCE_ACTIVITY_RECOGNITION = "ActivityRecognition";
-    public static final String RECORD_DATA_PROPERTY_NAME = "Activities";
+
+    /**Properties for Record**/
+    public static final String RECORD_DATA_PROPERTY_NAME = "DetectedActivities";
+
     public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES = "AR.MostProbableActivity";
     public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = "AR.AllProbableActivities";
 
     /**label **/
-    public static final String IN_VEHICLE_STRING = "in_vehicle";
-    public static final String ON_FOOT_STRING = "on_foot";
-    public static final String WALKING_STRING = "walking";
-    public static final String RUNNING_STRING = "running";
-    public static final String TILTING_STRING = "tilting";
-    public static final String STILL_STRING = "still";
-    public static final String ON_BiCYCLE_STRING = "on_bicycle";
-    public static final String UNKNOWN_STRING = "unknown";
-    public static final String NA_STRING = "NA";
+    public static final String STRING_DETECTED_ACTIVITY_IN_VEHICLE = "in_vehicle";
+    public static final String STRING_DETECTED_ACTIVITY_ON_FOOT = "on_foot";
+    public static final String STRING_DETECTED_ACTIVITY_WALKING = "walking";
+    public static final String STRING_DETECTED_ACTIVITY_RUNNING = "running";
+    public static final String STRING_DETECTED_ACTIVITY_TILTING = "tilting";
+    public static final String STRING_DETECTED_ACTIVITY_STILL = "still";
+    public static final String STRING_DETECTED_ACTIVITY_ON_BICYCLE = "on_bicycle";
+    public static final String STRING_DETECTED_ACTIVITY_UNKNOWN = "unknown";
+    public static final String STRING_DETECTED_ACTIVITY_NA = "NA";
 
     /** Tag for logging. */
     private static final String LOG_TAG = "ActRcgnManager";
@@ -337,6 +340,49 @@ public class ActivityRecognitionManager extends ContextStateManager
     }
 
 
+
+    /**
+     * ContextStateMAnager needs to override this fundtion to implement writing a Record and save it to the LocalDataPool
+     */
+    public void saveRecordToLocalRecordPool() {
+
+        /** create a Record to save timestamp, session it belongs to, and Data**/
+        ActivityRecognitionRecord record = new ActivityRecognitionRecord();
+        record.setProbableActivities(sProbableActivities);
+
+        /** create data in a JSON Object. Each CotnextSource will have different formats.
+         * So we need each ContextSourceMAnager to implement this part**/
+        JSONObject data = new JSONObject();
+
+        //also set data:
+        JSONArray activitiesJSON = new JSONArray();
+
+        //add all activities to JSONArray
+        for (int i=0; i<sProbableActivities.size(); i++){
+            DetectedActivity detectedActivity =  sProbableActivities.get(i);
+            String activityAndConfidence = getActivityNameFromType(detectedActivity.getType()) + Constants.ACTIVITY_DELIMITER + detectedActivity.getConfidence();
+            activitiesJSON.put(activityAndConfidence);
+        }
+
+        //add activityJSON Array to data
+        try {
+            data.put(RECORD_DATA_PROPERTY_NAME, activitiesJSON);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        /**we set data in Record**/
+        record.setData(data);
+        record.setTimestamp(sLatestDetectionTime);
+
+        Log.d(LOG_TAG, "testing saving records at " + record.getTimeString() + " data: " + record.getData());
+
+
+        /**add it to the LocalRecordPool**/
+        mLocalRecordPool.add(record);
+
+    }
+
     public static List<DetectedActivity> getProbableActivities() {
         return sProbableActivities;
     }
@@ -356,39 +402,8 @@ public class ActivityRecognitionManager extends ContextStateManager
                  | checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES);
 
         if (isRequested){
-            //store activityRecord
-            JSONObject data = new JSONObject();
-            ActivityRecognitionRecord record = new ActivityRecognitionRecord();
-            record.setProbableActivities(sProbableActivities);
-
-            //also set data:
-            JSONArray activitiesJSON = new JSONArray();
-
-            //add all activity to JSONArray
-            for (int i=0; i<sProbableActivities.size(); i++){
-
-                DetectedActivity detectedActivity =  sProbableActivities.get(i);
-                String activityAndConfidence = getActivityNameFromType(detectedActivity.getType()) + Constants.ACTIVITY_DELIMITER + detectedActivity.getConfidence();
-                activitiesJSON.put(activityAndConfidence);
-
-            }
-
-            //add activityJSON Array to data
-            try {
-                data.put(RECORD_DATA_PROPERTY_NAME, activitiesJSON);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            Log.d(LOG_TAG, "[test json data] the JSON obejct activity data is " + data);
-
-            //add data to records
-            record.setData(data);
-            record.setTimestamp(sLatestDetectionTime);
-            //add record to local record pool of ActivityRecognitionManager
-            addRecord(record);
+            saveRecordToLocalRecordPool();
         }
-
     }
 
     public void setProbableActivities(List<DetectedActivity> probableActivities) {
@@ -566,23 +581,23 @@ public class ActivityRecognitionManager extends ContextStateManager
     public static String getActivityNameFromType(int activityType) {
         switch(activityType) {
             case DetectedActivity.IN_VEHICLE:
-                return IN_VEHICLE_STRING;
+                return STRING_DETECTED_ACTIVITY_IN_VEHICLE;
             case DetectedActivity.ON_BICYCLE:
-                return ON_BiCYCLE_STRING;
+                return STRING_DETECTED_ACTIVITY_ON_BICYCLE;
             case DetectedActivity.ON_FOOT:
-                return ON_FOOT_STRING;
+                return STRING_DETECTED_ACTIVITY_ON_FOOT;
             case DetectedActivity.STILL:
-                return STILL_STRING;
+                return STRING_DETECTED_ACTIVITY_STILL;
             case DetectedActivity.RUNNING:
-                return RUNNING_STRING;
+                return STRING_DETECTED_ACTIVITY_RUNNING;
             case DetectedActivity.WALKING:
-                return WALKING_STRING;
+                return STRING_DETECTED_ACTIVITY_WALKING;
             case DetectedActivity.UNKNOWN:
-                return UNKNOWN_STRING;
+                return STRING_DETECTED_ACTIVITY_UNKNOWN;
             case DetectedActivity.TILTING:
-                return TILTING_STRING;
+                return STRING_DETECTED_ACTIVITY_TILTING;
             case NO_ACTIVITY_TYPE:
-                return NA_STRING;
+                return STRING_DETECTED_ACTIVITY_NA;
         }
         return "NA";
     }
@@ -590,21 +605,21 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     public static int getActivityTypeFromName(String activityName) {
 
-        if (activityName.equals(IN_VEHICLE_STRING)) {
+        if (activityName.equals(STRING_DETECTED_ACTIVITY_IN_VEHICLE)) {
             return DetectedActivity.IN_VEHICLE;
-        }else if(activityName.equals(ON_BiCYCLE_STRING)) {
+        }else if(activityName.equals(STRING_DETECTED_ACTIVITY_ON_BICYCLE)) {
             return DetectedActivity.ON_BICYCLE;
-        }else if(activityName.equals(ON_FOOT_STRING)) {
+        }else if(activityName.equals(STRING_DETECTED_ACTIVITY_ON_FOOT)) {
             return DetectedActivity.ON_FOOT;
-        }else if(activityName.equals(STILL_STRING)) {
+        }else if(activityName.equals(STRING_DETECTED_ACTIVITY_STILL)) {
             return DetectedActivity.STILL;
-        }else if(activityName.equals(UNKNOWN_STRING)) {
+        }else if(activityName.equals(STRING_DETECTED_ACTIVITY_UNKNOWN)) {
             return DetectedActivity.UNKNOWN ;
-        }else if(activityName.equals(RUNNING_STRING)) {
+        }else if(activityName.equals(STRING_DETECTED_ACTIVITY_RUNNING)) {
             return DetectedActivity.RUNNING ;
-        }else if (activityName.equals(WALKING_STRING)){
+        }else if (activityName.equals(STRING_DETECTED_ACTIVITY_WALKING)){
             return DetectedActivity.WALKING;
-        }else if(activityName.equals(TILTING_STRING)) {
+        }else if(activityName.equals(STRING_DETECTED_ACTIVITY_TILTING)) {
             return DetectedActivity.TILTING;
         }else {
             return NO_ACTIVITY_TYPE;

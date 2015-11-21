@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -34,6 +35,9 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     public static String CONTEXT_SOURCE_PHONE_SENSOR = "PhoneSensor";
 
+    /**Properties for Record**/
+    public static final String RECORD_DATA_PROPERTY_NAME = "SensorValues";
+
     /**system components**/
     private static Context mContext;
     private static SensorManager mSensorManager ;
@@ -50,9 +54,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     private static float mProximity ;
     private static float mMagneticField_x, mMagneticField_y, mMagneticField_z;
 
-    private float mLight;
-    private float mPressure;
-    private float mRelativeHumidity;
+    private float mLight, mPressure, mRelativeHumidity, mAmbientTemperature ;
 
     /**Store a list of sensosr that PhoneSensorManager has registered*/
     private ArrayList<ContextSource> mRegisteredSensorList;
@@ -75,7 +77,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mLinearAcceleration_x = mLinearAcceleration_y = mLinearAcceleration_z = Constants.NULL_NUMERIC_VALUE;
         mRotationVector_x_sin = mRotationVector_y_sin =  mRotationVector_z_sin = mRotationVector_cos = Constants.NULL_NUMERIC_VALUE;
         mHeartRate = mStepCount = mStepDetect =Constants.NULL_NUMERIC_VALUE;
-        mLight = mPressure = mRelativeHumidity = mProximity = Constants.NULL_NUMERIC_VALUE;
+        mLight = mPressure = mRelativeHumidity = mProximity = mAmbientTemperature =Constants.NULL_NUMERIC_VALUE;
 
         //initiate registered sneosr list
         mRegisteredSensorList = new ArrayList<ContextSource>();
@@ -542,32 +544,53 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     }
 
 
+
+    /**
+     * In PhoneSensorManager, all the values are float numbers
+     */
+    protected void saveRecordToLocalRecordPool (float[] values) {
+
+        /** store values into a Record so that we can store them in the local database **/
+        Record record = new Record();
+        record.setTimestamp(ContextManager.getCurrentTimeInMillis());
+        record.setSource(Sensor.STRING_TYPE_ACCELEROMETER);
+
+        /** create data in a JSON Object. Each CotnextSource will have different formats.
+         * So we need each ContextSourceMAnager to implement this part**/
+        JSONObject data = new JSONObject();
+        JSONArray array = new JSONArray();
+
+        try {
+
+            //put all values in Data JSONObject
+            for (int i=0; i< values.length; i++) {
+                array.put(values[i]);
+            }
+
+            data.put(RECORD_DATA_PROPERTY_NAME, array);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        /*** Set data to Record **/
+        record.setData(data);
+
+
+        /** Save Record**/
+        mLocalRecordPool.add(record);
+
+    }
+
+
+
     /**get Accelerometer values**/
     private void getAccelerometer(SensorEvent event) {
         mAccele_x = event.values[0];	// Acceleration force along the x axis (including gravity). m/s2
         mAccele_y = event.values[1];	// Acceleration force along the y axis (including gravity). m/s2
         mAccele_z = event.values[2];	// Acceleration force along the z axis (including gravity). m/s2
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-            values.put(event.values[1]);
-            values.put(event.values[2]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_ACCELEROMETER);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
 
@@ -577,26 +600,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mGyroscope_y = event.values[1];	// Rate of rotation around the y axis. rad/s
         mGyroscope_z = event.values[2];	// Rate of rotation around the z axis. rad/s
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-            values.put(event.values[1]);
-            values.put(event.values[2]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_GYROSCOPE);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
 
     }
 
@@ -607,26 +611,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mGravity_y = event.values[1];	// Force of gravity along the y axis m/s2
         mGravity_z = event.values[2];	// Force of gravity along the z axis m/s2
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-            values.put(event.values[1]);
-            values.put(event.values[2]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_GRAVITY);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
     /**get linear acceleration values**/
     private void getLinearAcceleration(SensorEvent event) {
@@ -634,26 +619,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mLinearAcceleration_y = event.values[1];	//Acceleration force along the y axis (excluding gravity).  m/s2
         mLinearAcceleration_z = event.values[2];	//Acceleration force along the z axis (excluding gravity).  m/s2
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-            values.put(event.values[1]);
-            values.put(event.values[2]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_LINEAR_ACCELERATION);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     /**get rotation vector values**/
@@ -663,28 +629,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mRotationVector_z_sin = event.values[2];	//  Rotation vector component along the z axis (z * sin(�c/2)). Unitless
         mRotationVector_cos = event.values[3];		// Scalar component of the rotation vector ((cos(�c/2)).1 Unitless
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-            values.put(event.values[1]);
-            values.put(event.values[2]);
-            values.put(event.values[3]);
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_ROTATION_VECTOR);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     /**get magnetic field values**/
@@ -693,214 +638,59 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mMagneticField_y = event.values[1];	// Geomagnetic field strength along the y axis.
         mMagneticField_z = event.values[2];	// Geomagnetic field strength along the z axis.
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-            values.put(event.values[1]);
-            values.put(event.values[2]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_MAGNETIC_FIELD);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     /**get proximity values**/
     private void getProximity(SensorEvent event){
         mProximity = event.values[0];
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_PROXIMITY);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     private void getAmbientTemperature(SensorEvent event){
         /* Environment Sensors */
-        float mAmbientTemperature = event.values[0];
+        mAmbientTemperature = event.values[0];
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_AMBIENT_TEMPERATURE);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
 
     }
 
     private void getLight(SensorEvent event){
         mLight = event.values[0];
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_LIGHT);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     private void getPressure(SensorEvent event){
         mPressure = event.values[0];
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_PRESSURE);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     private void getRelativeHumidity(SensorEvent event){
         mRelativeHumidity = event.values[0];
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_RELATIVE_HUMIDITY);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     private void getHeartRate (SensorEvent event) {
         mHeartRate = event.values[0];
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_HEART_RATE);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     private void getStepCounter (SensorEvent event) {
         mStepCount = event.values[0];
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_STEP_COUNTER);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
 
     }
 
     private void getStepDetector (SensorEvent event) {
         mStepDetect = event.values[0];
 
-        //store values into a Record so that we can store them in the local database
-        Record record = new Record();
-
-        //add data
-        JSONObject data = new JSONObject();
-        JSONArray values = new JSONArray();
-
-        try {
-            values.put(event.values[0]);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        record.setTimestamp(getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_STEP_DETECTOR);
-
-        addRecord(record);
+        saveRecordToLocalRecordPool(event.values);
     }
 
     /**get the current time in milliseconds**/

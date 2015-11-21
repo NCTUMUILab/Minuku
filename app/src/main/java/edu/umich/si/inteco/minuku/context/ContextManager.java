@@ -417,8 +417,11 @@ public class ContextManager {
                  * **/
 
                 ActivityRecognitionRecord record = (ActivityRecognitionRecord) mActivityRecognitionManager.getLastSavedRecord();
+
                 if (record!=null){
-                    int transportationMode= mTransportationModeManager.examineTransportation(record);
+                    mTransportationModeManager.examineTransportation(record);
+                    Log.d(LOG_TAG, "[examineTransportation] transoprtatopn: " + TransportationModeManager.getConfirmedActvitiyString());
+
                 }
 
                 /* after the transportationModeManager generate a transportation label, we update Mobility

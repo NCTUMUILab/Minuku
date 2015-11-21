@@ -1,16 +1,22 @@
 package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
+import edu.umich.si.inteco.minuku.model.Record.LocationRecord;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
@@ -24,8 +30,8 @@ public class TransportationModeManager extends ContextStateManager {
     public static final int CONTEXT_SOURCE_TRANSPORTATION = 0;
     public static final int CONTEXT_SOURCE_DETECTION_STATE = 1;
 
-    public static final String CONTEXT_SOURCE_TRANSPORTATION_STRING = "transportation";
-    public static final String CONTEXT_SOURCE_DETECTION_STATE_STRING = "detectoinState";
+    public static final String STRING_CONTEXT_SOURCE_TRANSPORTATION = "Transportation";
+    public static final String STRING_CONTEXT_SOURCE_DETECTION_STATE = "DetectionState";
 
     public static final int STATE_STATIC = 0;
     public static final int STATE_SUSPECTING_START = 1;
@@ -39,10 +45,10 @@ public class TransportationModeManager extends ContextStateManager {
     private static final float CONFIRM_STOP_ACTIVITY_THRESHOLD_ON_FOOT = (float)0.2;
     private static final float CONFIRM_STOP_ACTIVITY_THRESHOLD_ON_BICYCLE =(float) 0.2;
 
-    public static final String TRANSPORTATION_MODE_NAME_IN_VEHICLE = "in_vehicle";
-    public static final String TRANSPORTATION_MODE_NAME_ON_FOOT = "on_foot";
-    public static final String TRANSPORTATION_MODE_NAME_ON_BICYCLE = "on_bicycle";
-    public static final String TRANSPORTATION_MODE_NAME_IN_NO_TRANSPORTATION = "NA";
+    public static final String TRANSPORTATION_MODE_NAME_IN_VEHICLE = ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_IN_VEHICLE;
+    public static final String TRANSPORTATION_MODE_NAME_ON_FOOT =ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_ON_FOOT;
+    public static final String TRANSPORTATION_MODE_NAME_ON_BICYCLE = ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_ON_BICYCLE;
+    public static final String TRANSPORTATION_MODE_NAME_IN_NO_TRANSPORTATION = "static";
 
     private static final long WINDOW_LENGTH_START_ACTIVITY_DEFAULT = 20 * Constants.MILLISECONDS_PER_SECOND;
     private static final long WINDOW_LENGTH_STOP_ACTIVITY_DEFAULT = 20 * Constants.MILLISECONDS_PER_SECOND;
@@ -53,6 +59,21 @@ public class TransportationModeManager extends ContextStateManager {
     private static final long WINDOW_LENGTH_STOP_ACTIVITY_ON_FOOT = 60 * Constants.MILLISECONDS_PER_SECOND;
     private static final long WINDOW_LENGTH_STOP_ACTIVITY_ON_BICYCLE = 90 * Constants.MILLISECONDS_PER_SECOND;
 
+    //the frequency of requesting google activity from the google play service
+    public static int ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL_IN_SECONDS = 5;
+
+    public static long ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL =
+            ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL_IN_SECONDS * Constants.MILLISECONDS_PER_SECOND;
+
+    private static long sActivityRecognitionUpdateIntervalInSeconds = ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL_IN_SECONDS;
+
+    private static long sActivityRecognitionUpdateIntervalInMilliseconds =
+            sActivityRecognitionUpdateIntervalInSeconds * Constants.MILLISECONDS_PER_SECOND;
+
+    /**Properties for Record**/
+    public static final String RECORD_DATA_PROPERTY_TRANSPORTATION = "Transportation";
+
+
     public static final int NO_ACTIVITY_TYPE = -1;
     public static final int IN_VEHICLE = DetectedActivity.IN_VEHICLE;
     public static final int ON_FOOT = DetectedActivity.ON_FOOT;
@@ -62,18 +83,8 @@ public class TransportationModeManager extends ContextStateManager {
     public static final int TILTING = DetectedActivity.TILTING;
 
     /**Constant **/
-    public static final String IN_VEHICLE_STRING = "in_vehicle";
-    public static final String ON_FOOT_STRING = "on_foot";
-    public static final String WALKING_STRING = "walking";
-    public static final String RUNNING_STRING = "running";
-    public static final String TILTING_STRING = "tilting";
-    public static final String STILL_STRING = "still";
-    public static final String ON_BiCYCLE_STRING = "on_bicycle";
-    public static final String UNKNOWN_STRING = "unknown";
-    public static final String NA_STRING = "NA";
-
-    private static int mSuspectedStartActivityType = -1;
-    private static int mSuspectedStopActivityType = -1;
+    private static int mSuspectedStartActivityType = NO_ACTIVITY_TYPE;
+    private static int mSuspectedStopActivityType = NO_ACTIVITY_TYPE;
     private static int mConfirmedActivityType = NO_ACTIVITY_TYPE;// the initial value of activity is STILL.
     private static long mSuspectTime = 0;
     private static int mCurrentState = STATE_STATIC;
@@ -98,15 +109,45 @@ public class TransportationModeManager extends ContextStateManager {
 
     }
 
+    /** each ContextStateManager should override this static method
+     * it adds a list of ContextSource that it will manage **/
+    protected void setUpContextSourceList(){
+
+        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager. mContextSource:  " + mContextSourceList);
+
+        boolean isAvailable;
+
+        // Google Play Service is available after api level 15
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            isAvailable = true;
+        }
+        else
+            isAvailable = false;
+
+
+        //add two context sources: most probable activity and all probable activities, with defaul sampling rate.
+        mContextSourceList.add(
+                new ContextSource(
+                        STRING_CONTEXT_SOURCE_TRANSPORTATION,
+                        CONTEXT_SOURCE_TRANSPORTATION,
+                        isAvailable,
+                        sActivityRecognitionUpdateIntervalInMilliseconds
+                ));
+
+        return;
+    }
+
     /**
      * use ActivityRecognition Service's latest activity labels to examine transportaiton mode.
      * @return transportation mode. We make this synchronized because we don't want other classes
      * to use the transportation label before this function generates a new label
+     * Since this is the fuction where we set the confirmed activity, we determien whether we want to
+     * save it into LocalRecordPool depending on whether it is requested
      */
     public int examineTransportation(ActivityRecognitionRecord record) {
 
    //     Log.d(LOG_TAG, "[examineTransportation] enter" );
-//        Log.d(LOG_TAG, "[examineTransportation] enter" + ActivityRecognitionManager.getProbableActivities() );
+        Log.d(LOG_TAG, "[examineTransportation] enter" + ActivityRecognitionManager.getProbableActivities() );
 
         List<DetectedActivity> probableActivities = record.getProbableActivities();
         long detectionTime = record.getTimestamp();
@@ -321,16 +362,18 @@ public class TransportationModeManager extends ContextStateManager {
                                 "Suspect Start Transportation:\t" + getActivityNameFromType(getSuspectedStartActivityType()) + "\t" + "state:" + getStateName(getCurrentState()) );
 
                     }
-
-
-
                 }
-
             }
+        }
 
 
+        /** if transportation is requested, save transportation record **/
+        boolean isRequested = checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_TRANSPORTATION);
 
+        Log.d(LOG_TAG, STRING_CONTEXT_SOURCE_TRANSPORTATION + "examineTransportation isRequested: " + isRequested);
 
+        if (isRequested){
+            saveRecordToLocalRecordPool();
         }
 
         return getConfirmedActivityType();
@@ -608,6 +651,38 @@ public class TransportationModeManager extends ContextStateManager {
         }
     }
 
+    /**
+     * ContextStateMAnager needs to override this fundtion to implement writing a Record and save it to the LocalDataPool
+     */
+    public void saveRecordToLocalRecordPool() {
+
+        /** create a Record to save timestamp, session it belongs to, and Data**/
+
+        //we create LocationRecord instead of record because we expect to use some of these data later in memory
+        Record record = new Record();
+
+        /** create data in a JSON Object. Each CotnextSource will have different formats.
+         * So we need each ContextSourceMAnager to implement this part**/
+        JSONObject data = new JSONObject();
+
+        //add location to data
+        try {
+            data.put(RECORD_DATA_PROPERTY_TRANSPORTATION, getConfirmedActvitiyString());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        /**we set data in Record**/
+        record.setData(data);
+        record.setTimestamp(ContextManager.getCurrentTimeInMillis());
+
+        Log.d(LOG_TAG, "testing saving records at " + record.getTimeString() + " data: " + record.getData());
+
+        /**add it to the LocalRecordPool**/
+        mLocalRecordPool.add(record);
+
+    }
 
     private void examineCondition () {
 
@@ -668,7 +743,7 @@ public class TransportationModeManager extends ContextStateManager {
         return mConfirmedActivityType;
     }
 
-    public static void setConfirmedActivityType(int confirmedActivityType) {
+    public void setConfirmedActivityType(int confirmedActivityType) {
         TransportationModeManager.mConfirmedActivityType = confirmedActivityType;
     }
 
@@ -717,45 +792,45 @@ public class TransportationModeManager extends ContextStateManager {
     public static String getActivityNameFromType(int activityType) {
         switch(activityType) {
             case DetectedActivity.IN_VEHICLE:
-                return "in_vehicle";
+                return ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_IN_VEHICLE;
             case DetectedActivity.ON_BICYCLE:
-                return "on_bicycle";
+                return ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_ON_BICYCLE;
             case DetectedActivity.ON_FOOT:
-                return "on_foot";
+                return ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_ON_FOOT;
             case DetectedActivity.STILL:
-                return "still";
+                return ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_STILL;
             case DetectedActivity.RUNNING:
-                return "running";
+                return ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_RUNNING;
             case DetectedActivity.WALKING:
-                return "walking";
+                return ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_WALKING;
             case DetectedActivity.UNKNOWN:
-                return "unknown";
+                return ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_UNKNOWN;
             case DetectedActivity.TILTING:
-                return "tilting";
+                return ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_TILTING;
             case NO_ACTIVITY_TYPE:
-                return "NA";
+                return TRANSPORTATION_MODE_NAME_IN_NO_TRANSPORTATION;
         }
-        return "NA";
+        return TRANSPORTATION_MODE_NAME_IN_NO_TRANSPORTATION;
     }
 
 
     public static int getActivityTypeFromName(String activityName) {
 
-        if (activityName.equals("in_vehicle")) {
+        if (activityName.equals(ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_IN_VEHICLE)) {
             return DetectedActivity.IN_VEHICLE;
-        }else if(activityName.equals("on_bicycle")) {
+        }else if(activityName.equals(ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_ON_BICYCLE)) {
             return DetectedActivity.ON_BICYCLE;
-        }else if(activityName.equals("on_foot")) {
+        }else if(activityName.equals(ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_ON_FOOT)) {
             return DetectedActivity.ON_FOOT;
-        }else if(activityName.equals("still")) {
+        }else if(activityName.equals(ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_STILL)) {
             return DetectedActivity.STILL;
-        }else if(activityName.equals("unknown")) {
+        }else if(activityName.equals(ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_UNKNOWN)) {
             return DetectedActivity.UNKNOWN ;
-        }else if(activityName.equals("running")) {
+        }else if(activityName.equals(ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_RUNNING)) {
             return DetectedActivity.RUNNING ;
-        }else if (activityName.equals("walking")){
+        }else if (activityName.equals(ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_WALKING)){
             return DetectedActivity.WALKING;
-        }else if(activityName.equals("tilting")) {
+        }else if(activityName.equals(ActivityRecognitionManager.STRING_DETECTED_ACTIVITY_TILTING)) {
             return DetectedActivity.TILTING;
         }else {
             return NO_ACTIVITY_TYPE;
@@ -767,9 +842,9 @@ public class TransportationModeManager extends ContextStateManager {
 
         switch (sourceName){
 
-            case CONTEXT_SOURCE_TRANSPORTATION_STRING:
+            case STRING_CONTEXT_SOURCE_TRANSPORTATION:
                 return CONTEXT_SOURCE_TRANSPORTATION;
-            case CONTEXT_SOURCE_DETECTION_STATE_STRING:
+            case STRING_CONTEXT_SOURCE_DETECTION_STATE:
                 return CONTEXT_SOURCE_DETECTION_STATE;
             default:
                 return -1;
@@ -781,9 +856,9 @@ public class TransportationModeManager extends ContextStateManager {
         switch (sourceType){
 
             case CONTEXT_SOURCE_TRANSPORTATION:
-                return CONTEXT_SOURCE_TRANSPORTATION_STRING;
+                return STRING_CONTEXT_SOURCE_TRANSPORTATION;
             case CONTEXT_SOURCE_DETECTION_STATE:
-                return CONTEXT_SOURCE_DETECTION_STATE_STRING;
+                return STRING_CONTEXT_SOURCE_DETECTION_STATE;
             default:
                 return "NA";
 

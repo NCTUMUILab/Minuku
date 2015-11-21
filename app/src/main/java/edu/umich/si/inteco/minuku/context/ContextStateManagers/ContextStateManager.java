@@ -1,6 +1,11 @@
 package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
+import android.hardware.Sensor;
 import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -119,7 +124,7 @@ public abstract class ContextStateManager {
 
         for (int i=0; i<mContextSourceList.size(); i++){
             mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
-           // Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
         }
     }
 
@@ -171,9 +176,10 @@ public abstract class ContextStateManager {
         //add ActiveLoggingTask
         mActiveLoggingTasks.add(loggingTask);
 
+        Log.d(LOG_TAG, "[addActiveLoggingTask]" + this.getName() + " have " + mActiveLoggingTasks.size() + "logging task");
+
         //after add a logging task, we need to update the Request Status of the ContextSourceList
         updateContextSourceListRequestStatus();
-
 
     }
 
@@ -190,17 +196,41 @@ public abstract class ContextStateManager {
     }
 
 
-    protected void addRecord (Record record) {
+    /**
+     * ContextStateMAnager needs to override this fundtion to create data content for a Record
+     */
+    protected void saveRecordToLocalRecordPool (Object[] values) {
+
+        /** store values into a Record so that we can store them in the local database **/
+        Record record = new Record();
+        record.setTimestamp(ContextManager.getCurrentTimeInMillis());
+        record.setSource(Sensor.STRING_TYPE_ACCELEROMETER);
+
+        /** create data in a JSON Object. Each CotnextSource will have different formats.
+         * So we need each ContextSourceMAnager to implement this part**/
+        JSONObject data = new JSONObject();
+
+        // ....
+        //implement data....put values of contextsources into data. we expect to see different
+        //contextsources have different formats.
+        // ....
+
+        /*** Set data to Record **/
+        record.setData(data);
+
+        /** Save Record**/
         mLocalRecordPool.add(record);
+
     }
+
 
     public Record getLastSavedRecord (){
-        return mLastSavedRecord;
+        if (mLocalRecordPool.size()>0)
+            return mLocalRecordPool.get(mLocalRecordPool.size()-1);
+        else
+            return null;
     }
 
-    public void setLastSavedRecord (Record record) {
-        mLastSavedRecord = record;
-    }
 
     /*******************************************************************************************/
     /********************************* Monitoring Related** ************************************/
