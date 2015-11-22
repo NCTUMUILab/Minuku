@@ -3,6 +3,8 @@ package edu.umich.si.inteco.minuku.model.Record;
 import com.google.android.gms.maps.model.LatLng;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
 
 /**
  * Created by Armuro on 11/21/15.
@@ -15,7 +17,7 @@ public class LocationRecord extends Record {
 
     public LocationRecord(double lat, double lng, float accuracy) {
         super();
-
+        _source = LocationManager.STRING_CONTEXT_SOURCE_LOCATION;
         this.mLat = lat;
         this.mLng = lng;
         this.mAccuracy = accuracy;

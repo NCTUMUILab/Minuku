@@ -39,7 +39,7 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
     /**constants**/
 
     //The interval for location updates. Inexact. Updates may be more or less frequent.
-    public static final long UPDATE_INTERVAL_IN_SECONDS = 5;
+    public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
      //The fastest rate for active location updates.
     public static final long FASTEST_UPDATE_INTERVAL_IN_SECONDS = 2;
 
@@ -74,8 +74,10 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
     public static final String RECORD_DATA_PROPERTY_BEARING = "Bearing";
     public static final String RECORD_DATA_PROPERTY_EXTRAS = "Extras";
 
-
     public static final int CONTEXT_SOURCE_LOCATION = 0;
+
+    /** KeepAlive **/
+    protected int KEEPALIVE_MINUTE = 5;
 
     // Keys for storing activity state in the Bundle.
     protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
@@ -129,6 +131,8 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         buildGoogleApiClient();
 
         setUpContextSourceList();
+
+        setKeepalive( KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
 
     }
 
@@ -207,7 +211,7 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
         //If no location is requested, we should stop requesting location update
         if (!isRequested){
-            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting AR informatoin because it is not needed anymore");
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting location informatoin because it is not needed anymore");
             //TODO: need to create this in the study json to test (triggered logging location)
 
             //if there's an location update going on, we should remove it. Otherwise, we don't need to do anything
@@ -249,19 +253,18 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
             data.put(RECORD_DATA_PROPERTY_SPEED, mCurrentLocation.getSpeed());
             data.put(RECORD_DATA_PROPERTY_BEARING, mCurrentLocation.getBearing());
             data.put(RECORD_DATA_PROPERTY_PROVIDER, mCurrentLocation.getProvider());
-            data.put(RECORD_DATA_PROPERTY_EXTRAS, mCurrentLocation.getExtras());
 
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        Log.d(LOG_TAG, "testing saving records at " + record.getTimeString() + " data: " + record.getData());
-
-
         /**we set data in Record**/
         record.setData(data);
         record.setTimestamp(ContextManager.getCurrentTimeInMillis());
+
+        Log.d(LOG_TAG, "testing saving records at " + record.getTimeString() + " data: " + record.getData());
+
 
         /**add it to the LocalRecordPool**/
         addRecord(record);

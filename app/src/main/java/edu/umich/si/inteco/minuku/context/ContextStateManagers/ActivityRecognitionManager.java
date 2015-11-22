@@ -72,7 +72,6 @@ public class ActivityRecognitionManager extends ContextStateManager
     private static long sActivityRecognitionUpdateIntervalInMilliseconds =
             sActivityRecognitionUpdateIntervalInSeconds * Constants.MILLISECONDS_PER_SECOND;
 
-
     private static Context mContext;
 
     /***Activity Recognition Requester**/
@@ -88,6 +87,12 @@ public class ActivityRecognitionManager extends ContextStateManager
     private static DetectedActivity sMostProbableActivity;
 
     private static long sLatestDetectionTime = -1;
+
+    protected static int sLocalRecordPoolMaxSize =
+            3 * (Constants.SECONDS_PER_MINUTE / ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL_IN_SECONDS); //36 = 3 mins * 12 times/min
+
+    /** KeepAlive **/
+    protected int KEEPALIVE_MINUTE = 3;
 
     public ActivityRecognitionManager(Context context) {
 
@@ -108,6 +113,9 @@ public class ActivityRecognitionManager extends ContextStateManager
         sLatestDetectionTime = -1;
 
         setUpContextSourceList();
+
+        //we use 3 minutes insead of 5 minutes
+        setKeepalive( KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
 
     }
 

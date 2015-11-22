@@ -56,7 +56,7 @@ public class Record {
 		this.isCopiedToPublicPool = isCopiedToPublicPool;
 	}
 
-	public void setID(int id){
+	public void setID(long id){
 		_id = id;
 	}
 

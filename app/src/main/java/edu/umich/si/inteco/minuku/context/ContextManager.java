@@ -53,6 +53,8 @@ public class ContextManager {
     public static final int BACKGROUND_RECORDING_INITIAL_DELAY = 0;
     public static final int CONTEXT_MANAGER_REFRESH_FREQUENCY = 5 ;
 
+    public static final int LOCAL_RECORD_POOL_MAX_SIZE = 50;
+    public static final int PUBLIC_RECORD_POOL_MAX_SIZE = 500;
 
     /**RecordPool is a List for temporarily storing records that will be stored into the database or files later**/
     private static ArrayList<Record> mRecordPool;

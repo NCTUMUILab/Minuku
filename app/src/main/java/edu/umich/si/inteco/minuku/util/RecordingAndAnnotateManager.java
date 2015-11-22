@@ -47,6 +47,8 @@ public class RecordingAndAnnotateManager {
 
     public static final int BACKGOUND_RECORDING_SESSION_ID = 1;
 
+    public static final boolean enableSeparateBackgroundRecording = false;
+
     //visualization type
     public static final String ANNOTATION_VISUALIZATION_NONE = "none";
     public static final String ANNOTATION_VISUALIZATION_TYPE_LOCATION = "location";
@@ -83,7 +85,9 @@ public class RecordingAndAnnotateManager {
         mCurRecordingSessions = new ArrayList<Session>();
 
         //add the background recording to the curRecordingSession
-        setupBackgroundRecordingEnvironment();
+
+        if (enableSeparateBackgroundRecording)
+            setupBackgroundRecordingEnvironment();
     }
 
     /**

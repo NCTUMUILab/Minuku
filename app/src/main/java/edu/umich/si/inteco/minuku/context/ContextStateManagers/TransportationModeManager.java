@@ -95,6 +95,10 @@ public class TransportationModeManager extends ContextStateManager {
 
     private ActivityRecognitionManager mActivityRecognitionManager;
 
+    /** KeepAlive **/
+    protected int KEEPALIVE_MINUTE = 3;
+
+
     /** Tag for logging. */
     private static final String LOG_TAG = "TransModeDetector";
 
@@ -106,6 +110,9 @@ public class TransportationModeManager extends ContextStateManager {
         mContext = context;
 
         setUpContextSourceList();
+
+        //we use 3 minutes insead of 5 minutes
+        setKeepalive( KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
 
     }
 
@@ -660,6 +667,7 @@ public class TransportationModeManager extends ContextStateManager {
 
         //we create LocationRecord instead of record because we expect to use some of these data later in memory
         Record record = new Record();
+        record.setSource(STRING_CONTEXT_SOURCE_TRANSPORTATION);
 
         /** create data in a JSON Object. Each CotnextSource will have different formats.
          * So we need each ContextSourceMAnager to implement this part**/

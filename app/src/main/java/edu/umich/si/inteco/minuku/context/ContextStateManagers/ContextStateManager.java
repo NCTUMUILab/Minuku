@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.ContextSource;
@@ -54,6 +55,7 @@ public abstract class ContextStateManager {
 
 
     protected String mName;
+    protected long recordCount;
     protected ArrayList<Record> mLocalRecordPool;
     protected ArrayList<Condition> mConditions;
     protected ArrayList<LoggingTask> mActiveLoggingTasks;
@@ -62,6 +64,11 @@ public abstract class ContextStateManager {
     /**each contextStateManager has a list of ContextSource available for use**/
     protected ArrayList<ContextSource> mContextSourceList;
     protected Record mLastSavedRecord;
+    protected static int sLocalRecordPoolMaxSize = 50;
+
+    /** KeepAlive **/
+    protected int KEEPALIVE_MINUTE = 5;
+    protected long sKeepalive;
 
 //    protected static HashMap<Integer, Boolean>mSourceExtractTable
 
@@ -74,11 +81,17 @@ public abstract class ContextStateManager {
 
 
     public ContextStateManager() {
+
+        recordCount = 0;
+
         mLocalRecordPool = new ArrayList<Record>();
         mStateMappingRules = new ArrayList<StateMappingRule>();
         mActiveLoggingTasks = new ArrayList<LoggingTask>();
         mStates = new ArrayList<State>();
         mContextSourceList = new ArrayList<ContextSource>();
+
+        //set keepalive
+        setKeepalive(KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);//5 minute;;
     }
 
     public ContextStateManager(ArrayList<Record> mlocalRecordPool) {
@@ -183,8 +196,13 @@ public abstract class ContextStateManager {
 
     }
 
-    //copy records from LocalRecordPool to PublicRecordPool
+
+    /**
+     * copy records from LocalRecordPool to PublicRecordPool
+      */
     public void copyRecordsToPublicRecordPool() {
+
+        int count = 0;
 
         for (int i=0; i<mLocalRecordPool.size(); i++ ) {
 
@@ -195,11 +213,14 @@ public abstract class ContextStateManager {
                 ContextManager.getPublicRecordPool().add(mLocalRecordPool.get(i));
                 //after the record has been copied, we need to mark it "copie", so that we won't copied again
                 record.setIsCopiedToPublicPool(true);
+                Log.d(LOG_TAG, this.getName() + "[test logging] moving record " + record.getID() + " : " + record.getTimeString() + " to public pool" );
+                count ++;
             }
         }
 
-        Log.d(LOG_TAG, this.getName() + " finished copying records, it has " + mLocalRecordPool.size() + " records.  Now contextmangaer have "
-                + ContextManager.getPublicRecordPool().size() + "records");
+        Log.d(LOG_TAG, this.getName() + "[test logging] moving " + count + " records to public pool, local pool now has " + mLocalRecordPool.size() +
+                " records.  pubolc pool has " + ContextManager.getPublicRecordPool().size() + "records");
+
     }
 
 
@@ -216,7 +237,7 @@ public abstract class ContextStateManager {
         /** store values into a Record so that we can store them in the local database **/
         Record record = new Record();
         record.setTimestamp(ContextManager.getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_ACCELEROMETER);
+        record.setSource("YOUR OWN SOURCE TYPE");
 
         /** create data in a JSON Object. Each CotnextSource will have different formats.
          * So we need each ContextSourceMAnager to implement this part**/
@@ -241,8 +262,21 @@ public abstract class ContextStateManager {
      */
     protected void removeOutDatedRecord() {
 
-        //TODO: implement this.
+        for (int i=0; i<mLocalRecordPool.size(); i++) {
 
+            Record record = mLocalRecordPool.get(i);
+
+            //calculate time difference
+            long diff =  ContextManager.getCurrentTimeInMillis() - mLocalRecordPool.get(i).getTimestamp();
+
+            //remove outdated records.
+            if (diff >= sKeepalive){
+                mLocalRecordPool.remove(record);
+                Log.d(LOG_TAG, "[test logging]remove record " + record.getSource() + record.getID() + " logged at " + record.getTimeString() + " to " + this.getName());
+
+                i--;
+            }
+        }
     }
 
     /**
@@ -252,7 +286,11 @@ public abstract class ContextStateManager {
     protected void addRecord(Record record) {
 
         /**1. add record to the local pool **/
+        long id = recordCount++;
+        record.setID(id);
+
         mLocalRecordPool.add(record);
+        Log.d(LOG_TAG, "[test logging]add record " + record.getSource() +record.getID() + "logged at " + record.getTimeString() + " to " + this.getName() );
 
         /**2. check whether we should remove old record **/
         removeOutDatedRecord();
@@ -649,6 +687,13 @@ public abstract class ContextStateManager {
     }
 
 
+    public long getKeepalive() {
+        return sKeepalive;
+    }
+
+    public void setKeepalive(long keepalive) {
+        this.sKeepalive = keepalive;
+    }
 
     public static int getRelationship(String  relationshipName) {
 
