@@ -231,6 +231,8 @@ public class RecordingAndAnnotateManager {
         //TODO: maybe in the future we should add the battery information at somewhere else
         session.setBatteryLife(BatteryHelper.getBatteryPercentage());
 
+        Log.d(LOG_TAG, "[test currunningSession ] addCurRecordingSession added session " + session.getId());
+
         //add to the list
         mCurRecordingSessions.add(session);
 

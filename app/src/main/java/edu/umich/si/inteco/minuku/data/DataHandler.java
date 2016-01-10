@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
@@ -53,10 +54,24 @@ public class DataHandler {
      * @param source
      * @return
      */
+
+    //TODO: complete the list
     public static String getTableNameByRecordType(String source) {
 
         String tableName = "";
 
+        if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
+            tableName = DatabaseNameManager.RECORD_TABLE_NAME_LOCATION;
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)) {
+            tableName = DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY_RECOGNITION;
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_TRANSPORTATION)) {
+            tableName = DatabaseNameManager.RECORD_TABLE_NAME_TRANSPORTATION;
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_SENSPR_ACCELEROMETER)) {
+            tableName = DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_ACCELEROMETER;
+        }
 
 
 
@@ -90,12 +105,14 @@ public class DataHandler {
         // we first inspect which record has been saved by the current session. We start from the end of the record pool
         //  Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] inspecting record at " + i + ". Its has been saved by " +  recordpool.get(i).getSavedSessionIds());
         /** 1. check whether the record has been saved by the session **/
-        for (int i=recordpool.size()-1; i>=0; i--)
+        for (int i=recordpool.size()-1; i>=0; i--) {
+
             if (recordpool.get(i).getSavedSessionIds().contains(session_id)) {
                 //once we found the last record been saved by the session, we mark it as the starting point to save records.
                 indexOfLastSavedByCurSession = i;
                 break;
             }
+        }
 
         //if indexOfLastSavedByCurSession =0, none of the records has been saved, so the start index should be 0
         if (indexOfLastSavedByCurSession == 0)
@@ -114,10 +131,11 @@ public class DataHandler {
                 //LocalDBHelper will save the record according to the type of the record
                 LocalDBHelper.insertRecordTable ( recordpool.get(i), getTableNameByRecordType(recordpool.get(i).getSource()), session_id);
 
+                //mark the record as being saved by the session.
                 if (!recordpool.get(i).getSavedSessionIds().contains(session_id))
                     recordpool.get(i).getSavedSessionIds().add(session_id);
 
-                 Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] finishing saving record at " + i + ", mark it has been saved by " + session_id + " now it has been saved by " +  recordpool.get(i).getSavedSessionIds());
+                 Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] finishing saving record " + recordpool.get(i).getSource() +  " at " + i + ", mark it has been saved by " + session_id + " now it has been saved by " +  recordpool.get(i).getSavedSessionIds());
 
 
             }catch (IndexOutOfBoundsException e ){
@@ -141,7 +159,8 @@ public class DataHandler {
 
             for (int j=0; j< RecordingAndAnnotateManager.getCurRecordingSessions().size(); j++){
 
-                //get the session id
+                //get the id of all running sessions and check whether the record in the pool has marked the session id.
+                //if it is marked, the record has been saved in that session.
                 int runningSessionId = (int) RecordingAndAnnotateManager.getCurRecordingSessions().get(j).getId();
 
                 //check if the session is currently paused, if yes, we don't consider it (because records should not be saved by a paused session)
@@ -149,7 +168,6 @@ public class DataHandler {
                     Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] the session " + runningSessionId + " is paused, we do not consider it" );
                     continue;
                 }
-
 
                 //if we found any record that is not marked as been saved in a session, the flag is set false
                 if (!recordpool.get(i).getSavedSessionIds().contains(runningSessionId)) {

@@ -246,8 +246,6 @@ public class ActionManager {
 				//if the action is to recording records  
 				else if (action.getType().equals(ActionManager.ACTION_TYPE_SAVING_RECORD)){
 
-					Log.d(LOG_TAG, "start saving record action ");
-
                     /**1. create a SavingRecordAction **/
 					SavingRecordAction savingRecordAction = (SavingRecordAction) action;
 
@@ -264,6 +262,8 @@ public class ActionManager {
                      **/
 					int sessionId  = (int) mLocalDBHelper.querySessionCount()+1;
 
+                    Log.d(LOG_TAG, "[test currunningSession ]start saving record action with session " + sessionId);
+
                     //save the session info to the saveRecord action
 					savingRecordAction.setSessionId(sessionId);
 					
@@ -272,6 +272,7 @@ public class ActionManager {
 
                     //a session is associate with a list of ContextSource names, and put it in the metadata.
                     session.setContextSourceTypes(ContextManager.getSourceNamesFromLoggingTasks(savingRecordAction.getLoggingTasks()));
+                    session.setId(sessionId);
 
                     //add session to the curRecordingSession
                     RecordingAndAnnotateManager.addCurRecordingSession(session);
@@ -518,6 +519,7 @@ public class ActionManager {
                      * **/
                     ContextManager.copyRecordFromLocalRecordPoolToPublicRecordPool(savingRecordAction.getLoggingTasks());
 
+                    //save data from publie record pool to database
 					mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), savingRecordAction.getSessionId() );
 
                     //check if the recording allows users to add annotation in process. If yes, we add an

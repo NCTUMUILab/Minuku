@@ -13,7 +13,7 @@
 
 
     <string name="add_details_recording_btn">ADD DETAILS</string>
-    <string name="checkin_btn">CHECK IN</string>
+    <string name="checkin_btn">CHECKPOINT</string>
     <string name="stop_btn">STOP</string>
     <string name="start_btn">START</string>
 

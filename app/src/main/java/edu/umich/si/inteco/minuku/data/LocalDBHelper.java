@@ -613,11 +613,12 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			//data is JSON String
 			values.put(DatabaseNameManager.COL_DATA, record.getData().toString(0));
 
-            //Log.d(LOG_TAG, "[insertRecordTable] Inserting record " + ContextManager.getSensorTypeName(record.getType()) + ": at-" + record.getTimestamp() + " : " + record.getTimeString() + " in session " + session_id );
-            //" to the record table " + table_name);
+            Log.d(LOG_TAG, "[insertRecordTable][SaveRecordsToLocalDatabase]  Going to inserting record "  + record.getSource() + ": at-" + record.getTimestamp() + " : " + record.getTimeString() + " in session " + session_id +
+            " to the record table " + table_name);
+
 			rowId = db.insert(table_name, null, values);
 
-		Log.d(LOG_TAG, "[insertRecordTable] Inserting successfully! The " + table_name + " table now has " + rowId + " rows.");
+			Log.d(LOG_TAG, "[insertRecordTable][SaveRecordsToLocalDatabase]  Inserting successfully! The " + table_name + " table now has " + rowId + " rows.");
 			
 		}catch(Exception e){
 			e.printStackTrace();

@@ -233,6 +233,9 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
         /** create a Record to save timestamp, session it belongs to, and Data**/
 
+        Log.d(LOG_TAG, "testing saving records saveRecordToLocalRecordPool in " + this.getName() );
+
+
         //we create LocationRecord instead of record because we expect to use some of these data later in memory
         LocationRecord record = new LocationRecord(
                 mCurrentLocation.getLatitude(),

@@ -16,7 +16,6 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
-import edu.umich.si.inteco.minuku.model.Record.LocationRecord;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;

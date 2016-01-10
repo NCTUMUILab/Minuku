@@ -155,7 +155,7 @@ public class RemoteDBHelper {
     }
 
     public static String postLogFiles(Date lastSyncDate){
-
+/*
         //we will get the latest uploaded log file and then decide which log file to upload
         File logFile[] = FileHelper.getLogDirectory().listFiles();
 
@@ -201,14 +201,15 @@ public class RemoteDBHelper {
         }
 
         return res;
+*/
 
-
+        return null;
     }
 
 
 
     public static void postBackgroundRecordingDocuments(long lastSyncHourTime) {
-
+/*
         ArrayList<JSONObject> documents = RecordingAndAnnotateManager.getBackgroundRecordingDocuments(lastSyncHourTime);
 
         if (documents!=null) {
@@ -217,12 +218,12 @@ public class RemoteDBHelper {
                 new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_BACKGROUND_RECORDING, json, DATA_TYPE_BACKGROUND_RECORDING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
             }
         }
-
+*/
     }
 
 
     public static void postModifiedSessionDocuments() {
-
+/*
         ArrayList<JSONObject> documents = RecordingAndAnnotateManager.getModifiedSessionDocuments();
 
 
@@ -247,12 +248,12 @@ public class RemoteDBHelper {
 
             }
         }
-
+*/
     }
 
 
     public static void postSessionDocuments(long lastSyncHourTime) {
-
+/*
         ArrayList<JSONObject> documents = RecordingAndAnnotateManager.getSessionecordingDocuments(lastSyncHourTime);
 
         if (documents!=null) {
@@ -261,7 +262,7 @@ public class RemoteDBHelper {
                 new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
             }
         }
-
+*/
     }
 
 
