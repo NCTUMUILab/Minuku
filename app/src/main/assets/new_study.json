@@ -33,6 +33,12 @@
 
 			  ],
 
+			  "BackgroundLogging":{
+				"Enabled": true,
+				"Logging_tasks":"1,2,3",
+				"Logging_rate": 5
+			  },
+
 			  "Logging":
 				[
 				  {

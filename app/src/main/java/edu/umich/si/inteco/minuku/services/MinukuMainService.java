@@ -187,9 +187,6 @@ public class MinukuMainService extends Service {
 
         mFileHelper = new FileHelper (this);
 
-        //initiate the Record and Annotation Manager
-        mRecordingAndAnnotateManager = new RecordingAndAnnotateManager(this);
-
         //initiate the TaskManager and load the tasks
         mTaskManager = new TaskManager(this);
 
@@ -209,6 +206,9 @@ public class MinukuMainService extends Service {
         mQuestionnaireManager = new QuestionnaireManager(this);
 
         mConfigurationManager = new ConfigurationManager(this, mContextManager);
+
+        //initiate the Record and Annotation Manager
+        mRecordingAndAnnotateManager = new RecordingAndAnnotateManager(this);
 
         //initiate the DataHandler
         mDataHandler = new DataHandler (this);

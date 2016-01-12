@@ -37,10 +37,9 @@ public class TaskManager {
 		//check tasks from the database
         ArrayList<String> res = new ArrayList<String>();
         res = mLocalDBHelper.queryTasks();
-        Log.d(LOG_TAG, "there are " + res.size() + " tasks in the database");
+//        Log.d(LOG_TAG, "[loadTask] there are " + res.size() + " tasks in the database " + res.toString());
 
-		//if only the background recording task is in the database, ;oa
-				
+		//if only the background recording task is in the database,
 		if (res.size()<=1){
 			loadTestingTasksFromAsset();
 		}
@@ -51,7 +50,7 @@ public class TaskManager {
 			//if there are tasks in the database, load them into the memory
 			for (int i=0; i<res.size() ; i++){
 				String t = res.get(i);
-				Log.d(LOG_TAG, " the " + i + " task is:  " + t );
+//				Log.d(LOG_TAG, "[loadTask]  the " + i + " task is:  " + t );
 
 				//get properties of each task.
 				String [] separated = t.split(";;;");
@@ -63,9 +62,9 @@ public class TaskManager {
 				long startTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_TASK_START_TIME]);
 				long endTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_TASK_END_TIME]);
 				
-				Log.d(LOG_TAG, "get task from the database: id: " + id + " , study id: " + study_id + " name " + name + " , " + description + " , at " + 
-			    " , start  " + startTime + " , end: " + endTime);
-				
+//				Log.d(LOG_TAG, "loadTask get task from the database: id: " + id + " , study id: " + study_id + " name " + name + " , " + description + " , at " +
+//			    " , start  " + startTime + " , end: " + endTime);
+//
 				
 				//add the task into the tasklist object
 				Task task = new Task(id, name, startTime, endTime, description, study_id);
@@ -84,8 +83,9 @@ public class TaskManager {
 		if (mTaskList==null){
 			mTaskList = new ArrayList<Task>();	
 		}
-		
-		
+
+		//Log.d(LOG_TAG, "[loadTask] loadTestingTasksFromAsset");
+
 		/** load tasks from the studies.txt (in JSON), after we connect to the databse, we will get the study file **/
 		
 		//read the study json file from assets
@@ -106,8 +106,11 @@ public class TaskManager {
 				
 				for (int j = 0; j < taskJSONArray.length(); j++){
 					
-					JSONObject taskJSON = taskJSONArray.getJSONObject(j);		
-					
+					JSONObject taskJSON = taskJSONArray.getJSONObject(j);
+
+//					Log.d(LOG_TAG, "[loadTask] taskJSON " + taskJSON.toString());
+
+
 					//extract values
 					int id = taskJSON.getInt(ConfigurationManager.CONFIGURATION_PROPERTIES_ID);
 					String name = taskJSON.getString(ConfigurationManager.CONFIGURATION_PROPERTIES_NAME);
@@ -117,7 +120,7 @@ public class TaskManager {
 					long endTime = taskJSON.getLong(ConfigurationManager.TASK_PROPERTIES_END_TIME);
 					
 					
-					Log.d(LOG_TAG, "get task from the file: id: " + id + " , " + name + " , " + description + " , " + createdTime + " , " + startTime + " , " + endTime);
+				//	Log.d(LOG_TAG, "[loadTask] get task from the file: id: " + id + " , " + name + " , " + description + " , " + createdTime + " , " + startTime + " , " + endTime);
 					
 					
 					//create Task object and inset the task into the list

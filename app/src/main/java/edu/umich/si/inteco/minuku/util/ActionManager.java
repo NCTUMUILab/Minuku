@@ -507,17 +507,19 @@ public class ActionManager {
 				/** if the action is to recording records, we save records in the public record pool in the local SQLLite database  **/
 				else if (action.getType().equals(ActionManager.ACTION_TYPE_SAVING_RECORD)){
 
-				    Log.d(LOG_TAG, "[participatory sensing] execute saving record action, this is the " + action.getExecutionCount() + "th time of this action");
+				    Log.d(LOG_TAG, "execute saving record action, this is the " + action.getExecutionCount() + "th time of this action");
 
 					SavingRecordAction savingRecordAction = (SavingRecordAction) action;
-					
-					//TODO: get a list of record to save and put it into the recording list.
 
-					/** we call ContextManager to move data records from local record pool to publid record pool
-                     * by passing which logging task the action is associated with
-                     * ContextMAnageer will know which ContextStateMAnager will have data in localRecordPool
-                     * **/
-                    ContextManager.copyRecordFromLocalRecordPoolToPublicRecordPool(savingRecordAction.getLoggingTasks());
+                    Log.d(LOG_TAG, "execute saving record action to session " + savingRecordAction.getSessionId());
+
+                             //TODO: get a list of record to save and put it into the recording list.
+
+                             /** we call ContextManager to move data records from local record pool to publid record pool
+                              * by passing which logging task the action is associated with
+                              * ContextMAnageer will know which ContextStateMAnager will have data in localRecordPool
+                              * **/
+                             ContextManager.copyRecordFromLocalRecordPoolToPublicRecordPool(savingRecordAction.getLoggingTasks());
 
                     //save data from publie record pool to database
 					mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), savingRecordAction.getSessionId() );

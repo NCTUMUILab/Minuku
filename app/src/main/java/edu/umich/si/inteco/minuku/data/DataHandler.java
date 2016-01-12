@@ -240,41 +240,21 @@ public class DataHandler {
 */
 
 
-    public static ArrayList<String> getDataBySession(int sessionId, String sourceNames, long startTime, long endTime) {
-
+    public static ArrayList<String> getDataBySession(int sessionId, String sourceName, long startTime, long endTime) {
 
         //for each record type get data
 
         ArrayList<String> resultList = new ArrayList<String>();
 
-
-        //TODO: get data from database
         //first know which table and column to query..
-        /*
-        ArrayList<String> tableAndColumns = getTableAndColumnByRecordType(recordType);
+        String tableName= getTableNameByRecordType(sourceName);
+        Log.d(LOG_TAG, "[getDataBySession] getting data from  " + tableName);
 
-        String tableName="", columnName1="", columnName2="", columnName3="" ;
-
-        //get table and column names
-        if (tableAndColumns!=null && tableAndColumns.size()>0){
-
-            tableName = tableAndColumns.get(0);
-
-            //get result without filter any columns
-            if (tableAndColumns.size()==1){
-
-                //execute the query
-                resultList = LocalDBHelper.queryRecordsInSession(tableName, sessionId, startTime, endTime);
-         //       Log.d(LOG_TAG, "[getDataBySession] got " + resultList.size() + " of results from queryRecordsInSession");
-
-
-            }
-
-
+        //get data from the table
+        if (tableName !=null) {
+            resultList = LocalDBHelper.queryRecordsInSession(tableName, sessionId, startTime, endTime);
+            Log.d(LOG_TAG, "[getDataBySession] the result from " + tableName + " is  " + resultList);
         }
-        */
-
-
 
         return resultList;
     }

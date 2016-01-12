@@ -54,7 +54,7 @@ public class Constants {
 	public static final int BACKGOUND_RECORDING_SESSION_ID= 1;	//the id column in the session table is auto-incremental, so the minimum is 1
 	public static final int BACKGOUND_RECORDING_TASK_ID= 0;	//task with id 0 means it's the background recording.
 	public static final String BACKGOUND_RECORDING_TASK_NAME = "Background_Recording";
-	public static final String BACKGOUND_RECORDING_TASK_DESCRIPTION = "The task is Probe's background recording";
+	public static final String BACKGOUND_RECORDING_TASK_DESCRIPTION = "The task is Minuku's background logging";
 	public static final int BACKGOUND_RECORDING_NO_STUDY_ID = 0;
 
 

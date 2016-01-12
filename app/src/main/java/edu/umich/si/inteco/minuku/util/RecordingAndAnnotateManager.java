@@ -47,8 +47,6 @@ public class RecordingAndAnnotateManager {
 
     public static final int BACKGOUND_RECORDING_SESSION_ID = 1;
 
-    public static final boolean enableSeparateBackgroundRecording = false;
-
     //visualization type
     public static final String ANNOTATION_VISUALIZATION_NONE = "none";
     public static final String ANNOTATION_VISUALIZATION_TYPE_LOCATION = "location";
@@ -86,8 +84,16 @@ public class RecordingAndAnnotateManager {
 
         //add the background recording to the curRecordingSession
 
-        if (enableSeparateBackgroundRecording)
+        Log.d(LOG_TAG, "[testBackgroundLogging] ContextManager.getBackgroundLoggingSetting().isEnabled()  "
+                + ContextManager.getBackgroundLoggingSetting().isEnabled());
+        if (ContextManager.getBackgroundLoggingSetting().isEnabled()){
             setupBackgroundRecordingEnvironment();
+        }
+        else {
+
+            //TODO: we need to remove existing backgroundlogging task from the database
+        }
+
     }
 
     /**
@@ -204,7 +210,7 @@ public class RecordingAndAnnotateManager {
 
 
     public static void startListRecordingActivity(String reviewMode) {
-        Log.d(LOG_TAG, " [test listrecording review mode] [startListRecordingActivity] going to start list recording activity from annoatate activity, the review mode is " +reviewMode);
+        Log.d(LOG_TAG, " [test listrecording review mode] [startListRecordingActivity] going to start list recording activity from annoatate activity, the review mode is " + reviewMode);
 
         if (reviewMode.equals(RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_NONE)) {
             return ;
@@ -609,12 +615,12 @@ public class RecordingAndAnnotateManager {
      * **/
 
     public void setupBackgroundRecordingEnvironment() {
-
+        
         //Create a task and a session for background recording
-
-        //if the task and the session for background recording has been setup, then return
         Session session = new Session(ContextManager.getCurrentTimeInMillis());
         session.setId(BACKGOUND_RECORDING_SESSION_ID);
+
+        //if backgroundlogging is active, we should add it into the current logging session.
         addCurRecordingSession(session);
 
         Task task = new Task(Constants.BACKGOUND_RECORDING_TASK_ID,
@@ -624,31 +630,36 @@ public class RecordingAndAnnotateManager {
 
         session.setTaskId(task.getId());
 
+
+        /**if the database is empty, we need to store the background recording session into the database
+         * else, we need to check whether the Task table has stored Background recording.
+         * If there's one, we don't need to do anything.
+         * TODO: we need to save the backgroudrecording setting in Preference
+         */
+
         //check database for tasks
         ArrayList<String> res = mLocalDBHelper.queryTasks();
-        //if the database is empty, we need to store the background recording session into the database
 
-        //for the labeling study, if there are existing configurations, we remove it and insert new ones...
-        //TODO: remove this part after we can update the configuration from the database...
+        //if the task and the session for background recording has been setup, then return
         if (res.size()>0) {
             //remove the configurations..
-            mLocalDBHelper.removeTasks();
-            res = mLocalDBHelper.queryTasks();
-            Log.d(LOG_TAG, "[loadConfiguration] there are " + res.size() + " tasks in the database");
 
-        }
-        if (res.size()==0){
-            //insert task for background recording into the database
+            //check tasks in the DB to examine whether a backgroundlogging task has been saved (we jsut need one background recording!)
+            for (int i=0; i<res.size();i++){
+
+                //a backgroundlogging task has been saved in the database, do not need to insert another one. Return!
+                if (res.get(i).contains("Background_Recording")){
+                    return;
+                }
+            }
+            //if not return yet, there's no existing background logging task in the DB, so we insert the task
             mLocalDBHelper.insertTaskTable(task, DatabaseNameManager.TASK_TABLE_NAME);
-
         }
 
         //if the database is empty, we need to store the background recording session into the database
-       // Log.d(LOG_TAG, " [setupBackgroundRecordingEnvironment] checking sessions...now there are " + mLocalDBHelper.querySessionCount() + " sessions");
         if (mLocalDBHelper.querySessionCount()==0){
             //insert session for background recording into the database
             saveSessionToDataBase(session);
-
         }
 
     }
@@ -834,6 +845,7 @@ public class RecordingAndAnnotateManager {
         while (endTime <now) {
 
             JSONObject document= getBackgroundRecordingDocument(startTime, endTime);
+            //Log.d(LOG_TAG, "[getBackgroundRecordingDocuments] get document" + document.toString());
             documents.add(document);
             startTime = endTime;
             endTime += Constants.MILLISECONDS_PER_HOUR;

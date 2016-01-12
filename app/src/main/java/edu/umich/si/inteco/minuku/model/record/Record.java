@@ -38,13 +38,13 @@ public class Record {
 	@Override
 	public String toString() {
 		return "Record{" +
-				"_id=" + _id +
-				", _timestamp=" + _timestamp +
-				", _source='" + _source + '\'' +
-				", _session=" + _session +
-				", mSavedBySessionIds=" + mSavedBySessionIds +
-				", mData=" + mData +
-				", mTimestring='" + mTimestring + '\'' +
+				"id=" + _id +
+				", timestamp=" + _timestamp +
+				", source='" + _source + '\'' +
+				", session=" + _session +
+				", savedBySessionIds=" + mSavedBySessionIds +
+				", data=" + mData +
+				", timestring='" + mTimestring + '\'' +
 				'}';
 	}
 

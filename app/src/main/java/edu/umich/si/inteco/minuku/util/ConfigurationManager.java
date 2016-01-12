@@ -11,10 +11,7 @@ import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
@@ -61,6 +58,8 @@ public class ConfigurationManager {
 	public static final String CONFIGURATION_CATEGORY_TASK = "Tasks";
 	public static final String CONFIGURATION_CATEGORY_CIRCUMSTANCE = "Circumstances";
 	public static final String CONFIGURATION_CATEGORY_LOGGING = "Logging";
+	public static final String CONFIGURATION_CATEGORY_BACKGROUND_LOGGING = "BackgroundLogging";
+
 	public static final String CONFIGURATION_CATEGORY_QUESTIONNAIRE = "Questionnaires";
 	public static final String CONFIGURATION_CATEGORY_CONTEXTSOURCE_SETTING = "ContextSourceSetting";
 
@@ -74,6 +73,11 @@ public class ConfigurationManager {
 	public static final String CONDITION_PROPERTIES_MEASURE ="Measure";
 	public static final String CONDITION_PROPERTIES_VALUE_CRITERION ="Value_Criteria";
 	public static final String CONDITION_PROPERTIES_TIME_CRITERION ="Time_Criteria";
+
+	//backgroundRecording
+	public static final String BACKGROUND_LOGGING_PROPERTIES_LOGGING_RATE = "Logging_rate";
+	public static final String BACKGROUND_LOGGING_PROPERTIES_LOGGING_TASKS = "Logging_tasks";
+	public static final String BACKGROUND_LOGGING_PROPERTIES_LOGGING_ENABLED = "Enabled";
 
 	//within content
 
@@ -282,7 +286,21 @@ public class ConfigurationManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+		/** load background recording setting **/
+		try {
+			Log.d(LOG_TAG, "[testBackgroundLogging]  load the configuration of backgroundlogging " + config.getStudyId());
+
+			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_BACKGROUND_LOGGING)){
+				JSONObject backgroundLogging = content.getJSONObject(ConfigurationManager.CONFIGURATION_CATEGORY_BACKGROUND_LOGGING);
+				loadBackgroundLoggingFromJSON(backgroundLogging, config.getStudyId());
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 		/** load circumstances **/
 		try {
 			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_CIRCUMSTANCE)){
@@ -319,6 +337,56 @@ public class ConfigurationManager {
 		}
 		
 		
+	}
+
+
+	/**
+	 * if the study wants background recording separate from the logging task, we need to read the
+	 * configuration
+	 * @param backgroundLogging
+	 * @param study_id
+	 */
+	public static void loadBackgroundLoggingFromJSON(JSONObject backgroundLogging, int study_id) {
+
+		Log.d(LOG_TAG, "[testBackgroundLogging] load backgroundlogging of study " + study_id);
+
+		try {
+
+			boolean enabled = backgroundLogging.getBoolean(BACKGROUND_LOGGING_PROPERTIES_LOGGING_ENABLED);
+			String logging_tasks = backgroundLogging.getString(BACKGROUND_LOGGING_PROPERTIES_LOGGING_TASKS);
+			int rate = backgroundLogging.getInt(BACKGROUND_LOGGING_PROPERTIES_LOGGING_RATE);
+
+			//find which logging task the action is associated with
+			String [] ids = logging_tasks.split(",");
+
+			//TODO: logging task for background recoridng should be saved in Preference
+
+			//set enabled
+			ContextManager.getBackgroundLoggingSetting().setEnabled(enabled);
+
+			//set rate
+			ContextManager.getBackgroundLoggingSetting().setLoggingRate(rate);
+
+			//associate circumstance ids to the monitoring action.
+			for (int j=0; j<ids.length; j++){
+				int id = Integer.parseInt(ids[j]);
+
+				//add loggingtask ids to background recording
+				ContextManager.getBackgroundLoggingSetting().addLoggingTask(id);
+			}
+
+
+			Log.d(LOG_TAG, "[testBackgroundLogging] load backgroundlogging enabled: " +
+					ContextManager.getBackgroundLoggingSetting().isEnabled()
+					+ " logging: " + ContextManager.getBackgroundLoggingSetting().getLoggingTasks() + " rate: " +
+					ContextManager.getBackgroundLoggingSetting().getLoggingRate());
+
+
+		}
+		catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+
 	}
 
 

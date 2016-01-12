@@ -20,6 +20,7 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationMod
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.UserInteractionManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
+import edu.umich.si.inteco.minuku.model.BackgroundLoggingSetting;
 import edu.umich.si.inteco.minuku.model.Circumstance;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
@@ -45,7 +46,7 @@ public class ContextManager {
     protected static boolean sIsExtractingContextEnabled = true;
 
     //flag of whether BackgroundRecording is enabled
-    protected static boolean sIsBackgroundRecordingEnabled  = false;
+    protected static boolean sIsBackgroundLoggingEnabled = false;
 
     //mContext is MinukuService
 	private Context mContext;
@@ -130,8 +131,7 @@ public class ContextManager {
     //handle the local SQLite operation
   	private static LocalDBHelper mLocalDBHelpder;
 
-    /***sensor values***/
-    private float mAccelationSquareRoot;
+    private static BackgroundLoggingSetting mBackgroundLoggingSetting;
 
     private static ActivityRecognitionManager mActivityRecognitionManager;
 
@@ -171,6 +171,8 @@ public class ContextManager {
         mScheduledExecutorService = Executors.newScheduledThreadPool(CONTEXT_MANAGER_REFRESH_FREQUENCY);
 
         RECORD_TYPE_LIST = new ArrayList<Integer>();
+
+        mBackgroundLoggingSetting = new BackgroundLoggingSetting();
 
         //initiate Context Source Managers
         mLocationManager = new LocationManager(mContext);
@@ -409,11 +411,11 @@ public class ContextManager {
                 //However, now we want to enable background recording so that we can monitor circumstances.
                 //circumstanceually. If researachers do not monitor anything, this flag should be false.
 
-                /*
-                if (sIsBackgroundRecordingEnabled){
+
+                if (sIsBackgroundLoggingEnabled){
                     DataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
                 }
-*/
+
 
                 /* update transportation mode. Transporation Manager will use the latet activity label
                  * saved in the ActivityRecognitionManager to infer the user's current transportation mode
@@ -532,6 +534,10 @@ public class ContextManager {
     }
 
 
+    public static BackgroundLoggingSetting getBackgroundLoggingSetting() {
+        return mBackgroundLoggingSetting;
+    }
+
     /**
    *
    * ContextMAnager assigns loggingTask to the right contextStateManagers with the LoggingTaskIDs.
@@ -580,6 +586,11 @@ public class ContextManager {
         else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION))
             mUserInteractionManager.addActiveLoggingTask(loggingTask);
 
+    }
+
+
+    public static void setIsBackgroundLoggingEnabled(boolean enabled) {
+        sIsBackgroundLoggingEnabled = enabled;
     }
 
     /**
