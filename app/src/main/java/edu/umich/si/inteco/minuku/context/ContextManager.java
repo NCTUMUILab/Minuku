@@ -407,20 +407,28 @@ public class ContextManager {
                  testActivityRecordIndex+=1;
                  **/
 
+
+
+                /**
+                 * 1. The first task of ContextManager is to execute BackgroundLogging if it is enabled.
+                 */
+
                 //Recording is one of the types of actions that users need to put into the configuration.
-                //However, now we want to enable background recording so that we can monitor circumstances.
                 //circumstanceually. If researachers do not monitor anything, this flag should be false.
+                if (getBackgroundLoggingSetting().isEnabled()){
 
+                    ArrayList<Integer> loggingTaskIds = getBackgroundLoggingSetting().getLoggingTasks();
+                    copyRecordFromLocalRecordPoolToPublicRecordPool(loggingTaskIds);
 
-                if (sIsBackgroundLoggingEnabled){
+                    //save data from publie record pool to database
                     DataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
                 }
 
 
-                /* update transportation mode. Transporation Manager will use the latet activity label
+                /**2.
+                 * The second task is to update transportation mode. Transporation Manager will use the latet activity label
                  * saved in the ActivityRecognitionManager to infer the user's current transportation mode
                  * **/
-
                 ActivityRecognitionRecord record = (ActivityRecognitionRecord) mActivityRecognitionManager.getLastSavedRecord();
 
                 if (record!=null){
@@ -429,15 +437,18 @@ public class ContextManager {
 
                 }
 
-                /* after the transportationModeManager generate a transportation label, we update Mobility
-                 * of the user. The mobility information, right now,  will be used to control the
-                 * frequency of location udpate to save battery life**/
+                /**3. The third task is to update Mobility of the user after the transportationModeManager generate a transportation label,
+                 * The mobility information, is also used to control the frequency of location udpate to save battery life**/
                 MobilityManager.updateMobility();
 
 
-                String travelHistoryMessage="NA";
-                /*we create a travel log here*/
+                /************************************** For Traveling Study *****************************
+                 * The third task is to update Mobility of the user after the transportationModeManager generate a transportation label,
+                 * The mobility information, is also used to control the frequency of location udpate to save battery life**/
 
+                String travelHistoryMessage="NA";
+
+                /*we create a travel log here*/
                 if (ActivityRecognitionManager.getProbableActivities()!=null &&
                         LocationManager.getCurrentLocation()!=null ){
                     travelHistoryMessage= MobilityManager.getMobility() + "\t" +
@@ -448,8 +459,6 @@ public class ContextManager {
                             LocationManager.getCurrentLocation().getLongitude() + "," +
                             LocationManager.getCurrentLocation().getAccuracy();
                 }
-
-                //Log.d(LOG_TAG, "travel history message:" + travelHistoryMessage);
 
                 //create travel history file
                 LogManager.log(LogManager.LOG_TYPE_TRAVEL_LOG,

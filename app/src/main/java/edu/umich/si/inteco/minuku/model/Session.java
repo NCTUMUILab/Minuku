@@ -43,10 +43,22 @@ public class Session {
         return mContextSourceNames;
     }
 
+    public void addContextSourceType(String sourceType) {
+        if ( this.mContextSourceNames==null){
+            mContextSourceNames = new ArrayList<String>();
+        }
+        this.mContextSourceNames.add(sourceType);
+    }
+
     public void setContextSourceTypes(ArrayList<String> sourceTypes) {
         this.mContextSourceNames = sourceTypes;
     }
 
+    public void setContextSourceTypes(String[] contextsources) {
+        for (int i=0; i<contextsources.length; i++){
+            addContextSourceType(contextsources[i]);
+        }
+    }
 
 
     public boolean isPaused() {

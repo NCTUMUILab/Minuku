@@ -171,6 +171,9 @@ public class DatabaseNameManager {
     //session has been changed flag
     public static final String COL_SESSION_MODIFIED_FLAG = "session_modified_flag";
 
+    //session has been changed flag
+    public static final String COL_SESSION_CONTEXTSOURCES = "session_contextsources";
+
     public static final int COL_INDEX_SESSION_ID = 0;
 
     public static final int COL_INDEX_SESSION_TASK_ID = 1;
@@ -186,6 +189,8 @@ public class DatabaseNameManager {
     public static final int COL_INDEX_SESSION_BATTERY_LIFE = 6;
 
     public static final int COL_INDEX_SESSION_MODIFIED_FLAG = 7;
+
+    public static final int COL_INDEX_SESSION_CONTEXTSOURCES = 8;
    
     /**
      * Columns of RECORD Table. 

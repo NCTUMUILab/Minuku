@@ -513,13 +513,13 @@ public class ActionManager {
 
                     Log.d(LOG_TAG, "execute saving record action to session " + savingRecordAction.getSessionId());
 
-                             //TODO: get a list of record to save and put it into the recording list.
+                     //TODO: get a list of record to save and put it into the recording list.
 
-                             /** we call ContextManager to move data records from local record pool to publid record pool
-                              * by passing which logging task the action is associated with
-                              * ContextMAnageer will know which ContextStateMAnager will have data in localRecordPool
-                              * **/
-                             ContextManager.copyRecordFromLocalRecordPoolToPublicRecordPool(savingRecordAction.getLoggingTasks());
+                     /** we call ContextManager to move data records from local record pool to publid record pool
+                      * by passing which logging task the action is associated with
+                      * ContextMAnageer will know which ContextStateMAnager will have data in localRecordPool
+                      * **/
+                    ContextManager.copyRecordFromLocalRecordPoolToPublicRecordPool(savingRecordAction.getLoggingTasks());
 
                     //save data from publie record pool to database
 					mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), savingRecordAction.getSessionId() );

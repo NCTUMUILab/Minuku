@@ -370,7 +370,6 @@ public class ConfigurationManager {
 			//associate circumstance ids to the monitoring action.
 			for (int j=0; j<ids.length; j++){
 				int id = Integer.parseInt(ids[j]);
-
 				//add loggingtask ids to background recording
 				ContextManager.getBackgroundLoggingSetting().addLoggingTask(id);
 			}

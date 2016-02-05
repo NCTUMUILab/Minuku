@@ -159,8 +159,8 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     				DatabaseNameManager.COL_SESSION_END_TIME + " INTEGER, " +
                     DatabaseNameManager.COL_SESSION_ANNOTATION_SET + " TEXT, " +
                     DatabaseNameManager.COL_SESSION_BATTERY_LIFE + " NUMERIC, " +
-                    DatabaseNameManager.COL_SESSION_MODIFIED_FLAG + " INTEGER " +
-    				
+                    DatabaseNameManager.COL_SESSION_MODIFIED_FLAG + " INTEGER, " +
+                    DatabaseNameManager.COL_SESSION_CONTEXTSOURCES + " TEXT NOT NULL " +
     				");" ;
     	
     	db.execSQL(cmd);
@@ -570,9 +570,19 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             values.put(DatabaseNameManager.COL_SESSION_START_TIME, session.getStartTime());
             values.put(DatabaseNameManager.COL_SESSION_BATTERY_LIFE, session.getBatteryLife());
 
+            String contextsourceStr = "";
+            //create a string for contextsource
+            for (int i=0; i<session.getContextSourceNames().size(); i++){
+                contextsourceStr += session.getContextSourceNames().get(i);
+                if (i<session.getContextSourceNames().size()-1)
+                    contextsourceStr += Constants.CONTEXT_SOURCE_DELIMITER;
+            }
+
+            values.put(DatabaseNameManager.COL_SESSION_CONTEXTSOURCES, contextsourceStr);
 
             //get row number after the insertion
-            Log.d(LOG_TAG, " Inserting session " + session.getTaskId() + ": Session-" + session.getStartTime() + " to the session table " + table_name);
+            Log.d(LOG_TAG, "[testing sav and load session] Inserting session task id: " + session.getTaskId() + " id: " + session.getId() + ": Session-" + session.getStartTime() +
+                      " with contextsource " + contextsourceStr +  " to the session table " + table_name);
 
             rowId = db.insert(table_name, null, values);
 

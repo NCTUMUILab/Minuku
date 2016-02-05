@@ -151,7 +151,7 @@ public class RecordingAndAnnotateManager {
      */
     public static void saveSessionToDataBase(Session session) {
         long rowId = mLocalDBHelper.insertSessionTable(session, DatabaseNameManager.SESSION_TABLE_NAME);
-        Log.d(LOG_TAG, "[saveSessionToDataBase] saving session " + session.getId() + " to the database");
+        Log.d(LOG_TAG, "[testing sav and load session][saveSessionToDataBase] saving session " + session.getId() + " to the database");
 
     }
 
@@ -266,11 +266,16 @@ public class RecordingAndAnnotateManager {
             String sessionStr = res.get(i);
             String[] separated = sessionStr.split(Constants.DELIMITER);
 
+            /** get properties of the session **/
             int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
             int taskId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_TASK_ID]);
             long startTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_START_TIME]);
             float batteryLife = Float.parseFloat(separated[DatabaseNameManager.COL_INDEX_SESSION_BATTERY_LIFE]);
 
+            //the original contextsourceString is connected by Constants.CONTEXT_SOURCE_DELIMITER. we need to make it an array so that we can save it to
+            //a session later
+            String contextsourceString = separated[DatabaseNameManager.COL_INDEX_SESSION_CONTEXTSOURCES];
+            String[] contextsourceArray = contextsourceString.split(Constants.CONTEXT_SOURCE_DELIMITER);
 
             long endTime = 0;
             //the session could be still ongoing..so we need to check where's endTime
@@ -280,7 +285,7 @@ public class RecordingAndAnnotateManager {
 
                 //there 's no end time of the session, we take the time of the last record
                 String lastRecord = DataHandler.getLastSavedRecordInSession(sessionId);
-                Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
+//                Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
                 if (lastRecord!=null){
                     long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
                     Log.d(LOG_TAG, "[test get session time] the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
@@ -289,7 +294,7 @@ public class RecordingAndAnnotateManager {
 
             }
 
-
+            /** get annotaitons associated with the session **/
             JSONObject annotationSetJSON = null;
             JSONArray annotateionSetJSONArray = null;
             try {
@@ -299,12 +304,18 @@ public class RecordingAndAnnotateManager {
                 e.printStackTrace();
             }
 
-            Log.d(LOG_TAG, " [getSessions] id " + id + " startTime" + startTime + " end time " + endTime+ " annotateionSetJSONArray " +annotateionSetJSONArray );
 
+            /** create sessions from the properies obtained **/
             session = new Session(id, startTime, taskId );
             session.setEndTime(endTime);
             session.setBatteryLife(batteryLife);
-            //get annotationset
+            session.setContextSourceTypes(contextsourceArray);
+
+            Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " annotateionSetJSONArray " + annotateionSetJSONArray);
+            Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " contextsource " + session.getContextSourceNames());
+
+
+            //set annotationset if there is one
             if (annotateionSetJSONArray!=null){
                 AnnotationSet annotationSet =  toAnnorationSet(annotateionSetJSONArray);
                 session.setAnnotationSet(annotationSet);
@@ -615,10 +626,32 @@ public class RecordingAndAnnotateManager {
      * **/
 
     public void setupBackgroundRecordingEnvironment() {
-        
-        //Create a task and a session for background recording
+
+        Log.d(LOG_TAG, "[setupBackgroundRecordingEnvironment] setting up background recording");
+
+        /**1 Create a task and a session for background recording**/
         Session session = new Session(ContextManager.getCurrentTimeInMillis());
         session.setId(BACKGOUND_RECORDING_SESSION_ID);
+
+        /**2 configure backroundrecording based on the setting**/
+
+        //we first know which loggin task is associated with the background recording, then we get the contextsource for each logging task.
+        for (int i=0; i< ContextManager.getBackgroundLoggingSetting().getLoggingTasks().size(); i++){
+            //get logging task id
+            int id = ContextManager.getBackgroundLoggingSetting().getLoggingTasks().get(i);
+            //get context source name from each logging task
+            String contextsource= ContextManager.getLoggingTask(id).getSource();
+            //add the contexSource to session
+            session.addContextSourceType(contextsource);
+
+//            Log.d(LOG_TAG, "[setupBackgroundRecordingEnvironment] the backgroundrecording contain logging task " +
+//                            ContextManager.getLoggingTask(id) + " with the source: " + ContextManager.getLoggingTask(id).getSource()
+//                    + " and add to session ");
+
+        }
+
+
+
 
         //if backgroundlogging is active, we should add it into the current logging session.
         addCurRecordingSession(session);
@@ -804,12 +837,16 @@ public class RecordingAndAnnotateManager {
         //time range is from the last SyncHour to the most recent complete hour
         long now = ContextManager.getCurrentTimeInMillis();
 
+        Session session = getSession(BACKGOUND_RECORDING_SESSION_ID);
+//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] session: " + session);
+//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] session: start time " + session.getStartTime() + " lastsync : " +   lastSyncHourTime);
+
         long startTime =0;
         long endTime  =0;
         //there's no backgrounding documents existing in the server
         if (lastSyncHourTime==0) {
 
-            startTime = getSession(BACKGOUND_RECORDING_SESSION_ID).getStartTime();
+            startTime = session.getStartTime();
             //produce hour time
 
             TimeZone tz = TimeZone.getDefault();
@@ -827,7 +864,7 @@ public class RecordingAndAnnotateManager {
 
             startTime = startCal.getTimeInMillis();
             endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
-            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments] no backgorund recording yet, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
+//            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] no backgorund recording yet, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
 
         }
         //there are specific lastSynchourTime
@@ -835,7 +872,7 @@ public class RecordingAndAnnotateManager {
             //if the last sync hour in the database is 9, we start from 10, because 9 indicates that 9:00-10:00 has been stored. So we start from 10-11
             startTime = lastSyncHourTime+ Constants.MILLISECONDS_PER_HOUR;
             endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
-            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments] get lastSynchour, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
+//            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] get lastSynchour, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
         }
 
 
@@ -851,6 +888,7 @@ public class RecordingAndAnnotateManager {
             endTime += Constants.MILLISECONDS_PER_HOUR;
         }
 
+        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] the documents are:" + documents);
         return documents;
 
     }
@@ -864,14 +902,10 @@ public class RecordingAndAnnotateManager {
          //we will generate Background recording jSON basedon the 1st hour and the lasthour
          JSONObject document  = new JSONObject();
 
-         //get data from the database
-
-         SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
-
+         //we generate a background recording document for each hour
          JSONObject hourJSON = new JSONObject();
 
          try {
-
              SimpleDateFormat sdf_id = new SimpleDateFormat(Constants.DATE_FORMAT_FOR_ID);
              document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ID, Constants.DEVICE_ID +"-"+ScheduleAndSampleManager.getTimeString(startTime, sdf_id) );
              document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION, Constants.CURRENT_STUDY_CONDITION );
@@ -881,10 +915,13 @@ public class RecordingAndAnnotateManager {
              e.printStackTrace();
          }
 
+         //create a session object from the database.
          Session session = getSession(RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID);
 
          for (int i=0; i<session.getContextSourceNames().size(); i++) {
 
+             //TODO: it seems that we're not getting any data from the database, thought we can already format the session document. need to check
+             // DataHandler.getDataBySession
 
              //get data from the database
              ArrayList<String> res = DataHandler.getDataBySession(RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID,
