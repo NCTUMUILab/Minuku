@@ -1061,8 +1061,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
                     DatabaseNameManager.COL_TIMESTAMP_LONG + " < " + endTime  +
                     " order by " + DatabaseNameManager.COL_TIMESTAMP_LONG;
 
-
-            Log.d(LOG_TAG, "[queryRecordsInSession][testgetdata] the query statement is " +sql);
+//            Log.d(LOG_TAG, "[queryRecordsInSession][testgetdata] the query statement is " +sql);
 
             //execute the query
             Cursor cursor = db.rawQuery(sql, null);
@@ -1074,7 +1073,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
                     curRow += cursor.getString(i)+ Constants.DELIMITER;
 
                 }
-                Log.d(LOG_TAG, "[queryRecordsInSession][testgetdata] get result row " +curRow);
+//                Log.d(LOG_TAG, "[queryRecordsInSession][testgetdata] get result row " +curRow);
 
                 rows.add(curRow);
             }

@@ -62,9 +62,9 @@ public class ScheduleAndSampleManager {
 	public static final String SCHEDULE_SAMPLE_METHOD_FIXED_TIME_OF_DAY = "fixed_time_of_day";
 	public static final String SCHEDULE_SAMPLE_METHOD_FIXED_INTERVAL = "fixed_interval";
 
-    public static final String UPDATE_SCHEDULE_ALARM = "edu.umich.si.inteco.captureprobe.updateScheduleAlarm";
-    public static final String STOP_SERVICE_ALARM = "edu.umich.si.inteco.captureprobe.stopServiceAlarm";
-    public static final String START_SERVICE_ALARM = "edu.umich.si.inteco.captureprobe.startServiceAlarm";
+    public static final String UPDATE_SCHEDULE_ALARM = "edu.umich.si.inteco.minuku.updateScheduleAlarm";
+    public static final String STOP_SERVICE_ALARM = "edu.umich.si.inteco.minuku.stopServiceAlarm";
+    public static final String START_SERVICE_ALARM = "edu.umich.si.inteco.minuku.startServiceAlarm";
 	
 	
 	public static final String SCHEDULE_PROPERTIES_TYPE = "Type";

@@ -47,12 +47,12 @@
         </activity>
 
         <activity android:name=".activities.AnnotateActivity"
-            android:label="CaptureProbe"
+            android:label="Minuku"
             android:launchMode="singleTask"
             ></activity>
 
         <activity android:name=".activities.ListRecordingActivity"
-            android:label="CaptureProbe"
+            android:label="Minuku"
             android:launchMode="singleTask">
 
         </activity>
@@ -103,9 +103,9 @@
             >
 
             <intent-filter>
-                <action android:name="edu.umich.si.inteco.captureprobe.updateScheduleAlarm"/>
-                <action android:name="edu.umich.si.inteco.captureprobe.stopServiceAlarm"/>
-                <action android:name="edu.umich.si.inteco.captureprobe.startServiceAlarm"/>
+                <action android:name="edu.umich.si.inteco.minuku.updateScheduleAlarm"/>
+                <action android:name="edu.umich.si.inteco.minuku.stopServiceAlarm"/>
+                <action android:name="edu.umich.si.inteco.minuku.startServiceAlarm"/>
             </intent-filter>
         </receiver>
 

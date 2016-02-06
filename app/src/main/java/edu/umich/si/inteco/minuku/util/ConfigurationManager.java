@@ -388,7 +388,11 @@ public class ConfigurationManager {
 
 	}
 
-
+	/**
+	 * this funciton looks for "Logging" in the study configuration and loads the configuration for each logging task
+	 * @param loggingJSONArray
+	 * @param study_id
+	 */
 	public static void loadLoggingFromJSON(JSONArray loggingJSONArray, int study_id) {
 
 		Log.d(LOG_TAG, "[loadLoggingFromJSON] load logging of study " + study_id);
@@ -396,7 +400,6 @@ public class ConfigurationManager {
 		for (int i =0; i<loggingJSONArray.length(); i++) {
 
 			JSONObject loggingJSON = null;
-
 			try {
 
 				loggingJSON  = loggingJSONArray.getJSONObject(i);
@@ -440,7 +443,7 @@ public class ConfigurationManager {
 
 				settingJSON  = settingJSONArray.getJSONObject(i);
 
-				//every source setting should specify the source. If a source is not listed, we use the default
+				//every source setting should specify a source. If a source is not listed, we use the default
 				String source = settingJSON.getString(CONFIGURATION_PROPERTIES_SOURCE);
 
 				//the defaul is -1, i.e. using the default value.
