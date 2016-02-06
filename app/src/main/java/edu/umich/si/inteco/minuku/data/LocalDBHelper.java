@@ -621,10 +621,10 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             values.put(DatabaseNameManager.COL_TIMESTAMP_STRING, getTimeString(record.getTimestamp()));
             values.put(DatabaseNameManager.COL_TIMESTAMP_LONG, record.getTimestamp());
 			//data is JSON String
-			values.put(DatabaseNameManager.COL_DATA, record.getData().toString(0));
+			values.put(DatabaseNameManager.COL_DATA, record.getData().toString());
 
-            Log.d(LOG_TAG, "[insertRecordTable][SaveRecordsToLocalDatabase]  Going to inserting record "  + record.getSource() + ": at-" + record.getTimestamp() + " : " + record.getTimeString() + " in session " + session_id +
-            " to the record table " + table_name);
+            Log.d(LOG_TAG, "[insertRecordTable][SaveRecordsToLocalDatabase]  Going to inserting record "  + record.getSource() + ": at " + record.getTimestamp() + " : " + record.getTimeString() + " in session " + session_id +
+            " to the record table " + table_name + " content" + record.getData().toString());
 
 			rowId = db.insert(table_name, null, values);
 
@@ -1062,7 +1062,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
                     " order by " + DatabaseNameManager.COL_TIMESTAMP_LONG;
 
 
-            //Log.d(LOG_TAG, "[queryRecordsInSession] the query statement is " +sql);
+            Log.d(LOG_TAG, "[queryRecordsInSession][testgetdata] the query statement is " +sql);
 
             //execute the query
             Cursor cursor = db.rawQuery(sql, null);
@@ -1070,9 +1070,11 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             while(cursor.moveToNext()){
                 String curRow = "";
                 for (int i=0; i<columnCount; i++){
+//                    Log.d(LOG_TAG, "[queryRecordsInSession][testgetdata] column " + i + " content: " + cursor.getString(i));
                     curRow += cursor.getString(i)+ Constants.DELIMITER;
+
                 }
-                //Log.d(LOG_TAG, "[queryRecordsInSession] get result row " +curRow);
+                Log.d(LOG_TAG, "[queryRecordsInSession][testgetdata] get result row " +curRow);
 
                 rows.add(curRow);
             }

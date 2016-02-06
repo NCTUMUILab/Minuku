@@ -243,17 +243,18 @@ public class DataHandler {
     public static ArrayList<String> getDataBySession(int sessionId, String sourceName, long startTime, long endTime) {
 
         //for each record type get data
+        Log.d(LOG_TAG, "[getDataBySession][testgetdata] getting data from  sessiom " + sessionId + " - " + sourceName);
 
         ArrayList<String> resultList = new ArrayList<String>();
 
         //first know which table and column to query..
         String tableName= getTableNameByRecordType(sourceName);
-        Log.d(LOG_TAG, "[getDataBySession] getting data from  " + tableName);
+        Log.d(LOG_TAG, "[getDataBySession][testgetdata] getting data from  " + tableName);
 
         //get data from the table
         if (tableName !=null) {
             resultList = LocalDBHelper.queryRecordsInSession(tableName, sessionId, startTime, endTime);
-            Log.d(LOG_TAG, "[getDataBySession] the result from " + tableName + " is  " + resultList);
+//            Log.d(LOG_TAG, "[getDataBySession][testgetdata] the result from " + tableName + " is  " + resultList);
         }
 
         return resultList;

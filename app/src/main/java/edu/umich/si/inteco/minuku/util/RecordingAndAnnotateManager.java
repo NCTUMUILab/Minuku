@@ -837,9 +837,9 @@ public class RecordingAndAnnotateManager {
         //time range is from the last SyncHour to the most recent complete hour
         long now = ContextManager.getCurrentTimeInMillis();
 
+        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] lastSyncHourTime: " + lastSyncHourTime);
         Session session = getSession(BACKGOUND_RECORDING_SESSION_ID);
-//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] session: " + session);
-//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] session: start time " + session.getStartTime() + " lastsync : " +   lastSyncHourTime);
+        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] session: start time " + session.getStartTime() + " lastsync : " +   lastSyncHourTime);
 
         long startTime =0;
         long endTime  =0;
@@ -922,6 +922,8 @@ public class RecordingAndAnnotateManager {
 
              //TODO: it seems that we're not getting any data from the database, thought we can already format the session document. need to check
              // DataHandler.getDataBySession
+
+             Log.d (LOG_TAG, "[getBackgroundRecordingDocument][testgetdata] going to get data from session " + session.getId());
 
              //get data from the database
              ArrayList<String> res = DataHandler.getDataBySession(RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID,
