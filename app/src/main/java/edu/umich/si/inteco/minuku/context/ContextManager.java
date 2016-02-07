@@ -503,7 +503,7 @@ public class ContextManager {
      */
     public static void copyRecordFromLocalRecordPoolToPublicRecordPool(ArrayList<Integer> loggingTaskIds) {
 
-        Log.d(LOG_TAG, "testing saving records [moveRecordFromLocalRecordPoolToPublicRecordPool] for logging tasks" + loggingTaskIds.toString());
+//        Log.d(LOG_TAG, "testing saving records [moveRecordFromLocalRecordPoolToPublicRecordPool] for logging tasks" + loggingTaskIds.toString());
         //1. find the corresponding contextStateManager based on the loggingTask Id
         for (int i=0; i<loggingTaskIds.size();i++){
             //get loggingTask by id
@@ -524,7 +524,7 @@ public class ContextManager {
      */
     private static void copyRecordFromLocalRecordPoolToPublicRecordPool(String contextStateManagerName, LoggingTask loggingTask) {
 
-        Log.d(LOG_TAG, "testing saving records moving records in " + contextStateManagerName + " for logging tasks " + loggingTask.getSource());
+//        Log.d(LOG_TAG, "testing saving records moving records in " + contextStateManagerName + " for logging tasks " + loggingTask.getSource());
 
         //1.
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))

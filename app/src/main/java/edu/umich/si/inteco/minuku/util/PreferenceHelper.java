@@ -14,6 +14,7 @@ public class PreferenceHelper {
     //preferndce name
     public static final String PACKAGE_NAME = "edu.umich.si.inteco.minuku";
 
+    public static final String CONFIGURATIONS = ".CONFIGURATIONS";
     public static final String SHARED_PREFERENCE_NAME = PACKAGE_NAME + ".SHARED_PREFERENCES_NAME";
     public static final String DEVICE_ID = PACKAGE_NAME+ ".DEVICE_ID";
     public static final String USER_ID = PACKAGE_NAME+ ".USER_ID";

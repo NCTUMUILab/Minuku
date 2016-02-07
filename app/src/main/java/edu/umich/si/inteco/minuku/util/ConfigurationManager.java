@@ -1,6 +1,7 @@
 package edu.umich.si.inteco.minuku.util;
 
 import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.google.android.gms.analytics.Tracker;
@@ -126,9 +127,6 @@ public class ConfigurationManager {
 
 	//within control: schedule
 	public static final String ACTION_PROPERTIES_SCHEDULE= "Schedule";
-
-
-	private static LocalDBHelper mLocalDBHelper;
 	private static Context mContext;
 	private static ContextManager mContextManager;
 	
@@ -136,113 +134,91 @@ public class ConfigurationManager {
 
 		mContextManager = contextManager;
 		mContext = context;
-		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 		loadConfiguration();
 	}
-	
-	
+
+
+    /**
+     * this function allow remotely updating the configuration in the future
+     */
+    public void updateConfiguration() {
+
+        //update configuration
+        //modify the configuration stored in the sharedpreference
+
+
+        //reload configuration
+        loadConfiguration();
+    }
 	
 	/**
 	 * When the app is back to active, the app loads configurations from the database
 	 */
 	public void loadConfiguration() {
-		
-		Log.d(LOG_TAG, "[loadConfiguration]");
 
-		//connect to the DB and load configuration from the DB
-		ArrayList<String> res = new ArrayList<String>();		
-	
-		/** 1. first try to load configurations from the database **/
-		res = mLocalDBHelper.queryConfigurations();
-		Log.d(LOG_TAG, "[loadConfiguration] there are " + res.size() + " configurations in the database");
-		/*
-		for (int i=0; i<res.size() ; i++){
-			
-			String cline = res.get(i);			
-			String [] separated = cline.split(Constants.DELIMITER);
-			//Log.d(LOG_TAG, "[loadConfiguration] the first configuration from the database has " + separated.length + " attributes the content is " + cline);
-			
-			int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_CONFIGURATION_ID]);
-			int study_id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_CONFIGURATION_STUDY_ID]);
-			int version = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_CONFIGURATION_VERSION]);
-			String name = separated[DatabaseNameManager.COL_INDEX_CONFIGURATION_NAME];
-			String content_str = separated[DatabaseNameManager.COL_INDEX_CONFIGURATION_CONTENT];	
-			
-			JSONObject content=null;
-			try {
-				content = new JSONObject(content_str);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        //save string of configuration
+        String configurationsStr = "";
 
-			//create configuration
-			Configuration config = new Configuration (id, study_id, version, name, content) ;
+        /** first check if there's a configuraiton in the SharedPreference or not**/
+        if ( !PreferenceHelper.getPreferenceString(PreferenceHelper.CONFIGURATIONS, "NA").equals("NA")) {
 
-			//load the content of the configuration
-			loadConfigurationContent (config);
-			
-		}
-		*/
+            Log.d(LOG_TAG, "[loadConfiguration] load configuration from SharedPreference" );
+            //there's a configuration already in the SharedPreference, we just load the json file
+            //then save the configuration into SharedPreference
+            configurationsStr = PreferenceHelper.getPreferenceString(PreferenceHelper.CONFIGURATIONS, "NA");
 
-		/*** 2 if there is no data in the DB ( or sharedpreference), then load file **/
+        }
+        else {
+            //there has not been a configuration in the SharedPreference, i.e. we need to load from the file and then
+            //save it in the SharedPreference
 
-		
-		if (res.size()==0){
+            //load the configuration file
+            String filename = TEST_FILE_NAME;
 
-			//load files
-            String filename =  TEST_FILE_NAME;
+            Log.d(LOG_TAG, "[loadConfiguration] no configuration in the database, load configuration from file.." + filename);
+            configurationsStr = new FileHelper(mContext).loadFileFromAsset(filename);
 
-            Log.d(LOG_TAG, "[loadConfiguration] no configuration in the database, load file.." + filename);
-            String study_str = new FileHelper(mContext).loadFileFromAsset(filename);
+            PreferenceHelper.setPreferenceValue(PreferenceHelper.CONFIGURATIONS, configurationsStr);
+        }
 
-			//load circumstances and conditions
-			try {
 
-				JSONArray studyJSONArray = new JSONArray(study_str);
-				
-				for (int i=0; i< studyJSONArray.length(); i++){
-					
-					JSONObject studyJSON = studyJSONArray.getJSONObject(i);							
-					
-					//get the properties of the current study
-					int study_id = studyJSON.getInt(CONFIGURATION_PROPERTIES_ID);
-					String study_name = studyJSON.getString(CONFIGURATION_PROPERTIES_NAME);
-					Log.d(LOG_TAG, "[loadConfiguration]  Now reading the study " + study_id + " : " + study_name);
-					
-					
-					//now get configuration JSON
-					JSONObject configJSON = studyJSON.getJSONObject(CONFIGURATION_PROPERTIES_CONFIGURATION);
-					
-					//get properties of the config
-					int id = configJSON.getInt(CONFIGURATION_PROPERTIES_ID);
-					int version = configJSON.getInt(CONFIGURATION_PROPERTIES_VERSION);
-					String name = configJSON.getString(CONFIGURATION_PROPERTIES_NAME);					
-					JSONObject content = configJSON.getJSONObject(CONFIGURATION_PROPERTIES_CONTENT);			
-					Configuration config = new Configuration (id, study_id, version, name, content) ;
-					
-					//Load the content of the configuration
-					loadConfigurationContent (config);
-					
-					//store the configuration into the database
-				//	Log.d(LOG_TAG, "[loadConfiguration]  After creating the configuration object, inser the configuration into the database");
-					
-				//	mLocalDBHelper.insertConfigurationTable(config, DatabaseNameManager.CONFIGURATION_TABLE_NAME);
+        Log.d(LOG_TAG, "[loadConfiguration] the configuraiton string being loaded is: " + configurationsStr);
 
-					//TODO: save configuration in SharedPreference
+        /**2. then we load the content of the configuration**/
+        //
+        try {
+            //A confuguration file contains one or multiple study, in a JSONArray format. Each JSONObject is a
+            // study
+            JSONArray studyJSONArray = new JSONArray(configurationsStr);
 
-	
-				}
-				
-			
-				
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}				
-		}
-		
-		
+            for (int i=0; i< studyJSONArray.length(); i++){
+
+                JSONObject studyJSON = studyJSONArray.getJSONObject(i);
+
+                //get the properties of the current study
+                int study_id = studyJSON.getInt(CONFIGURATION_PROPERTIES_ID);
+                String study_name = studyJSON.getString(CONFIGURATION_PROPERTIES_NAME);
+                Log.d(LOG_TAG, "[loadConfiguration]  Now reading the study " + study_id + " : " + study_name);
+
+
+                //now get configuration JSON
+                JSONObject configJSON = studyJSON.getJSONObject(CONFIGURATION_PROPERTIES_CONFIGURATION);
+
+                //get properties of the config
+                int id = configJSON.getInt(CONFIGURATION_PROPERTIES_ID);
+                int version = configJSON.getInt(CONFIGURATION_PROPERTIES_VERSION);
+                String name = configJSON.getString(CONFIGURATION_PROPERTIES_NAME);
+                JSONObject content = configJSON.getJSONObject(CONFIGURATION_PROPERTIES_CONTENT);
+                Configuration config = new Configuration (id, study_id, version, name, content) ;
+
+                //Load the content of the configuration
+                loadConfigurationContent (config);
+            }
+
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            Log.e(LOG_TAG, "[loadConfiguration] Error in ConfigurationStr");
+        }
 		
 	}
 
