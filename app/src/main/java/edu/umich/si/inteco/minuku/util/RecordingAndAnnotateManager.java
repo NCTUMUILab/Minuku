@@ -835,9 +835,9 @@ public class RecordingAndAnnotateManager {
         //time range is from the last SyncHour to the most recent complete hour
         long now = ContextManager.getCurrentTimeInMillis();
 
-        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] lastSyncHourTime: " + lastSyncHourTime);
+//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] lastSyncHourTime: " + lastSyncHourTime);
         Session session = getSession(BACKGOUND_RECORDING_SESSION_ID);
-        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] session: start time " + session.getStartTime() + " lastsync : " +   lastSyncHourTime);
+//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] session: start time " + session.getStartTime() + " lastsync : " +   lastSyncHourTime);
 
         long startTime =0;
         long endTime  =0;
