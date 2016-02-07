@@ -153,22 +153,22 @@ public class TransportationModeManager extends ContextStateManager {
     public int examineTransportation(ActivityRecognitionRecord record) {
 
    //     Log.d(LOG_TAG, "[examineTransportation] enter" );
-        Log.d(LOG_TAG, "[examineTransportation] enter" + ActivityRecognitionManager.getProbableActivities() );
+//        Log.d(LOG_TAG, "[examineTransportation] enter" + ActivityRecognitionManager.getProbableActivities() );
 
         List<DetectedActivity> probableActivities = record.getProbableActivities();
         long detectionTime = record.getTimestamp();
 
 
-        Log.d(LOG_TAG, "[examineTransportation] " + ScheduleAndSampleManager.getTimeString(detectionTime) + " the acitivty is: " +
-                probableActivities.toString());
+//        Log.d(LOG_TAG, "[examineTransportation] " + ScheduleAndSampleManager.getTimeString(detectionTime) + " the acitivty is: " +
+//                probableActivities.toString());
 
 
         //if in the static state, we try to suspect new activity
         if (getCurrentState()==STATE_STATIC) {
             //getLatestActivityRecognitionRecord();
 
-            Log.d (LOG_TAG, " examineTransportation at STATE_STATIC " +
-                    getActivityNameFromType(getSuspectedStartActivityType()) );
+//            Log.d (LOG_TAG, " examineTransportation at STATE_STATIC " +
+//                    getActivityNameFromType(getSuspectedStartActivityType()) );
 
 
             //if the detected activity is vehicle, bike or on foot, then we suspect the activity from now
@@ -185,7 +185,7 @@ public class TransportationModeManager extends ContextStateManager {
                 //set suspect time
                 setSuspectTime(detectionTime);
 
-                Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()));
+//                Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()));
 
                 LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                         LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -214,7 +214,7 @@ public class TransportationModeManager extends ContextStateManager {
                     //set the suspect time so that other class can access it.(startTime is when we think the transportation starts)
                     setSuspectTime(startTime);
 
-                    Log.d (LOG_TAG, " examineTransportation [confiremd start activity]  " + getActivityNameFromType(getConfirmedActivityType()) + " entering state " + getStateName(getCurrentState()));
+//                    Log.d (LOG_TAG, " examineTransportation [confiremd start activity]  " + getActivityNameFromType(getConfirmedActivityType()) + " entering state " + getStateName(getCurrentState()));
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -232,7 +232,7 @@ public class TransportationModeManager extends ContextStateManager {
 
                     setSuspectTime(0);
 
-                    Log.d (LOG_TAG, " examineTransportation [cancel activity suspection], back to state " + getStateName(getCurrentState()));
+//                    Log.d (LOG_TAG, " examineTransportation [cancel activity suspection], back to state " + getStateName(getCurrentState()));
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -259,7 +259,7 @@ public class TransportationModeManager extends ContextStateManager {
                 //set suspect time
                 setSuspectTime(detectionTime);
 
-                Log.d (LOG_TAG, " examineTransportation [detected stop possible activity] " + getActivityNameFromType(getSuspectedStopActivityType()) + " entering state " + getStateName(getCurrentState()));
+//                Log.d (LOG_TAG, " examineTransportation [detected stop possible activity] " + getActivityNameFromType(getSuspectedStopActivityType()) + " entering state " + getStateName(getCurrentState()));
 
 
                 LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
@@ -293,7 +293,7 @@ public class TransportationModeManager extends ContextStateManager {
                     //set the suspect time so that other class can access it.(startTime is when we think the transportation starts)
                     setSuspectTime(startTime);
 
-                    Log.d (LOG_TAG, " examineTransportation [stop activity], entering state" + getStateName(getCurrentState()));
+//                    Log.d (LOG_TAG, " examineTransportation [stop activity], entering state" + getStateName(getCurrentState()));
 
 
                 }
@@ -305,7 +305,7 @@ public class TransportationModeManager extends ContextStateManager {
 
                     setSuspectedStartActivityType(NO_ACTIVITY_TYPE);
 
-                    Log.d (LOG_TAG, " examineTransportation [still maintain confirmed]" + getActivityNameFromType(getConfirmedActivityType()) + " still in the state " + getStateName(getCurrentState()));
+//                    Log.d (LOG_TAG, " examineTransportation [still maintain confirmed]" + getActivityNameFromType(getConfirmedActivityType()) + " still in the state " + getStateName(getCurrentState()));
 
                     LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
                             LogManager.LOG_TAG_PROBE_TRANSPORTATION,
@@ -333,8 +333,8 @@ public class TransportationModeManager extends ContextStateManager {
 
                 if (isTimeToConfirm) {
 
-                    Log.d (LOG_TAG, " examineTransportation yes it's good time to confirm whether we can change the suspection for "
-                            + getActivityNameFromType(probableActivities.get(0).getType()));
+//                    Log.d (LOG_TAG, " examineTransportation yes it's good time to confirm whether we can change the suspection for "
+//                            + getActivityNameFromType(probableActivities.get(0).getType()));
 
                     long startTime = detectionTime - getWindowLengh(probableActivities.get(0).getType(), STATE_SUSPECTING_START) ;
                     long endTime = detectionTime;
@@ -358,7 +358,7 @@ public class TransportationModeManager extends ContextStateManager {
 
                         setSuspectedStartActivityType(probableActivities.get(0).getType());
 
-                        Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()));
+//                        Log.d (LOG_TAG, " examineTransportation [detected start possible activity] " + getActivityNameFromType(getSuspectedStartActivityType()) + " entering state " + getStateName(getCurrentState()));
 
                         //start suspecting new activity
                         setSuspectTime(detectionTime);
@@ -376,7 +376,7 @@ public class TransportationModeManager extends ContextStateManager {
         /** if transportation is requested, save transportation record **/
         boolean isRequested = checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_TRANSPORTATION);
 
-        Log.d(LOG_TAG, STRING_CONTEXT_SOURCE_TRANSPORTATION + "examineTransportation isRequested: " + isRequested);
+//        Log.d(LOG_TAG, STRING_CONTEXT_SOURCE_TRANSPORTATION + "examineTransportation isRequested: " + isRequested);
 
         if (isRequested){
             saveRecordToLocalRecordPool();
@@ -451,7 +451,7 @@ public class TransportationModeManager extends ContextStateManager {
 
         ArrayList<Record> recordPool = mActivityRecognitionManager.getLocalRecordPool();
 
-        Log.d(LOG_TAG, " examineTransportation you find " + recordPool.size() + " records in the activity recognition pool");
+//        Log.d(LOG_TAG, " examineTransportation you find " + recordPool.size() + " records in the activity recognition pool");
 
         for (int i=0; i<recordPool.size(); i++) {
 
@@ -505,7 +505,7 @@ public class TransportationModeManager extends ContextStateManager {
 
         if (windowData.size()!=0) {
             //if the percentage > threshold
-            Log.d(LOG_TAG, "[confirmStoptPossibleTransportation] examineTransportation the percentage is  " + percentage + " the recent count is " +inRecentCount);
+//            Log.d(LOG_TAG, "[confirmStoptPossibleTransportation] examineTransportation the percentage is  " + percentage + " the recent count is " +inRecentCount);
 
             if ( threshold >= percentage && inRecentCount <= 2)
                 return true;
@@ -547,7 +547,7 @@ public class TransportationModeManager extends ContextStateManager {
         if (windowData.size()!=0) {
 
             //if the percentage > threshold
-            Log.d(LOG_TAG, "[changeSuspectingTransportation] examineTransportation changing transportation recentCount " +inRecentCount + " within " + windowData.size()  + "  data");
+//            Log.d(LOG_TAG, "[changeSuspectingTransportation] examineTransportation changing transportation recentCount " +inRecentCount + " within " + windowData.size()  + "  data");
 
 
             if ( inRecentCount >= 2)
@@ -567,7 +567,7 @@ public class TransportationModeManager extends ContextStateManager {
 
         float threshold = getConfirmStartThreshold(activityType);
 
-        Log.d(LOG_TAG, " examineTransportation the threshold is " + threshold + " the windowDAta size is " + windowData.size());
+//        Log.d(LOG_TAG, " examineTransportation the threshold is " + threshold + " the windowDAta size is " + windowData.size());
 
         /** check if in the window data the number of the possible activity exceeds the threshold**/
 
@@ -582,13 +582,13 @@ public class TransportationModeManager extends ContextStateManager {
             //in the recent 6 there are more than 3
             if (i >= windowData.size()-5) {
 
-                Log.d(LOG_TAG, " examineTransportation start to see if there're more than 3");
+//                Log.d(LOG_TAG, " examineTransportation start to see if there're more than 3");
 
 
                 if (detectedActivities.get(0).getType()==activityType ) {
                     inRecentCount +=1;
-                    Log.d(LOG_TAG, " examineTransportation got " + getActivityNameFromType(detectedActivities.get(0).getType())
-                            + " equal to  " + getActivityNameFromType(activityType));
+//                    Log.d(LOG_TAG, " examineTransportation got " + getActivityNameFromType(detectedActivities.get(0).getType())
+//                            + " equal to  " + getActivityNameFromType(activityType));
 
                 }
             }
@@ -600,14 +600,13 @@ public class TransportationModeManager extends ContextStateManager {
 
         }
 
-        Log.d(LOG_TAG, "[confirmStartPossibleTransportation] examineTransportation there are " + count  +  " " +
-                getActivityNameFromType(activityType) + " out of " + windowData.size() + " data ");
+//        Log.d(LOG_TAG, "[confirmStartPossibleTransportation] examineTransportation there are " + count  +  " " + getActivityNameFromType(activityType) + " out of " + windowData.size() + " data ");
 
         if (windowData.size()!=0) {
 
             float percentage = (float)count/windowData.size();
             //if the percentage > threshold
-           Log.d(LOG_TAG, "[confirmStartPossibleTransportation] examineTransportation the percentage is  " + percentage + " recentCount " +inRecentCount);
+//           Log.d(LOG_TAG, "[confirmStartPossibleTransportation] examineTransportation the percentage is  " + percentage + " recentCount " +inRecentCount);
 
            if ( threshold <= percentage || inRecentCount >= 2)
                return true;
@@ -684,7 +683,7 @@ public class TransportationModeManager extends ContextStateManager {
         record.setData(data);
         record.setTimestamp(ContextManager.getCurrentTimeInMillis());
 
-        Log.d(LOG_TAG, "testing saving records at " + record.getTimeString() + " data: " + record.getData());
+//        Log.d(LOG_TAG, "testing saving records at " + record.getTimeString() + " data: " + record.getData());
 
         /**add it to the LocalRecordPool**/
         addRecord(record);

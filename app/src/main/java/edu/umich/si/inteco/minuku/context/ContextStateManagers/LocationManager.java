@@ -338,7 +338,7 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         //set intervals for the locaiton request
         mLocationRequest.setInterval(sUpdateIntervalInMilliSeconds);
 
-        Log.d(LOG_TAG, "[testLocationUpdate] the interval is  " + sUpdateIntervalInMilliSeconds);
+//        Log.d(LOG_TAG, "[testLocationUpdate] the interval is  " + sUpdateIntervalInMilliSeconds);
 
         // Sets the fastest rate for active location updates.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
@@ -356,8 +356,12 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         if (mGoogleApiClient.isConnected()){
             Log.d(LOG_TAG, "[testLocationUpdate] send out location udpate request");
 
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
+            try{
+                LocationServices.FusedLocationApi.requestLocationUpdates(
+                        mGoogleApiClient, mLocationRequest, this);
+            }catch (SecurityException e) {
+
+            }
 
             Log.d(LOG_TAG, "[testLocationUpdate] after send out location udpate request");
         }
@@ -400,7 +404,7 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
     * Called by Location Services when the request to connect the
     * client finishes successfully. At this point, you can
     * request the current location or start periodic updates
-    */	
+    */
 	@Override
 	public void onConnected(Bundle dataBundle) {
 
@@ -415,8 +419,13 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         // moves to a new location, and then changes the device orientation, the original location
         // is displayed as the activity is re-created.
         if (mCurrentLocation == null) {
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+            try{
+                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+            }
+            catch (SecurityException e){
+
+            }
         }
 
         // If Minuku requests location updates before GoogleApiClient connects, we set

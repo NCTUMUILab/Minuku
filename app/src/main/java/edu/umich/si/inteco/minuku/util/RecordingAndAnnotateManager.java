@@ -210,7 +210,7 @@ public class RecordingAndAnnotateManager {
 
 
     public static void startListRecordingActivity(String reviewMode) {
-        Log.d(LOG_TAG, " [test listrecording review mode] [startListRecordingActivity] going to start list recording activity from annoatate activity, the review mode is " + reviewMode);
+//        Log.d(LOG_TAG, " [test listrecording review mode] [startListRecordingActivity] going to start list recording activity from annoatate activity, the review mode is " + reviewMode);
 
         if (reviewMode.equals(RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_NONE)) {
             return ;
@@ -237,7 +237,7 @@ public class RecordingAndAnnotateManager {
         //TODO: maybe in the future we should add the battery information at somewhere else
         session.setBatteryLife(BatteryHelper.getBatteryPercentage());
 
-        Log.d(LOG_TAG, "[test currunningSession ] addCurRecordingSession added session " + session.getId());
+//        Log.d(LOG_TAG, "[test currunningSession ] addCurRecordingSession added session " + session.getId());
 
         //add to the list
         mCurRecordingSessions.add(session);
@@ -264,6 +264,8 @@ public class RecordingAndAnnotateManager {
         for (int i=0; i<res.size() ; i++) {
 
             String sessionStr = res.get(i);
+
+            //split each row into columns
             String[] separated = sessionStr.split(Constants.DELIMITER);
 
             /** get properties of the session **/
@@ -311,7 +313,7 @@ public class RecordingAndAnnotateManager {
             session.setBatteryLife(batteryLife);
             session.setContextSourceTypes(contextsourceArray);
 
-            Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " annotateionSetJSONArray " + annotateionSetJSONArray);
+//            Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " annotateionSetJSONArray " + annotateionSetJSONArray);
             Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " contextsource " + session.getContextSourceNames());
 
 
@@ -328,12 +330,8 @@ public class RecordingAndAnnotateManager {
 
 
     public static ArrayList<String> getRecordsInBackgroundRecording(String tableName){
-
         //test query the background recording session
         ArrayList<String> res = LocalDBHelper.queryRecordsInSession(tableName,BACKGOUND_RECORDING_SESSION_ID);
-
-        Log.d(LOG_TAG,"[see background recording records]" + res);
-
         return res;
     }
 

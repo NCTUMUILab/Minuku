@@ -25,9 +25,17 @@ import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
     private static final String LOG_TAG = "MainActivity";
+
+    /**
+     * The {@link Tracker} used to record screen views.
+     */
+    private Tracker mTracker;
 
     public static final int PAGE_POSITION_RECORDING = 0;
     public static final int PAGE_POSITION_TASKS = 1;
@@ -51,6 +59,11 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /**For Google Analytic**/
+        // [START shared_tracker]
+        // Obtain the shared Tracker instance.
+        AnalyticsMinuku application = (AnalyticsMinuku) getApplication();
+        mTracker = application.getDefaultTracker();
 
         //RemoteDBHelper.syncWithRemoteDatabase();
         // Log.d(LOG_TAG, "[queryLastBackgroundRecordingLogSyncHour] get the synTime is " + lastSynhour);
@@ -202,6 +215,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
         // TODO Auto-generated method stub
 
+        // Google Analytic [START custom_event]
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("Share")
+                .build());
+        // Google Analytic [END custom_event]
+
+
         mViewPager.setCurrentItem(tab.getPosition());
 
         //save the current page
@@ -213,9 +234,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         if (tab.getText().equals(Constants.MAIN_ACTIVITY_TAB_RECORDINGS)){
             ListRecordingSectionFragment.refreshRecordingList();
         }
-
-
-
 
         //Log user action
         LogManager.log(LogManager.LOG_TYPE_USER_ACTION_LOG,
@@ -229,6 +247,14 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     }
 
+    private void sendScreenNameToGoogleAnalytic(String screenname) {
+
+        // Google Analystic [START screen_view_hit]
+        mTracker.setScreenName("screenName : " + screenname);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        // Google Analystic  [END screen_view_hit]
+
+    }
 
     /**
      * A {@link android.support.v4.app.FragmentPagerAdapter} that returns a fragment corresponding to one of the primary
@@ -243,17 +269,22 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         @Override
         public Fragment getItem(int i) {
 
+            //Google Analytic
+            sendScreenNameToGoogleAnalytic("Opening Minuku");
+
             switch (i) {
                 case 0:
 
                     if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
                         RecordSectionFragment recordSectionFragment = new RecordSectionFragment();
                         recordSectionFragment.setRetainInstance(true);
+
                         return recordSectionFragment;
                     }
                     else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.HYRBID_LABELING_CONDITION)){
                         CheckinSectionFragment checkinSectionFragment = new CheckinSectionFragment();
                         checkinSectionFragment.setRetainInstance(true);
+
                         return checkinSectionFragment;
                     }
                     else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)) {
@@ -279,6 +310,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         ListRecordingSectionFragment listRecordingSectionFragment = new ListRecordingSectionFragment();
                         listRecordingSectionFragment.setReviewMode(mReviewMode);
                         listRecordingSectionFragment.setRetainInstance(true);
+
                         return listRecordingSectionFragment;
                     }
                     else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)){
