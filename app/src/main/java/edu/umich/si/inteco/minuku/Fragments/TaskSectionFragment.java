@@ -42,7 +42,7 @@ public class TaskSectionFragment extends Fragment{
 
 
         idTextView = (TextView) rootView.findViewById(R.id.idTextView);
-        idTextView.setText("My ID:" + Constants.DEVICE_ID);
+        idTextView.setText("My ID:" + Constants.USER_ID);
 
         taskListView = (ListView) rootView.findViewById(R.id.task_list);
 

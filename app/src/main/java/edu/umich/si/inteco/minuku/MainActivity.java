@@ -149,6 +149,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onResume() {
         super.onResume();  // Always call the superclass method first
 
+
+        // Google Analytic [START custom_event]
+        mTracker.send(new HitBuilders.EventBuilder()
+                .setCategory("Action")
+                .setAction("MinukuAppIsReopened")
+                .build());
+        // Google Analytic [END custom_event]
+
+
         // Set up the action bar.
         final ActionBar actionBar = getActionBar();
 
@@ -214,14 +223,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
         // TODO Auto-generated method stub
-
-        // Google Analytic [START custom_event]
-        mTracker.send(new HitBuilders.EventBuilder()
-                .setCategory("Action")
-                .setAction("Share")
-                .build());
-        // Google Analytic [END custom_event]
-
 
         mViewPager.setCurrentItem(tab.getPosition());
 

@@ -3,6 +3,8 @@ package edu.umich.si.inteco.minuku.util;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.android.gms.analytics.Tracker;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -193,10 +195,10 @@ public class ConfigurationManager {
 
             Log.d(LOG_TAG, "[loadConfiguration] no configuration in the database, load file.." + filename);
             String study_str = new FileHelper(mContext).loadFileFromAsset(filename);
-			
+
 			//load circumstances and conditions
 			try {
-		
+
 				JSONArray studyJSONArray = new JSONArray(study_str);
 				
 				for (int i=0; i< studyJSONArray.length(); i++){

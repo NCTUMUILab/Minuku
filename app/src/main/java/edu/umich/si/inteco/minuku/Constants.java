@@ -60,6 +60,7 @@ public class Constants {
 
 	/**participant**/
     public static String DEVICE_ID = "NA";
+	public static String USER_ID = "NA";
 
 	//action alarm
 	public static final String ACTION_ALARM = "edu.umich.si.inteco.captureprobe.actionAlarm";

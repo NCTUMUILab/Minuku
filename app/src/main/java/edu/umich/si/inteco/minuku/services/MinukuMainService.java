@@ -8,8 +8,14 @@ import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import edu.umich.si.inteco.minuku.AnalyticsMinuku;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.EventManager;
@@ -39,6 +45,8 @@ public class MinukuMainService extends Service {
     /** Tag for logging. */
     private static final String LOG_TAG = "MinukuMainService";
 
+    //Google Analytic
+    private static Tracker mTracker;
 
     /**
      *
@@ -146,6 +154,7 @@ public class MinukuMainService extends Service {
     @Override
     public void onCreate() {
 
+
         LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                 LogManager.LOG_TAG_SERVICE,
                 "Service onCreate");
@@ -159,15 +168,49 @@ public class MinukuMainService extends Service {
         mPreferenceHelper = new PreferenceHelper(this);
         Log.d(LOG_TAG, "going to create the probe service");
 
-        //if device id is not set yet, set device id to the shared prefernece
+        /** We're going to set the DeviceID for the phone; To not collect PII, we create a user id that hashes a combined string of
+         * the timestamp and a deviceID**/
+        String phoneUID = "";
+        //store device ID to Constants.Device_ID.
         if ( PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA").equals("NA")) {
+
+            //get id of the phone
             TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
-            Constants.DEVICE_ID = mngr.getDeviceId();
-            PreferenceHelper.setPreferenceValue(PreferenceHelper.DEVICE_ID, mngr.getDeviceId());
+            phoneUID = mngr.getDeviceId();
+
+            //save device id (phone identitfiable number)
+            Constants.DEVICE_ID = phoneUID;
+
+            //combined device id, timestamp, and minuku
+            Constants.USER_ID = ("Minuku" + (ContextManager.getCurrentTimeInMillis() + Constants.DEVICE_ID).hashCode());
+
+            //TODO: create user loggin and use that as the id.
+            // add a unixtime to it and then hash the whole string. The purpose is try to create an unidentifiable user id
+
+            PreferenceHelper.setPreferenceValue(PreferenceHelper.DEVICE_ID, Constants.DEVICE_ID);
+            PreferenceHelper.setPreferenceValue(PreferenceHelper.USER_ID, Constants.USER_ID);
         }
         else {
             Constants.DEVICE_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA");
+            Constants.USER_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.USER_ID, "NA");
         }
+
+        // Google Analytic. Use the ID to track on Google Analytic
+        // [START shared_tracker]
+        AnalyticsMinuku application = (AnalyticsMinuku) getApplication();
+        mTracker = application.getDefaultTracker();
+        mTracker.set("&uid",Constants.USER_ID );
+
+
+        Log.d(LOG_TAG, "the phone uid is  " + Constants.DEVICE_ID + " and the hash is " + Constants.USER_ID+
+        "the tracker id is " + mTracker.get("&uid"));
+
+
+
+
+
+        // [END shared_tracker]
+
 
         mLocalDBHelpder = new LocalDBHelper(this, Constants.TEST_DATABASE_NAME);
 
@@ -373,6 +416,16 @@ public class MinukuMainService extends Service {
     static Runnable mMainThreadrunnable = new Runnable() {
         @Override
         public void run() {
+
+
+            /***If Google Analytic Tracker is enabled, we periodically send data to the server**/
+
+            mTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("ServiceChecking")
+                    .setAction(Constants.USER_ID)
+                    .setLabel(Constants.USER_ID)
+                    .build());
+
 
             //the main thread use the default interval to run continuous actions
             //the continuous actions are listed in the RunningActionList maintained by the ActionManager.
