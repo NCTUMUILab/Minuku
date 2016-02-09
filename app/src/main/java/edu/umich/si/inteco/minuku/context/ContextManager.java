@@ -128,6 +128,8 @@ public class ContextManager {
 
     private static ArrayList<LoggingTask> mLoggingTaskList;
 
+    private static ArrayList<LoggingTask> mActiveLoggingTaskList;
+
     //handle the local SQLite operation
   	private static LocalDBHelper mLocalDBHelpder;
 
@@ -164,9 +166,10 @@ public class ContextManager {
 
         mLoggingTaskList = new ArrayList<LoggingTask>();
 
-		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
         //initiate the RecordPool
         mRecordPool = new ArrayList<Record>();
+
+		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 
         mScheduledExecutorService = Executors.newScheduledThreadPool(CONTEXT_MANAGER_REFRESH_FREQUENCY);
 
@@ -188,12 +191,6 @@ public class ContextManager {
         mUserInteractionManager = new UserInteractionManager(mContext);
 
         mMobilityManager = new MobilityManager(mContext, this);
-
-
-      //  mActivityRecognitionRequester = new ActivityRecognitionRequester(mContext);
-
-      //  mActivityRecognitionRemover = new ActivityRecognitionRemover(mContext);
-
 	}
 
     /**
@@ -571,7 +568,7 @@ public class ContextManager {
    * ContextMAnager assigns loggingTask to the right contextStateManagers with the LoggingTaskIDs.
    * @param loggingTaskIds
    */
-    public void assignLoggingTasks(ArrayList<Integer> loggingTaskIds) {
+    public void assignActiveLoggingTasks(ArrayList<Integer> loggingTaskIds) {
 
         Log.d(LOG_TAG, " [testing logging task and requested] in assignLoggingTasks ");
 
@@ -584,7 +581,7 @@ public class ContextManager {
             String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
 
             //then we add the loggingTask to the right ContextStateManager's active Logging Task
-            assignLoggingTasks(contextStateManagerName, loggingTask);
+            assignActiveLoggingTasks(contextStateManagerName, loggingTask);
 
         }
 
@@ -596,7 +593,7 @@ public class ContextManager {
      * @param contextStateManagerName
      * @param loggingTask
      */
-    private void assignLoggingTasks(String contextStateManagerName, LoggingTask loggingTask) {
+    private void assignActiveLoggingTasks(String contextStateManagerName, LoggingTask loggingTask) {
 
         Log.d(LOG_TAG, " [testing logging task and requested] assign  logging task: " +
                 loggingTask.getSource() + " to " + contextStateManagerName);

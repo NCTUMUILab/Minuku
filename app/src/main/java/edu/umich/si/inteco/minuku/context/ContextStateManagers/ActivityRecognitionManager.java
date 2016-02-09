@@ -111,6 +111,8 @@ public class ActivityRecognitionManager extends ContextStateManager
 
         sLatestDetectionTime = -1;
 
+        setUpContextSourceList();
+
         //we use 3 minutes insead of 5 minutes
         setKeepalive( KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
 

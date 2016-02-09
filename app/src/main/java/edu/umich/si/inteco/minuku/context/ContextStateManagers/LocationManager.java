@@ -130,6 +130,8 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         // API.
         buildGoogleApiClient();
 
+        setUpContextSourceList();
+
         setKeepalive( KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
 
     }

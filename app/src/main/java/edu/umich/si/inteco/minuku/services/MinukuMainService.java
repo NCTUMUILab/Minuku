@@ -168,6 +168,7 @@ public class MinukuMainService extends Service {
         mPreferenceHelper = new PreferenceHelper(this);
         Log.d(LOG_TAG, "going to create the probe service");
 
+
         /** We're going to set the DeviceID for the phone; To not collect PII, we create a user id that hashes a combined string of
          * the timestamp and a deviceID**/
         String phoneUID = "";
@@ -195,20 +196,11 @@ public class MinukuMainService extends Service {
             Constants.USER_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.USER_ID, "NA");
         }
 
-        // Google Analytic. Use the ID to track on Google Analytic
+        /** Google Analytic. Use the ID to track on Google Analytic **/
         // [START shared_tracker]
         AnalyticsMinuku application = (AnalyticsMinuku) getApplication();
         mTracker = application.getDefaultTracker();
         mTracker.set("&uid",Constants.USER_ID );
-
-
-        Log.d(LOG_TAG, "the phone uid is  " + Constants.DEVICE_ID + " and the hash is " + Constants.USER_ID+
-        "the tracker id is " + mTracker.get("&uid"));
-
-
-
-
-
         // [END shared_tracker]
 
 

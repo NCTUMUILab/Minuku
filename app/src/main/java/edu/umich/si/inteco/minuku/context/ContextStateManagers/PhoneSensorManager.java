@@ -61,7 +61,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         super();
         Log.d(LOG_TAG, "[testing start service] going to start the context extractor");
 
-       // mContext = context;
+        mContext = context;
 
         //call sensor manager from the service
         mSensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
@@ -88,9 +88,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     @Override
     protected void setUpContextSourceList(){
 
-        if (mSensorManager==null){
-            mSensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
-        }
+        Log.d(LOG_TAG, "testing registerSensor in setUpContextSourceList");
 
         mContextSourceList.add(
                 new ContextSource(
@@ -204,6 +202,8 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
                         mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
 
+        Log.d(LOG_TAG, "testing registerSensor in setUpContextSourceList " + mContextSourceList.size() + " contextsources have been initiated");
+
 
         return;
 
@@ -212,6 +212,9 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
      * e.g sampling rate. */
     public void updateContextSourceList(String source, long samplingRate){
+
+        Log.d(LOG_TAG, "testing registerSensor in updateContextSourceList ");
+
 
         //update all sources if the source name is a general name (e.g. ActivityRecognition)
         if (source.equals(CONTEXT_SOURCE_PHONE_SENSOR)) {
@@ -332,7 +335,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     protected  void registerRequestedSensor() {
 
-        Log.d(LOG_TAG, "[testing Sensor] registerRequestedSensor, the size of mContextSource is" + mContextSourceList.size());
+        Log.d(LOG_TAG, "testing registerSensor in updateContextSourceList \");\n] registerRequestedSensor, the size of mContextSource is" + mContextSourceList.size());
         /** If for some reason you do need to change the delay, you will have to unregister and reregister the sensor listener.
          *
          */

@@ -9,15 +9,19 @@ public class LoggingTask {
     protected String mSourceString;
     protected int mSourceType;
     protected int mId;
+    //if there's any current logging session (including background recording) specifying the
+    // loggingTask, it is active
+    protected boolean mActive;
 
     public LoggingTask() {
-
+        mActive = false;
     }
 
     public LoggingTask(int id, String source) {
 
         mSourceString = source;
         mId = id;
+        mActive = false;
     }
 
     public int getSourceType() {
@@ -34,5 +38,13 @@ public class LoggingTask {
 
     public int getId() {
         return mId;
+    }
+
+    public boolean isActive() {
+        return mActive;
+    }
+
+    public void setActive(boolean active) {
+        this.mActive = active;
     }
 }

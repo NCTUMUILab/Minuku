@@ -253,7 +253,7 @@ public class ActionManager {
                     ArrayList<Integer> loggingTaskIds = savingRecordAction.getLoggingTasks();
 
                     /**3. call ConteLtManagT to assign logging task to appropropriates ContextSTateManager**/
-                    mContextManager.assignLoggingTasks(loggingTaskIds);
+                    mContextManager.assignActiveLoggingTasks(loggingTaskIds);
 
 					
 					/** when start a new recorind action, we need to start a new session, and add the session id io the action
