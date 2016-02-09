@@ -87,10 +87,10 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
      * it adds a list of ContextSource that it will manage **/
     @Override
     protected void setUpContextSourceList(){
-
-
-        Log.d(LOG_TAG, "setUpContextSourceList in PhoneSensorManager. mContextSource:  " + mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
-
+        
+        if (mSensorManager==null){
+            mSensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
+        }
 
         mContextSourceList.add(
                 new ContextSource(
