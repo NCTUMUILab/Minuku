@@ -61,7 +61,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         super();
         Log.d(LOG_TAG, "[testing start service] going to start the context extractor");
 
-        mContext = context;
+       // mContext = context;
 
         //call sensor manager from the service
         mSensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
@@ -87,7 +87,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
      * it adds a list of ContextSource that it will manage **/
     @Override
     protected void setUpContextSourceList(){
-        
+
         if (mSensorManager==null){
             mSensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
         }

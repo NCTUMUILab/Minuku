@@ -1,5 +1,6 @@
 package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.util.Log;
 
@@ -90,12 +91,16 @@ public abstract class ContextStateManager {
         mStates = new ArrayList<State>();
         mContextSourceList = new ArrayList<ContextSource>();
 
-        //add ContextSources into the contextSourceList
-        setUpContextSourceList();
+        /** add ContextSources into the contextSourceList
+         * do this in each ContextStateManager since each may required different access to the
+         * phone resource  **/
+        
+        //setUpContextSourceList();
 
         //set keepalive
         setKeepalive(KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);//5 minute;;
     }
+
 
     public ContextStateManager(ArrayList<Record> mlocalRecordPool) {
         this.mLocalRecordPool = mlocalRecordPool;
