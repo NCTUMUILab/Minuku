@@ -178,7 +178,8 @@ public class ConfigurationManager {
             Log.d(LOG_TAG, "[loadConfiguration] no configuration in the database, load configuration from file.." + filename);
             configurationsStr = new FileHelper(mContext).loadFileFromAsset(filename);
 
-            PreferenceHelper.setPreferenceValue(PreferenceHelper.CONFIGURATIONS, configurationsStr);
+            //TODO: uncomment this: for testing purpose we need to comment out this so that we can alwasy load configuration from the file
+//            PreferenceHelper.setPreferenceValue(PreferenceHelper.CONFIGURATIONS, configurationsStr);
         }
 
 

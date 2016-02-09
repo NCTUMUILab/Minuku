@@ -30,9 +30,6 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     /** Tag for logging. */
     private static final String LOG_TAG = "PhoneSensorMnger";
 
-    //TODO: we set this temporarily false because we want to test nother source first
-    private static boolean isExtractingPhoneSensorData = true;
-
     public static String CONTEXT_SOURCE_PHONE_SENSOR = "PhoneSensor";
 
     /**Properties for Record**/
@@ -56,7 +53,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     private float mLight, mPressure, mRelativeHumidity, mAmbientTemperature ;
 
-    /**Store a list of sensosr that PhoneSensorManager has registered*/
+    /**Store a list of sensosr that PhoneSensorManager has registered. PhoneSensorManager only obtains values from registered sensors */
     private ArrayList<ContextSource> mRegisteredSensorList;
 
     public PhoneSensorManager(Context context) {
@@ -91,15 +88,9 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     @Override
     protected void setUpContextSourceList(){
 
-        Log.d(LOG_TAG, "setUpContextSourceList in PhoneSensorManager. mContextSource:  " + mContextSourceList);
-
-        Log.d(LOG_TAG, "setUpContextSourceList in PhoneSensorManager. mContextSource:  " + mContextSourceList.size());
 
         Log.d(LOG_TAG, "setUpContextSourceList in PhoneSensorManager. mContextSource:  " + mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
 
-
-
-        mContextSourceList.add(new ContextSource());
 
         mContextSourceList.add(
                 new ContextSource(
@@ -136,7 +127,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
                 new ContextSource(
                         Sensor.STRING_TYPE_GYROSCOPE,
                         Sensor.TYPE_GYROSCOPE,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)!=null,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null,
                         SensorManager.SENSOR_DELAY_NORMAL));
 
 
@@ -214,7 +205,6 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
                         SensorManager.SENSOR_DELAY_NORMAL));
 
 
-
         return;
 
     }
@@ -256,15 +246,6 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     }
 
 
-
-    public boolean isExtractingPhoneSensorData() {
-        return isExtractingPhoneSensorData;
-    }
-
-    public void setExtractingPhoneSensor(boolean flag) {
-        isExtractingPhoneSensorData = flag;
-    }
-
     /**
      * let ContextManager to call to unregister sensors
      */
@@ -275,8 +256,18 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     /**
      * let ContextManager to call to unregister sensors
      */
-    protected void enableSensor() {
+    @Override
+    public void requestUpdates() {
+        //only register the requested sensors
         registerRequestedSensor();
+    }
+
+    /**
+     * let ContextManager to unregister sensors
+     */
+    @Override
+    public void removeUpdates() {
+        unRegisterSensors();
     }
 
     /*
@@ -336,40 +327,35 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     }
 
     /**
-     * register all the requested sensor list
+     * register all the available and requested sensor list
      */
 
     protected  void registerRequestedSensor() {
 
+        Log.d(LOG_TAG, "[testing Sensor] registerRequestedSensor, the size of mContextSource is" + mContextSourceList.size());
         /** If for some reason you do need to change the delay, you will have to unregister and reregister the sensor listener.
          *
          */
+        for (int i=0; i<mContextSourceList.size(); i++){
 
-        //we don't register any sensor if isExtractingPhoneSensorData is false.
-        if (!isExtractingPhoneSensorData){
-            return;
-        }
-        else {
+            ContextSource  sensor = mContextSourceList.get(i);
+            Log.d(LOG_TAG, "[testing Sensor] now checking sensor " +sensor.getName() + " requested ? " + sensor.isRequested() + " avaiiability: " + sensor.isAvailable() );
 
-            for (int i=0; i<mContextSourceList.size(); i++){
+            //only register sensor that is available and is requested.
+            if (sensor.isAvailable() && sensor.isRequested()) {
 
-                ContextSource  sensor = mContextSourceList.get(i);
-                //only register sensor that is available and is requested.
-                if (sensor.isAvailable() && sensor.isRequested()) {
+                //we register sensor using its name and samplingMode: Normal, UI, Game, or Fastest
+                boolean result =registerSensorByName(sensor.getName(), sensor.getSamplingMode());
 
-                    //we register sensor using its name and samplingMode: Normal, UI, Game, or Fastest
-                    boolean result =registerSensorByName(sensor.getName(), sensor.getSamplingMode());
-
-                    //if registering the requested sensor succesfully, put it in the registered sensor list
-                    if (result){
-                        mRegisteredSensorList.add(sensor);
-                    }
-
+                //if registering the requested sensor succesfully, put it in the registered sensor list
+                if (result){
+                    Log.d(LOG_TAG, "[testing Sensor] add Sensor :" + sensor.getName() + " to the  mRegisteredSensorList");
+                    mRegisteredSensorList.add(sensor);
                 }
 
             }
-        }
 
+        }
     }
 
     /**

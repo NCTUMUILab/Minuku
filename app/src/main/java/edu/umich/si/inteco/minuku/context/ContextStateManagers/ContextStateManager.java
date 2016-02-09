@@ -90,6 +90,9 @@ public abstract class ContextStateManager {
         mStates = new ArrayList<State>();
         mContextSourceList = new ArrayList<ContextSource>();
 
+        //add ContextSources into the contextSourceList
+        setUpContextSourceList();
+
         //set keepalive
         setKeepalive(KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);//5 minute;;
     }
@@ -111,7 +114,20 @@ public abstract class ContextStateManager {
     }
 
 
-    public  void updateContextSourceList(String source, float samplingRate){
+    /**
+     * Allow ContextManager to requestd and remove updates
+     */
+    public void requestUpdates() {}
+
+    public void removeUpdates() {}
+
+
+    /**
+     * Update the Setting of ContextSourceList
+     * @param source
+     * @param samplingRate
+     */
+    public void updateContextSourceList(String source, float samplingRate){
 
         //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
 

@@ -35,7 +35,7 @@
 
 			  "BackgroundLogging":{
 				"Enabled": true,
-				"Logging_tasks":"1,3",
+				"Logging_tasks":"1,3,5",
 				"Logging_rate": 5
 			  },
 
@@ -55,7 +55,15 @@
 				  },
 				  {
 					"Id": 4,
-					"Source": "Sensor."
+					"Source": "Sensor.Accelerometer"
+				  },
+				  {
+					"Id": 5,
+					"Source": "Sensor.Light"
+				  },
+				  {
+					"Id": 6,
+					"Source": "Sensor.Proximity"
 				  }
 				],
 				"Circumstances":

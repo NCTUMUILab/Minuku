@@ -24,7 +24,6 @@ import edu.umich.si.inteco.minuku.context.ActivityRecognitionService;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
-import edu.umich.si.inteco.minuku.model.Record.Record;
 
 /**
  * Created by Armuro on 10/4/15.
@@ -112,8 +111,6 @@ public class ActivityRecognitionManager extends ContextStateManager
 
         sLatestDetectionTime = -1;
 
-        setUpContextSourceList();
-
         //we use 3 minutes insead of 5 minutes
         setKeepalive( KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
 
@@ -194,7 +191,8 @@ public class ActivityRecognitionManager extends ContextStateManager
      * Start the activity recognition update request process by
      * getting a connection.
      */
-    public void requestActivityRecognitionUpdates() {
+    @Override
+    public void requestUpdates() {
 
         //Log.d(LOG_TAG, "[requestUpdates] going to request location update ");
         //we need to get location. Set this true
@@ -218,7 +216,8 @@ public class ActivityRecognitionManager extends ContextStateManager
      *
      *
      */
-    public void removeActivityRecognitionUpdates() {
+    @Override
+    public void removeUpdates() {
 
         mRequestingActivityRecognitionUpdates = false;
 
@@ -342,7 +341,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         //if the client is connected in order to stop activity recognition update, we remove the update
         //after the client is connected
         else{
-            removeActivityRecognitionUpdates();
+            removeUpdates();
         }
 
     }

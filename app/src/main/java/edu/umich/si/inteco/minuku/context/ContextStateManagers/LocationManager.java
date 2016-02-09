@@ -130,8 +130,6 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         // API.
         buildGoogleApiClient();
 
-        setUpContextSourceList();
-
         setKeepalive( KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
 
     }
@@ -169,7 +167,8 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
      * Start the activity recognition update request process by
      * getting a connection.
      */
-    public void requestLocationUpdate() {
+    @Override
+    public void requestUpdates() {
 
         Log.d(LOG_TAG, "[testLocationUpdate] going to request location update ");
         //we need to get location. Set this true
@@ -216,13 +215,13 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
             //if there's an location update going on, we should remove it. Otherwise, we don't need to do anything
             if (mRequestingLocationUpdates)
-                removeLocationUpdate();
+                removeUpdates();
         }
 
         else {
             //if we haven't started a location update, now start to update. Otherwise, we don't need to do anything.
             if (!mRequestingLocationUpdates)
-                requestLocationUpdate();
+                requestUpdates();
         }
     }
 
@@ -274,8 +273,8 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
     }
 
-
-    public void removeLocationUpdate() {
+    @Override
+    public void removeUpdates() {
         //stop requesting location udpates
 
         mRequestingLocationUpdates = false;
@@ -435,7 +434,7 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
             startLocationUpdates();
         }
         else {
-            removeLocationUpdate();
+            removeUpdates();
         }
 
 	}
@@ -470,10 +469,10 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
             //after we get location we need to update the location request
             //1. remove the update
-            removeLocationUpdate();
+            removeUpdates();
             //2. create new update, and then start update
             createLocationRequest();
-            requestLocationUpdate();
+            requestUpdates();
         }
 
 

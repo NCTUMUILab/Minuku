@@ -246,14 +246,14 @@ public class ContextManager {
     public void requesLocationUpdate () {
         if (mLocationManager!=null){
             Log.d(LOG_TAG, "[startRequestingLocation] start to request location udpate");
-            mLocationManager.requestLocationUpdate();
+            mLocationManager.requestUpdates();
         }
     }
 
     public void removeLocationUpdate () {
         if (mLocationManager!=null){
             Log.d(LOG_TAG, "[stopRequestingActivityRecognition] stop to request location");
-            mLocationManager.removeLocationUpdate();
+            mLocationManager.removeUpdates();
         }
     }
 
@@ -263,14 +263,30 @@ public class ContextManager {
      */
     private void requestActivityRecognitionUpdate(){
         Log.d(LOG_TAG, "[startRequestingActivityRecognition] start to request activity udpate");
-        mActivityRecognitionManager.requestActivityRecognitionUpdates();
+        mActivityRecognitionManager.requestUpdates();
     }
 
     private void removeActivityRecognitionUpdate(){
         Log.d(LOG_TAG, "[stopRequestingActivityRecognition] stop to request activity udpate");
         //if Google Play service is available, stop the update
         // Pass the remove request to the remover object (the intent is the same as the request intent)
-        mActivityRecognitionManager.removeActivityRecognitionUpdates();
+        mActivityRecognitionManager.removeUpdates();
+    }
+
+    /***
+     * Requesting and Removing Sensor information update
+     */
+    private void requestSensorUpdate() {
+        Log.d(LOG_TAG, "[testing Sensor] start to request sensor udpate");
+        mPhoneSensorManager.requestUpdates();
+    }
+
+    /**
+     * Remove update
+     */
+    private void removeSensorUpdate() {
+        Log.d(LOG_TAG, "[testing Sensor] stop requesting sensor udpate");
+        mPhoneSensorManager.removeUpdates();
     }
 
 
@@ -294,8 +310,8 @@ public class ContextManager {
         //get activity information
         requestActivityRecognitionUpdate();
 
-        //registerSensors();
-
+        //get sensor information from PhoneSensorManager
+        requestSensorUpdate();
 
 
         //get geofence transitions
@@ -506,11 +522,14 @@ public class ContextManager {
 //        Log.d(LOG_TAG, "testing saving records [moveRecordFromLocalRecordPoolToPublicRecordPool] for logging tasks" + loggingTaskIds.toString());
         //1. find the corresponding contextStateManager based on the loggingTask Id
         for (int i=0; i<loggingTaskIds.size();i++){
+
             //get loggingTask by id
             LoggingTask  loggingTask = getLoggingTask(loggingTaskIds.get(i));
 
+            //find the contextStateManager responsible for the loggingTask because we need to copy record from that localRecordPool to the Public Record Pool
             String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
 
+            //after finding the ContextStateManager, we copy the Record from the LocalRecordPool of that ContextStatManager to the PublicRecordPool
             copyRecordFromLocalRecordPoolToPublicRecordPool(contextStateManagerName, loggingTask);
         }
 
@@ -890,6 +909,7 @@ public class ContextManager {
             return CONTEXT_STATE_MANAGER_LOCATION;
         }
 
+        //as long as the name of the ContextSource contain "Sensor.", the ContextStateManager is PhoneSensorManager
         else if (source.contains("Sensor.") ) {
             return CONTEXT_STATE_MANAGER_PHONE_SENSOR;
         }

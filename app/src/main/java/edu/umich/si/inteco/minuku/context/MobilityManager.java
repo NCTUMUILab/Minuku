@@ -139,7 +139,7 @@ public class MobilityManager {
         else if (MobilityManager.ADJUST_LOCATION_UPDATE_INTERVAL_WHEN_STATIC
                 == MobilityManager.REMOVE_LOCATION_UPDATE_WHEN_STATIC) {
             Log.d(LOG_TAG, "[updateMobility] we remove location update");
-            mContextManager.getLocationManager().removeLocationUpdate();
+            mContextManager.getLocationManager().removeUpdates();
 
         }
         else {
