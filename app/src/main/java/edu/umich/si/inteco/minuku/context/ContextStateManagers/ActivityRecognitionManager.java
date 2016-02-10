@@ -114,7 +114,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         setUpContextSourceList();
 
         //we use 3 minutes insead of 5 minutes
-        setKeepalive( KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
+        setKeepalive(KEEPALIVE_MINUTE * Constants.MILLISECONDS_PER_MINUTE);
 
     }
 
@@ -196,7 +196,7 @@ public class ActivityRecognitionManager extends ContextStateManager
     @Override
     public void requestUpdates() {
 
-        //Log.d(LOG_TAG, "[requestUpdates] going to request location update ");
+        Log.d(LOG_TAG, "[requestUpdates] Activity Recognition going to request location update ");
         //we need to get location. Set this true
         mRequestingActivityRecognitionUpdates = true;
 
@@ -546,12 +546,16 @@ public class ActivityRecognitionManager extends ContextStateManager
             isRequested = isRequested | mContextSourceList.get(i).isRequested();
 
         }
+
+        if (isRequested) {
+            requestUpdates();
+        }
+
         //If neither AllProbableActivities nor MostProbableActivity are requested, we should stop requesting activity information
-        if (!isRequested){
-            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting AR informatoin because it is not needed anymore");
-            //TODO: need to create this in the study json to test (triggered logging AR)
+        else{
             removeUpdates();
         }
+
     }
 
 

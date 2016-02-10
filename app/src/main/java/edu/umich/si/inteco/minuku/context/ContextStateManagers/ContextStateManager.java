@@ -268,13 +268,13 @@ public abstract class ContextStateManager {
                 ContextManager.getPublicRecordPool().add(mLocalRecordPool.get(i));
                 //after the record has been copied, we need to mark it "copie", so that we won't copied again
                 record.setIsCopiedToPublicPool(true);
-                Log.d(LOG_TAG, this.getName() + "[test logging] copying record " + record.getSource() + ":" + record.getID()  + " : " + record.getTimeString() + " to public pool" );
+//                Log.d(LOG_TAG, this.getName() + "[test logging] copying record " + record.getSource() + ":" + record.getID()  + " : " + record.getTimeString() + " to public pool" );
                 count ++;
             }
         }
 
-        Log.d(LOG_TAG, this.getName() + "[test logging] moving " + count + " records to public pool, local pool now has " + mLocalRecordPool.size() +
-                " records.  pubolc pool has " + ContextManager.getPublicRecordPool().size() + "records");
+//        Log.d(LOG_TAG, this.getName() + "[test logging] moving " + count + " records to public pool, local pool now has " + mLocalRecordPool.size() +
+//                " records.  pubolc pool has " + ContextManager.getPublicRecordPool().size() + "records");
 
     }
 
