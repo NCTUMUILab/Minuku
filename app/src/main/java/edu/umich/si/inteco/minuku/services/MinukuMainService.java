@@ -284,9 +284,6 @@ public class MinukuMainService extends Service {
         //and triggered ProbeObjects. This will help the service to find the triggered action when a trigger is fired.
         TriggerManager.setUpTriggerLinks();
 
-        //register actions that should launch when the service starts, and schedule actions that need to be scheduled.
-        mActionManager.registerActionControls();
-
         startMinukuService();
 
         //register receiver
@@ -381,12 +378,14 @@ public class MinukuMainService extends Service {
     //TODO: fix this
     public void startMinukuService(){
 
-        Log.d(LOG_TAG, "[testing start service]  [startMinukuService] star the probe service");
+        Log.d(LOG_TAG, "[startMinukuService] star the probe service");
         //TODO: checking updated configurations
-
 
         //start the main functions of ContextManager
         mContextManager.startContextManager();
+
+        //register actions that should launch when the service starts, and schedule actions that need to be scheduled.
+        mActionManager.registerActionControls();
 
         //running mainthread for running continuous action
         runMainThread();

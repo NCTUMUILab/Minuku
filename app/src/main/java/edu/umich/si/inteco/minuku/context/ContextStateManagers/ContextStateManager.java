@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
@@ -59,7 +60,7 @@ public abstract class ContextStateManager {
     protected long recordCount;
     protected ArrayList<Record> mLocalRecordPool;
     protected ArrayList<Condition> mConditions;
-    protected ArrayList<LoggingTask> mActiveLoggingTasks;
+    protected ArrayList<LoggingTask> mLoggingTasks;
     protected ArrayList<StateMappingRule> mStateMappingRules;
     protected ArrayList<State> mStates;
     /**each contextStateManager has a list of ContextSource available for use**/
@@ -87,7 +88,7 @@ public abstract class ContextStateManager {
 
         mLocalRecordPool = new ArrayList<Record>();
         mStateMappingRules = new ArrayList<StateMappingRule>();
-        mActiveLoggingTasks = new ArrayList<LoggingTask>();
+        mLoggingTasks = new ArrayList<LoggingTask>();
         mStates = new ArrayList<State>();
         mContextSourceList = new ArrayList<ContextSource>();
 
@@ -169,12 +170,16 @@ public abstract class ContextStateManager {
      */
     protected boolean updateContextSourceRequestStatus(ContextSource contextSource) {
 
-        boolean isLogging = isRequestedByActiveLoggingTasks(contextSource);
+//        boolean isLoggingInBackGroundLogging = isRequestedByBackgroundLoggingTasks(contextSource);
+        boolean isLoggingInAction = isRequestedByActiveLoggingTasks(contextSource);
+
         boolean isMonitored = isStateMonitored(contextSource.getSourceId());
-        boolean isRequested = isLogging | isMonitored;
-//
-//        Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] the contextSource " + contextSource.getName() +
-//                " Logging " + isLogging + " monitored : " + isMonitored + " isRequested: " + isRequested);
+        boolean isRequested = isLoggingInAction | isMonitored ;
+
+        Log.d(LOG_TAG, "[testing logging task and requested][updateContextSourceListRequestStatus] " +
+                "the contextSource " + contextSource.getName() +
+                " ActionLogging " + isLoggingInAction + " monitored : " + isMonitored + " isRequested: " + isRequested);
+
         return isRequested;
 
     }
@@ -205,12 +210,26 @@ public abstract class ContextStateManager {
      * Then it calls updateContextSourceListRequestStatus to update whether contextsource is requested.
      * @param loggingTask
      */
-    public void addActiveLoggingTask(LoggingTask loggingTask) {
-
+    public void addLoggingTask(LoggingTask loggingTask) {
         //add ActiveLoggingTask
-        mActiveLoggingTasks.add(loggingTask);
+        mLoggingTasks.add(loggingTask);
+    }
 
-        Log.d(LOG_TAG, "[addActiveLoggingTask]" + this.getName() + " have " + mActiveLoggingTasks.size() + "logging task");
+    /**
+     * ContextManager will update the LoggingTasks, i.e. make them active or inactive. This is
+     * @param loggingTask
+     */
+    public void updateLoggingTask(LoggingTask loggingTask, boolean enabled ) {
+
+//        Log.d(LOG_TAG, " [testing logging task and requested] update the status of loggingTask " + loggingTask + " to " + enabled);
+
+        for (int i=0; i<mLoggingTasks.size(); i++){
+            //if we find the logging task
+            if (loggingTask.equals(mLoggingTasks.get(i))){
+                mLoggingTasks.get(i).setEnabled(enabled);
+                Log.d(LOG_TAG, " [testing logging task and requested] the loggingTask " + loggingTask + " is updated to " + mLoggingTasks.get(i).isEnabled());
+            }
+        }
 
         //after add a logging task, we need to update the Request Status of the ContextSourceList
         updateContextSourceListRequestStatus();
@@ -497,19 +516,53 @@ public abstract class ContextStateManager {
      */
     protected boolean isRequestedByActiveLoggingTasks(ContextSource contextSource) {
 
-        Log.d(LOG_TAG, "isRequestedByActiveLoggingTasks There are " + mActiveLoggingTasks.size() + " loggin tacks in  "  + this.getName() +
-                "[updateContextSourceListRequestStatus] is in activeLogging Task " );
+        for (int i=0; i<mLoggingTasks.size(); i++) {
 
-        for (int i=0; i<mActiveLoggingTasks.size(); i++) {
+//            Log.d(LOG_TAG, "[testing logging task and requested] isRequestedByActiveLoggingTasks checking ContextSource " + contextSource.getName() + " with logging task" +  mLoggingTasks.get(i).getSource());
 
-            Log.d(LOG_TAG, "isRequestedByActiveLoggingTasks checking ContextSource " + contextSource.getName() + " with logging task" +  mActiveLoggingTasks.get(i).getSource());
+            //find the logging task containing the contextsource and see if the loggingTask is enabled
+            if (contextSource.getName().equals( mLoggingTasks.get(i).getSource() )
+                    &&  mLoggingTasks.get(i).isEnabled() ){
+                Log.d(LOG_TAG, "[testing logging task and requested] the ContextSource " + contextSource.getName() +
+                        " indeed is requested by the logging task" );
 
-            //if contextsource is requested by an active logging task
-            if (contextSource.getName().equals( mActiveLoggingTasks.get(i).getSource())){
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * This function takes a ContextSource and examines whether it is requested by a BackgroundRecording
+     * @param contextSource
+     * @return
+     */
+    protected boolean isRequestedByBackgroundLoggingTasks(ContextSource contextSource) {
+
+        Log.d(LOG_TAG, "[testing logging task and requested] check whether ContextSource " + contextSource.getName() +
+                " is requested  by BackgroundLogging ");
+
+        boolean isRequested = false;
+
+        //find the logging Task and see if that's in backgroundLogging
+        for (int i=0; i<mLoggingTasks.size(); i++) {
+
+            Log.d(LOG_TAG, "[testing logging task and requested] checking loggingTask" +   mLoggingTasks.get(i).getSource());
+
+            //find the loggingtask containing the contextsource
+            if (contextSource.getName().equals( mLoggingTasks.get(i).getSource() )){
+                Log.d(LOG_TAG, "[testing logging task and requested] find the loggingTask " + mLoggingTasks.get(i).getSource()
+                 + mLoggingTasks.get(i).getId());
+
+                //find if that's in BackgroundLogging (using id)
+                isRequested = ContextManager.isLoggingTaskContainedInBackGroundLogging(mLoggingTasks.get(i).getId());
+
+            }
+        }
+
+        Log.d(LOG_TAG, "[testing logging task and requested] the loggingTask requested by BackgroundLogging " + isRequested);
+
+        return isRequested;
     }
 
 
@@ -593,7 +646,7 @@ public abstract class ContextStateManager {
 
 
     public void removeActiveLoggingTask (LoggingTask loggingTask) {
-        mActiveLoggingTasks.remove(loggingTask);
+        mLoggingTasks.remove(loggingTask);
     }
 
     public void addStateMappingRule(StateMappingRule rule){

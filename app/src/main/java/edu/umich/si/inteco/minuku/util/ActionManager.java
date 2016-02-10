@@ -24,7 +24,6 @@ import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
-import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.Questionnaire.EmailQuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
@@ -253,7 +252,7 @@ public class ActionManager {
                     ArrayList<Integer> loggingTaskIds = savingRecordAction.getLoggingTasks();
 
                     /**3. call ConteLtManagT to assign logging task to appropropriates ContextSTateManager**/
-                    mContextManager.assignActiveLoggingTasks(loggingTaskIds);
+                    mContextManager.executeLoggingTasksRequestedByAction(loggingTaskIds);
 
 					
 					/** when start a new recorind action, we need to start a new session, and add the session id io the action
@@ -778,7 +777,13 @@ public class ActionManager {
             if (action.getType().equals(ActionManager.ACTION_TYPE_SAVING_RECORD)){
 
                 SavingRecordAction savingRecordAction = (SavingRecordAction) action;
+
+                //get session id so that we can stop session
                 int sessionId = savingRecordAction.getSessionId();
+
+                //get associated loggingtask ids
+                ArrayList<Integer> loggingTaskIds = savingRecordAction.getLoggingTasks();
+
                 Log.d(LOG_TAG,"[stopAction] examineTransportation the recording session " + sessionId + " has to be stoped");
                 Session session = RecordingAndAnnotateManager.getCurRecordingSession(sessionId);
 
@@ -793,6 +798,12 @@ public class ActionManager {
                     RecordingAndAnnotateManager.getCurRecordingSessions().remove(session);
                     NotificationHelper.cancelNotification(NotificationHelper.NOTIFICATION_ID_ONGOING_RECORDING_ANNOTATE_IN_PROCESS);
                 }
+
+
+                //we tell contextManager that we no longer need LoggingTask to be active
+                /**3. call ConteLtManagT to assign logging task to appropropriates ContextSTateManager**/
+                mContextManager.stopLoggingTasksRequestedByAction(loggingTaskIds);
+
 
             }
 

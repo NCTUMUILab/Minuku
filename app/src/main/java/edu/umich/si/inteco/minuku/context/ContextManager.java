@@ -128,7 +128,8 @@ public class ContextManager {
 
     private static ArrayList<LoggingTask> mLoggingTaskList;
 
-    private static ArrayList<LoggingTask> mActiveLoggingTaskList;
+    //stores a list of ids of LoggingTask that are running by an Action
+    private static ArrayList<Integer> mLoggingTaskByActionList;
 
     //handle the local SQLite operation
   	private static LocalDBHelper mLocalDBHelpder;
@@ -166,6 +167,8 @@ public class ContextManager {
 
         mLoggingTaskList = new ArrayList<LoggingTask>();
 
+        mLoggingTaskByActionList = new ArrayList<Integer>();
+
         //initiate the RecordPool
         mRecordPool = new ArrayList<Record>();
 
@@ -191,6 +194,7 @@ public class ContextManager {
         mUserInteractionManager = new UserInteractionManager(mContext);
 
         mMobilityManager = new MobilityManager(mContext, this);
+
 	}
 
     /**
@@ -200,13 +204,14 @@ public class ContextManager {
 
         Log.d(LOG_TAG, "[startContextManager]");
 
+
         /**
-         * The first thing in ContextManager is to setup the task in ContextStateManager, including
+         * Setup the task in ContextStateManager, including
          * determining what contextual information to record and monitor.
          * According to the recording and the monitoring task, ContextManager determines which
          * contextual information to extract
          */
-        updateTasksInContextStateManager();
+        assignTasksToContextStateManager();
 
         /**ContextManager has the control to start and stop extracting contextual information*/
         if (sIsExtractingContextEnabled) {
@@ -386,6 +391,104 @@ public class ContextManager {
     }
 
 
+    /**
+     * this function updates the tasks that each ContextStateManager need to perform
+     */
+    public void assignTasksToContextStateManager() {
+
+        Log.d(LOG_TAG, "[assignTasksToContextStateManager] ");
+
+        Log.d(LOG_TAG, "[assignTasksToContextStateManager] circumstance:  " + getCircumstanceList().size()
+         + " loggingTaskssize " + mLoggingTaskList.size());
+
+        /**1. assign monitoring task to contextStateManagers **/
+        for (int i=0; i<getCircumstanceList().size(); i++){
+
+            //creating StateMappingRule and add to the relevant ContextStateManagers
+            Circumstance circumstance = getCircumstanceList().get(i);
+
+            //get conditions in each circumstance
+            for (int j=0; j< circumstance.getConditionList().size(); j++) {
+
+                Condition condition = circumstance.getConditionList().get(j);
+
+                //for each condition, we need to know which ContextStateManager will need to generate a state
+                // for that condition.
+                String contextStateManagerName = getContextStateManagerName(condition.getSource());
+
+                //we give contextStateManager a list of criteria for each state.
+                ArrayList<StateValueCriterion> criteria = condition.getStateValueCriteria();
+
+                //If the criteria are met, it changes the state to the value
+                String stateValue = condition.getStateValue();
+
+                Log.d(LOG_TAG, "[assignTasksToContextStateManager] condition for " + contextStateManagerName
+                        + " source: " + condition.getSource() );
+
+                int sourceType = getSourceTypeFromName(contextStateManagerName, condition.getSource());
+
+                //condition originall saves string of source, becuase it is specified by users. We need to
+                //find the corresponding source type.
+                Log.d(LOG_TAG, "[assignTasksToContextStateManager] condition for " + contextStateManagerName
+                        + " source: " + condition.getSource() + " soucetype: " +
+                        getSourceTypeFromName(contextStateManagerName, condition.getSource()));
+
+                //generate a sateMappingRule for the ContextStateManager to use to monitor the state
+                StateMappingRule rule = new StateMappingRule(contextStateManagerName, sourceType, criteria, stateValue);
+
+
+                //then we update condition so that it remembers source types in the future.
+                condition.setSourceType(sourceType);
+                //it also remembers which state is monitors.
+                condition.setStateName(rule.getName());
+
+                Log.d(LOG_TAG, "[assignTasksToContextStateManager] adding a rule:" +
+                        "the rule is: " + rule.toString() + " is for " + contextStateManagerName);
+
+                assignMonitoringTasks(contextStateManagerName, rule);
+
+            }
+
+        }
+
+        /**2. assign logging task to contextStateManagers **/
+        for (int j=0; j<mLoggingTaskList.size(); j++) {
+
+            //get loggingTask
+            LoggingTask loggingTask= mLoggingTaskList.get(j);
+
+            //then we find the ContextStateManager for loggintask according to the sourceType
+            String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
+
+
+            Log.d(LOG_TAG, "[assignTasksToContextStateManager][testing logging task and requested] assign loggingtask " + loggingTask.getSource()
+                     + " to " +contextStateManagerName);
+
+            //then we add the loggingTask to the right ContextStateManager's active Logging Task
+            assignLoggingTask(contextStateManagerName, loggingTask);
+
+        }
+
+
+        /**3. Assigne BackgroundLoggingTask to ContextStateMananger**/
+        //we update the status of the LoggingTask in the ContextStateManager
+
+        //for each loggingTask ids, we first locate the LoggingTask from ContextManager
+        for (int m=0; m<getBackgroundLoggingSetting().getLoggingTasks().size(); m++){
+
+            LoggingTask loggingTask= getLoggingTask(getBackgroundLoggingSetting().getLoggingTasks().get(m));
+
+            //then we find the ContextStateManager for the sourceType
+            String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
+
+            //we update the status of the LoggingTask in the ContextStateManager
+            updateLoggingTasksInContextStateManager(contextStateManagerName, loggingTask);
+
+        }
+
+    }
+
+
     /*******************************************************************************************/
     /************************************** Main Thread ****************************************/
     /*******************************************************************************************/
@@ -431,12 +534,13 @@ public class ContextManager {
                 if (getBackgroundLoggingSetting().isEnabled()){
 
                     ArrayList<Integer> loggingTaskIds = getBackgroundLoggingSetting().getLoggingTasks();
+
+                    //we skip starting action and directly save Records to the DB
                     copyRecordFromLocalRecordPoolToPublicRecordPool(loggingTaskIds);
 
                     //save data from publie record pool to database
                     DataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
                 }
-
 
                 /**2.
                  * The second task is to update transportation mode. Transporation Manager will use the latet activity label
@@ -493,6 +597,21 @@ public class ContextManager {
     /********************************* Logging Task Related ************************************/
     /*******************************************************************************************/
 
+
+    public static boolean isLoggingTaskContainedInBackGroundLogging(int id) {
+
+        Log.d(LOG_TAG, "[testing logging task and requested] find the loggingTask " + id
+                + " in BackgroundLogging ");
+        //if we find the loggingTask id in the BackgroundLogging Task List, we return true.
+        for (int i=0; i<getBackgroundLoggingSetting().getLoggingTasks().size() ; i++){
+
+            if (id==getBackgroundLoggingSetting().getLoggingTasks().get(i))
+                Log.d(LOG_TAG, "[testing logging task and requested] the loggingTask " + id
+                        + " in FOUND in BackgroundLogging ");
+                return true;
+        }
+        return false;
+    }
 
 
     public static void addRecordToPublicRecordPool(Record record){
@@ -563,14 +682,136 @@ public class ContextManager {
         return mBackgroundLoggingSetting;
     }
 
+
+
     /**
    *
    * ContextMAnager assigns loggingTask to the right contextStateManagers with the LoggingTaskIDs.
    * @param loggingTaskIds
    */
-    public void assignActiveLoggingTasks(ArrayList<Integer> loggingTaskIds) {
+    public void executeLoggingTasksRequestedByAction(ArrayList<Integer> loggingTaskIds) {
 
-        Log.d(LOG_TAG, " [testing logging task and requested] in assignLoggingTasks ");
+        //for each loggingTask ids, we first locate the LoggingTask from ContextManager
+        for (int i=0; i<loggingTaskIds.size(); i++){
+
+            //if the id has not been added to the list, add it
+            if (!mLoggingTaskByActionList.contains(loggingTaskIds.get(i)))
+                mLoggingTaskByActionList.add(loggingTaskIds.get(i));
+
+            LoggingTask loggingTask= getLoggingTask(loggingTaskIds.get(i));
+
+            //then we find the ContextStateManager for the sourceType
+            String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
+
+            //we update the status of the LoggingTask in the ContextStateManager
+            updateLoggingTasksInContextStateManager(contextStateManagerName, loggingTask);
+
+        }
+    }
+
+    /**
+     * When a savingRecordAction is stopped we remove the loggingTasks from the mLoggingTaskByActionList
+     * @param loggingTaskIds
+     */
+    public void stopLoggingTasksRequestedByAction(ArrayList<Integer> loggingTaskIds){
+
+        for (int i=0; i<loggingTaskIds.size(); i++){
+            for (int j=0; j<mLoggingTaskByActionList.size(); j++) {
+                if (mLoggingTaskByActionList.get(j) == loggingTaskIds.get(i) ){
+                    //we first remove the loggingTask
+                    mLoggingTaskByActionList.remove(j);
+
+                    //we get the loggingTask object
+                    LoggingTask loggingTask= getLoggingTask(loggingTaskIds.get(i));
+
+                    //then we find the ContextStateManager for the sourceType
+                    String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
+
+                    //we update the status of the LoggingTask in the ContextStateManager
+                    updateLoggingTasksInContextStateManager(contextStateManagerName, loggingTask);
+
+                }
+            }
+
+        }
+    }
+
+
+    /**
+     * this function determines whether to enable or disable LoggingTask in a ContextStateManager,
+     * based on whether the loggingTask is requrested by a BackgroundLogging or by an Action
+     * @param contextStateManagerName
+     * @param loggingTask
+     */
+    private void updateLoggingTasksInContextStateManager(String contextStateManagerName, LoggingTask loggingTask) {
+
+        Log.d(LOG_TAG, " [testing logging task and requested] updateLoggingTask " + loggingTask.getSource());
+
+        boolean isPerformedByBackgroundLogging = false;
+        boolean isPerformedByAction = false;
+        boolean isRequested = false;
+
+
+        //check if the loggintask is still in a BackgroundLogging
+        if (getBackgroundLoggingSetting().isEnabled() && getBackgroundLoggingSetting().getLoggingTasks().contains(loggingTask.getId())){
+            isPerformedByBackgroundLogging = true;
+            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is included in BackgroundRecording " );
+
+        }
+
+        //check if the loggingtask is requested by an action
+        if (mLoggingTaskByActionList.contains(loggingTask.getId())){
+            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is performed by an Action " );
+            isPerformedByAction = true;
+        }
+
+        isRequested = isPerformedByAction | isPerformedByBackgroundLogging;
+        Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " should be enabled!! " );
+
+
+        if (isRequested){
+            enableLoggingTask(contextStateManagerName, loggingTask);
+        }
+        else {
+            disableLoggingTask(contextStateManagerName, loggingTask);
+        }
+
+    }
+
+
+    /**
+     * add the input loggingTask to the activeLoggingTaskList of the corresponding ContextStateManasger
+     * @param contextStateManagerName
+     * @param loggingTask
+     */
+    private void enableLoggingTask(String contextStateManagerName, LoggingTask loggingTask) {
+
+        Log.d(LOG_TAG, " [testing logging task and requested] enable logging task: " +
+                loggingTask.getSource() + " to " + contextStateManagerName);
+
+        //to execute a logging task is to set its Enagled to True.
+        if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
+            mActivityRecognitionManager.updateLoggingTask(loggingTask, true);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))
+            mPhoneStatusManager.updateLoggingTask(loggingTask, true);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_LOCATION))
+            mLocationManager.updateLoggingTask(loggingTask, true);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR))
+            mPhoneSensorManager.updateLoggingTask(loggingTask, true);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION))
+            mTransportationModeManager.updateLoggingTask(loggingTask, true);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION))
+            mUserInteractionManager.updateLoggingTask(loggingTask, true);
+
+    }
+
+
+    /**
+     *
+     * ContextMAnager assigns loggingTask to the right contextStateManagers with the LoggingTaskIDs.
+     * @param loggingTaskIds
+     */
+    public void disableLoggingTasks(ArrayList<Integer> loggingTaskIds) {
 
         //for each loggingTask ids, we first locate the LoggingTask from ContextManager
         for (int i=0; i<loggingTaskIds.size(); i++){
@@ -581,11 +822,9 @@ public class ContextManager {
             String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
 
             //then we add the loggingTask to the right ContextStateManager's active Logging Task
-            assignActiveLoggingTasks(contextStateManagerName, loggingTask);
+            disableLoggingTask(contextStateManagerName, loggingTask);
 
         }
-
-
     }
 
     /**
@@ -593,23 +832,52 @@ public class ContextManager {
      * @param contextStateManagerName
      * @param loggingTask
      */
-    private void assignActiveLoggingTasks(String contextStateManagerName, LoggingTask loggingTask) {
+    private void disableLoggingTask(String contextStateManagerName, LoggingTask loggingTask) {
 
-        Log.d(LOG_TAG, " [testing logging task and requested] assign  logging task: " +
+        Log.d(LOG_TAG, " [testing logging task and requested] disable logging task: " +
                 loggingTask.getSource() + " to " + contextStateManagerName);
 
+        //to execute a logging task is to set its Enagled to True.
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
-            mActivityRecognitionManager.addActiveLoggingTask(loggingTask);
+            mActivityRecognitionManager.updateLoggingTask(loggingTask, false);
         else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))
-            mPhoneStatusManager.addActiveLoggingTask(loggingTask);
+            mPhoneStatusManager.updateLoggingTask(loggingTask, false);
         else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_LOCATION))
-            mLocationManager.addActiveLoggingTask(loggingTask);
+            mLocationManager.updateLoggingTask(loggingTask, false);
         else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR))
-            mPhoneSensorManager.addActiveLoggingTask(loggingTask);
+            mPhoneSensorManager.updateLoggingTask(loggingTask, false);
         else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION))
-            mTransportationModeManager.addActiveLoggingTask(loggingTask);
+            mTransportationModeManager.updateLoggingTask(loggingTask, false);
         else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION))
-            mUserInteractionManager.addActiveLoggingTask(loggingTask);
+            mUserInteractionManager.updateLoggingTask(loggingTask, false);
+
+    }
+
+
+
+
+    /**
+     * add the input loggingTask to the activeLoggingTaskList of the corresponding ContextStateManasger
+     * @param contextStateManagerName
+     * @param loggingTask
+     */
+    private void assignLoggingTask(String contextStateManagerName, LoggingTask loggingTask) {
+
+//        Log.d(LOG_TAG, " [testing logging task and requested] assign  logging task: " +
+//                loggingTask.getSource() + " to " + contextStateManagerName);
+
+        if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
+            mActivityRecognitionManager.addLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))
+            mPhoneStatusManager.addLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_LOCATION))
+            mLocationManager.addLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR))
+            mPhoneSensorManager.addLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION))
+            mTransportationModeManager.addLoggingTask(loggingTask);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION))
+            mUserInteractionManager.addLoggingTask(loggingTask);
 
     }
 
@@ -662,66 +930,6 @@ public class ContextManager {
     /********************************* Monitoring Related** ************************************/
     /*******************************************************************************************/
 
-
-
-    /**
-     * this function updates the tasks that each ContextStateManager need to perform
-     */
-    public void updateTasksInContextStateManager() {
-
-        Log.d(LOG_TAG, "[updateTasksInContextStateManager] ");
-
-        /**assign monitoring task to contextStateManagers **/
-        for (int i=0; i<getCircumstanceList().size(); i++){
-
-            //creating StateMappingRule and add to the relevant ContextStateManagers
-            Circumstance circumstance = getCircumstanceList().get(i);
-
-            //get conditions in each circumstance
-            for (int j=0; j< circumstance.getConditionList().size(); j++) {
-
-                Condition condition = circumstance.getConditionList().get(j);
-
-                //for each condition, we need to know which ContextStateManager will need to generate a state
-                // for that condition.
-                String contextStateManagerName = getContextStateManagerName(condition.getSource());
-
-                //we give contextStateManager a list of criteria for each state.
-                ArrayList<StateValueCriterion> criteria = condition.getStateValueCriteria();
-
-                //If the criteria are met, it changes the state to the value
-                String stateValue = condition.getStateValue();
-
-                Log.d(LOG_TAG, "[updateTasksInContextStateManager] condition for " + contextStateManagerName
-                        + " source: " + condition.getSource() );
-
-                int sourceType = getSourceTypeFromName(contextStateManagerName, condition.getSource());
-
-                //condition originall saves string of source, becuase it is specified by users. We need to
-                //find the corresponding source type.
-                Log.d(LOG_TAG, "[updateTasksInContextStateManager] condition for " + contextStateManagerName
-                        + " source: " + condition.getSource() + " soucetype: " +
-                        getSourceTypeFromName(contextStateManagerName, condition.getSource()));
-
-                //generate a sateMappingRule for the ContextStateManager to use to monitor the state
-                StateMappingRule rule = new StateMappingRule(contextStateManagerName, sourceType, criteria, stateValue);
-
-
-                //then we update condition so that it remembers source types in the future.
-                condition.setSourceType(sourceType);
-                //it also remembers which state is monitors.
-                condition.setStateName(rule.getName());
-
-                Log.d(LOG_TAG, "[updateTasksInContextStateManager] adding a rule:" +
-                        "the rule is: " + rule.toString() + " is for " + contextStateManagerName);
-
-                assignMonitoringTasks(contextStateManagerName, rule);
-
-            }
-
-        }
-
-    }
 
     /**
      *

@@ -11,17 +11,17 @@ public class LoggingTask {
     protected int mId;
     //if there's any current logging session (including background recording) specifying the
     // loggingTask, it is active
-    protected boolean mActive;
+    protected boolean mEnabled;
 
     public LoggingTask() {
-        mActive = false;
+        mEnabled = false;
     }
 
     public LoggingTask(int id, String source) {
 
         mSourceString = source;
         mId = id;
-        mActive = false;
+        mEnabled = false;
     }
 
     public int getSourceType() {
@@ -40,11 +40,11 @@ public class LoggingTask {
         return mId;
     }
 
-    public boolean isActive() {
-        return mActive;
+    public boolean isEnabled() {
+        return mEnabled;
     }
 
-    public void setActive(boolean active) {
-        this.mActive = active;
+    public void setEnabled(boolean active) {
+        this.mEnabled = active;
     }
 }
