@@ -380,7 +380,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     protected  void registerRequestedSensor(ContextSource sensor) {
 
-        Log.d(LOG_TAG, "[testing Sensor] now checking sensor " +sensor.getName() + " requested ? " + sensor.isRequested() + " avaiiability: " + sensor.isAvailable() );
+        Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] now checking sensor " +sensor.getName() + " requested ? " + sensor.isRequested() + " avaiiability: " + sensor.isAvailable() );
 
         //only register sensor that is available and is requested.
         if (sensor.isAvailable() && sensor.isRequested()) {
@@ -390,7 +390,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
             //if registering the requested sensor succesfully, put it in the registered sensor list
             if (result){
-                Log.d(LOG_TAG, "[testing Sensor] add Sensor :" + sensor.getName() + " to the  mRegisteredSensorList");
+                Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] add Sensor :" + sensor.getName() + " to the  mRegisteredSensorList");
                 mRegisteredSensorList.add(sensor);
             }
 
@@ -738,6 +738,10 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     /**get Accelerometer values**/
     private void getAccelerometer(SensorEvent event) {
+
+
+        Log.d(LOG_TAG, "getting accelerometer:" + mAccele_x + " : " +  mAccele_y +  " : " + mAccele_y);
+
         mAccele_x = event.values[0];	// Acceleration force along the x axis (including gravity). m/s2
         mAccele_y = event.values[1];	// Acceleration force along the y axis (including gravity). m/s2
         mAccele_z = event.values[2];	// Acceleration force along the z axis (including gravity). m/s2
@@ -795,9 +799,12 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     /**get proximity values**/
     private void getProximity(SensorEvent event){
+
+//        Log.d(LOG_TAG, "getting proximity" + mProximity);
+
         mProximity = event.values[0];
 
-        saveRecordToLocalRecordPool(event.values);
+//        saveRecordToLocalRecordPool(event.values);
     }
 
     private void getAmbientTemperature(SensorEvent event){
@@ -809,6 +816,9 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     }
 
     private void getLight(SensorEvent event){
+
+        Log.d(LOG_TAG, "getting light" + mLight);
+
         mLight = event.values[0];
 
         saveRecordToLocalRecordPool(event.values);

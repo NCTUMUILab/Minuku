@@ -307,13 +307,13 @@ public class ContextManager {
         //TODO: depending on the source requested in the configuration, determine the source to use
 
         //get location information
-        requesLocationUpdate();
+       // requesLocationUpdate();
 
         //get activity information
-        requestActivityRecognitionUpdate();
+        //requestActivityRecognitionUpdate();
 
         //get sensor information from PhoneSensorManager
-        requestSensorUpdate();
+        //requestSensorUpdate();
 
 
         //get geofence transitions

@@ -532,14 +532,14 @@ public abstract class ContextStateManager {
     protected boolean isRequestedByActiveLoggingTasks(ContextSource contextSource) {
 
         for (int i=0; i<mLoggingTasks.size(); i++) {
-
-            Log.d(LOG_TAG, "[testing logging task and requested] isRequestedByActiveLoggingTasks " +
-                    "checking ContextSource " + contextSource.getName() + " with logging task" +
-                    mLoggingTasks.get(i).getSource());
-
-            Log.d(LOG_TAG, "[testing logging task and requested] comparing " +
-                    "ContextSourceName " + contextSource.getName() + " with source in LoggingTask Name" +
-                    mLoggingTasks.get(i).getSource());
+//
+//            Log.d(LOG_TAG, "[testing logging task and requested] isRequestedByActiveLoggingTasks " +
+//                    "checking ContextSource " + contextSource.getName() + " with logging task" +
+//                    mLoggingTasks.get(i).getSource());
+//
+//            Log.d(LOG_TAG, "[testing logging task and requested] comparing " +
+//                    "ContextSourceName " + contextSource.getName() + " with source in LoggingTask Name" +
+//                    mLoggingTasks.get(i).getSource());
 
             //find the logging task containing the contextsource and see if the loggingTask is enabled
             if (contextSource.getName().equals( mLoggingTasks.get(i).getSource() )
@@ -553,38 +553,38 @@ public abstract class ContextStateManager {
         return false;
     }
 
-    /**
-     * This function takes a ContextSource and examines whether it is requested by a BackgroundRecording
-     * @param contextSource
-     * @return
-     */
-    protected boolean isRequestedByBackgroundLoggingTasks(ContextSource contextSource) {
-
-        Log.d(LOG_TAG, "[testing logging task and requested] check whether ContextSource " + contextSource.getName() +
-                " is requested  by BackgroundLogging ");
-
-        boolean isRequested = false;
-
-        //find the logging Task and see if that's in backgroundLogging
-        for (int i=0; i<mLoggingTasks.size(); i++) {
-
-            Log.d(LOG_TAG, "[testing logging task and requested] checking loggingTask" +   mLoggingTasks.get(i).getSource());
-
-            //find the loggingtask containing the contextsource
-            if (contextSource.getName().equals( mLoggingTasks.get(i).getSource() )){
-                Log.d(LOG_TAG, "[testing logging task and requested] find the loggingTask " + mLoggingTasks.get(i).getSource()
-                 + mLoggingTasks.get(i).getId());
-
-                //find if that's in BackgroundLogging (using id)
-                isRequested = ContextManager.isLoggingTaskContainedInBackGroundLogging(mLoggingTasks.get(i).getId());
-
-            }
-        }
-
-        Log.d(LOG_TAG, "[testing logging task and requested] the loggingTask requested by BackgroundLogging " + isRequested);
-
-        return isRequested;
-    }
+//    /**
+//     * This function takes a ContextSource and examines whether it is requested by a BackgroundRecording
+//     * @param contextSource
+//     * @return
+//     */
+//    protected boolean isRequestedByBackgroundLoggingTasks(ContextSource contextSource) {
+//
+//        Log.d(LOG_TAG, "[testing logging task and requested] check whether ContextSource " + contextSource.getName() +
+//                " is requested  by BackgroundLogging ");
+//
+//        boolean isRequested = false;
+//
+//        //find the logging Task and see if that's in backgroundLogging
+//        for (int i=0; i<mLoggingTasks.size(); i++) {
+//
+//            Log.d(LOG_TAG, "[testing logging task and requested] checking loggingTask" +   mLoggingTasks.get(i).getSource());
+//
+//            //find the loggingtask containing the contextsource
+//            if (contextSource.getName().equals( mLoggingTasks.get(i).getSource() )){
+//                Log.d(LOG_TAG, "[testing logging task and requested] find the loggingTask " + mLoggingTasks.get(i).getSource()
+//                 + mLoggingTasks.get(i).getId());
+//
+//                //find if that's in BackgroundLogging (using id)
+//                isRequested = ContextManager.isLoggingTaskContainedInBackGroundLogging(mLoggingTasks.get(i).getId());
+//
+//            }
+//        }
+//
+//        Log.d(LOG_TAG, "[testing logging task and requested] the loggingTask requested by BackgroundLogging " + isRequested);
+//
+//        return isRequested;
+//    }
 
 
     /**
