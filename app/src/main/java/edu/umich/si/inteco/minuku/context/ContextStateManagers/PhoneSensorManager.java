@@ -234,6 +234,41 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         return;
     }
 
+    /**
+     *For each ContextSource we check whether it is requested and update its request status
+     */
+    protected void updateContextSourceListRequestStatus() {
+
+        boolean isRequested = false;
+
+        for (int i=0; i<mContextSourceList.size(); i++){
+
+            ContextSource source = mContextSourceList.get(i);
+
+            mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(source));
+            Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource "
+                    + source.getName() + " requested: " + source.isRequested());
+
+            isRequested = mContextSourceList.get(i).isRequested();
+
+            //If neither AllProbableActivities nor MostProbableActivity are requested, we should stop requesting activity information
+            if (isRequested){
+                Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting informatoin because it is not needed anymore");
+
+                //TODO: check if the contextsource is currently getting update, if not, start update
+                if (!mRegisteredSensorList.contains(source)){
+                    registerRequestedSensor(source);
+                }
+            }
+            else {
+                //TODO: check if the contextsource is currently getting update, if yes, remove update
+                if (!mRegisteredSensorList.contains(source)){
+                    unRegisterSensor(source);
+                }
+            }
+        }
+    }
+
 
     /** this takes samplingMode as a String value and then use SensorManager's four update delay
      * Normal, UI, Game, and Fatest */
@@ -262,7 +297,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     @Override
     public void requestUpdates() {
         //only register the requested sensors
-        registerRequestedSensor();
+        registerRequestedSensors();
     }
 
     /**
@@ -329,11 +364,36 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
     }
 
+
     /**
      * register all the available and requested sensor list
      */
 
-    protected  void registerRequestedSensor() {
+    protected  void registerRequestedSensor(ContextSource sensor) {
+
+        Log.d(LOG_TAG, "[testing Sensor] now checking sensor " +sensor.getName() + " requested ? " + sensor.isRequested() + " avaiiability: " + sensor.isAvailable() );
+
+        //only register sensor that is available and is requested.
+        if (sensor.isAvailable() && sensor.isRequested()) {
+
+            //we register sensor using its name and samplingMode: Normal, UI, Game, or Fastest
+            boolean result =registerSensorByName(sensor.getName(), sensor.getSamplingMode());
+
+            //if registering the requested sensor succesfully, put it in the registered sensor list
+            if (result){
+                Log.d(LOG_TAG, "[testing Sensor] add Sensor :" + sensor.getName() + " to the  mRegisteredSensorList");
+                mRegisteredSensorList.add(sensor);
+            }
+
+        }
+
+    }
+
+    /**
+     * register all the available and requested sensor list
+     */
+
+    protected  void registerRequestedSensors() {
 
         Log.d(LOG_TAG, "testing registerSensor in updateContextSourceList \");\n] registerRequestedSensor, the size of mContextSource is" + mContextSourceList.size());
         /** If for some reason you do need to change the delay, you will have to unregister and reregister the sensor listener.
@@ -344,23 +404,25 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
             ContextSource  sensor = mContextSourceList.get(i);
             Log.d(LOG_TAG, "[testing Sensor] now checking sensor " +sensor.getName() + " requested ? " + sensor.isRequested() + " avaiiability: " + sensor.isAvailable() );
 
-            //only register sensor that is available and is requested.
-            if (sensor.isAvailable() && sensor.isRequested()) {
-
-                //we register sensor using its name and samplingMode: Normal, UI, Game, or Fastest
-                boolean result =registerSensorByName(sensor.getName(), sensor.getSamplingMode());
-
-                //if registering the requested sensor succesfully, put it in the registered sensor list
-                if (result){
-                    Log.d(LOG_TAG, "[testing Sensor] add Sensor :" + sensor.getName() + " to the  mRegisteredSensorList");
-                    mRegisteredSensorList.add(sensor);
-                }
-
-            }
+            //register the sensor
+            registerRequestedSensor(sensor);
 
         }
     }
 
+    /**
+     * unregister all the sensors
+     */
+    protected void unRegisterSensor(ContextSource source){
+       
+        //unregister
+        unregisterSensorByName(source.getName(), source.getSamplingMode());
+
+        //clear the mRegisteredSensorList too.
+        mRegisteredSensorList.remove(source);
+    }
+
+    
     /**
      * unregister all the sensors
      */
@@ -468,6 +530,98 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         }
     }
 
+    /** we need to use the setting: use ContextSourceList to get the setting for each ContextSource**/
+    protected void unregisterSensorByName(String name, int mode) {
+
+        switch (name){
+
+            //accelerometer
+            case Sensor.STRING_TYPE_ACCELEROMETER:
+
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)) ;
+
+                return ;
+            //gyriscope
+            case Sensor.STRING_TYPE_GYROSCOPE:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
+                return ;
+            //gravity
+            case Sensor.STRING_TYPE_GRAVITY:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY));
+
+                return;
+            case Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR));
+
+                return;
+            case Sensor.STRING_TYPE_LINEAR_ACCELERATION:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION));
+
+                return;
+
+            case Sensor.STRING_TYPE_PROXIMITY:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY));
+
+                return;
+
+
+            //ambient temperature
+            case Sensor.STRING_TYPE_AMBIENT_TEMPERATURE:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE));
+
+                return;
+            //light
+            case Sensor.STRING_TYPE_LIGHT:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
+
+
+                return;
+            //pressure
+            case Sensor.STRING_TYPE_PRESSURE:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE));
+
+                return;
+
+            //humidity
+            case Sensor.STRING_TYPE_RELATIVE_HUMIDITY:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY));
+
+                return;
+
+
+            case Sensor.STRING_TYPE_HEART_RATE:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE));
+
+                return;
+
+
+            case Sensor.STRING_TYPE_STEP_COUNTER:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER));
+
+                return;
+
+            case Sensor.STRING_TYPE_STEP_DETECTOR:
+                mSensorManager.unregisterListener(this,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR));
+
+                return;
+            default:
+                return;
+
+        }
+    }
 
 
 

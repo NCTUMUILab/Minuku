@@ -157,9 +157,24 @@ public abstract class ContextStateManager {
      */
     protected void updateContextSourceListRequestStatus() {
 
+        boolean isRequested = false;
+
         for (int i=0; i<mContextSourceList.size(); i++){
             mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
             Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
+
+            isRequested = mContextSourceList.get(i).isRequested();
+
+            //If neither AllProbableActivities nor MostProbableActivity are requested, we should stop requesting activity information
+            if (isRequested){
+                Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting informatoin because it is not needed anymore");
+
+                //TODO: check if the contextsource is currently getting update, if not, start update
+            }
+            else {
+                //TODO: check if the contextsource is currently getting update, if yes, remove update
+
+            }
         }
     }
 

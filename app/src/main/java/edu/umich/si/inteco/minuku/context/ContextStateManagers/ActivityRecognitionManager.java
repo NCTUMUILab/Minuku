@@ -230,7 +230,8 @@ public class ActivityRecognitionManager extends ContextStateManager
             connentClient();
         }
         else {
-            startActivityRecognitionUpdates();
+            stopActivityRecognitionUpdates();
+//            startActivityRecognitionUpdates();
 
             //after remove, disconnect the client.
             disconnectClient();
@@ -541,7 +542,7 @@ public class ActivityRecognitionManager extends ContextStateManager
             mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
             Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
 
-            //if any of two is requested, we still receive ActivityRecognitionUpdate
+            //if any of MostProbableActiivty or AllProbableActiivty is requested, we still receive ActivityRecognitionUpdate
             isRequested = isRequested | mContextSourceList.get(i).isRequested();
 
         }
@@ -549,7 +550,7 @@ public class ActivityRecognitionManager extends ContextStateManager
         if (!isRequested){
             Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting AR informatoin because it is not needed anymore");
             //TODO: need to create this in the study json to test (triggered logging AR)
-            stopActivityRecognitionUpdates();
+            removeUpdates();
         }
     }
 
