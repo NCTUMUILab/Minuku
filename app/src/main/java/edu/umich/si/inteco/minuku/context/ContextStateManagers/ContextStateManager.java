@@ -533,7 +533,13 @@ public abstract class ContextStateManager {
 
         for (int i=0; i<mLoggingTasks.size(); i++) {
 
-//            Log.d(LOG_TAG, "[testing logging task and requested] isRequestedByActiveLoggingTasks checking ContextSource " + contextSource.getName() + " with logging task" +  mLoggingTasks.get(i).getSource());
+            Log.d(LOG_TAG, "[testing logging task and requested] isRequestedByActiveLoggingTasks " +
+                    "checking ContextSource " + contextSource.getName() + " with logging task" +
+                    mLoggingTasks.get(i).getSource());
+
+            Log.d(LOG_TAG, "[testing logging task and requested] comparing " +
+                    "ContextSourceName " + contextSource.getName() + " with source in LoggingTask Name" +
+                    mLoggingTasks.get(i).getSource());
 
             //find the logging task containing the contextsource and see if the loggingTask is enabled
             if (contextSource.getName().equals( mLoggingTasks.get(i).getSource() )

@@ -39,6 +39,21 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     private static Context mContext;
     private static SensorManager mSensorManager ;
 
+    public static final String PHONE_SENSOR_ACCELEROMETER = "Sensor.Accelerometer";
+    public static final String PHONE_SENSOR_LINEAR_ACCELERATION = "Sensor.LinearAcceleration";
+    public static final String PHONE_SENSOR_ROTATION_VECTOR = "Sensor.RotationVector";
+    public static final String PHONE_SENSOR_GRAVITY = "Sensor.Gravity";
+    public static final String PHONE_SENSOR_GYROSCOPE = "Sensor.Gyroscope";
+    public static final String PHONE_SENSOR_LIGHT = "Sensor.Light";
+    public static final String PHONE_SENSOR_MAGNETIC_FIELD = "Sensor.MagneticField";
+    public static final String PHONE_SENSOR_PRESSURE = "Sensor.Pressure";
+    public static final String PHONE_SENSOR_PROXIMITY = "Sensor.Proximity";
+    public static final String PHONE_SENSOR_AMBIENT_TEMPERATURE = "Sensor.AmbientTemperature";
+    public static final String PHONE_SENSOR_RELATIVE_HUMIDITY = "Sensor.RelativeHumidity";
+    public static final String PHONE_SENSOR_STEP_COUNTER = "Sensor.StepCounter";
+    public static final String PHONE_SENSOR_STEP_DETECTOR = "Sensor.StepDetector";
+    public static final String PHONE_SENSOR_HEART_RATE = "Sensor.HeartRate";
+
     /**Motion Sensors**/
     private static float mAccele_x, mAccele_y, mAccele_z;
     private static float mGyroscope_x, mGyroscope_y, mGyroscope_z;
@@ -92,7 +107,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_ACCELEROMETER,
+                        PHONE_SENSOR_ACCELEROMETER,
                         Sensor.TYPE_ACCELEROMETER,
                         //if it is not null, return true, else, return false
                         (mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null),
@@ -101,21 +116,21 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_LINEAR_ACCELERATION,
+                        PHONE_SENSOR_LINEAR_ACCELERATION,
                         Sensor.TYPE_LINEAR_ACCELERATION,
                         (mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)!=null),
                         SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_ROTATION_VECTOR,
+                        PHONE_SENSOR_ROTATION_VECTOR,
                         Sensor.TYPE_ROTATION_VECTOR,
                         (mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) != null),
                         SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_GRAVITY,
+                        PHONE_SENSOR_GRAVITY,
                         Sensor.TYPE_GRAVITY,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null,
                         SensorManager.SENSOR_DELAY_NORMAL));
@@ -123,7 +138,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_GYROSCOPE,
+                        PHONE_SENSOR_GYROSCOPE,
                         Sensor.TYPE_GYROSCOPE,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null,
                         SensorManager.SENSOR_DELAY_NORMAL));
@@ -131,14 +146,14 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_LIGHT,
+                        PHONE_SENSOR_LIGHT,
                         Sensor.TYPE_LIGHT,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_MAGNETIC_FIELD,
+                        PHONE_SENSOR_MAGNETIC_FIELD,
                         Sensor.TYPE_MAGNETIC_FIELD,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
@@ -146,21 +161,21 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mContextSourceList.add(
                 new ContextSource(
-                Sensor.STRING_TYPE_PRESSURE,
+                PHONE_SENSOR_PRESSURE,
                 Sensor.TYPE_PRESSURE,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_PROXIMITY,
+                        PHONE_SENSOR_PROXIMITY,
                         Sensor.TYPE_PROXIMITY,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_AMBIENT_TEMPERATURE,
+                        PHONE_SENSOR_AMBIENT_TEMPERATURE,
                         Sensor.TYPE_AMBIENT_TEMPERATURE,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
@@ -168,7 +183,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_RELATIVE_HUMIDITY,
+                        PHONE_SENSOR_RELATIVE_HUMIDITY,
                         Sensor.TYPE_RELATIVE_HUMIDITY,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
@@ -176,28 +191,21 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_ROTATION_VECTOR,
-                        Sensor.TYPE_ROTATION_VECTOR,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!=null,
-                        SensorManager.SENSOR_DELAY_NORMAL));
-
-        mContextSourceList.add(
-                new ContextSource(
-                        Sensor.STRING_TYPE_STEP_COUNTER,
+                        PHONE_SENSOR_STEP_COUNTER,
                         Sensor.TYPE_STEP_COUNTER,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_STEP_DETECTOR,
+                        PHONE_SENSOR_STEP_DETECTOR,
                         Sensor.TYPE_STEP_DETECTOR,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
 
         mContextSourceList.add(
                 new ContextSource(
-                        Sensor.STRING_TYPE_HEART_RATE,
+                        PHONE_SENSOR_HEART_RATE,
                         Sensor.TYPE_HEART_RATE,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)!=null,
                         SensorManager.SENSOR_DELAY_NORMAL));
@@ -237,6 +245,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     /**
      *For each ContextSource we check whether it is requested and update its request status
      */
+    @Override
     protected void updateContextSourceListRequestStatus() {
 
         boolean isRequested = false;
@@ -442,35 +451,35 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         switch (name){
 
             //accelerometer
-            case Sensor.STRING_TYPE_ACCELEROMETER:
+            case PHONE_SENSOR_ACCELEROMETER:
                 result = mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                         mode);
                 return result;
                 //gyriscope
-            case Sensor.STRING_TYPE_GYROSCOPE:
+            case PHONE_SENSOR_GYROSCOPE:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),
                         mode);
                 return result;
                 //gravity
-            case Sensor.STRING_TYPE_GRAVITY:
+            case PHONE_SENSOR_GRAVITY:
                 result =mSensorManager.registerListener(this,
                             mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY),
                             mode);
                 return result;
-            case Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR:
+            case PHONE_SENSOR_ROTATION_VECTOR:
                 result =mSensorManager.registerListener(this,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR),
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
                         mode);
                 return result;
-            case Sensor.STRING_TYPE_LINEAR_ACCELERATION:
+            case PHONE_SENSOR_LINEAR_ACCELERATION:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION),
                         mode);
                 return result;
 
-            case Sensor.STRING_TYPE_PROXIMITY:
+            case PHONE_SENSOR_PROXIMITY:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY),
                         mode);
@@ -478,48 +487,48 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
 
             //ambient temperature
-            case Sensor.STRING_TYPE_AMBIENT_TEMPERATURE:
+            case PHONE_SENSOR_AMBIENT_TEMPERATURE:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE),
                         mode);
                 return result;
             //light
-            case Sensor.STRING_TYPE_LIGHT:
+            case PHONE_SENSOR_LIGHT:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),
                         mode);
 
                 return result;
             //pressure
-            case Sensor.STRING_TYPE_PRESSURE:
+            case PHONE_SENSOR_PRESSURE:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE),
                         mode);
                 return result;
 
             //humidity
-            case Sensor.STRING_TYPE_RELATIVE_HUMIDITY:
+            case PHONE_SENSOR_RELATIVE_HUMIDITY:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY),
                         mode);
                 return result;
 
 
-            case Sensor.STRING_TYPE_HEART_RATE:
+            case PHONE_SENSOR_HEART_RATE:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE),
                         mode);
                 return result;
 
 
-            case Sensor.STRING_TYPE_STEP_COUNTER:
+            case PHONE_SENSOR_STEP_COUNTER:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER),
                         mode);
                 return result;
 
 
-            case Sensor.STRING_TYPE_STEP_DETECTOR:
+            case PHONE_SENSOR_STEP_DETECTOR:
                 result =mSensorManager.registerListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR),
                         mode);
@@ -536,35 +545,35 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         switch (name){
 
             //accelerometer
-            case Sensor.STRING_TYPE_ACCELEROMETER:
+            case PHONE_SENSOR_ACCELEROMETER:
 
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)) ;
 
                 return ;
             //gyriscope
-            case Sensor.STRING_TYPE_GYROSCOPE:
+            case PHONE_SENSOR_GYROSCOPE:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
                 return ;
             //gravity
-            case Sensor.STRING_TYPE_GRAVITY:
+            case PHONE_SENSOR_GRAVITY:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY));
 
                 return;
-            case Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR:
+            case PHONE_SENSOR_ROTATION_VECTOR:
                 mSensorManager.unregisterListener(this,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR));
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR));
 
                 return;
-            case Sensor.STRING_TYPE_LINEAR_ACCELERATION:
+            case PHONE_SENSOR_LINEAR_ACCELERATION:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION));
 
                 return;
 
-            case Sensor.STRING_TYPE_PROXIMITY:
+            case PHONE_SENSOR_PROXIMITY:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY));
 
@@ -572,47 +581,47 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
 
             //ambient temperature
-            case Sensor.STRING_TYPE_AMBIENT_TEMPERATURE:
+            case PHONE_SENSOR_AMBIENT_TEMPERATURE:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE));
 
                 return;
             //light
-            case Sensor.STRING_TYPE_LIGHT:
+            case PHONE_SENSOR_LIGHT:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
 
 
                 return;
             //pressure
-            case Sensor.STRING_TYPE_PRESSURE:
+            case PHONE_SENSOR_PRESSURE:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE));
 
                 return;
 
             //humidity
-            case Sensor.STRING_TYPE_RELATIVE_HUMIDITY:
+            case PHONE_SENSOR_RELATIVE_HUMIDITY:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY));
 
                 return;
 
 
-            case Sensor.STRING_TYPE_HEART_RATE:
+            case PHONE_SENSOR_HEART_RATE:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE));
 
                 return;
 
 
-            case Sensor.STRING_TYPE_STEP_COUNTER:
+            case PHONE_SENSOR_STEP_COUNTER:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER));
 
                 return;
 
-            case Sensor.STRING_TYPE_STEP_DETECTOR:
+            case PHONE_SENSOR_STEP_DETECTOR:
                 mSensorManager.unregisterListener(this,
                         mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR));
 
