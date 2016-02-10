@@ -700,12 +700,12 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     /**
      * In PhoneSensorManager, all the values are float numbers
      */
-    protected void saveRecordToLocalRecordPool (float[] values) {
+    protected void saveRecordToLocalRecordPool (String sourceName, float[] values) {
 
         /** store values into a Record so that we can store them in the local database **/
         Record record = new Record();
         record.setTimestamp(ContextManager.getCurrentTimeInMillis());
-        record.setSource(Sensor.STRING_TYPE_ACCELEROMETER);
+        record.setSource(sourceName);
 
         /** create data in a JSON Object. Each CotnextSource will have different formats.
          * So we need each ContextSourceMAnager to implement this part**/
@@ -746,7 +746,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mAccele_y = event.values[1];	// Acceleration force along the y axis (including gravity). m/s2
         mAccele_z = event.values[2];	// Acceleration force along the z axis (including gravity). m/s2
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_ACCELEROMETER, event.values);
     }
 
 
@@ -756,7 +756,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mGyroscope_y = event.values[1];	// Rate of rotation around the y axis. rad/s
         mGyroscope_z = event.values[2];	// Rate of rotation around the z axis. rad/s
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_GYROSCOPE, event.values);
 
     }
 
@@ -767,7 +767,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mGravity_y = event.values[1];	// Force of gravity along the y axis m/s2
         mGravity_z = event.values[2];	// Force of gravity along the z axis m/s2
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_GRAVITY, event.values);
     }
     /**get linear acceleration values**/
     private void getLinearAcceleration(SensorEvent event) {
@@ -775,7 +775,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mLinearAcceleration_y = event.values[1];	//Acceleration force along the y axis (excluding gravity).  m/s2
         mLinearAcceleration_z = event.values[2];	//Acceleration force along the z axis (excluding gravity).  m/s2
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_LINEAR_ACCELERATION, event.values);
     }
 
     /**get rotation vector values**/
@@ -785,7 +785,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mRotationVector_z_sin = event.values[2];	//  Rotation vector component along the z axis (z * sin(�c/2)). Unitless
         mRotationVector_cos = event.values[3];		// Scalar component of the rotation vector ((cos(�c/2)).1 Unitless
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_ROTATION_VECTOR, event.values);
     }
 
     /**get magnetic field values**/
@@ -794,7 +794,7 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mMagneticField_y = event.values[1];	// Geomagnetic field strength along the y axis.
         mMagneticField_z = event.values[2];	// Geomagnetic field strength along the z axis.
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_MAGNETIC_FIELD, event.values);
     }
 
     /**get proximity values**/
@@ -804,14 +804,14 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mProximity = event.values[0];
 
-//        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_PROXIMITY, event.values);
     }
 
     private void getAmbientTemperature(SensorEvent event){
         /* Environment Sensors */
         mAmbientTemperature = event.values[0];
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_AMBIENT_TEMPERATURE, event.values);
 
     }
 
@@ -821,38 +821,38 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
         mLight = event.values[0];
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_LIGHT, event.values);
     }
 
     private void getPressure(SensorEvent event){
         mPressure = event.values[0];
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_PRESSURE, event.values);
     }
 
     private void getRelativeHumidity(SensorEvent event){
         mRelativeHumidity = event.values[0];
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_RELATIVE_HUMIDITY, event.values);
     }
 
     private void getHeartRate (SensorEvent event) {
         mHeartRate = event.values[0];
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_HEART_RATE, event.values);
     }
 
     private void getStepCounter (SensorEvent event) {
         mStepCount = event.values[0];
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_STEP_COUNTER, event.values);
 
     }
 
     private void getStepDetector (SensorEvent event) {
         mStepDetect = event.values[0];
 
-        saveRecordToLocalRecordPool(event.values);
+        saveRecordToLocalRecordPool(PHONE_SENSOR_STEP_DETECTOR, event.values);
     }
 
     /**get the current time in milliseconds**/
