@@ -29,11 +29,11 @@ public class Constants {
     public static final String CONFIGURATION_FILE_NAME_PARTI = "participatory_study.json";
 
     //Web serivce
-    public static final String WEB_SERVICE_URL_QUERY = "https://inteco.cloudapp.net:5001/query";
-    public static final String WEB_SERVICE_URL_POST_SESSION = "https://inteco.cloudapp.net:5001/postsession";
-    public static final String WEB_SERVICE_URL_POST_BACKGROUND_RECORDING = "https://inteco.cloudapp.net:5001/postbackgroundrecording";
-    public static final String WEB_SERVICE_URL_REQUEST_SENDING_EMAIL = "https://inteco.cloudapp.net:5001/request_sending_email";
-    public static final String WEB_SERVICE_URL_DEVICE_CHECKING = "http://inteco.cloudapp.net:5010/isalive";
+//    public static final String WEB_SERVICE_URL_QUERY = "https://inteco.cloudapp.net:5001/query";
+//    public static final String WEB_SERVICE_URL_POST_SESSION = "https://inteco.cloudapp.net:5001/postsession";
+//    public static final String WEB_SERVICE_URL_POST_BACKGROUND_RECORDING = "https://inteco.cloudapp.net:5001/postbackgroundrecording";
+//    public static final String WEB_SERVICE_URL_REQUEST_SENDING_EMAIL = "https://inteco.cloudapp.net:5001/request_sending_email";
+//    public static final String WEB_SERVICE_URL_DEVICE_CHECKING = "http://inteco.cloudapp.net:5010/isalive";
 
 
 	/**Google Play Service**/

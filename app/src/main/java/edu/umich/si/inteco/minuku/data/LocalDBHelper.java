@@ -558,6 +558,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	
     	//TODO: the user should be able to specify the database because each study may have a different database.
 
+        Log.d(LOG_TAG, "put session " + session.getId() + " source " +  session.getContextSourceNames() + " to table " + table_name);
 
 		long rowId=0;
 
@@ -940,7 +941,8 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     
     //get the number of existing session 
     public static long querySessionCount (){
-    	
+
+
     	long count = 0;
     	
     	try{
@@ -956,8 +958,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	}catch (Exception e){
     		
     	}
-
-    	return count;
+        return count;
     	
     }
     

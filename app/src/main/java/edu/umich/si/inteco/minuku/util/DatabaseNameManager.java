@@ -223,6 +223,7 @@ public class DatabaseNameManager {
 
 
     //JSON properties name for remote DB
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_OTHERS= "others";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION= "study_condition";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_NAME = "name";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP_HOUR = "timestamp_hour";
@@ -235,6 +236,7 @@ public class DatabaseNameManager {
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_ID = "_id";
     public static final String MONGO_DB_DOCUMENT_STUDY_CONDITION = "condition";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID = "device_id";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_USER_ID = "user_id";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID = "session_id";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT = "has_document";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_LAST_SYNC_HOUR_TIME = "last_sync_hour_time";

@@ -387,7 +387,7 @@ public class DataHandler {
 
         res = LocalDBHelper.queryRecordsInSession(
                 DatabaseNameManager.RECORD_TABLE_NAME_XYZ,
-                RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID,
+                RecordingAndAnnotateManager.BACKGOUND_LOGGING_SESSION_ID,
                 starTime,
                 endTime
                 );
@@ -460,7 +460,7 @@ public class DataHandler {
 				//execute the query
 				resultList = LocalDBHelper.queryWithoutColumn(
 						tableName,
-                        RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID,
+                        RecordingAndAnnotateManager.BACKGOUND_LOGGING_SESSION_ID,
 						timeConstraintList);
 				//Log.d(LOG_TAG, "[getDataByCondition] got " + resultList.size() + " of results from WithoutColumn");
 				
@@ -475,7 +475,7 @@ public class DataHandler {
 				//after getting table and column names, execute the query
 				resultList = LocalDBHelper.queryFromSingleColumn(
 						tableName,
-                        RecordingAndAnnotateManager.BACKGOUND_RECORDING_SESSION_ID,
+                        RecordingAndAnnotateManager.BACKGOUND_LOGGING_SESSION_ID,
 						columnName1, 
 						condition.getRelationship(), 
 						condition.getStringTargetValue(), 

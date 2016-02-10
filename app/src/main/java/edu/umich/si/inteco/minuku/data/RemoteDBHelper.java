@@ -8,8 +8,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,6 +41,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.model.Log.ProbeLog;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.FileHelper;
 import edu.umich.si.inteco.minuku.util.LogManager;
@@ -55,7 +56,7 @@ public class RemoteDBHelper {
     /** The time it takes for client to timeout */
     public static final int HTTP_TIMEOUT = 10000; // millisecond
     public static final int SOCKET_TIMEOUT = 20000; // millisecond
-    public static final long MINIMUM_UPDATE_FREQUENCY = 20* Constants.MILLISECONDS_PER_MINUTE; // 30 minutes
+    public static final long MINIMUM_UPDATE_FREQUENCY = 1* Constants.MILLISECONDS_PER_MINUTE; // 30 minutes
 
     public static final int POST_DATA_TYPE_JSON = 0;
     public static final int POST_DATA_TYPE_STRING = 1;
@@ -65,9 +66,45 @@ public class RemoteDBHelper {
     private static long lastLogfileUpdateTime=0;
     private static long lastSessionUpdateTime=0;
 
-    public static final String DATA_TYPE_BACKGROUND_RECORDING = "background_recording";
-    public static final String DATA_TYPE_SESSION_RECORDING = "session_recording";
+    public static final String DATA_TYPE_BACKGROUND_LOGGING = "background_recording";
+    public static final String DATA_TYPE_SESSION_LOGGING = "session_recording";
     public static final String DATA_TYPE_PHONE_LOG = "phone_log";
+
+
+    /**Query**/
+    public static boolean syncLogFiles = false;
+    public static boolean syncSessionLogging = false;
+    public static boolean syncBackgroundLogging = true;
+
+
+
+    //a list of server choice to query and post data
+    public static String REMOTE_SERVER_MICROSOFTAZZURE = "Azure";
+    public static String REMOTE_SERVER_AMAZON = "Amazon";
+    public static String REMOTE_SERVER_GOOGLEAPPENGINE = "GoogleAppEngine";
+    public static String REMOTE_SERVER_MONGOLAB = "MongoLab";
+
+    //the choice of server
+    public static String REMOTE_SERVER_CHOICE = REMOTE_SERVER_MONGOLAB;
+
+    /**MONGODBLAB**/
+
+    public static final String MONOGOLAB_APIKEY = "3z6I1uChYEVs0DKMBF_d-B_lUsRIlsmf";
+    public static final String MONGOLAB_APIKEY_PREFIX="?apiKey=";
+    public static final String MONGOLAB_DATABASE = "minuku";
+    public static final String MONGOLAB_URL = "https://api.mongolab.com/api/1/databases/";
+    public static final String MONGOLAB_DATABASE_MINUKU_COLLECTION_ISALIVE = "isalive";
+    public static final String MONGOLAB_DATABASE_MINUKU_COLLECTION_SESSION = "session";
+    public static final String MONGOLAB_DATABASE_MINUKU_COLLECTION_BACKGROUNDLOGGING = "backgroundlogging";
+
+    /**Google App Engine**/
+
+    /**Microsoft Azure**/
+    public static final String AZURE_WEB_SERVICE_URL_QUERY = "https://inteco.cloudapp.net:5001/query";
+    public static final String AZURE_WEB_SERVICE_URL_POST_SESSION = "https://inteco.cloudapp.net:5001/postsession";
+    public static final String AZURE_WEB_SERVICE_URL_POST_BACKGROUND_RECORDING = "https://inteco.cloudapp.net:5001/postbackgroundrecording";
+    public static final String AZURE_WEB_SERVICE_URL_REQUEST_SENDING_EMAIL = "https://inteco.cloudapp.net:5001/request_sending_email";
+    public static final String AZURE_WEB_SERVICE_URL_DEVICE_CHECKING = "http://inteco.cloudapp.net:5010/isalive";
 
 
 
@@ -144,11 +181,15 @@ public class RemoteDBHelper {
             if (now- getLastServerSyncTime() >= MINIMUM_UPDATE_FREQUENCY ) {
                 Log.d(LOG_TAG, "[syncWithRemoteDatabase][test modified session] tneed to query data now");
 
-                queryRemoteDB(DATA_TYPE_PHONE_LOG);
+                /**we only sync data when necessary**/
+                if (syncLogFiles)
+                    queryRemoteDB(DATA_TYPE_PHONE_LOG);
 
-                queryRemoteDB(DATA_TYPE_SESSION_RECORDING);
+                if (syncSessionLogging)
+                    queryRemoteDB(DATA_TYPE_SESSION_LOGGING);
 
-                queryRemoteDB(DATA_TYPE_BACKGROUND_RECORDING);
+                if (syncBackgroundLogging)
+                    queryRemoteDB(DATA_TYPE_BACKGROUND_LOGGING);
 
                 setLastSeverSyncTime(now);
             }
@@ -209,16 +250,42 @@ public class RemoteDBHelper {
 
 
     public static void postBackgroundRecordingDocuments(long lastSyncHourTime) {
-/*
+
+
+
         ArrayList<JSONObject> documents = RecordingAndAnnotateManager.getBackgroundRecordingDocuments(lastSyncHourTime);
+//        Log.d (LOG_TAG, "[postBackgroundRecordingDocuments][testing load session] the documents are:" + documents);
 
         if (documents!=null) {
             for (int i= 0; i<documents.size(); i++) {
                 String json = documents.get(i).toString();
-                new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_BACKGROUND_RECORDING, json, DATA_TYPE_BACKGROUND_RECORDING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
+                Log.d (LOG_TAG, "[postBackgroundRecordingDocuments][testing load session] document " + i + " is: " + json);
+
+
+                if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MONGOLAB)) {
+
+                    String url = MONGOLAB_URL + MONGOLAB_DATABASE + "/collections/" +
+                            MONGOLAB_DATABASE_MINUKU_COLLECTION_BACKGROUNDLOGGING + "/" +
+                            MONGOLAB_APIKEY_PREFIX + MONOGOLAB_APIKEY;
+
+                    new HttpAsyncPostJsonTask().execute(url,
+                            json,
+                            DATA_TYPE_BACKGROUND_LOGGING,
+                            ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
+
+
+                }
+                else if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MICROSOFTAZZURE)) {
+                    new HttpAsyncPostJsonTask().execute(
+                            AZURE_WEB_SERVICE_URL_POST_BACKGROUND_RECORDING,
+                            json,
+                            DATA_TYPE_BACKGROUND_LOGGING,
+                            ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
+
+                }
+
             }
         }
-*/
     }
 
 
@@ -234,7 +301,7 @@ public class RemoteDBHelper {
                     String time = documents.get(i).getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_START_TIME);
                     Log.d(LOG_TAG, "[postModifiedSessionDocuments][test modified session] post document " + documents.get(i).getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID) + " that starts at " + time);
                     String json = documents.get(i).toString();
-                    new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING, ScheduleAndSampleManager.getTimeString(0));
+                    new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_LOGGING, ScheduleAndSampleManager.getTimeString(0));
 
                     //we should make the modified flag of all uploaded documents to 0
                     int sessionId = documents.get(i).getInt(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SESSION_ID);
@@ -259,19 +326,19 @@ public class RemoteDBHelper {
         if (documents!=null) {
             for (int i= 0; i<documents.size(); i++) {
                 String json = documents.get(i).toString();
-                new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
+                new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_LOGGING, ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
             }
         }
 */
     }
 
 
-    public static String postSessionDocument(JSONObject sessionDocument){
+    public static String postSessionDocumentUsingPOST(JSONObject sessionDocument){
 
         String json = sessionDocument.toString();
 
         //post the session document
-        new HttpAsyncPostJsonTask().execute(Constants.WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_RECORDING);
+        new HttpAsyncPostJsonTask().execute(AZURE_WEB_SERVICE_URL_POST_SESSION, json, DATA_TYPE_SESSION_LOGGING);
 
         String res = null;
 
@@ -288,12 +355,13 @@ public class RemoteDBHelper {
 
 
     public static void queryRemoteDB(String queryType) {
-            new HttpAsyncQuery().execute(Constants.WEB_SERVICE_URL_QUERY, queryType);
+        Log.d(LOG_TAG, "syncWithRemoteDatabase queryRemoteDB");
+        new HttpAsyncQuery().execute(queryType);
     }
 
 
 
-    public static void queryLastFileDay(String address){
+    public static void queryLastFileDayUsingPOST(String address){
 
         //if today is 11th, we check whether files until 10th have been uploaded
         //get lastSynhour by query the MongoDB
@@ -305,10 +373,10 @@ public class RemoteDBHelper {
 
             URL url = new URL(address);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            Log.d(LOG_TAG, "[queryLastFileDay] connecting to " + address);
+            Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] connecting to " + address);
 
             if (url.getProtocol().toLowerCase().equals("https")) {
-                Log.d(LOG_TAG, "[queryLastFileDay] [using https]");
+                Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] [using https]");
                 trustAllHosts();
                 HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
                 https.setHostnameVerifier(DO_NOT_VERIFY);
@@ -351,7 +419,7 @@ public class RemoteDBHelper {
             int responseCode = conn.getResponseCode();
             inputStream = conn.getInputStream();
             result = convertInputStreamToString(inputStream);
-            Log.d(LOG_TAG, "[queryLastFileDay] the query responseCode "  + responseCode + " result is " + result);
+            Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] the query responseCode "  + responseCode + " result is " + result);
 
         }
         catch (NoSuchAlgorithmException e) {
@@ -374,7 +442,7 @@ public class RemoteDBHelper {
         SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW_HOUR_MIN);
         try {
             Date date = sdf.parse(result);
-            Log.d(LOG_TAG, "[queryLastFileDay] the date of the result is" + date);
+            Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] the date of the result is" + date);
             postLogFiles(date);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -384,13 +452,13 @@ public class RemoteDBHelper {
 
     public static void deviceChecking() {
 
-        new HttpAsyncDeviceChecking().execute(Constants.WEB_SERVICE_URL_DEVICE_CHECKING);
+        new HttpAsyncDeviceChecking().execute(AZURE_WEB_SERVICE_URL_DEVICE_CHECKING);
     }
 
     /**
      * this function periodically check in the server to show that the service is still alive
      */
-    public static void deviceCheckingTask(String address) {
+    public static void deviceCheckingTaskUsingPOST(String address) {
 
         //get lastSynhour by query the MongoDB
         InputStream inputStream = null;
@@ -443,7 +511,7 @@ public class RemoteDBHelper {
     }
 
 
-    public static void queryLastSyncSession(String address) {
+    public static void queryLastSyncSessionUsingPOST(String address) {
 
         //get lastSynhour by query the MongoDB
         InputStream inputStream = null;
@@ -453,10 +521,10 @@ public class RemoteDBHelper {
 
             URL url = new URL(address);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            Log.d(LOG_TAG, "[queryLastSyncSession] connecting to " + address);
+            Log.d(LOG_TAG, "[queryLastSyncSessionUsingPOST] connecting to " + address);
 
             if (url.getProtocol().toLowerCase().equals("https")) {
-                Log.d(LOG_TAG, "[queryLastSyncSession] [using https]");
+                Log.d(LOG_TAG, "[queryLastSyncSessionUsingPOST] [using https]");
                 trustAllHosts();
                 HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
                 https.setHostnameVerifier(DO_NOT_VERIFY);
@@ -481,7 +549,7 @@ public class RemoteDBHelper {
 
             JSONObject obj = new JSONObject();
             try {
-                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_SESSION_RECORDING);
+                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_SESSION_LOGGING);
                 obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_QUERY_DATA,
@@ -518,10 +586,10 @@ public class RemoteDBHelper {
         try {
             JSONObject resultJson = new JSONObject(result);
             String queryType = resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE);
-            Log.d(LOG_TAG, "[queryLastSyncSession] query type " + queryType);
+            Log.d(LOG_TAG, "[queryLastSyncSessionUsingPOST] query type " + queryType);
             if (resultJson.has(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT)) {
                 boolean hasDocument = Boolean.parseBoolean(resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT));
-                Log.d(LOG_TAG, "[queryLastSyncSession] the session recording has document? " + hasDocument);
+                Log.d(LOG_TAG, "[queryLastSyncSessionUsingPOST] the session recording has document? " + hasDocument);
 
                 //if the database has no background recording yet, we should submit all background recording
                 if (hasDocument) {
@@ -529,7 +597,7 @@ public class RemoteDBHelper {
                     //submit background recording until the recent hour
                     String lastSyncStartTimeStr = resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_START_TIME);
 
-                    Log.d(LOG_TAG, "[queryLastSyncSession] the startime of the last session is " + lastSyncStartTimeStr);
+                    Log.d(LOG_TAG, "[queryLastSyncSessionUsingPOST] the startime of the last session is " + lastSyncStartTimeStr);
 
                     SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
                     try {
@@ -549,23 +617,15 @@ public class RemoteDBHelper {
 
                 }
 
-
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
-
     }
 
 
-    /**
-     *
-     * @param address
-     */
-    public static void queryLastBackgroundRecordingLogSyncHour(String address){
+    public static void queryLastBackgroundLoggingSyncHourUsingGET(String address){
 
         //get lastSynhour by query the MongoDB
         InputStream inputStream = null;
@@ -575,10 +635,118 @@ public class RemoteDBHelper {
 
             URL url = new URL(address);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            Log.d(LOG_TAG, "[queryLastFileDay] connecting to " + address);
+            Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingGET] connecting to " + address);
+            int responseCode;
 
             if (url.getProtocol().toLowerCase().equals("https")) {
-                Log.d(LOG_TAG, "[queryLastFileDay] [using https]");
+                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingGET] [using https]");
+                trustAllHosts();
+                HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+                https.setHostnameVerifier(DO_NOT_VERIFY);
+                conn = https;
+            } else {
+                conn = (HttpURLConnection) url.openConnection();
+            }
+
+
+            SSLContext sc;
+            sc = SSLContext.getInstance("TLS");
+            sc.init(null, null, new java.security.SecureRandom());
+            conn.connect();
+
+            responseCode = conn.getResponseCode();
+            inputStream = conn.getInputStream();
+            result = convertInputStreamToString(inputStream);
+            Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastFileDayUsingPOST] the query responseCode "  + responseCode + " result is " + result);
+
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //result
+        try {
+            JSONArray response = new JSONArray(result);
+            Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] response JSONArray is " + response );
+
+
+            //TODO: if MongoLab has document, post BackgroundDocument since the last sync hour.
+
+            //TODO: if not, post all the background document
+
+            postBackgroundRecordingDocuments(0);
+
+
+//            JSONObject resultJson = new JSONObject(result);
+//            String queryType = resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE);
+//            Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] query type " + queryType);
+//            if (resultJson.has(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT)) {
+//                boolean hasDocument = Boolean.parseBoolean(resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT));
+//                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] the background recording has document? " + hasDocument);
+//
+//                //if the database has no background recording yet, we should submit all background recording
+//                if (hasDocument) {
+//
+//                    //submit background recording until the recent hour
+//                    String lastSyncHourStr = resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_LAST_SYNC_HOUR_TIME);
+//
+//                    Log.d(LOG_TAG, "syncWithRemoteDatabase the last sync hour is " + lastSyncHourStr);
+//
+//                    SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
+//                    try {
+//                        Date lastSynhHour = sdf.parse(lastSyncHourStr);
+//                        postBackgroundRecordingDocuments(lastSynhHour.getTime());
+//
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//
+//                }
+//                //no document
+//                else {
+//
+//                    postBackgroundRecordingDocuments(0);
+//
+//                }
+
+
+//            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
+     *
+     * @param address
+     */
+    public static void queryLastBackgroundLoggingSyncHourUsingPOST(String address){
+
+        //get lastSynhour by query the MongoDB
+        InputStream inputStream = null;
+        String result = "";
+
+        try {
+
+            URL url = new URL(address);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] connecting to " + address);
+
+            if (url.getProtocol().toLowerCase().equals("https")) {
+                Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] [using https]");
                 trustAllHosts();
                 HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
                 https.setHostnameVerifier(DO_NOT_VERIFY);
@@ -603,7 +771,7 @@ public class RemoteDBHelper {
 
             JSONObject obj = new JSONObject();
             try {
-                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_BACKGROUND_RECORDING);
+                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DATA_TYPE_BACKGROUND_LOGGING);
                 obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_QUERY_DATA,
@@ -619,7 +787,7 @@ public class RemoteDBHelper {
             int responseCode = conn.getResponseCode();
             inputStream = conn.getInputStream();
             result = convertInputStreamToString(inputStream);
-            Log.d(LOG_TAG, "[queryLastFileDay] the query responseCode "  + responseCode + " result is " + result);
+            Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] the query responseCode "  + responseCode + " result is " + result);
 
         }
         catch (NoSuchAlgorithmException e) {
@@ -639,10 +807,10 @@ public class RemoteDBHelper {
         try {
             JSONObject resultJson = new JSONObject(result);
             String queryType = resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE);
-            Log.d(LOG_TAG, "[queryLastBackgroundRecordingLogSyncHour] query type " + queryType);
+            Log.d(LOG_TAG, "[queryLastBackgroundLoggingSyncHourUsingPOST] query type " + queryType);
             if (resultJson.has(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT)) {
                 boolean hasDocument = Boolean.parseBoolean(resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT));
-                Log.d(LOG_TAG, "[queryLastBackgroundRecordingLogSyncHour] the background recording has document? " + hasDocument);
+                Log.d(LOG_TAG, "[queryLastBackgroundLoggingSyncHourUsingPOST] the background recording has document? " + hasDocument);
 
                 //if the database has no background recording yet, we should submit all background recording
                 if (hasDocument) {
@@ -699,10 +867,10 @@ public class RemoteDBHelper {
 
         try {
 
-            Log.d(LOG_TAG, "[queryLastFileDay] connecting to " + address);
+            Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] connecting to " + address);
 
             if (url.getProtocol().toLowerCase().equals("https")) {
-                Log.d(LOG_TAG, "[queryLastFileDay] [using https]");
+                Log.d(LOG_TAG, "[queryLastFileDayUsingPOST] [using https]");
                 trustAllHosts();
                 HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
                 https.setHostnameVerifier(DO_NOT_VERIFY);
@@ -824,7 +992,7 @@ public class RemoteDBHelper {
         String json  = data.toString();
 
        // Log.d(LOG_TAG, "[requestEmailFromServer] posting email" + json );
-        new HttpAsyncPostEmailJSONTask().execute(Constants.WEB_SERVICE_URL_REQUEST_SENDING_EMAIL, json);
+        new HttpAsyncPostEmailJSONTask().execute(AZURE_WEB_SERVICE_URL_REQUEST_SENDING_EMAIL, json);
 
     }
 
@@ -897,6 +1065,10 @@ public class RemoteDBHelper {
 
     public static String postJSON (String address, String json, String dataType, String lastSyncTime) {
 
+        Log.d(LOG_TAG, "[postJSON] post data to " + address);
+
+        LogManager.log(LogManager.LOG_TYPE_FILE_UPLOAD_LOG, "POSTJSON", json );
+
         InputStream inputStream = null;
         String result = "";
 
@@ -966,8 +1138,10 @@ public class RemoteDBHelper {
         BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
         String line = "";
         String result = "";
-        while((line = bufferedReader.readLine()) != null)
+        while((line = bufferedReader.readLine()) != null){
+            Log.d(LOG_TAG, "[syncWithRemoteDatabase] " + line);
             result += line;
+        }
 
         inputStream.close();
         return result;
@@ -981,24 +1155,61 @@ public class RemoteDBHelper {
         @Override
         protected String doInBackground(String... params) {
 
-            String url = params[0];
-            String queryTarget = params[1];
+            String url = "";
+            String queryTarget = params[0];
 
-            if (queryTarget.equals(DATA_TYPE_BACKGROUND_RECORDING)) {
-                Log.d(LOG_TAG, "going to query background recording");
-                queryLastBackgroundRecordingLogSyncHour(url);
+            Log.d(LOG_TAG, "syncWithRemoteDatabase HttpAsyncQuery");
+
+            if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MICROSOFTAZZURE)) {
+
+                if (queryTarget.equals(DATA_TYPE_BACKGROUND_LOGGING)) {
+                    Log.d(LOG_TAG, "syncWithRemoteDatabase going to query background recording");
+                    queryLastBackgroundLoggingSyncHourUsingPOST(url);
+                }
+                else if (queryTarget.equals(DATA_TYPE_PHONE_LOG)) {
+
+                    Log.d(LOG_TAG, "syncWithRemoteDatabase going to query log");
+                    queryLastFileDayUsingPOST(url);
+
+                }else if (queryTarget.equals(DATA_TYPE_SESSION_LOGGING)) {
+
+                    Log.d(LOG_TAG, "syncWithRemoteDatabase going to query session");
+                    queryLastSyncSessionUsingPOST(url);
+                    //query session and submit session
+                }
             }
-            else if (queryTarget.equals(DATA_TYPE_PHONE_LOG)) {
 
-                Log.d(LOG_TAG, "going to query log");
-                queryLastFileDay(url);
+            else if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MONGOLAB)) {
 
-            }else if (queryTarget.equals(DATA_TYPE_SESSION_RECORDING)) {
+                Log.d(LOG_TAG, "syncWithRemoteDatabase going to query background recording on MogoLab");
 
-                Log.d(LOG_TAG, "going to query session");
-                queryLastSyncSession(url);
-                //query session and submit session
+                url = MONGOLAB_URL + MONGOLAB_DATABASE ;
+
+
+                if (queryTarget.equals(DATA_TYPE_BACKGROUND_LOGGING)) {
+
+                    url += "/collections/" + MONGOLAB_DATABASE_MINUKU_COLLECTION_BACKGROUNDLOGGING + "/" +
+                            MONGOLAB_APIKEY_PREFIX + MONOGOLAB_APIKEY;
+
+//                    Log.d(LOG_TAG, "syncWithRemoteDatabase going to query background recording on MogoLab ON URL: " +url);
+
+                    queryLastBackgroundLoggingSyncHourUsingGET(url);
+                }
+                else if (queryTarget.equals(DATA_TYPE_PHONE_LOG)) {
+
+                    Log.d(LOG_TAG, "syncWithRemoteDatabase going to query log on MogoLab");
+//                    queryLastFileDayUsingGET(url);
+
+                }else if (queryTarget.equals(DATA_TYPE_SESSION_LOGGING)) {
+
+                    Log.d(LOG_TAG, "syncWithRemoteDatabase going to query session on MogoLab");
+//                    queryLastSyncSessionUsingGET(url);
+                    //query session and submit session
+                }
+
             }
+
+
 
             return "result";
         }
@@ -1079,7 +1290,7 @@ public class RemoteDBHelper {
             String result=null;
             String url = params[0];
 
-            deviceCheckingTask(url);
+            deviceCheckingTaskUsingPOST(url);
 
             return result;
         }

@@ -74,6 +74,8 @@ public class ContextManager {
 
     public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION = "ActivityRecognition";
     public static final String CONTEXT_SOURCE_NAME_TRANSPORTATION = "Transportation";
+    public static final String CONTEXT_SOURCE_NAME_APPLICATION_USAGE = "Applicaiton.Usage";
+    public static final String CONTEXT_SOURCE_NAME_APPLICATION_USER_ACTION = "Applicaiton.UserAction";
     public static final String CONTEXT_SOURCE_NAME_LOCATION = "Location";
     public static final String CONTEXT_SOURCE_NAME_SENSOR = "Sensor";
     public static final String CONTEXT_SOURCE_NAME_SENSOR_PROXIMITY = "Sensor.Proximity";

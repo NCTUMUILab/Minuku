@@ -22,6 +22,7 @@ public class LogManager {
     public static final String LOG_TYPE_TRAVEL_LOG = "User-Travel-Log";
     public static final String LOG_TYPE_CHECKPOINT_LOG = "User-Checkpoint-Log";
     public static final String LOG_TYPE_BETWEEN_CHECKPOINTS_LOG = "User-BetweenCheckpoints-Log";
+    public static final String LOG_TYPE_FILE_UPLOAD_LOG = "Server-Communication-Log";
 
     public static final String LOG_TAG_TRAVEL_HISTORY = "TRAVEL";
 	public static final String LOG_TAG_ACTIVITY_RECOGNITION = "AR";

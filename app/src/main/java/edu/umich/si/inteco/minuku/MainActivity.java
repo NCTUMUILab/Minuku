@@ -66,7 +66,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         mTracker = application.getDefaultTracker();
 
         //RemoteDBHelper.syncWithRemoteDatabase();
-        // Log.d(LOG_TAG, "[queryLastBackgroundRecordingLogSyncHour] get the synTime is " + lastSynhour);
+        // Log.d(LOG_TAG, "[queryLastBackgroundLoggingSyncHourUsingPOST] get the synTime is " + lastSynhour);
 
         /** when the app starts, first obtain the participant ID **/
         TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);

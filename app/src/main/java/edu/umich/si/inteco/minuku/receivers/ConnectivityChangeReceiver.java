@@ -44,7 +44,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver{
 
             Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connect to wifi");
 
-//            RemoteDBHelper.syncWithRemoteDatabase();
+            RemoteDBHelper.syncWithRemoteDatabase();
 
             //test getting background recording document from time 0
             ArrayList<JSONObject> documents = RecordingAndAnnotateManager.getBackgroundRecordingDocuments(0);

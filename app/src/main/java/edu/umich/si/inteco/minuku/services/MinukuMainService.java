@@ -262,7 +262,7 @@ public class MinukuMainService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        FileHelper.readTestFile();
+//        FileHelper.readTestFile();
 
         LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                 LogManager.LOG_TAG_SERVICE,
@@ -476,7 +476,7 @@ public class MinukuMainService extends Service {
 
 
                         //TODO: make writing to database an Action
-                        mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
+                        mDataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_LOGGING_SESSION_ID);
 
                         //after writing the records into files or databases, clear the record pools
                         //ContextManager.getPublicRecordPool().clear();
