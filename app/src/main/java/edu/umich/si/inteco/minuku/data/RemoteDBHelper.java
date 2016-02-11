@@ -53,6 +53,10 @@ import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
 public class RemoteDBHelper {
 
+
+    /**DatavaseName**/
+    public static String PROJECT_DATABASE = DatabaseNameManager.DATABASE_NAME_MINUKU;
+
     /** The time it takes for client to timeout */
     public static final int HTTP_TIMEOUT = 10000; // millisecond
     public static final int SOCKET_TIMEOUT = 20000; // millisecond
@@ -71,11 +75,16 @@ public class RemoteDBHelper {
     public static final String DATA_TYPE_PHONE_LOG = "phone_log";
 
 
+    /***Web Communication symbols**/
+    public static final String WEB_GET_PARAMETER_AND = "&";
+    public static final String WEB_GET_PARAMETER_EQUAL = "=";
+    public static final String WEB_GET_PARAMETER_QUESTION_MARK = "?";
+    public static final String WEB_GET_PARAMETER_SLASH = "/";
+
     /**Query**/
     public static boolean syncLogFiles = false;
     public static boolean syncSessionLogging = false;
     public static boolean syncBackgroundLogging = true;
-
 
 
     //a list of server choice to query and post data
@@ -87,15 +96,6 @@ public class RemoteDBHelper {
     //the choice of server
     public static String REMOTE_SERVER_CHOICE = REMOTE_SERVER_MONGOLAB;
 
-    /**MONGODBLAB**/
-
-    public static final String MONOGOLAB_APIKEY = "3z6I1uChYEVs0DKMBF_d-B_lUsRIlsmf";
-    public static final String MONGOLAB_APIKEY_PREFIX="?apiKey=";
-    public static final String MONGOLAB_DATABASE = "minuku";
-    public static final String MONGOLAB_URL = "https://api.mongolab.com/api/1/databases/";
-    public static final String MONGOLAB_DATABASE_MINUKU_COLLECTION_ISALIVE = "isalive";
-    public static final String MONGOLAB_DATABASE_MINUKU_COLLECTION_SESSION = "session";
-    public static final String MONGOLAB_DATABASE_MINUKU_COLLECTION_BACKGROUNDLOGGING = "backgroundlogging";
 
     /**Google App Engine**/
 
@@ -252,7 +252,6 @@ public class RemoteDBHelper {
     public static void postBackgroundRecordingDocuments(long lastSyncHourTime) {
 
 
-
         ArrayList<JSONObject> documents = RecordingAndAnnotateManager.getBackgroundRecordingDocuments(lastSyncHourTime);
 //        Log.d (LOG_TAG, "[postBackgroundRecordingDocuments][testing load session] the documents are:" + documents);
 
@@ -262,27 +261,27 @@ public class RemoteDBHelper {
                 Log.d (LOG_TAG, "[postBackgroundRecordingDocuments][testing load session] document " + i + " is: " + json);
 
 
-                if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MONGOLAB)) {
-
-                    String url = MONGOLAB_URL + MONGOLAB_DATABASE + "/collections/" +
-                            MONGOLAB_DATABASE_MINUKU_COLLECTION_BACKGROUNDLOGGING + "/" +
-                            MONGOLAB_APIKEY_PREFIX + MONOGOLAB_APIKEY;
-
-                    new HttpAsyncPostJsonTask().execute(url,
-                            json,
-                            DATA_TYPE_BACKGROUND_LOGGING,
-                            ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
-
-
-                }
-                else if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MICROSOFTAZZURE)) {
-                    new HttpAsyncPostJsonTask().execute(
-                            AZURE_WEB_SERVICE_URL_POST_BACKGROUND_RECORDING,
-                            json,
-                            DATA_TYPE_BACKGROUND_LOGGING,
-                            ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
-
-                }
+//                if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MONGOLAB)) {
+//
+//                    String url = MONGOLAB_URL + MONGOLAB_DATABASE + "/collections/" +
+//                            MONGOLAB_DATABASE_MINUKU_COLLECTION_BACKGROUNDLOGGING + "/?" +
+//                            MONGOLAB_APIKEY_PARAMETER + "=" + MONGOLAB_APIKEY;
+//
+//                    new HttpAsyncPostJsonTask().execute(url,
+//                            json,
+//                            DATA_TYPE_BACKGROUND_LOGGING,
+//                            ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
+//
+//
+//                }
+//                else if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MICROSOFTAZZURE)) {
+//                    new HttpAsyncPostJsonTask().execute(
+//                            AZURE_WEB_SERVICE_URL_POST_BACKGROUND_RECORDING,
+//                            json,
+//                            DATA_TYPE_BACKGROUND_LOGGING,
+//                            ScheduleAndSampleManager.getTimeString(lastSyncHourTime));
+//
+//                }
 
             }
         }
@@ -673,17 +672,43 @@ public class RemoteDBHelper {
         }
 
 
-        //result
-        try {
-            JSONArray response = new JSONArray(result);
-            Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] response JSONArray is " + response );
+        //if the document has the Minuku Prefix, that means it contains at least a document with the  id in the document,
+        boolean hasDocument = result.contains(Constants.MINUKU_PREFIX);
 
 
-            //TODO: if MongoLab has document, post BackgroundDocument since the last sync hour.
+        //TODO: if MongoLab has document, post BackgroundDocument since the last sync hour.
 
-            //TODO: if not, post all the background document
+        //if there is a Backgroundlogging document
+        if (hasDocument) {
 
-            postBackgroundRecordingDocuments(0);
+            //result
+            try {
+                JSONArray responseJSON = new JSONArray(result);
+                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] response JSONArray is " + responseJSON );
+
+                //get the last document because that should be the lastest one
+                JSONObject lastDocumentJSON = responseJSON.getJSONObject(responseJSON.length()-1);
+
+                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] the last document is  " + lastDocumentJSON );
+
+                //we get the data information from the last document
+                String queryType = lastDocumentJSON.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE);
+                String lastSyncHourStr = lastDocumentJSON.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_LAST_SYNC_HOUR_TIME);
+
+                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] query type " + queryType + " last hour is " + lastSyncHourStr);
+
+                //get the timestamp
+                SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
+                try {
+                    Date lastSynhHour = sdf.parse(lastSyncHourStr);
+                    //post the backgroune logging document based on the last sync hour
+                    //TODO: right now the posting function is commnented. Need to uncomment it
+                    postBackgroundRecordingDocuments(lastSynhHour.getTime());
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
 
 
 //            JSONObject resultJson = new JSONObject(result);
@@ -701,30 +726,34 @@ public class RemoteDBHelper {
 //
 //                    Log.d(LOG_TAG, "syncWithRemoteDatabase the last sync hour is " + lastSyncHourStr);
 //
-//                    SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
-//                    try {
-//                        Date lastSynhHour = sdf.parse(lastSyncHourStr);
-//                        postBackgroundRecordingDocuments(lastSynhHour.getTime());
-//
-//                    } catch (ParseException e) {
-//                        e.printStackTrace();
-//                    }
-//
+
 //
 //                }
 //                //no document
 //                else {
 //
-//                    postBackgroundRecordingDocuments(0);
+//
 //
 //                }
 
 
 //            }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
         }
+
+        //if there's no document in the BackgroundLogging collection, we just send all the documents. The lastsynchours is 0
+        else {
+            postBackgroundRecordingDocuments(0);
+        }
+
+
+
+
+
 
 
     }
@@ -1183,17 +1212,14 @@ public class RemoteDBHelper {
 
                 Log.d(LOG_TAG, "syncWithRemoteDatabase going to query background recording on MogoLab");
 
-                url = MONGOLAB_URL + MONGOLAB_DATABASE ;
-
-
                 if (queryTarget.equals(DATA_TYPE_BACKGROUND_LOGGING)) {
 
-                    url += "/collections/" + MONGOLAB_DATABASE_MINUKU_COLLECTION_BACKGROUNDLOGGING + "/" +
-                            MONGOLAB_APIKEY_PREFIX + MONOGOLAB_APIKEY;
+                    //give databasename and the collection name
+                    String queryLastSynHourURL = MongoLABHelper.getQueryOfSynLatestDocument( PROJECT_DATABASE, DatabaseNameManager.MONGODB_COLLECTION_BACKGROUNDLOGGING );
 
-//                    Log.d(LOG_TAG, "syncWithRemoteDatabase going to query background recording on MogoLab ON URL: " +url);
+                    Log.d(LOG_TAG, "syncWithRemoteDatabase going to query background recording on MogoLab ON URL: " +queryLastSynHourURL);
 
-                    queryLastBackgroundLoggingSyncHourUsingGET(url);
+                    queryLastBackgroundLoggingSyncHourUsingGET(queryLastSynHourURL);
                 }
                 else if (queryTarget.equals(DATA_TYPE_PHONE_LOG)) {
 

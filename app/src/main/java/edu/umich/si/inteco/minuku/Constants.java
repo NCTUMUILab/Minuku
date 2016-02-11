@@ -2,6 +2,10 @@ package edu.umich.si.inteco.minuku;
 
 public class Constants {
 
+	/**Minuku name**/
+	public static final String MINUKU_PREFIX = "Minuku";
+
+
 	/**for testing**/
 	public static boolean isTestingActivity = true;
 	public static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";

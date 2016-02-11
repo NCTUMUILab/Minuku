@@ -183,7 +183,7 @@ public class MinukuMainService extends Service {
             Constants.DEVICE_ID = phoneUID;
 
             //combined device id, timestamp, and minuku
-            Constants.USER_ID = ("Minuku" + (ContextManager.getCurrentTimeInMillis() + Constants.DEVICE_ID).hashCode());
+            Constants.USER_ID = (Constants.MINUKU_PREFIX + (ContextManager.getCurrentTimeInMillis() + Constants.DEVICE_ID).hashCode());
 
             //TODO: create user loggin and use that as the id.
             // add a unixtime to it and then hash the whole string. The purpose is try to create an unidentifiable user id

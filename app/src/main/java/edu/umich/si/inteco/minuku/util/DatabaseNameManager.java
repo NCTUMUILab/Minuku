@@ -10,6 +10,12 @@ public class DatabaseNameManager {
 	 * 
 	 * **/
 
+    public static final String DATABASE_NAME_MINUKU = "minuku";
+    public static final String MONGODB_COLLECTION_ISALIVE = "isalive";
+    public static final String MONGODB_COLLECTION_SESSION = "session";
+    public static final String MONGODB_COLLECTION_BACKGROUNDLOGGING = "backgroundlogging";
+
+
 	public static final String STUDY_TABLE_NAME = "Study_Table";
 	
 	public static final String TASK_TABLE_NAME = "Task_Table";
