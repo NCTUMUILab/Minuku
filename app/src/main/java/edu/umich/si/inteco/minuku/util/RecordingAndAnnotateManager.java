@@ -913,6 +913,7 @@ public class RecordingAndAnnotateManager {
              document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_OTHERS, Constants.CURRENT_STUDY_CONDITION );
              document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
              document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_USER_ID, Constants.USER_ID);
+             document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE, DatabaseNameManager.MONGODB_COLLECTION_BACKGROUNDLOGGING);
              document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP_HOUR, ScheduleAndSampleManager.getTimeString(startTime));
          } catch (JSONException e) {
              e.printStackTrace();

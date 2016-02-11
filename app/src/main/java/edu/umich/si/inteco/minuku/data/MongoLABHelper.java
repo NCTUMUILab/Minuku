@@ -5,7 +5,7 @@ import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 /**
  * Created by Armuro on 2/11/16.
  */
-public class MongoLABHelper {
+public class MongoLabHelper {
 
     /**MONGODBLAB**/
 
@@ -28,9 +28,9 @@ public class MongoLABHelper {
     public static final int MONGOLAB_SORT_DESCENDING_PARAMETER = -1;
 
 
-    public static String getQueryOfSynLatestDocument(String database, String collection) {
+    public static String getQueryOfSynLatestDocumentURL(String database, String collection) {
 
-        return  ( MONGOLAB_URL + "/" + database + "/" + "collections/" + collection + "/?" +
+        return  ( MONGOLAB_URL + database + "/" + "collections/" + collection + "/?" +
 
                 //sort in the descender order
                 MONGOLAB_SORT_PARAMETER + "=" + "{\"" + DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP_HOUR + "\":" + MONGOLAB_SORT_DESCENDING_PARAMETER + "}" +
@@ -41,6 +41,12 @@ public class MongoLABHelper {
 
     }
 
+
+    public static String postDocumentURL(String database, String collection) {
+
+        return  ( MONGOLAB_URL + database + "/" + "collections/" + collection + "/?" + MONGOLAB_APIKEY_PARAMETER + "=" + MONGOLAB_APIKEY);
+
+    }
 
 
 }
