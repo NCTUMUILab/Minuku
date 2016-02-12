@@ -23,7 +23,6 @@ public class MongoLabHelper {
     public static final String MONGOLAB_QUERY_PARAMETER = "q"; //restrict results by the specified JSON query
     public static final String MONGOLAB_LIMIT_PARAMETER = "l"; //specify the limit for the number of results (default is 1000)
 
-
     public static final int MONGOLAB_SORT_ASCENDING_PARAMETER = 1;
     public static final int MONGOLAB_SORT_DESCENDING_PARAMETER = -1;
 
@@ -47,6 +46,7 @@ public class MongoLabHelper {
         return  ( MONGOLAB_URL + database + "/" + "collections/" + collection + "/?" + MONGOLAB_APIKEY_PARAMETER + "=" + MONGOLAB_APIKEY);
 
     }
+
 
 
 }

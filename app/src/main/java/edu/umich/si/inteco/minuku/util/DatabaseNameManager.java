@@ -233,6 +233,7 @@ public class DatabaseNameManager {
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_STUDY_CONDITION= "study_condition";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_NAME = "name";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP_HOUR = "timestamp_hour";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP = "timestamp";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_START_TIME = "start_time";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_END_TIME = "end_time";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_BATTERY_LIFE = "battery_life";

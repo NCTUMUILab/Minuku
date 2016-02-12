@@ -836,9 +836,8 @@ public class RecordingAndAnnotateManager {
         //time range is from the last SyncHour to the most recent complete hour
         long now = ContextManager.getCurrentTimeInMillis();
 
-//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] lastSyncHourTime: " + lastSyncHourTime);
         Session session = getSession(BACKGOUND_LOGGING_SESSION_ID);
-//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] session: start time " + ScheduleAndSampleManager.getTimeString(session.getStartTime()) + " lastsync : " +   lastSyncHourTime);
+        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] session: start time " + ScheduleAndSampleManager.getTimeString(session.getStartTime()) + " lastsync : " +   lastSyncHourTime);
 
         long startTime =0;
         long endTime  =0;
@@ -879,7 +878,6 @@ public class RecordingAndAnnotateManager {
 
         //for that many hours, we generate each hour to generate Background recoridng document
         //getLogDocument(long startHourTime, long endHourTime)
-
         while (endTime <now) {
 
             JSONObject document= getBackgroundRecordingDocument(startTime, endTime);

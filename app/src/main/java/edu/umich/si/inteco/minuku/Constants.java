@@ -6,6 +6,9 @@ public class Constants {
 	public static final String MINUKU_PREFIX = "Minuku";
 
 
+	/**Monitoring Service**/
+	public static final String MINUKU_SERVICE_CHECKING_ISALIVE = "MinukuServiceCheckingIsAlive";
+
 	/**for testing**/
 	public static boolean isTestingActivity = true;
 	public static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";

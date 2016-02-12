@@ -8,11 +8,9 @@ import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.AnalyticsMinuku;
@@ -57,7 +55,7 @@ public class MinukuMainService extends Service {
     /**Context Manager in General*/
     //the frequency of storing the cached records
 
-    public static int DEFAULT_DEVICE_CHECKING_COUNT = 360;//half an hour. it counts down for every 5 seconds
+    public static int DEFAULT_DEVICE_CHECKING_COUNT = 60;//5 minutes. it counts down for every 5 seconds
 
     public static int DEFAULT_LOCATION_CHECKING_COUNT = 120;//half an hour. it counts down for every 5 seconds
 
@@ -409,15 +407,6 @@ public class MinukuMainService extends Service {
         public void run() {
 
 
-            /***If Google Analytic Tracker is enabled, we periodically send data to the server**/
-
-            mTracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("ServiceChecking")
-                    .setAction(Constants.USER_ID)
-                    .setLabel(Constants.USER_ID)
-                    .build());
-
-
             //the main thread use the default interval to run continuous actions
             //the continuous actions are listed in the RunningActionList maintained by the ActionManager.
             //Periodically the main thread call ActionManager to execute the contibuous actions.
@@ -436,17 +425,39 @@ public class MinukuMainService extends Service {
                         ActionManager.executeAction(action);
                     }
                 }
-                
 
-              //  Log.d(LOG_TAG, "the deviceChecking countdown is " +mDeviceCheckingTimeCountDown );
-                //device checking count down.
-                if (mDeviceCheckingTimeCountDown==0){
-                    RemoteDBHelper.deviceChecking();
-                    mDeviceCheckingTimeCountDown=DEFAULT_DEVICE_CHECKING_COUNT ;
+
+                /***if we need to check whether the device is alive**/
+                if (ConfigurationManager.MINUKU_SERVICE_CHECKIN_ENABLED) {
+
+                    if (mDeviceCheckingTimeCountDown==0 ){
+
+                        //if we want to use Google Analytic to check alive status
+                        if (ConfigurationManager.MINUKU_SERVICE_CHECKIN_GOOGLE_ANALYTICS_ENABLED){
+                            //If Google Analytic Tracker is enabled, we periodically send data to the
+                            mTracker.send(new HitBuilders.EventBuilder()
+                                    .setCategory(Constants.MINUKU_SERVICE_CHECKING_ISALIVE)
+                                    .setAction(Constants.USER_ID)
+                                    .setLabel(Constants.USER_ID)
+                                    .build());
+                        }
+
+                        //if we want to use remote MongoDB to check alive status
+                        if(ConfigurationManager.MINUKU_SERVICE_CHECKIN_MONGODB_ENABLED) {
+                            RemoteDBHelper.MinukuServiceCheckIn();
+                        }
+
+                        //reset
+                        mDeviceCheckingTimeCountDown=DEFAULT_DEVICE_CHECKING_COUNT ;
+
+                    }
+                    else {
+                        //count down
+                        mDeviceCheckingTimeCountDown-=1;
+                    }
+
                 }
-                else {
-                    mDeviceCheckingTimeCountDown-=1;
-                }
+
 
 
             }catch (IllegalArgumentException e){

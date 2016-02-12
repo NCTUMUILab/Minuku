@@ -41,6 +41,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.PreferenceHelper;
@@ -171,12 +172,11 @@ public class RemoteDBHelper {
             //update the session that just been modified
             postModifiedSessionDocuments();
 
-            Log.d(LOG_TAG, "[syncWithRemoteDatabase][test modified session] the wifi is connected, we can submit the data");
             Log.d(LOG_TAG, "[syncWithRemoteDatabase][test modified session] the last time we sync with the server is " + ScheduleAndSampleManager.getTimeString(getLastServerSyncTime()));
             long now = ScheduleAndSampleManager.getCurrentTimeInMillis();
 
             if (now- getLastServerSyncTime() >= MINIMUM_UPDATE_FREQUENCY ) {
-                Log.d(LOG_TAG, "[syncWithRemoteDatabase][test modified session] tneed to query data now");
+                Log.d(LOG_TAG, "[syncWithRemoteDatabase][test modified session] need to query data now");
 
                 /**we only sync data when necessary**/
                 if (syncLogFiles)
@@ -247,7 +247,6 @@ public class RemoteDBHelper {
 
 
     public static void postBackgroundRecordingDocuments(long lastSyncHourTime) {
-
 
         ArrayList<JSONObject> documents = RecordingAndAnnotateManager.getBackgroundRecordingDocuments(lastSyncHourTime);
 //        Log.d (LOG_TAG, "[postBackgroundRecordingDocuments][testing load session] the documents are:" + documents);
@@ -444,15 +443,19 @@ public class RemoteDBHelper {
 
     }
 
-    public static void deviceChecking() {
+    /**
+     * checking if Minuku is
+     */
+    public static void MinukuServiceCheckIn() {
 
-        new HttpAsyncDeviceChecking().execute(AZURE_WEB_SERVICE_URL_DEVICE_CHECKING);
+        new HttpAsyncMinukuCheckin().execute();
     }
+
 
     /**
      * this function periodically check in the server to show that the service is still alive
      */
-    public static void deviceCheckingTaskUsingPOST(String address) {
+    public static void MinunuServiceCheckinUsingPOST(String address) {
 
         //get lastSynhour by query the MongoDB
         InputStream inputStream = null;
@@ -475,12 +478,14 @@ public class RemoteDBHelper {
 
             JSONObject obj = new JSONObject();
             try {
+                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_USER_ID, Constants.USER_ID);
                 obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID, Constants.DEVICE_ID);
+                obj.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP, ContextManager.getCurrentTimeString());
+
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_QUERY_DATA,
                         "DeviceChecking");
 
-                Log.d(LOG_TAG, " sendind device id" + Constants.DEVICE_ID);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -491,7 +496,7 @@ public class RemoteDBHelper {
             int responseCode = conn.getResponseCode();
             inputStream = conn.getInputStream();
             result = convertInputStreamToString(inputStream);
-            Log.d(LOG_TAG, "[deviceChecking] device checking "  + responseCode + " result is " + result);
+//            Log.d(LOG_TAG, "[deviceChecking] device checking "  + responseCode + " result is " + result);
 
         }
         catch (ProtocolException e) {
@@ -629,11 +634,11 @@ public class RemoteDBHelper {
 
             URL url = new URL(address);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingGET] connecting to " + address);
+//            Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingGET] connecting to " + address);
             int responseCode;
 
             if (url.getProtocol().toLowerCase().equals("https")) {
-                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingGET] [using https]");
+//                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingGET] [using https]");
                 trustAllHosts();
                 HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
                 https.setHostnameVerifier(DO_NOT_VERIFY);
@@ -669,17 +674,12 @@ public class RemoteDBHelper {
 
         //if the document has the Minuku Prefix, that means it contains at least a document with the  id in the document,
         boolean hasDocument = result.contains(Constants.MINUKU_PREFIX);
-//        Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] hasDocument is " + hasDocument );
-
-        //TODO: if MongoLab has document, post BackgroundDocument since the last sync hour.
 
         //if there is a Backgroundlogging document
         if (hasDocument) {
 
-            //result
             try {
                 JSONArray responseJSON = new JSONArray(result);
-//                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] response JSONArray is " + responseJSON );
 
                 //get the last document because that should be the lastest one
                 JSONObject lastDocumentJSON = responseJSON.getJSONObject(responseJSON.length()-1);
@@ -687,11 +687,6 @@ public class RemoteDBHelper {
                 Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] the last document is  " + lastDocumentJSON );
 
                 String queryType=null;
-
-                //we get the data information from the last document
-                if (lastDocumentJSON.has(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE)){
-                   queryType = lastDocumentJSON.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE);
-                }
 
                 //get the hour
                 String lastSyncHourStr = lastDocumentJSON.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP_HOUR);
@@ -710,35 +705,6 @@ public class RemoteDBHelper {
                     e.printStackTrace();
                 }
 
-
-//            JSONObject resultJson = new JSONObject(result);
-//            String queryType = resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE);
-//            Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] query type " + queryType);
-//            if (resultJson.has(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT)) {
-//                boolean hasDocument = Boolean.parseBoolean(resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_HAS_DOCUMENT));
-//                Log.d(LOG_TAG, "syncWithRemoteDatabase [queryLastBackgroundLoggingSyncHourUsingPOST] the background recording has document? " + hasDocument);
-//
-//                //if the database has no background recording yet, we should submit all background recording
-//                if (hasDocument) {
-//
-//                    //submit background recording until the recent hour
-//                    String lastSyncHourStr = resultJson.getString(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_LAST_SYNC_HOUR_TIME);
-//
-//                    Log.d(LOG_TAG, "syncWithRemoteDatabase the last sync hour is " + lastSyncHourStr);
-//
-
-//
-//                }
-//                //no document
-//                else {
-//
-//
-//
-//                }
-
-
-//            }
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -749,13 +715,6 @@ public class RemoteDBHelper {
         else {
             postBackgroundRecordingDocuments(0);
         }
-
-
-
-
-
-
-
     }
 
     /**
@@ -1168,7 +1127,7 @@ public class RemoteDBHelper {
         String line = "";
         String result = "";
         while((line = bufferedReader.readLine()) != null){
-            Log.d(LOG_TAG, "[syncWithRemoteDatabase] " + line);
+//            Log.d(LOG_TAG, "[syncWithRemoteDatabase] " + line);
             result += line;
         }
 
@@ -1186,8 +1145,6 @@ public class RemoteDBHelper {
 
             String url = "";
             String queryTarget = params[0];
-
-            Log.d(LOG_TAG, "syncWithRemoteDatabase HttpAsyncQuery");
 
             if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MICROSOFTAZZURE)) {
 
@@ -1308,15 +1265,20 @@ public class RemoteDBHelper {
 
 
     //use HTTPAsyncTask to post data
-    private static class HttpAsyncDeviceChecking extends AsyncTask<String, Void, String> {
+    private static class HttpAsyncMinukuCheckin extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
 
             String result=null;
-            String url = params[0];
 
-            deviceCheckingTaskUsingPOST(url);
+            if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MICROSOFTAZZURE))
+                MinunuServiceCheckinUsingPOST(AZURE_WEB_SERVICE_URL_DEVICE_CHECKING);
+
+            else if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MONGOLAB)){
+                MinunuServiceCheckinUsingPOST(MongoLabHelper.postDocumentURL(PROJECT_DATABASE, DatabaseNameManager.MONGODB_COLLECTION_ISALIVE));
+            }
+
 
             return result;
         }

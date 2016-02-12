@@ -43,6 +43,12 @@ public class ConfigurationManager {
 
 	public static final String CONFIGURATION_FILE_NAME = Constants.CONFIGURATION_FILE_NAME_PARTI;
 
+	//device checking
+	public static boolean MINUKU_SERVICE_CHECKIN_ENABLED = true;
+	public static boolean MINUKU_SERVICE_CHECKIN_GOOGLE_ANALYTICS_ENABLED = true;
+	public static boolean MINUKU_SERVICE_CHECKIN_MONGODB_ENABLED = true;
+
+
 	public static final String CONFIGURATION_PROPERTIES_ID = "Id";
 	public static final String CONFIGURATION_PROPERTIES_STUDY = "Study";
 	public static final String CONFIGURATION_PROPERTIES_VERSION = "Version";
