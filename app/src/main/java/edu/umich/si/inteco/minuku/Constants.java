@@ -15,6 +15,7 @@ public class Constants {
 	public static final String TEST_DATABASE_NAME = "SensingStudyDatabase";
 
     /***Main Activity Tab Name**/
+	public static final String MAIN_ACTIVITY_TAB_HOME = "Home";
     public static final String MAIN_ACTIVITY_TAB_DAILY_REPORT = "Daily Report";
     public static final String MAIN_ACTIVITY_TAB_RECORD = "Record";
     public static final String MAIN_ACTIVITY_TAB_RECORDINGS = "Recordings";
@@ -30,6 +31,8 @@ public class Constants {
 	public static final String IN_STIU_LABELING_CONDITION = "In Situ Labeling";
 	public static final String POST_HOC_LABELING_CONDITION = "Post Hoc Labeling";
 	public static final String HYRBID_LABELING_CONDITION = "Hybrid Labeling";
+	public static final String NORMAL_CONDITION = "Normal";
+
 
     public static final String CONFIGURATION_FILE_NAME_POST_HOC = "post_hoc_study.json";
     public static final String CONFIGURATION_FILE_NAME_IN_SITU = "in_situ_study.json";
@@ -52,7 +55,7 @@ public class Constants {
     public static final String WEB_SERVICE_URL_POST_FILES = "https://inteco.cloudapp.net:5001/postlog";
 
 
-    public static String CURRENT_STUDY_CONDITION = PARTICIPATORY_LABELING_CONDITION;
+    public static String CURRENT_STUDY_CONDITION = NORMAL_CONDITION;
 
 	//this is the id for the labling study.
 	public static final int LABELING_STUDY_ID = 1;

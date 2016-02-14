@@ -13,7 +13,12 @@ public class Configuration {
 	private int _version = -1;
 	private String _name = "Configuration";
 	private JSONObject _content;
-	
+
+	/**backend**/
+	private String mBackendService = "NA";
+	private String mBackendDatabaseType = "NA";
+	private String mBackendDatabaseName = "NA";
+	private String mBackendServiceURL = "NA";
 	
 	public Configuration (int id, int study_id, int version, String name, JSONObject content) {
 		
@@ -66,6 +71,36 @@ public class Configuration {
 	public void setContent (JSONObject content){
 		this._content = content;
 	}
-	
-	
+
+	public String getBackendService() {
+		return mBackendService;
+	}
+
+	public void setBackendService(String backendService) {
+		this.mBackendService = backendService;
+	}
+
+	public String getBackendDatabaseType() {
+		return mBackendDatabaseType;
+	}
+
+	public void setBackendDatabaseType(String backendDatabaseType) {
+		this.mBackendDatabaseType = backendDatabaseType;
+	}
+
+	public String getBackendDatabaseName() {
+		return mBackendDatabaseName;
+	}
+
+	public void setBackendDatabaseName(String backendDatabaseName) {
+		this.mBackendDatabaseName = backendDatabaseName;
+	}
+
+	public String getBackendServiceURL() {
+		return mBackendServiceURL;
+	}
+
+	public void setBackendServiceURL(String backendServiceURL) {
+		this.mBackendServiceURL = backendServiceURL;
+	}
 }

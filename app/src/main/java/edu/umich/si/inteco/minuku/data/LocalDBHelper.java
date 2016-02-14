@@ -27,61 +27,61 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
 	/** Tag for logging. */
     private static final String LOG_TAG = "LocalDBHelper";
-    
+
     /**parameters for creating a database**/
 
     private static int DATABASE_VERSION = 1;
 
-    
+
     /** constants **/
-    
-    private static String SQL_CMD_CREATE_TABLE = "CREATE TABLE"; 
-    
-    private static int SQL_TYPE_CREATE_TABLE = 1; 
-    
-    private static int SQL_TYPE_INSERT_TABLE = 2; 
- 
-    
+
+    private static String SQL_CMD_CREATE_TABLE = "CREATE TABLE";
+
+    private static int SQL_TYPE_CREATE_TABLE = 1;
+
+    private static int SQL_TYPE_INSERT_TABLE = 2;
+
+
     /***Member**/
-    
+
     private Context mContext;
-    
-    
+
+
 	public LocalDBHelper(Context context, String dbName) {
 
 		super(context, dbName, null, DATABASE_VERSION);
-		
+
 		mContext = context;
 
         initiateDatabaseManager();
 
 	}
-	
+
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 
 		//when the DBHelper is initiated, create the necessary tables
 		if (db!=null){
-			
-			////Log.d(LOG_TAG, " the DB " + db.toString() + " has existed");
-			
-			createStudyTable(db, DatabaseNameManager.STUDY_TABLE_NAME);	
-			
-			//2. Whenever a study is created, create a TASK Table 
-			createTaskTable(db, DatabaseNameManager.TASK_TABLE_NAME);			
-			
-			//3. ...and a SESSION table, so that we can insert tasks and session into the table
-			createSessionTable(db, DatabaseNameManager.SESSION_TABLE_NAME);		
-			
-			//4 a study will have a configuration, presumably.
-			createConfigurationTable(db, DatabaseNameManager.CONFIGURATION_TABLE_NAME);	
-			
-			//5 create user response table
-			createUserResponseTable(db, DatabaseNameManager.USER_RESPONSE_TABLE_NAME);	
-			
-			createQuestionnaireTable(db, DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME);	
 
-			//4. create necessary record tables 
+			////Log.d(LOG_TAG, " the DB " + db.toString() + " has existed");
+
+			createStudyTable(db, DatabaseNameManager.STUDY_TABLE_NAME);
+
+			//2. Whenever a study is created, create a TASK Table
+			createTaskTable(db, DatabaseNameManager.TASK_TABLE_NAME);
+
+			//3. ...and a SESSION table, so that we can insert tasks and session into the table
+			createSessionTable(db, DatabaseNameManager.SESSION_TABLE_NAME);
+
+			//4 a study will have a configuration, presumably.
+			createConfigurationTable(db, DatabaseNameManager.CONFIGURATION_TABLE_NAME);
+
+			//5 create user response table
+			createUserResponseTable(db, DatabaseNameManager.USER_RESPONSE_TABLE_NAME);
+
+			createQuestionnaireTable(db, DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME);
+
+			//4. create necessary record tables
 			createRecordTables(db);
 
             initiateDatabaseManager();
@@ -89,7 +89,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 		}
 
 
-			
+
 	}
 
 
@@ -98,15 +98,15 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-	
+
 		/*
 		if (db!=null){
 			db.execSQL("DROP TABLE IF EXISTS " + TASK_TABLE_NAME);
 			db.execSQL("DROP TABLE IF EXISTS " + SESSION_TABLE_NAME);
 			onCreate(db);
 		}*/
-	}	
-    
+	}
+
 
     public void initiateDatabaseManager() {
         DatabaseManager.initializeInstance(this);
@@ -114,21 +114,21 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
 
 	public void createStudyTable(SQLiteDatabase db, String table_name){
-    	
-    	String cmd = SQL_CMD_CREATE_TABLE + " " + 
+
+    	String cmd = SQL_CMD_CREATE_TABLE + " " +
     				table_name + " ( "+
     				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY, " +
     				DatabaseNameManager.COL_STUDY_NAME + " TEXT NOT NULL " +
     				");" ;
-    	
+
     	db.execSQL(cmd);
 
     }
 
-    
+
     public void createTaskTable(SQLiteDatabase db, String table_name){
-    	
-    	String cmd = SQL_CMD_CREATE_TABLE + " " + 
+
+    	String cmd = SQL_CMD_CREATE_TABLE + " " +
     				table_name + " ( "+
     				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY, " +
     				DatabaseNameManager.COL_STUDY_ID + " INTEGER NOT NULL, " +
@@ -138,19 +138,19 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     				DatabaseNameManager.COL_START_TIME + " INTEGER NOT NULL, " +
     				DatabaseNameManager.COL_END_TIME + " INTEGER NOT NULL " +
     				");" ;
-    	
+
     	db.execSQL(cmd);
     }
-    
+
 
     /**
-     * 
+     *
      * @param db
      * @param table_name
      */
     public void createSessionTable(SQLiteDatabase db, String table_name){
-    	
-    	String cmd = SQL_CMD_CREATE_TABLE + " " + 
+
+    	String cmd = SQL_CMD_CREATE_TABLE + " " +
     				table_name + " ( "+
     				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
     				DatabaseNameManager.COL_TASK_ID + " INTEGER NOT NULL, " +
@@ -162,90 +162,90 @@ public class LocalDBHelper extends SQLiteOpenHelper{
                     DatabaseNameManager.COL_SESSION_MODIFIED_FLAG + " INTEGER, " +
                     DatabaseNameManager.COL_SESSION_CONTEXTSOURCES + " TEXT NOT NULL " +
     				");" ;
-    	
+
     	db.execSQL(cmd);
-    }    
-    
+    }
+
     public void createConfigurationTable(SQLiteDatabase db, String table_name){
-    	
-    	String cmd = SQL_CMD_CREATE_TABLE + " " + 
+
+    	String cmd = SQL_CMD_CREATE_TABLE + " " +
 				table_name + " ( "+
 				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY, " +
 				DatabaseNameManager.COL_STUDY_ID + " INTEGER NOT NULL, " +
-				DatabaseNameManager.COL_CONFIGURATION_NAME+ " TEXT, " + 
+				DatabaseNameManager.COL_CONFIGURATION_NAME+ " TEXT, " +
 				DatabaseNameManager.COL_CONFIGURATION_VERSION+ " INTEGER, " +
 				DatabaseNameManager.COL_CONFIGURATION_CONTENT+ " TEXT " +
 				");" ;
-	
+
 		db.execSQL(cmd);
 
-    	
+
     }
-    
+
     public void createUserResponseTable(SQLiteDatabase db, String table_name){
-    	
-    	String cmd = SQL_CMD_CREATE_TABLE + " " + 
+
+    	String cmd = SQL_CMD_CREATE_TABLE + " " +
 				table_name + " ( "+
 				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				DatabaseNameManager.COL_STUDY_ID + " INTEGER NOT NULL, " +
-				DatabaseNameManager.COL_QUESTIONNAIRE_ID+ " INTEGER NOT NULL, " + 
+				DatabaseNameManager.COL_QUESTIONNAIRE_ID+ " INTEGER NOT NULL, " +
 				DatabaseNameManager.COL_START_TIME+ " INTEGER, " +
 				DatabaseNameManager.COL_END_TIME+ " INTEGER, " +
 				DatabaseNameManager.COL_CONTENT+ " TEXT " +
 				");" ;
-	
+
 		db.execSQL(cmd);
 
-    	
+
     }
-    
-    
+
+
     public void createQuestionnaireTable(SQLiteDatabase db, String table_name){
-    	
-    	String cmd = SQL_CMD_CREATE_TABLE + " " + 
+
+    	String cmd = SQL_CMD_CREATE_TABLE + " " +
 				table_name + " ( "+
 				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-				DatabaseNameManager.COL_STUDY_ID + " INTEGER NOT NULL, " + 
+				DatabaseNameManager.COL_STUDY_ID + " INTEGER NOT NULL, " +
 				DatabaseNameManager.COL_QUESTIONNAIRE_GENERATED_TIME+ " INTEGER, " +
 				DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME+ " INTEGER, " +
 				DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME+ " INTEGER, " +
-				DatabaseNameManager.COL_QUESTIONNAIRE_RESPONSE + " TEXT " + 
+				DatabaseNameManager.COL_QUESTIONNAIRE_RESPONSE + " TEXT " +
 				");" ;
-	
+
 		db.execSQL(cmd);
 
-    	
+
     }
-    
-    
+
+
     /**
-     * 
+     *
      * @param db
      * @param table_name
      */
     public void createRecordTable(SQLiteDatabase db, String table_name){
-    	
+
     	////Log.d(LOG_TAG, " enter createSessionTable()");
-    	
-    	String cmd = SQL_CMD_CREATE_TABLE + " " + 
+
+    	String cmd = SQL_CMD_CREATE_TABLE + " " +
     				table_name + " ( "+
     				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
     				DatabaseNameManager.COL_SESSION_ID + " INTEGER NOT NULL, " +
 					DatabaseNameManager.COL_DATA + " INTEGER NOT NULL, " +
-    				DatabaseNameManager.COL_TIMESTAMP_STRING+ " TEXT NOT NULL, " + 
+    				DatabaseNameManager.COL_TIMESTAMP_STRING+ " TEXT NOT NULL, " +
     				DatabaseNameManager.COL_TIMESTAMP_LONG+ " INTEGER NOT NULL " +
     				");" ;
 
     	db.execSQL(cmd);
-    	
+
     }
-    
+
     /***
      * This function create all record tables
      * @param db
      */
     private void createRecordTables (SQLiteDatabase db){
-    	
+
     	//Location
     	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_LOCATION);
     	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY_RECOGNITION);
@@ -262,22 +262,22 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
 		//TODO: to add more tables
     }
-    
-    
+
+
     /**
-     * 
+     *
      * Insert data into tables. Since every table has a different scheme, we separate them as different functions
-     * 
+     *
      * **/
-    
-    
+
+
     public long insertStudyTable(int id, String table_name){
 
-    	
-		
+
+
 		//get row number after the insertion
 		//Log.d(LOG_TAG, " Inserting study " + id);
-		
+
 		long rowId=0;
 		try{
 
@@ -293,19 +293,19 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 		}
 
         DatabaseManager.getInstance().closeDatabase();
-		
+
 		//Log.d(LOG_TAG, " Inserting successfully! The " + table_name + " table now has " + rowId + " rows.");
-		
+
 		return rowId;
     }
-    
+
     /**
      * insert a task into a TaskTable
      * @param task
      * @param table_name
      */
     public long insertTaskTable(Task task, String table_name){
-	
+
 
     	//TODO: the user should be able to specify the database because each study may have a different database.
 
@@ -339,13 +339,13 @@ public class LocalDBHelper extends SQLiteOpenHelper{
         DatabaseManager.getInstance().closeDatabase();
 
 		//Log.d(LOG_TAG, " Inserting successfully! The " + table_name + " table now has " + queryTaskCount() + " rows.");
-		
+
 		return rowId;
     }
-	
-    
+
+
     /**
-     * 
+     *
      * @param config
      * @param table_name
      * @return
@@ -374,24 +374,24 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
         DatabaseManager.getInstance().closeDatabase();
 		//Log.d(LOG_TAG, " Inserting configuration successfully! The " + table_name + " table now has " + rowId + " rows.");
-		
+
 		return rowId;
-		
+
     }
-    
- 
+
+
     /**
      * insert a response into a ResponseTable
      * @param response
      * @param table_name
      */
     public long insertUserResponseTable(UserResponse response, String table_name){
-	
+
     	//TODO: the user should be able to specify the database because each study may have a different database.
 
 		//get row number after the insertion
 		Log.d(LOG_TAG, " Inserting User Response " + response.getId() + " response: " + response.getContent()  + " to the task table " + table_name);
-		
+
 		long rowId=0;
 		try{
 
@@ -411,15 +411,15 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			rowId = -1;
 		}
 
-		
+
 		//Log.d(LOG_TAG, " Inserting successfully! The " + table_name + " table now has " + rowId + " rows.");
-		
+
 		return rowId;
     }
-    
-    
+
+
     public long insertQuestionnaireTable(Questionnaire questionnaire, String table_name){
-    	
+
     	//TODO: the user should be able to specify the database because each study may have a different database.
 
 		long rowId=0;
@@ -436,9 +436,9 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			rowId = -1;
 		}
 
-		
+
 		//Log.d(LOG_TAG, " Inserting successfully! The " + table_name + " table now has " + rowId + " rows.");
-		
+
 		return rowId;
     }
 
@@ -484,7 +484,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     public void updateSessionEndTime(int sessionId, String table_name, long endTime ){
 
 
-    	
+
 		String where = DatabaseNameManager.COL_ID + " = " +  sessionId;
 
 		try{
@@ -495,12 +495,12 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             db.update(DatabaseNameManager.SESSION_TABLE_NAME, values, where, null);
 		//	Log.d(LOG_TAG, " Updating end time " + endTime  + " successfully! ");
             DatabaseManager.getInstance().closeDatabase();
-			
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		
-		
+
+
 		ArrayList<String> result = querySessions();
 		//Log.d(LOG_TAG, "the session update result is " + result);
 
@@ -548,14 +548,49 @@ public class LocalDBHelper extends SQLiteOpenHelper{
        // Log.d(LOG_TAG, "the session update result is " + result);
 
     }
-    
+
+	/**
+	 * update session
+	 * @param session
+	 * @param table_name
+	 * @return
+	 */
+	public void updateSessionTable(Session session, String table_name){
+
+		String where = DatabaseNameManager.COL_ID + " = " +  session.getId();
+
+		try{
+			SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+			ContentValues values = new ContentValues();
+
+			String contextsourceStr = "";
+			//create a string for contextsource
+			for (int i=0; i<session.getContextSourceNames().size(); i++){
+				contextsourceStr += session.getContextSourceNames().get(i);
+				if (i<session.getContextSourceNames().size()-1)
+					contextsourceStr += Constants.CONTEXT_SOURCE_DELIMITER;
+			}
+
+			values.put(DatabaseNameManager.COL_SESSION_CONTEXTSOURCES, contextsourceStr);
+
+			db.update(DatabaseNameManager.SESSION_TABLE_NAME, values, where, null);
+			Log.d(LOG_TAG, "  testBackgroundLogging] Updating background logging task " + contextsourceStr);
+			DatabaseManager.getInstance().closeDatabase();
+
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
+	}
+
+
     /**
      * insert a session into a TaskTable
      * @param session
      * @param table_name
      */
     public long insertSessionTable(Session session, String table_name){
-    	
+
     	//TODO: the user should be able to specify the database because each study may have a different database.
 
         Log.d(LOG_TAG, "put session " + session.getId() + " source " +  session.getContextSourceNames() + " to table " + table_name);
@@ -630,24 +665,24 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			rowId = db.insert(table_name, null, values);
 
 //			Log.d(LOG_TAG, "[insertRecordTable][SaveRecordsToLocalDatabase]  Inserting successfully! The " + table_name + " table now has " + rowId + " rows.");
-			
+
 		}catch(Exception e){
 			e.printStackTrace();
 			rowId = -1;
 		}
 
         DatabaseManager.getInstance().closeDatabase();
-		
+
 		return rowId;
     }
 
 
 
-    
+
     public ArrayList<String> queryUnUploadedData(long lastSynTimestamp){
-    	
+
     	ArrayList<String> s = new ArrayList<String>();
-    	
+
     	return s;
     }
 
@@ -698,26 +733,26 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
 
     /*****
-     * 
+     *
      * Query Tables
-     * 
-     * 
+     *
+     *
      */
 
 
 
-    
-    //query configuration table 
+
+    //query configuration table
     public static ArrayList<String> queryConfigurations(){
-    	
+
     	ArrayList<String> rows = new ArrayList<String>();
-    	
+
     	try{
 
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     		String sql = "SELECT *"  +" FROM " + DatabaseNameManager.CONFIGURATION_TABLE_NAME ;
-    		
-    		Cursor cursor = db.rawQuery(sql, null);   		
+
+    		Cursor cursor = db.rawQuery(sql, null);
     		int columnCount = cursor.getColumnCount();
 			while(cursor.moveToNext()){
 				String curRow = "";
@@ -728,27 +763,27 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			}
 			cursor.close();
             DatabaseManager.getInstance().closeDatabase();
-    		
+
     	}catch (Exception e){
-    		
+
     	}
-    	
+
     	return rows;
 
     }
 
-    
+
     //query task table
     public static ArrayList<String> queryTasks (){
-    	
+
     	ArrayList<String> rows = new ArrayList<String>();
-    	
+
     	try{
 
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     		String sql = "SELECT *"  +" FROM " + DatabaseNameManager.TASK_TABLE_NAME ;
-    		
-    		Cursor cursor = db.rawQuery(sql, null);   		
+
+    		Cursor cursor = db.rawQuery(sql, null);
     		int columnCount = cursor.getColumnCount();
 			while(cursor.moveToNext()){
 				String curRow = "";
@@ -760,14 +795,14 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			cursor.close();
 
             DatabaseManager.getInstance().closeDatabase();
-    		
+
     	}catch (Exception e){
-    		
+
     	}
 
 
     	return rows;
-    	
+
     }
 
 
@@ -844,15 +879,15 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
     //query task table
     public static ArrayList<String> querySessions (){
-    	
+
     	ArrayList<String> rows = new ArrayList<String>();
-    	
+
     	try{
 
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     		String sql = "SELECT *"  +" FROM " + DatabaseNameManager.SESSION_TABLE_NAME ;
-    		
-    		Cursor cursor = db.rawQuery(sql, null);   		
+
+    		Cursor cursor = db.rawQuery(sql, null);
     		int columnCount = cursor.getColumnCount();
 			while(cursor.moveToNext()){
 				String curRow = "";
@@ -864,14 +899,14 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			cursor.close();
 
             DatabaseManager.getInstance().closeDatabase();
-    		
+
     	}catch (Exception e){
-    		
+
     	}
 
 
     	return rows;
-    	
+
     }
 
     public static ArrayList<String> querySession(int sessionId){
@@ -913,59 +948,59 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
 
     }
-    
-    //get the number of existing session 
+
+    //get the number of existing session
     public static long queryTaskCount (){
-    	
+
     	long count = 0;
-    	
+
     	try{
 
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     		String sql = "SELECT * "  +" FROM " + DatabaseNameManager.TASK_TABLE_NAME ;
-    		Cursor cursor = db.rawQuery(sql, null);  
+    		Cursor cursor = db.rawQuery(sql, null);
     		count = cursor.getCount();
-    		
+
 			cursor.close();
 
             DatabaseManager.getInstance().closeDatabase();
 
 
     	}catch (Exception e){
-    		
+
     	}
 
     	return count;
-    	
+
     }
-    
-    //get the number of existing session 
+
+    //get the number of existing session
     public static long querySessionCount (){
 
 
     	long count = 0;
-    	
+
     	try{
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     		String sql = "SELECT * "  +" FROM " + DatabaseNameManager.SESSION_TABLE_NAME ;
-    		Cursor cursor = db.rawQuery(sql, null);  
+    		Cursor cursor = db.rawQuery(sql, null);
     		count = cursor.getCount();
-    		
+
 			cursor.close();
 
             DatabaseManager.getInstance().closeDatabase();
-    		
+
     	}catch (Exception e){
-    		
+
     	}
         return count;
-    	
+
     }
-    
-    
+
+
     /*
     private static String generateTimeConstraintSQL(ArrayList<Criterion> timeconstraints){
-    	
+
     	String sql="";
     	float recency = -1;
     	long timestamp = -1;
@@ -973,38 +1008,38 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	if (timeconstraints.size()==0){
     		return null;
     	}
-    	
+
     	for (int i = 0; i<timeconstraints.size(); i++){
-    		
+
     		Criterion tc = timeconstraints.get(i);
-    		
+
     		if (tc.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_RECENCY) ){
     			recency = tc.getInterval();
     		}
     		else if (tc.getType().equals(ConditionManager.CONDITION_TIME_CONSTRAINT_EXACTTIME)){
     			timestamp = tc.getExactTime();
     		}
-    		
+
     	}
 
-		
+
 		//add time into SQL
 		if (recency!=-1){
-			
+
 			long targetTime =  getCurrentTimeInMilli() - (long)(recency* Constants.MILLISECONDS_PER_SECOND) ;
-			
-			sql += DatabaseNameManager.COL_TIMESTAMP_LONG + " > "  + targetTime; 
-			
+
+			sql += DatabaseNameManager.COL_TIMESTAMP_LONG + " > "  + targetTime;
+
 		}
 		else if (timestamp!=-1){
 
 			//TODO: exact time
-			
+
 		}
 
-    	
+
     	return sql;
-    	
+
     }
 */
 
@@ -1133,44 +1168,44 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
     }
 
-    
+
     /**query result from multiple columns and values**/
     public static ArrayList<String> queryFromMultipleColumns(String table_name, int sessionid, ArrayList<String> columns, ArrayList<String> relations, ArrayList<String> values, ArrayList<Criterion> timeconstraints){
-    	
-   
+
+
     	ArrayList<String> rows = new ArrayList<String>();
-    	
+
     	return rows;
     }
-    
-    
+
+
 	/***
-	 * 
-	 * 
+	 *
+	 *
 	 * *Utility Functions**
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
 	 * ***/
 	/**get the current time in milliseconds**/
-	private static long getCurrentTimeInMilli(){		
-		//get timzone		
-		TimeZone tz = TimeZone.getDefault();		
+	private static long getCurrentTimeInMilli(){
+		//get timzone
+		TimeZone tz = TimeZone.getDefault();
 		Calendar cal = Calendar.getInstance(tz);
-		long t = cal.getTimeInMillis();		
+		long t = cal.getTimeInMillis();
 
 		return t;
 	}
-	
+
 	/**Generate a formated time string (in the format of "yyyy-MM-dd HH:mm:ss" **/
 	private static String getTimeString(long time) {
-		
+
 		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
 		String timeString = sdf_now.format(time);
-		
+
 		return timeString;
 	}
 
-	
+
 
 }

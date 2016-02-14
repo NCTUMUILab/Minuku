@@ -647,6 +647,9 @@ public class ContextManager {
             //find the contextStateManager responsible for the loggingTask because we need to copy record from that localRecordPool to the Public Record Pool
             String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
 
+//            Log.d (LOG_TAG, "[testBackgroundLogging] copy data for contextsource:  " + loggingTask.getSource() + " from " + contextStateManagerName);
+
+
             //after finding the ContextStateManager, we copy the Record from the LocalRecordPool of that ContextStatManager to the PublicRecordPool
             copyRecordFromLocalRecordPoolToPublicRecordPool(contextStateManagerName, loggingTask);
         }
@@ -661,7 +664,7 @@ public class ContextManager {
      */
     private static void copyRecordFromLocalRecordPoolToPublicRecordPool(String contextStateManagerName, LoggingTask loggingTask) {
 
-//        Log.d(LOG_TAG, "testing saving records moving records in " + contextStateManagerName + " for logging tasks " + loggingTask.getSource());
+//        Log.d(LOG_TAG, "testBackgroundLogging testing saving records moving records in " + contextStateManagerName + " for logging tasks " + loggingTask.getSource());
 
         //1.
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))

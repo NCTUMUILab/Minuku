@@ -89,7 +89,7 @@ public class PhoneStatusManager extends ContextStateManager {
             @Override
             public void run() {
 
-                getMostRecentRunningApp();
+//                getMostRecentRunningApp();
 
                 mMainThread.postDelayed(this, MinukuMainService.DEFAULT_APP_MONITOR_RATE_INTERVAL);
 

@@ -16,6 +16,7 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
+import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
 import edu.umich.si.inteco.minuku.model.Questionnaire.EmailQuestionnaireTemplate;
@@ -68,6 +69,8 @@ public class ConfigurationManager {
 	public static final String CONFIGURATION_CATEGORY_CIRCUMSTANCE = "Circumstances";
 	public static final String CONFIGURATION_CATEGORY_LOGGING = "Logging";
 	public static final String CONFIGURATION_CATEGORY_BACKGROUND_LOGGING = "BackgroundLogging";
+	public static final String CONFIGURATION_CATEGORY_BACKEND = "Backend";
+
 
 	public static final String CONFIGURATION_CATEGORY_QUESTIONNAIRE = "Questionnaires";
 	public static final String CONFIGURATION_CATEGORY_CONTEXTSOURCE_SETTING = "ContextSourceSetting";
@@ -87,6 +90,13 @@ public class ConfigurationManager {
 	public static final String BACKGROUND_LOGGING_PROPERTIES_LOGGING_RATE = "Logging_rate";
 	public static final String BACKGROUND_LOGGING_PROPERTIES_LOGGING_TASKS = "Logging_tasks";
 	public static final String BACKGROUND_LOGGING_PROPERTIES_LOGGING_ENABLED = "Enabled";
+
+
+	//backend
+	public static final String BACKEND_PROPERTIES_SERVICE_NAME = "Service";
+	public static final String BACKEND_PROPERTIES_DATABASE_TYPE = "Database_type";
+	public static final String BACKEND_PROPERTIES_DATABASE_NAME = "Database_name";
+	public static final String BACKEND_PROPERTIES_SERVER_URL = "Server_url";
 
 	//within content
 
@@ -135,11 +145,13 @@ public class ConfigurationManager {
 	public static final String ACTION_PROPERTIES_SCHEDULE= "Schedule";
 	private static Context mContext;
 	private static ContextManager mContextManager;
+	private static ArrayList<Configuration> mCongiurationList;
 	
 	public ConfigurationManager(Context context, ContextManager contextManager){
 
 		mContextManager = contextManager;
 		mContext = context;
+		mCongiurationList = new ArrayList<Configuration>();
 		loadConfiguration();
 	}
 
@@ -165,6 +177,9 @@ public class ConfigurationManager {
         //save string of configuration
         String configurationsStr = "";
 
+        Log.d(LOG_TAG, "[loadConfiguration] 1");
+
+
         /** first check if there's a configuraiton in the SharedPreference or not**/
         if ( !PreferenceHelper.getPreferenceString(PreferenceHelper.CONFIGURATIONS, "NA").equals("NA")) {
 
@@ -183,6 +198,8 @@ public class ConfigurationManager {
 
             Log.d(LOG_TAG, "[loadConfiguration] no configuration in the database, load configuration from file.." + filename);
             configurationsStr = new FileHelper(mContext).loadFileFromAsset(filename);
+            Log.d(LOG_TAG, "[loadConfiguration] file content is " + configurationsStr);
+
 
             //TODO: uncomment this: for testing purpose we need to comment out this so that we can alwasy load configuration from the file
 //            PreferenceHelper.setPreferenceValue(PreferenceHelper.CONFIGURATIONS, configurationsStr);
@@ -216,10 +233,13 @@ public class ConfigurationManager {
                 int version = configJSON.getInt(CONFIGURATION_PROPERTIES_VERSION);
                 String name = configJSON.getString(CONFIGURATION_PROPERTIES_NAME);
                 JSONObject content = configJSON.getJSONObject(CONFIGURATION_PROPERTIES_CONTENT);
-                Configuration config = new Configuration (id, study_id, version, name, content) ;
+
+				//create configuration object
+				Configuration config = new Configuration (id, study_id, version, name, content) ;
+				mCongiurationList.add(config);
 
                 //Load the content of the configuration
-                loadConfigurationContent (config);
+                loadConfigurationContent(config);
             }
 
         } catch (JSONException e) {
@@ -244,7 +264,7 @@ public class ConfigurationManager {
 		//source is in JSON format
 		JSONObject content = config.getContent();
 		
-		Log.d(LOG_TAG, "[loadConfigurationContent]  load the configuration content of study " + config.getStudyId());
+		Log.d(LOG_TAG, "[loadConfigurationContent]testbackend  load the configuration content of study " + config.getStudyId());
 
         //load configuration settings
         try {
@@ -261,6 +281,21 @@ public class ConfigurationManager {
         }
 
 
+		/** Backend **/
+		try {
+
+			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_BACKEND)){
+				JSONObject backendJSON = content.getJSONObject(CONFIGURATION_CATEGORY_BACKEND);
+                Log.d(LOG_TAG, "[loadConfigurationContent]testbackend  load the configuration content of study " +backendJSON);
+                loadBackendFromJSON(config, backendJSON, config.getStudyId());
+            }
+
+
+		}catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		/** load Logging **/
 		try {
 			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_LOGGING)){
@@ -274,8 +309,6 @@ public class ConfigurationManager {
 
 		/** load background recording setting **/
 		try {
-			Log.d(LOG_TAG, "[testBackgroundLogging]  load the configuration of backgroundlogging " + config.getStudyId());
-
 			if (content.has(ConfigurationManager.CONFIGURATION_CATEGORY_BACKGROUND_LOGGING)){
 				JSONObject backgroundLogging = content.getJSONObject(ConfigurationManager.CONFIGURATION_CATEGORY_BACKGROUND_LOGGING);
 				loadBackgroundLoggingFromJSON(backgroundLogging, config.getStudyId());
@@ -360,10 +393,50 @@ public class ConfigurationManager {
 			}
 
 
+
 			Log.d(LOG_TAG, "[testBackgroundLogging] load backgroundlogging enabled: " +
-					ContextManager.getBackgroundLoggingSetting().isEnabled()
+					ContextManager.getBackgroundLoggingSetting().isEnabled() +
+                    "logging tasks: " + ContextManager.getBackgroundLoggingSetting().getLoggingTasks()
 					+ " logging: " + ContextManager.getBackgroundLoggingSetting().getLoggingTasks() + " rate: " +
 					ContextManager.getBackgroundLoggingSetting().getLoggingRate());
+
+
+		}
+		catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+
+	}
+
+
+	/**
+	 * if the study wants background recording separate from the logging task, we need to read the
+	 * configuration
+	 * @param backendJSON
+	 * @param study_id
+	 */
+	public static void loadBackendFromJSON(Configuration config, JSONObject backendJSON, int study_id) {
+
+		try {
+
+            Log.d(LOG_TAG, "[testbackend] server setting:   " +backendJSON);
+
+            String databaseType  = backendJSON.getString(BACKEND_PROPERTIES_DATABASE_TYPE);
+			String databaseName  = backendJSON.getString(BACKEND_PROPERTIES_DATABASE_NAME);
+			String serviceName  = backendJSON.getString(BACKEND_PROPERTIES_SERVICE_NAME);
+			String serviceURL  = backendJSON.getString(BACKEND_PROPERTIES_SERVER_URL);
+
+            //add this to the configuration. Each study may have its own server
+            //TODO: separate settings for different studies
+            config.setBackendDatabaseName(databaseName);
+            config.setBackendDatabaseType(databaseType);
+            config.setBackendService(serviceName);
+            config.setBackendServiceURL(serviceURL);
+
+            RemoteDBHelper.setServerChoice(serviceName);
+            RemoteDBHelper.setProjectDatabaseName(databaseName);
+
+//			Log.d(LOG_TAG, "[testbackend] server setting:   " + RemoteDBHelper.REMOTE_SERVER_CHOICE  + " : " + RemoteDBHelper.ProjectDatabaseName);
 
 
 		}

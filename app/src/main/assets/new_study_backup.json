@@ -37,7 +37,7 @@
 			  {
 				"Service": "MongoLab",
 				"Database_type":"NoSQL",
-				"Database_name":"minuku",
+				"Database_name":"Minuku",
 				"Server_url":"https://api.mongolab.com/api/1/databases/"
 			  },
 
@@ -128,6 +128,81 @@
 						]
 					}					
 				],
+			
+				"Actions":
+				[
+					{
+						"Id": 1,
+						"Execution_style":"one-time",
+						"Type": "questionnaire",
+						"Name": "triggering carried item questionnaire",
+						"Questionnaire_id":1,
+						"Control":{
+							"Start":
+							[
+								{
+									"Launch": "triggered",
+									"Trigger": 
+									{
+										"Class":"Circumstance",
+										"Id":2,
+										"Sampling_rate": 1
+									},
+									"Schedule":
+									{
+										"Sample_method":"simple_one_time",
+										"Sample_delay": 2
+									}
+								}							
+							]
+						
+						},		
+						
+						"Notification":
+						[
+							{
+								"Launch":"when_start",	
+								"Type":"normal",
+								"Title": "What item are you carrying?",
+								"Message": "Please tab to report what items you are carrying."
+							}
+						]
+					},
+
+				  {
+					"Id": 2,
+					"Continuity":
+					{
+					  "Rate": 3,
+					  "Duration": -1
+					},
+					"Execution_style":"one_time",
+					"Type": "saving_record",
+					"Name": "recording context",
+					"Logging_tasks":"2",
+					"Control":{
+
+					  "Start":
+					  [
+						{
+						  "Launch": "app_start"
+						}
+
+					  ]
+					},
+					"Notification":
+					[
+					  {
+						"Launch":"when_start",
+						"Type":"normal",
+						"Title": "Minuku Recording....",
+						"Message": "Minuku is currently recording your information"
+					  }
+					]
+				  }
+				],
+
+
 
 				"Questionnaires":
 				[

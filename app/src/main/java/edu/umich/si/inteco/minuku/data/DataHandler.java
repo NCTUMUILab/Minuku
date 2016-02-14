@@ -135,7 +135,7 @@ public class DataHandler {
                 if (!recordpool.get(i).getSavedSessionIds().contains(session_id))
                     recordpool.get(i).getSavedSessionIds().add(session_id);
 
-//                 Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] finishing saving record " + recordpool.get(i).getSource() +  " at " + i + ", mark it has been saved by " + session_id + " now it has been saved by " +  recordpool.get(i).getSavedSessionIds());
+                 Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] finishing saving record " + recordpool.get(i).getSource() +  " at " + i + ", mark it has been saved by " + session_id + " now it has been saved by " +  recordpool.get(i).getSavedSessionIds());
 
 
             }catch (IndexOutOfBoundsException e ){

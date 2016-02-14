@@ -16,6 +16,7 @@ import android.view.Menu;
 
 import edu.umich.si.inteco.minuku.Fragments.CheckinSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.DailyJournalSectionFragment;
+import edu.umich.si.inteco.minuku.Fragments.HomeFragment;
 import edu.umich.si.inteco.minuku.Fragments.ListRecordingSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.RecordSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.TaskSectionFragment;
@@ -83,8 +84,8 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         }
 
 
-        // Create the adapter that will return a fragment for each of the three primary sections
-        // of the app.
+        /** Create the adapter that will return a fragment for each of the three primary sections
+        // of the app.**/
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the action bar.
@@ -117,27 +118,40 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         //we first set the mLaunchtab parameter based on the study condition
         //TODO: Probe should not have conditions, remove this after the labeling study..
-        if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)) {
-            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_RECORD;
-            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORD).setTabListener(this));
-            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
-        }
-        else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.IN_STIU_LABELING_CONDITION)) {
-            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT;
+
+        //Minuku is not running with any condition, just normaly. there's only profile interface in this condition.
+        if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.NORMAL_CONDITION)) {
+            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_HOME;
+            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_HOME).setTabListener(this));
         }
 
-        else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)) {
-            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT;
-            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
-        }
-        else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.HYRBID_LABELING_CONDITION)) {
-            mLaunchTab = Constants.MAIN_ACTIVITY_TAB_RECORD;
-            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORD).setTabListener(this));
-            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
+        //Minuku is running with Conditions
+        else {
+            if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)) {
+                mLaunchTab = Constants.MAIN_ACTIVITY_TAB_RECORD;
+                actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORD).setTabListener(this));
+                actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
+            }
+            else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.IN_STIU_LABELING_CONDITION)) {
+                mLaunchTab = Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT;
+            }
+
+            else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)) {
+                mLaunchTab = Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT;
+                actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
+            }
+            else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.HYRBID_LABELING_CONDITION)) {
+                mLaunchTab = Constants.MAIN_ACTIVITY_TAB_RECORD;
+                actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORD).setTabListener(this));
+                actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_RECORDINGS).setTabListener(this));
+            }
+
+            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT).setTabListener(this));
+            actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_TASKS).setTabListener(this));
+
         }
 
-        actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_DAILY_REPORT).setTabListener(this));
-        actionBar.addTab(actionBar.newTab().setText(Constants.MAIN_ACTIVITY_TAB_TASKS).setTabListener(this));
+
 
         currentTabPos = -1;
 
@@ -274,9 +288,15 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             sendScreenNameToGoogleAnalytic("Opening Minuku");
 
             switch (i) {
-                case 0:
 
-                    if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
+                case 0:
+                    if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.NORMAL_CONDITION)){
+                    HomeFragment homeSectionFragment = new HomeFragment();
+                        homeSectionFragment.setRetainInstance(true);
+                        return homeSectionFragment;
+                    }
+
+                    else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
                         RecordSectionFragment recordSectionFragment = new RecordSectionFragment();
                         recordSectionFragment.setRetainInstance(true);
 
@@ -287,13 +307,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                         checkinSectionFragment.setRetainInstance(true);
 
                         return checkinSectionFragment;
-                    }
-                    else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)) {
-                        mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_RECENT;
-                        ListRecordingSectionFragment listRecordingSectionFragment = new ListRecordingSectionFragment();
-                        listRecordingSectionFragment.setReviewMode(mReviewMode);
-                        listRecordingSectionFragment.setRetainInstance(true);
-                        return listRecordingSectionFragment;
                     }
 
                     else {
@@ -314,12 +327,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
                         return listRecordingSectionFragment;
                     }
-                    else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.POST_HOC_LABELING_CONDITION)){
-                        mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_RECENT;
-                        DailyJournalSectionFragment dailyJournalSectionFragment = new DailyJournalSectionFragment();
-                        dailyJournalSectionFragment.setRetainInstance(true);
-                        return dailyJournalSectionFragment;
-                    }
+
                     else {
 
                         TaskSectionFragment taskSectionFragment = new TaskSectionFragment();
