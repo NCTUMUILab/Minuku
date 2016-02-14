@@ -37,8 +37,9 @@
 			  {
 				"Service": "MongoLab",
 				"Database_type":"NoSQL",
-				"Database_name":"minuku",
-				"Server_url":"https://api.mongolab.com/api/1/databases/"
+				"Database_name":"testing",
+				"Server_url":"https://api.mongolab.com/api/1/databases/",
+				"Server_api":"3z6I1uChYEVs0DKMBF_d-B_lUsRIlsmf"
 			  },
 
 			  "BackgroundLogging":{
@@ -55,7 +56,7 @@
 				  },
 				  {
 					"Id": 2,
-				  	"Source": "AR.AllProbableActivities"
+				  	"Source": "ActivityRecognition"
 				  },
 				  {
 					"Id": 3,

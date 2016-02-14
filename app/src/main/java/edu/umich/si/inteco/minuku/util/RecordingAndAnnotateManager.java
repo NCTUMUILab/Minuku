@@ -336,6 +336,8 @@ public class RecordingAndAnnotateManager {
 
 
         }
+
+
         return session;
     }
 
@@ -856,57 +858,66 @@ public class RecordingAndAnnotateManager {
         long now = ContextManager.getCurrentTimeInMillis();
 
         Session session = getSession(BACKGOUND_LOGGING_SESSION_ID);
-        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments]testbackend] session: start time " + ScheduleAndSampleManager.getTimeString(session.getStartTime()) + " lastsync : " +   lastSyncHourTime);
 
-        long startTime =0;
-        long endTime  =0;
+        try {
 
-        //there's no backgrounding documents existing in the server
-        if (lastSyncHourTime==0) {
+            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments]testbackend] session: start time " + ScheduleAndSampleManager.getTimeString(session.getStartTime()) + " lastsync : " +   lastSyncHourTime);
+
+            long startTime =0;
+            long endTime  =0;
+
+            //there's no backgrounding documents existing in the server
+            if (lastSyncHourTime==0) {
 
 //            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] from be beginning " );
-            startTime = session.getStartTime();
-            //produce hour time
+                startTime = session.getStartTime();
+                //produce hour time
 
-            TimeZone tz = TimeZone.getDefault();
-            Calendar startCal = Calendar.getInstance(tz);
-            startCal.setTimeInMillis(startTime);
+                TimeZone tz = TimeZone.getDefault();
+                Calendar startCal = Calendar.getInstance(tz);
+                startCal.setTimeInMillis(startTime);
 
-            //get the date of now: the first month is Jan:0
-            int year = startCal.get(Calendar.YEAR);
-            int month = startCal.get(Calendar.MONTH) + 1;
-            int day = startCal.get(Calendar.DAY_OF_MONTH);
-            int hour = startCal.get(Calendar.HOUR_OF_DAY);
+                //get the date of now: the first month is Jan:0
+                int year = startCal.get(Calendar.YEAR);
+                int month = startCal.get(Calendar.MONTH) + 1;
+                int day = startCal.get(Calendar.DAY_OF_MONTH);
+                int hour = startCal.get(Calendar.HOUR_OF_DAY);
 
 
-            startCal.set(year, month-1,day, hour, 0,0);
+                startCal.set(year, month-1,day, hour, 0,0);
 
-            startTime = startCal.getTimeInMillis();
-            endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
-//            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments [testgetdata] no backgorund recording yet, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
+                startTime = startCal.getTimeInMillis();
+                endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
+                Log.d (LOG_TAG, "[getBackgroundRecordingDocuments [testbackend no backgorund recording yet, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
 
-        }
-        //there are specific lastSynchourTime
-        else {
-            //if the last sync hour in the database is 9, we start from 10, because 9 indicates that 9:00-10:00 has been stored. So we start from 10-11
-            startTime = lastSyncHourTime+ Constants.MILLISECONDS_PER_HOUR;
-            endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
+            }
+            //there are specific lastSynchourTime
+            else {
+                //if the last sync hour in the database is 9, we start from 10, because 9 indicates that 9:00-10:00 has been stored. So we start from 10-11
+                startTime = lastSyncHourTime+ Constants.MILLISECONDS_PER_HOUR;
+                endTime = startTime + Constants.MILLISECONDS_PER_HOUR;
 //            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments] [testgetdata] get lastSynchour, startTime " + ScheduleAndSampleManager.getTimeString(startTime) + " - " + ScheduleAndSampleManager.getTimeString(endTime) );
+            }
+
+
+            //for that many hours, we generate each hour to generate Background recoridng document
+            //getLogDocument(long startHourTime, long endHourTime)
+            while (endTime <now) {
+
+                JSONObject document= getBackgroundRecordingDocument(startTime, endTime);
+//                Log.d(LOG_TAG, "[getBackgroundRecordingDocuments][testbackend] get document" + document.toString());
+                documents.add(document);
+                startTime = endTime;
+                endTime += Constants.MILLISECONDS_PER_HOUR;
+            }
+
+        }catch (Exception e) {
+
+            Log.d (LOG_TAG, "[getBackgroundRecordingDocument]testbackend Error happens in getting session");
         }
 
 
-        //for that many hours, we generate each hour to generate Background recoridng document
-        //getLogDocument(long startHourTime, long endHourTime)
-        while (endTime <now) {
-
-            JSONObject document= getBackgroundRecordingDocument(startTime, endTime);
-            Log.d(LOG_TAG, "[getBackgroundRecordingDocuments][testbackend] get document" + document.toString());
-            documents.add(document);
-            startTime = endTime;
-            endTime += Constants.MILLISECONDS_PER_HOUR;
-        }
-
-//        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] the documents are:" + documents);
+        Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testing load session] the documents are:" + documents);
         return documents;
 
     }
@@ -915,7 +926,7 @@ public class RecordingAndAnnotateManager {
     //TODO: we should get background document based on the logging task.
      public static JSONObject getBackgroundRecordingDocument(long startTime, long endTime) {
 
-         Log.d (LOG_TAG, "[getBackgroundRecordingDocument][testgetdata] going to get background recording from " + ScheduleAndSampleManager.getTimeString(startTime) + " to " + ScheduleAndSampleManager.getTimeString(endTime));
+         Log.d (LOG_TAG, "[getBackgroundRecordingDocument][testbackend] going to get background recording from " + ScheduleAndSampleManager.getTimeString(startTime) + " to " + ScheduleAndSampleManager.getTimeString(endTime));
 
          //we will generate Background recording jSON basedon the 1st hour and the lasthour
          JSONObject document  = new JSONObject();
@@ -935,16 +946,16 @@ public class RecordingAndAnnotateManager {
          } catch (JSONException e) {
              e.printStackTrace();
          }
-
-         Log.d (LOG_TAG, "[getBackgroundRecordingDocument][testgetdata] before get session data the document is "
-                 + document);
+//
+//         Log.d (LOG_TAG, "[getBackgroundRecordingDocument][testgetdata] before get session data the document is "
+//                 + document);
 
 
          //create a session object from the database.
          Session session = getSession(RecordingAndAnnotateManager.BACKGOUND_LOGGING_SESSION_ID);
 
          //
-         Log.d (LOG_TAG, "[testBackgroundLogging][testgetdata] contextsource of session " + session.getId() + " are: " + session.getContextSourceNames() );
+         Log.d (LOG_TAG, "[testBackgroundLogging][testbackend] contextsource of session " + session.getId() + " are: " + session.getContextSourceNames() );
 
          for (int i=0; i<session.getContextSourceNames().size(); i++) {
 
@@ -1041,7 +1052,7 @@ public class RecordingAndAnnotateManager {
 
          }//end of contextsource document
 
-//         Log.d (LOG_TAG, "getBackgroundRecordingDocument [testgetdata] document " + document);
+         Log.d (LOG_TAG, "getBackgroundRecordingDocument [testbackend] document " + document);
          return document;
      }
 

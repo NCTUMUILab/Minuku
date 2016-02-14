@@ -918,6 +918,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
         try{
 
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
             String sql = "SELECT *"  +" FROM " + DatabaseNameManager.SESSION_TABLE_NAME +
                     //condition with session id
                     " where " + DatabaseNameManager.COL_ID + " = " + sessionId + "";

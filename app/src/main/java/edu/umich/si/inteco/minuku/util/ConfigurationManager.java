@@ -16,6 +16,7 @@ import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
+import edu.umich.si.inteco.minuku.data.MongoLabHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
@@ -97,6 +98,8 @@ public class ConfigurationManager {
 	public static final String BACKEND_PROPERTIES_DATABASE_TYPE = "Database_type";
 	public static final String BACKEND_PROPERTIES_DATABASE_NAME = "Database_name";
 	public static final String BACKEND_PROPERTIES_SERVER_URL = "Server_url";
+	public static final String BACKEND_PROPERTIES_SERVER_API = "Server_api";
+
 
 	//within content
 
@@ -425,6 +428,7 @@ public class ConfigurationManager {
 			String databaseName  = backendJSON.getString(BACKEND_PROPERTIES_DATABASE_NAME);
 			String serviceName  = backendJSON.getString(BACKEND_PROPERTIES_SERVICE_NAME);
 			String serviceURL  = backendJSON.getString(BACKEND_PROPERTIES_SERVER_URL);
+            String serviceAPI = backendJSON.getString(BACKEND_PROPERTIES_SERVER_API);
 
             //add this to the configuration. Each study may have its own server
             //TODO: separate settings for different studies
@@ -435,6 +439,20 @@ public class ConfigurationManager {
 
             RemoteDBHelper.setServerChoice(serviceName);
             RemoteDBHelper.setProjectDatabaseName(databaseName);
+
+
+            //assign API key to the right service
+            if (serviceName.equals(RemoteDBHelper.REMOTE_SERVER_MONGOLAB)){
+                MongoLabHelper.setMongolabApikey(serviceAPI);
+            }else if (serviceName.equals(RemoteDBHelper.REMOTE_SERVER_MICROSOFTAZZURE)) {
+
+            }else if (serviceName.equals(RemoteDBHelper.REMOTE_SERVER_MICROSOFTAZZURE)) {
+
+            }else if (serviceName.equals(RemoteDBHelper.REMOTE_SERVER_GOOGLEAPPENGINE)) {
+
+            }else if (serviceName.equals(RemoteDBHelper.REMOTE_SERVER_AMAZON)) {
+
+            }
 
 //			Log.d(LOG_TAG, "[testbackend] server setting:   " + RemoteDBHelper.REMOTE_SERVER_CHOICE  + " : " + RemoteDBHelper.ProjectDatabaseName);
 

@@ -55,7 +55,7 @@ public class MinukuMainService extends Service {
     /**Context Manager in General*/
     //the frequency of storing the cached records
 
-    public static int DEFAULT_DEVICE_CHECKING_COUNT = 120;//5 minutes. it counts down for every 5 seconds
+    public static int DEFAULT_DEVICE_CHECKING_COUNT = 60;//5 minutes. it counts down for every 5 seconds
 
     public static int DEFAULT_LOCATION_CHECKING_COUNT = 120;//half an hour. it counts down for every 5 seconds
 

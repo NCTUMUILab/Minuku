@@ -9,7 +9,8 @@ public class MongoLabHelper {
 
     /**MONGODBLAB**/
 
-    public static final String MONGOLAB_APIKEY = "3z6I1uChYEVs0DKMBF_d-B_lUsRIlsmf";
+    public static String MongoAPIKey = "NA";
+
     public static final String MONGOLAB_APIKEY_PARAMETER="apiKey";
 
     public static final String MONGOLAB_DATABASE = "minuku";
@@ -35,7 +36,7 @@ public class MongoLabHelper {
                 MONGOLAB_SORT_PARAMETER + "=" + "{\"" + DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_TIMESTAMP_HOUR + "\":" + MONGOLAB_SORT_DESCENDING_PARAMETER + "}" +
 
                 "&" + MONGOLAB_LIMIT_PARAMETER + "=" + 1 +
-                "&" + MONGOLAB_APIKEY_PARAMETER + "=" + MONGOLAB_APIKEY);
+                "&" + MONGOLAB_APIKEY_PARAMETER + "=" + MongoAPIKey);
 
 
     }
@@ -43,8 +44,13 @@ public class MongoLabHelper {
 
     public static String postDocumentURL(String database, String collection) {
 
-        return  ( MONGOLAB_URL + database + "/" + "collections/" + collection + "/?" + MONGOLAB_APIKEY_PARAMETER + "=" + MONGOLAB_APIKEY);
+        return  ( MONGOLAB_URL + database + "/" + "collections/" + collection + "/?" + MONGOLAB_APIKEY_PARAMETER + "=" + MongoAPIKey);
 
+    }
+
+    public static void setMongolabApikey (String key) {
+
+        MongoAPIKey = key;
     }
 
 

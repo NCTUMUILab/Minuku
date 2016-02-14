@@ -238,8 +238,6 @@ public class RemoteDBHelper {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-
         }
 
 
@@ -265,6 +263,9 @@ public class RemoteDBHelper {
         ArrayList<JSONObject> documents = RecordingAndAnnotateManager.getBackgroundRecordingDocuments(lastSyncHourTime);
         Log.d (LOG_TAG, "[postBackgroundRecordingDocuments]testbackend] the documents are:" + documents);
 
+//        Log.d (LOG_TAG, "[postBackgroundRecordingDocuments][testing load session] starting ");
+
+
         if (documents!=null) {
             for (int i= 0; i<documents.size(); i++) {
                 String json = documents.get(i).toString();
@@ -273,6 +274,8 @@ public class RemoteDBHelper {
                 //get backend information from the study configuration
 
                 if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MONGOLAB)) {
+
+                    Log.d (LOG_TAG, "[testbackend][syncWithRemoteDatabase] background document post to mongolab");
 
                     String postURL =MongoLabHelper.postDocumentURL(ProjectDatabaseName, DatabaseNameManager.MONGODB_COLLECTION_BACKGROUNDLOGGING);
 
@@ -481,7 +484,6 @@ public class RemoteDBHelper {
 
             URL url = new URL(address);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            Log.d(LOG_TAG, "[deviceChecking] connecting to " + address);
 
             conn.setReadTimeout(HTTP_TIMEOUT);
             conn.setConnectTimeout(SOCKET_TIMEOUT);
@@ -501,6 +503,9 @@ public class RemoteDBHelper {
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_QUERY_DATA,
                         "DeviceChecking");
+
+                Log.d(LOG_TAG, "[deviceChecking] connecting to " + address + " with data " + obj.toString());
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -729,6 +734,7 @@ public class RemoteDBHelper {
 
         //if there's no document in the BackgroundLogging collection, we just send all the documents. The lastsynchours is 0
         else {
+            Log.d(LOG_TAG, "syncWithRemoteDatabase [testbackend] there's no document on the server " );
             postBackgroundRecordingDocuments(0);
         }
     }
@@ -1295,6 +1301,7 @@ public class RemoteDBHelper {
                 MinunuServiceCheckinUsingPOST(AZURE_WEB_SERVICE_URL_DEVICE_CHECKING);
 
             else if (REMOTE_SERVER_CHOICE.equals(REMOTE_SERVER_MONGOLAB)){
+                Log.d(LOG_TAG, "[deviceChecking] ttpAsyncMinukuCheckin" + ProjectDatabaseName + " to collection " + DatabaseNameManager.MONGODB_COLLECTION_ISALIVE);
                 MinunuServiceCheckinUsingPOST(MongoLabHelper.postDocumentURL(ProjectDatabaseName, DatabaseNameManager.MONGODB_COLLECTION_ISALIVE));
             }
 

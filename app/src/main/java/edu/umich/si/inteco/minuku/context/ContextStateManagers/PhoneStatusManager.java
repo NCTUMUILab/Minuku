@@ -107,9 +107,11 @@ public class PhoneStatusManager extends ContextStateManager {
         String currentApp = "NA";
 
         /**
-         * we have to check whether the phone is after API 21 or not.
+         * we have to check whether the phone is above API 21 or not.
          */
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+
+            //UsageStatsManager is available after Lollipop
             UsageStatsManager usm = (UsageStatsManager) mContext.getSystemService(Context.USAGE_STATS_SERVICE);
 
             List<UsageStats> appList = null;
