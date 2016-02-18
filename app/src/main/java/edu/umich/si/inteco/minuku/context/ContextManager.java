@@ -80,8 +80,12 @@ public class ContextManager {
     public static final String CONTEXT_SOURCE_NAME_SENSOR = "Sensor";
     public static final String CONTEXT_SOURCE_NAME_SENSOR_PROXIMITY = "Sensor.Proximity";
     public static final String CONTEXT_SOURCE_NAME_SENSPR_ACCELEROMETER = "Sensor.Accelerometer";
-    public static final String CONTEXT_SOURCE_NAME_SENSPR_LIGHT = "Sensor.Light";
+    public static final String CONTEPhoneStatusManagerXT_SOURCE_NAME_SENSPR_LIGHT = "Sensor.Light";
 
+
+    public static final int CONTEXT_SOURCE_INVALID_VALUE_INTEGER = -9999;
+    public static final long CONTEXT_SOURCE_INVALID_VALUE_LONG_INTEGER = -9999;
+    public static final String CONTEXT_SOURCE_INVALID_VALUE_STRING = "NA";
 
     /*RECORD TYPE NAME*/
     public static final String CONTEXT_RECORD_TYPE_LOCATION_NAME = "Location";

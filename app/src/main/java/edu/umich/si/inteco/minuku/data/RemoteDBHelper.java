@@ -66,6 +66,9 @@ public class RemoteDBHelper {
     private static long lastLogfileUpdateTime=0;
     private static long lastSessionUpdateTime=0;
 
+    private static boolean submitDataOnlyOverWifi = true;
+
+
     public static final String DATA_TYPE_BACKGROUND_LOGGING = "background_recording";
     public static final String DATA_TYPE_SESSION_LOGGING = "session_recording";
     public static final String DATA_TYPE_PHONE_LOG = "phone_log";
@@ -1359,4 +1362,14 @@ public class RemoteDBHelper {
     public static void setLastSeverSyncTime(long lastSessionUpdateTime) {
         PreferenceHelper.setPreferenceValue(PreferenceHelper.DATABASE_LAST_SEVER_SYNC_TIME, lastSessionUpdateTime);
     }
+
+
+    public static void setSubmitDataOnlyOverWifi(boolean flag) {
+        submitDataOnlyOverWifi = flag;
+    }
+
+    public static boolean getSubmitDataOnlyOverWifi() {
+        return submitDataOnlyOverWifi;
+    }
+
 }

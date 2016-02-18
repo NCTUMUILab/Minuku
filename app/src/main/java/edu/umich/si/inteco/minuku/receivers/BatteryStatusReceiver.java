@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.BatteryManager;
 import android.util.Log;
 
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManager;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.BatteryHelper;
 
@@ -24,15 +26,14 @@ public class BatteryStatusReceiver extends BroadcastReceiver{
         int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
         float battPercentage = level/(float)scale;
 
-        BatteryHelper.setBatteryLevel(level);
-        BatteryHelper.setBatteryPercentage(battPercentage);
-
+        PhoneStatusManager.setBatteryLevel(level);
+        PhoneStatusManager.setBatteryPercentage(battPercentage);
 
         int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
         boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
                 status == BatteryManager.BATTERY_STATUS_FULL;
 
-        BatteryHelper.setCharging(isCharging);
+        PhoneStatusManager.setIsCharging(isCharging);
 
         int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
         boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
@@ -40,17 +41,18 @@ public class BatteryStatusReceiver extends BroadcastReceiver{
 
 
         if (!isCharging){
-            BatteryHelper.setBatteryChargingState(BatteryHelper.NO_CHARGING);
+            PhoneStatusManager.setBatteryChargingState(BatteryHelper.NO_CHARGING);
         }
         else if (chargePlug==BatteryManager.BATTERY_PLUGGED_USB){
-            BatteryHelper.setBatteryChargingState(BatteryHelper.USB_CHARGING);
+            PhoneStatusManager.setBatteryChargingState(BatteryHelper.USB_CHARGING);
         }else if (chargePlug==BatteryManager.BATTERY_PLUGGED_AC){
-            BatteryHelper.setBatteryChargingState(BatteryHelper.AC_CHARGING);
+            PhoneStatusManager.setBatteryChargingState(BatteryHelper.AC_CHARGING);
         }
 
         /*** we control whether to start or stop the Probe service based on the Battery status **/
+        //TODO: Kill Minuku service if the battery is low
 
-        Log.d(LOG_TAG, "[BatteryStatusReceiver] now the phone is " + BatteryHelper.getBatteryChargingState() + " the battery percentage is " + BatteryHelper.getBatteryPercentage());
+        Log.d(LOG_TAG, "[BatteryStatusReceiver] now the phone is " + PhoneStatusManager.getBatteryChargingState() + " the battery percentage is " + BatteryHelper.getBatteryPercentage());
 
         //when the phone is charging, we should just have the service running, regardless of the battery status
         if (isCharging) {
