@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManager;
@@ -70,7 +71,6 @@ public class ContextManager {
     public static final String CONTEXT_STATE_MANAGER_PHONE_STATUS = "PhoneStatus";
     public static final String CONTEXT_STATE_MANAGER_TRANSPORTATION = "Transportation";
     public static final String CONTEXT_STATE_MANAGER_USER_INTERACTION = "UserInteraction";
-
 
     public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION = "ActivityRecognition";
     public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION_PREFIX = "AR.";
@@ -139,8 +139,7 @@ public class ContextManager {
     //stores a list of ids of LoggingTask that are running by an Action
     private static ArrayList<Integer> mLoggingTaskByActionList;
 
-    //handle the local SQLite operation
-  	private static LocalDBHelper mLocalDBHelpder;
+    private static ArrayList<ContextStateManager> mContextStateMangers;
 
     private static BackgroundLoggingSetting mBackgroundLoggingSetting;
 
@@ -171,6 +170,8 @@ public class ContextManager {
 
 		mContext = context;
 
+        mContextStateMangers = new ArrayList<ContextStateManager>();
+
         mCircumstanceList = new ArrayList<Circumstance>();
 
         mLoggingTaskList = new ArrayList<LoggingTask>();
@@ -179,8 +180,6 @@ public class ContextManager {
 
         //initiate the RecordPool
         mRecordPool = new ArrayList<Record>();
-
-		mLocalDBHelpder = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 
         mScheduledExecutorService = Executors.newScheduledThreadPool(CONTEXT_MANAGER_REFRESH_FREQUENCY);
 
@@ -203,6 +202,18 @@ public class ContextManager {
 
         mMobilityManager = new MobilityManager(mContext, this);
 
+        Log.d(LOG_TAG, "test creat tables before add csms");
+
+
+        /***Add ContextStateManagers**/
+        mContextStateMangers.add(mLocationManager);
+        mContextStateMangers.add(mActivityRecognitionManager);
+        mContextStateMangers.add(mTransportationModeManager);
+        mContextStateMangers.add(mPhoneSensorManager);
+        mContextStateMangers.add(mPhoneStatusManager);
+
+
+        Log.d(LOG_TAG, "test creat tables after add csms");
 	}
 
     /**
@@ -1195,6 +1206,9 @@ public class ContextManager {
         }
     }
 
+    public static ArrayList<ContextStateManager> getContextStateManagerList() {
+        return mContextStateMangers;
+    }
 
 
     public static int getSourceTypeFromName (String contextStateManager, String sourceName){

@@ -13,6 +13,13 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Configuration;
 import edu.umich.si.inteco.minuku.model.Criterion;
@@ -62,6 +69,8 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
 		//when the DBHelper is initiated, create the necessary tables
 		if (db!=null){
+
+			Log.d(LOG_TAG, "test creat tables before LBLocal oncreate");
 
 			////Log.d(LOG_TAG, " the DB " + db.toString() + " has existed");
 
@@ -225,7 +234,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
      */
     public void createRecordTable(SQLiteDatabase db, String table_name){
 
-    	////Log.d(LOG_TAG, " enter createSessionTable()");
+    	Log.d(LOG_TAG, " test creat tables enter createSessionTable()");
 
     	String cmd = SQL_CMD_CREATE_TABLE + " " +
     				table_name + " ( "+
@@ -246,21 +255,56 @@ public class LocalDBHelper extends SQLiteOpenHelper{
      */
     private void createRecordTables (SQLiteDatabase db){
 
-    	//Location
-    	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_LOCATION);
-    	createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY_RECOGNITION);
-		createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_TRANSPORTATION);
-        createRecordTable (db, DatabaseNameManager.RECORD_TABLE_NAME_APPLICATION_ACTIVITY);
+		Log.d(LOG_TAG, " test creat tables ContextManager.getContextStateManagerList() " + ContextManager.getContextStateManagerList());
 
-		/**Sensor**/
-    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_ACCELEROMETER);
-    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_ACCELERATION);
-    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_AMBIENT_TEMPERATURE);
-    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_PRESSURE);
-    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_PROXIMITY);
-    	createRecordTable(db, DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_LIGHT);
+		Log.d(LOG_TAG, "test creat tables  ContextManager.getContextStateManagerList() " + ContextManager.getContextStateManagerList().size());
 
-		//TODO: to add more tables
+
+//		for (int i=0; i<  LocationManager.getAllDatabaseTableNames().size(); i++){
+//			String name =  LocationManager.getAllDatabaseTableNames().get(i);
+//			createRecordTable(db,name);
+//			Log.d(LOG_TAG, "[test creat tables] create tables :" + name);
+//		}
+//
+//		for (int i=0; i<  ActivityRecognitionManager.getAllDatabaseTableNames().size(); i++){
+//			String name =  ActivityRecognitionManager.getAllDatabaseTableNames().get(i);
+//			createRecordTable(db,name);
+//			Log.d(LOG_TAG, "[test creat tables] create tables :" + name);
+//		}
+//
+//		for (int i=0; i<  PhoneStatusManager.getAllDatabaseTableNames().size(); i++){
+//			String name =  PhoneStatusManager.getAllDatabaseTableNames().get(i);
+//			createRecordTable(db,name);
+//			Log.d(LOG_TAG, "[test creat tables] create tables :" + name);
+//		}
+//
+//		for (int i=0; i<  PhoneSensorManager.getAllDatabaseTableNames().size(); i++){
+//			String name =  PhoneSensorManager.getAllDatabaseTableNames().get(i);
+//			createRecordTable(db,name);
+//			Log.d(LOG_TAG, "[test creat tables] create tables :" + name);
+//		}
+//
+//		for (int i=0; i<  TransportationModeManager.getAllDatabaseTableNames().size(); i++){
+//			String name =  TransportationModeManager.getAllDatabaseTableNames().get(i);
+//			createRecordTable(db,name);
+//			Log.d(LOG_TAG, "[test creat tables] create tables :" + name);
+//		}
+
+
+
+		/**loop through ContextStateManagers to create record tables (record tables are defined in each ContextStateManager**/
+		for (int i=0; i< ContextManager.getContextStateManagerList().size(); i++){
+
+			ContextStateManager csm = ContextManager.getContextStateManagerList().get(i);
+
+			Log.d(LOG_TAG, "[test creat tables] create tables : now CSM is " + csm.getName() + " all table name size :" + csm.getAllDatabaseTableNames().size()  );
+
+			for (int j=0; j<csm.getAllDatabaseTableNames().size(); j++) {
+
+				createRecordTable(db, csm.getAllDatabaseTableNames().get(j));
+				Log.d(LOG_TAG, "[test creat tables] create tables :" + csm.getAllDatabaseTableNames().get(j));
+			}
+		}
     }
 
 

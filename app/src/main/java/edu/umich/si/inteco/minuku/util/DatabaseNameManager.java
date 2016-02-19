@@ -28,25 +28,6 @@ public class DatabaseNameManager {
 	
 	public static final String USER_RESPONSE_TABLE_NAME = "UserResponse_Table";
 
-
-
-    /**Record Table**/
-	public static final String RECORD_TABLE_NAME_LOCATION = "Record_Table_Location";
-	public static final String RECORD_TABLE_NAME_ACTIVITY_RECOGNITION = "Record_Table_ActivityRecognition";
-    public static final String RECORD_TABLE_NAME_TRANSPORTATION = "Record_Table_Transportation";
-    public static final String RECORD_TABLE_NAME_APPLICATION_ACTIVITY = "Record_Table_AppActivity";
-	public static final String RECORD_TABLE_NAME_SENSOR_ACCELEROMETER = "Record_Table_Accelerometer";
-	public static final String RECORD_TABLE_NAME_SENSOR_GRAVITY  = "Record_Table_Sensor_Gravity";
-	public static final String RECORD_TABLE_NAME_SENSOR_GYRSCOPE = "Record_Table_Sensor_Gyroscope";
-	public static final String RECORD_TABLE_NAME_SENSOR_ACCELERATION = "Record_Table_Sensor_Linear_Acceleration";
-	public static final String RECORD_TABLE_NAME_SENSOR_ROTATION_VECTOR = "Record_Table_Sensor_Rotation_Vector";
-	public static final String RECORD_TABLE_NAME_SENSOR_MAGNETIC_FIELD = "Record_Table_Sensor_Magnetic_Field";
-	public static final String RECORD_TABLE_NAME_SENSOR_ORIENTATION = "Record_Table_Sensor_Orientation";
-	public static final String RECORD_TABLE_NAME_SENSOR_PROXIMITY = "Record_Table_Sensor_Proximity";
-	public static final String RECORD_TABLE_NAME_SENSOR_AMBIENT_TEMPERATURE = "Record_Table_Sensor_Ambient_Temperature";
-	public static final String RECORD_TABLE_NAME_SENSOR_LIGHT = "Record_Table_Sensor_Light";
-	public static final String RECORD_TABLE_NAME_SENSOR_PRESSURE = "Record_Table_Sensor_Pressure";
-	public static final String RECORD_TABLE_NAME_SENSOR_HUMIDITY = "Record_Table_Sensor_Humidity";
 	public static final String COL_ID = "_id";
 	
 	

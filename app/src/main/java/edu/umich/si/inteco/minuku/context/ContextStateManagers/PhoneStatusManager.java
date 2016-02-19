@@ -53,7 +53,13 @@ public class PhoneStatusManager extends ContextStateManager {
     /** Tag for logging. */
     private static final String LOG_TAG = "PhoneStatusManager";
 
-    /**Properties for Record**/
+    /**Table Names**/
+    public static final String RECORD_TABLE_NAME_APPUSAGE = "Record_Table_AppUsage";
+    public static final String RECORD_TABLE_NAME_TELEPHONY = "Record_Table_Telephony";
+    public static final String RECORD_TABLE_NAME_CONNECTIVITY = "Record_Table_Connectivity";
+    public static final String RECORD_TABLE_NAME_BATTERY = "Record_Table_Battery";
+    public static final String RECORD_TABLE_NAME_RINGER = "Record_Table_Ringer";
+
     /**Properties for Record**/
     public static final String RECORD_DATA_PROPERTY_BATTERY_LEVEL = "Level";
     public static final String RECORD_DATA_PROPERTY_BATTERY_PERCENTAGE = "Percentage";
@@ -1206,6 +1212,42 @@ public class PhoneStatusManager extends ContextStateManager {
 
     public static void setGSM(boolean isGSM) {
         mIsGSM = isGSM;
+    }
+
+    /**Database table name should be defined by each ContextStateManager. So each CSM should overwrite this**/
+    public static String getDatabaseTableNameBySourceName (String sourceName) {
+
+        if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY))
+            return RECORD_TABLE_NAME_BATTERY;
+        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE))
+            return RECORD_TABLE_NAME_APPUSAGE;
+        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY))
+            return RECORD_TABLE_NAME_CONNECTIVITY;
+        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY))
+            return RECORD_TABLE_NAME_TELEPHONY;
+        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER))
+            return RECORD_TABLE_NAME_RINGER;
+        else
+            return null;
+
+    }
+
+    /**
+     * this function should return a list of database table names for its contextsource. Must implement it
+     * in order to create tables
+     * @return
+     */
+    @Override
+    public ArrayList<String> getAllDatabaseTableNames () {
+        ArrayList<String> tablenames = new ArrayList<String>();
+
+        tablenames.add(RECORD_TABLE_NAME_BATTERY);
+        tablenames.add(RECORD_TABLE_NAME_APPUSAGE);
+        tablenames.add(RECORD_TABLE_NAME_CONNECTIVITY);
+        tablenames.add(RECORD_TABLE_NAME_RINGER);
+        tablenames.add(RECORD_TABLE_NAME_TELEPHONY);
+
+        return tablenames;
     }
 
 

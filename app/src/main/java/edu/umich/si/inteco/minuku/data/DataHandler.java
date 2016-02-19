@@ -15,11 +15,18 @@ import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.UserInteractionManager;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
+import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
 public class DataHandler {
 
@@ -55,30 +62,6 @@ public class DataHandler {
      * @return
      */
 
-    //TODO: complete the list
-    public static String getTableNameByRecordType(String source) {
-
-        String tableName = "";
-
-        if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
-            tableName = DatabaseNameManager.RECORD_TABLE_NAME_LOCATION;
-        }
-        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)) {
-            tableName = DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY_RECOGNITION;
-        }
-        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_TRANSPORTATION)) {
-            tableName = DatabaseNameManager.RECORD_TABLE_NAME_TRANSPORTATION;
-        }
-        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_SENSPR_ACCELEROMETER)) {
-            tableName = DatabaseNameManager.RECORD_TABLE_NAME_SENSOR_ACCELEROMETER;
-        }
-
-
-
-        return tableName;
-    }
-
-	
 	 
 	/**
 	 * write data to the local sqllite database
@@ -129,7 +112,7 @@ public class DataHandler {
             try{
 
                 //LocalDBHelper will save the record according to the type of the record
-                LocalDBHelper.insertRecordTable ( recordpool.get(i), getTableNameByRecordType(recordpool.get(i).getSource()), session_id);
+                LocalDBHelper.insertRecordTable ( recordpool.get(i), getTableNameByContextSourceName(recordpool.get(i).getSource()), session_id);
 
                 //mark the record as being saved by the session.
                 if (!recordpool.get(i).getSavedSessionIds().contains(session_id))
@@ -248,7 +231,7 @@ public class DataHandler {
         ArrayList<String> resultList = new ArrayList<String>();
 
         //first know which table and column to query..
-        String tableName= getTableNameByRecordType(sourceName);
+        String tableName= getTableNameByContextSourceName(sourceName);
         Log.d(LOG_TAG, "[getDataBySession][testgetdata] getting data from  " + tableName);
 
         //get data from the table
@@ -306,29 +289,12 @@ public class DataHandler {
         ArrayList<String> resultList = new ArrayList<String>();
 
         //first know which table and column to query..
-        ArrayList<String> tableAndColumns = getTableAndColumnByVizType(annotationVizType);
+        String tableName = getTableAndColumnByVizType(annotationVizType);
 
-        String tableName="";
+        resultList = LocalDBHelper.queryRecordsInSession(tableName, sessionId);
+        Log.d(LOG_TAG, "[getDataBySession] got " + resultList.size() + " of results from queryRecordsInSession");
 
-        //get table and column names
-        if (tableAndColumns!=null && tableAndColumns.size()>0){
-
-            tableName = tableAndColumns.get(0);
-
-            //get result without filter any columns
-            if (tableAndColumns.size()==1){
-
-                //execute the query
-                resultList = LocalDBHelper.queryRecordsInSession(tableName, sessionId);
-                Log.d(LOG_TAG, "[getDataBySession] got " + resultList.size() + " of results from queryRecordsInSession");
-
-
-
-            }
-
-        }
-
-            return resultList;
+        return resultList;
     }
 
 
@@ -410,21 +376,41 @@ public class DataHandler {
     }
     */
 
-    public static String getLastSavedRecordInSession(int sessionId) {
-
+    public static long getTimeOfLastSavedRecordInSession(int sessionId, ArrayList<String> contextsources) {
 
         ArrayList<String> res = new ArrayList<String>();
 
-        res = LocalDBHelper.queryLastRecord(
-                DatabaseNameManager.RECORD_TABLE_NAME_LOCATION,
-                sessionId);
+        long latestTime = 0;
 
-        Log.d(LOG_TAG, "[getLastSavedActivityRecord] the last record is " + res);
+        /**we loop through the contextsources tables to find the latest time**/
+        for (int i=0; i<contextsources.size(); i++){
 
-        if (res.size()>0)
-            return res.get(0);
-        else
-            return null;
+            res = LocalDBHelper.queryLastRecord(
+                    getTableNameByContextSourceName(contextsources.get(i)),
+                    sessionId);
+
+            Log.d(LOG_TAG, "[test get session time] testgetdata the last record is " + res);
+            //if there's a record
+            if (res!=null && res.size()>0){
+
+                String lastRecord = res.get(0);
+                long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
+                Log.d(LOG_TAG, "[test get session time] testgetdata the last record time is " + ScheduleAndSampleManager.getTimeString(time));
+
+                //compare time
+                if (time>latestTime){
+                    latestTime = time;
+                    Log.d(LOG_TAG, "[test get session time] update, latest time is changed to  " + ScheduleAndSampleManager.getTimeString(time));
+
+                }
+            }
+
+        }
+
+        Log.d(LOG_TAG, "[test get session time]return the latest time: " + ScheduleAndSampleManager.getTimeString(latestTime));
+
+        return latestTime;
+
     }
 
 
@@ -576,60 +562,19 @@ public class DataHandler {
 	}*/
 
 
-    public static ArrayList<String> getTableAndColumnByVizType(String annotationVizType) {
-
-        ArrayList<String> TableAndColumns = new ArrayList<String>();
-
+    public static String getTableAndColumnByVizType(String annotationVizType) {
 
         if (annotationVizType==RecordingAndAnnotateManager.ANNOTATION_VISUALIZATION_TYPE_LOCATION) {
 
-            TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_LOCATION);
-
+            return LocationManager.RECORD_TABLE_NAME_LOCATION;
 
         }
-        return TableAndColumns;
+
+        return null;
 
     }
 
 
-
-	/**
-	 * This function gets the condition and find the corresponding Table and Columns in the local database.
-	 * @param condition
-	 * @return
-	 */
-    /*
-	public static ArrayList<String> getTableAndColumnByConditionType (Condition condition) {
-		
-		//the first value in the array is Table name, the rest is the column names. Note that there could be more than one column
-		ArrayList<String> TableAndColumns = new ArrayList<String>();	
-		
-		//Log.d(LOG_TAG, "[getTableAndColumnByConditionType] the condition type is " + condition.getType());
-
-		if (condition.getType().equals(ConditionManager.CONDITION_TYPE_ACTIVITY_TYPE)){	
-			
-			TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY);
-			TableAndColumns.add(DatabaseNameManager.COL_ACTIVITY_1);	//type of the most probable activity	
-		}
-		
-		if (condition.getType().equals(ConditionManager.CONDITION_TYPE_ACTIVITY_CONFIDENCE)){
-			
-			TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_ACTIVITY);
-			TableAndColumns.add(DatabaseNameManager.COL_ACTIVITY_CONF_1);	//confidence of the most probable activity	
-		}
-		
-
-		if (condition.getType().equals(ConditionManager.CONDITION_TYPE_DISTANCE_TO)){
-			//Log.d(LOG_TAG, "[getTableAndColumnByConditionType] the condition is distance");
-			TableAndColumns.add(DatabaseNameManager.RECORD_TABLE_NAME_LOCATION);
-		}
-		
-		
-		return TableAndColumns;
-		
-	}
-	*/
-	
 	
 	/***
 	 * 
@@ -647,80 +592,6 @@ public class DataHandler {
 		return s;
 	}
 
-
-    /**
-     * this function inquire ContextManager to get ContextStateManager, and then get their defined tableNames.
-     * @param sourceName
-     * @return
-     */
-    //not sure yet this should be in ContextMAnager or in DBHandler
-    private static String getTableNameByContextSource(String sourceName) {
-
-
-        String tableName = null;
-
-
-
-
-
-
-        return tableName;
-    }
-
-	
-	/**
-	 * 
-	 * @param number
-	 * @return
-	 */
-
-    //TODO: getTableNameByContextSource
-    /*
-	private static String getTableNameBySensorSourceNumber(int number){
-		
-		String tableName = "";
-		
-		if (number== Sensor.TYPE_ACCELEROMETER){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_ACCELEROMETER;
-		}else if (number==Sensor.TYPE_GRAVITY){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_GRAVITY;
-		}else if (number==Sensor.TYPE_GYROSCOPE){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_GYRSCOPE;
-		}else if (number==Sensor.TYPE_LINEAR_ACCELERATION){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_ACCELERATION;
-		}else if (number==Sensor.TYPE_ROTATION_VECTOR){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_ROTATION_VECTOR;
-		}else if (number==Sensor.TYPE_MAGNETIC_FIELD){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_MAGNETIC_FIELD;
-		}else if (number==Sensor.TYPE_PROXIMITY){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_PROXIMITY;
-		}else if (number==Sensor.TYPE_AMBIENT_TEMPERATURE){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_AMBIENT_TEMPERATURE;
-		}else if (number==Sensor.TYPE_LIGHT){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_LIGHT;
-		}else if (number==Sensor.TYPE_PRESSURE){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_PRESSURE;
-		}else if (number==Sensor.TYPE_RELATIVE_HUMIDITY){
-			tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
-		}
-        //TODO: add health relate sensor conditions, e.g. hear reate, step
-
-        else if (number==Sensor.TYPE_HEART_RATE){
-            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
-        }
-        else if (number==Sensor.TYPE_STEP_COUNTER){
-            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
-        }
-        else if (number==Sensor.TYPE_STEP_DETECTOR){
-            //tableName = DatabaseNameManager.RECORD_TABLE_NAME_HUMIDITY;
-        }
-
-		
-		return tableName; 
-	}
-*/
-	
-	
 	
 	/***get the filename based on the sensor source**/
 	private static String getFileNameBySensorSourceNumber(int number){
@@ -762,35 +633,35 @@ public class DataHandler {
 		
 		return filename;
 	}
-	
-	
-	/***
-	 * 
-	 * 
-	 * *Utility Functions**
-	 * 
-	 * 
-	 * 
-	 * ***/
-	/**get the current time in milliseconds**/
-	public static long getCurrentTimeInMilli(){		
-		//get timzone		
-		TimeZone tz = TimeZone.getDefault();		
-		Calendar cal = Calendar.getInstance(tz);
-		long t = cal.getTimeInMillis();		
-		return t;
-	}
-	
-	/**get the current time in string (in the format of "yyyy-MM-dd HH:mm:ss" **/
-	public static String getCurrentTimeString(){		
-		//get timzone		
-		TimeZone tz = TimeZone.getDefault();		
-		Calendar cal = Calendar.getInstance(tz);
-		
-		SimpleDateFormat sdf_now = new SimpleDateFormat(Constants.DATE_FORMAT_NOW);
-		String currentTimeString = sdf_now.format(cal.getTime());
-		
-		return currentTimeString;
-	}
+
+    //TODO: complete the list
+    public static String getTableNameByContextSourceName(String source) {
+
+        String tableName = null;
+
+        if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
+            tableName = LocationManager.getDatabaseTableNameBySourceName(source);
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)) {
+            tableName = ActivityRecognitionManager.getDatabaseTableNameBySourceName(source);
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_TRANSPORTATION)) {
+            tableName = TransportationModeManager.getDatabaseTableNameBySourceName(source);
+        }
+        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR_PREFIX)) {
+            tableName = PhoneSensorManager.getDatabaseTableNameBySourceName(source);
+        }
+        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX)) {
+            tableName = PhoneStatusManager.getDatabaseTableNameBySourceName(source);
+        }
+        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_USER_INTERACTION_PREFIX)) {
+            tableName = UserInteractionManager.getDatabaseTableNameBySourceName(source);
+        }
+
+        return tableName;
+    }
+
+
+
 
 }

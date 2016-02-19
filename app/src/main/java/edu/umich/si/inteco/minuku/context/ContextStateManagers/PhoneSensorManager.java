@@ -14,12 +14,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.Record.Record;
@@ -31,6 +29,25 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     private static final String LOG_TAG = "PhoneSensorMnger";
 
     public static String CONTEXT_SOURCE_PHONE_SENSOR = "PhoneSensor";
+
+
+    /**Table Name**/
+    public static final String RECORD_TABLE_NAME_SENSOR_ACCELEROMETER = "Record_Table_Accelerometer";
+    public static final String RECORD_TABLE_NAME_SENSOR_GRAVITY  = "Record_Table_Sensor_Gravity";
+    public static final String RECORD_TABLE_NAME_SENSOR_GYRSCOPE = "Record_Table_Sensor_Gyroscope";
+    public static final String RECORD_TABLE_NAME_SENSOR_ACCELERATION = "Record_Table_Sensor_Linear_Acceleration";
+    public static final String RECORD_TABLE_NAME_SENSOR_ROTATION_VECTOR = "Record_Table_Sensor_Rotation_Vector";
+    public static final String RECORD_TABLE_NAME_SENSOR_MAGNETIC_FIELD = "Record_Table_Sensor_Magnetic_Field";
+    public static final String RECORD_TABLE_NAME_SENSOR_ORIENTATION = "Record_Table_Sensor_Orientation";
+    public static final String RECORD_TABLE_NAME_SENSOR_PROXIMITY = "Record_Table_Sensor_Proximity";
+    public static final String RECORD_TABLE_NAME_SENSOR_AMBIENT_TEMPERATURE = "Record_Table_Sensor_Ambient_Temperature";
+    public static final String RECORD_TABLE_NAME_SENSOR_LIGHT = "Record_Table_Sensor_Light";
+    public static final String RECORD_TABLE_NAME_SENSOR_PRESSURE = "Record_Table_Sensor_Pressure";
+    public static final String RECORD_TABLE_NAME_SENSOR_HUMIDITY = "Record_Table_Sensor_Humidity";
+    public static final String RECORD_TABLE_NAME_SENSOR_HEART_RATE = "Record_Table_Sensor_Hear_Rate";
+    public static final String RECORD_TABLE_NAME_SENSOR_STEP_COUNTER = "Record_Table_Sensor_Step_Counter";
+    public static final String RECORD_TABLE_NAME_SENSOR_STEP_DETECTION = "Record_Table_Sensor_Step_Detection";
+
 
     /**Properties for Record**/
     public static final String RECORD_DATA_PROPERTY_NAME = "SensorValues";
@@ -790,6 +807,8 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         saveRecordToLocalRecordPool(PHONE_SENSOR_ROTATION_VECTOR, event.values);
     }
 
+
+
     /**get magnetic field values**/
     private void getMagneticField(SensorEvent event){
         mMagneticField_x = event.values[0];	// Geomagnetic field strength along the x axis.
@@ -855,6 +874,68 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mStepDetect = event.values[0];
 
         saveRecordToLocalRecordPool(PHONE_SENSOR_STEP_DETECTOR, event.values);
+    }
+
+
+    /**Database table name should be defined by each ContextStateManager. So each CSM should overwrite this**/
+    public static String getDatabaseTableNameBySourceName (String sourceName) {
+
+        switch (sourceName) {
+            case PHONE_SENSOR_ACCELEROMETER:
+                return RECORD_TABLE_NAME_SENSOR_ACCELEROMETER;
+            case PHONE_SENSOR_GYROSCOPE:
+                return RECORD_TABLE_NAME_SENSOR_GYRSCOPE;
+            case PHONE_SENSOR_GRAVITY:
+                return RECORD_TABLE_NAME_SENSOR_GRAVITY;
+            case PHONE_SENSOR_ROTATION_VECTOR:
+                return RECORD_TABLE_NAME_SENSOR_ROTATION_VECTOR;
+            case PHONE_SENSOR_LINEAR_ACCELERATION:
+                return RECORD_TABLE_NAME_SENSOR_ACCELERATION;
+            case PHONE_SENSOR_PROXIMITY:
+                return RECORD_TABLE_NAME_SENSOR_PROXIMITY;
+            case PHONE_SENSOR_AMBIENT_TEMPERATURE:
+                return RECORD_TABLE_NAME_SENSOR_AMBIENT_TEMPERATURE;
+            case PHONE_SENSOR_LIGHT:
+                return RECORD_TABLE_NAME_SENSOR_LIGHT;
+            case PHONE_SENSOR_PRESSURE:
+                return RECORD_TABLE_NAME_SENSOR_PRESSURE;
+            case PHONE_SENSOR_RELATIVE_HUMIDITY:
+                return RECORD_TABLE_NAME_SENSOR_HUMIDITY;
+            case PHONE_SENSOR_HEART_RATE:
+                return RECORD_TABLE_NAME_SENSOR_HEART_RATE;
+            case PHONE_SENSOR_STEP_COUNTER:
+                return RECORD_TABLE_NAME_SENSOR_STEP_COUNTER;
+            case PHONE_SENSOR_STEP_DETECTOR:
+                return RECORD_TABLE_NAME_SENSOR_STEP_DETECTION;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * this function should return a list of database table names for its contextsource. Must implement it
+     * in order to create tables
+     * @return
+     */
+    @Override
+    public ArrayList<String> getAllDatabaseTableNames () {
+        ArrayList<String> tablenames = new ArrayList<String>();
+
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_ACCELEROMETER);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_GYRSCOPE);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_GRAVITY);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_ROTATION_VECTOR);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_ACCELERATION);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_PROXIMITY);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_AMBIENT_TEMPERATURE);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_LIGHT);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_PRESSURE);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_HUMIDITY);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_HEART_RATE);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_STEP_COUNTER);
+        tablenames.add(RECORD_TABLE_NAME_SENSOR_STEP_DETECTION);
+
+        return tablenames;
     }
 
     /**get the current time in milliseconds**/

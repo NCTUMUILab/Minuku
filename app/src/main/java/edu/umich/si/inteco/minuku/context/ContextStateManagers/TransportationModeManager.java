@@ -32,6 +32,9 @@ public class TransportationModeManager extends ContextStateManager {
     public static final String STRING_CONTEXT_SOURCE_TRANSPORTATION = "Transportation";
     public static final String STRING_CONTEXT_SOURCE_DETECTION_STATE = "DetectionState";
 
+    /**Table Name**/
+    public static final String RECORD_TABLE_NAME_TRANSPORTATION = "Record_Table_Transportation";
+
     public static final int STATE_STATIC = 0;
     public static final int STATE_SUSPECTING_START = 1;
     public static final int STATE_CONFIRMED = 2;
@@ -772,6 +775,25 @@ public class TransportationModeManager extends ContextStateManager {
 
     public static void addActivityRecognitionRecord(ActivityRecognitionRecord record) {
         getActivityRecognitionRecords().add(record);
+    }
+
+    /**Database table name should be defined by each ContextStateManager. So each CSM should overwrite this**/
+    public static String getDatabaseTableNameBySourceName (String sourceName) {
+        return RECORD_TABLE_NAME_TRANSPORTATION;
+    }
+
+    /**
+     * this function should return a list of database table names for its contextsource. Must implement it
+     * in order to create tables
+     * @return
+     */
+    @Override
+    public ArrayList<String> getAllDatabaseTableNames () {
+        ArrayList<String> tablenames = new ArrayList<String>();
+
+        tablenames.add(RECORD_TABLE_NAME_TRANSPORTATION);
+
+        return tablenames;
     }
 
 

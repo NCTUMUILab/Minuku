@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.umich.si.inteco.minuku.Constants;
@@ -30,6 +31,9 @@ import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
  */
 public class ActivityRecognitionManager extends ContextStateManager
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    /**Table Name**/
+    public static final String RECORD_TABLE_NAME_ACTIVITY_RECOGNITION = "Record_Table_ActivityRecognition";
 
 
     /**ContextSourceType**/
@@ -590,6 +594,24 @@ public class ActivityRecognitionManager extends ContextStateManager
     }
 
 
+    /**Database table name should be defined by each ContextStateManager. So each CSM should overwrite this**/
+    public static String getDatabaseTableNameBySourceName (String sourceName) {
+        return RECORD_TABLE_NAME_ACTIVITY_RECOGNITION;
+    }
+
+    /**
+     * this function should return a list of database table names for its contextsource. Must implement it
+     * in order to create tables
+     * @return
+     */
+    @Override
+    public ArrayList<String> getAllDatabaseTableNames () {
+        ArrayList<String> tablenames = new ArrayList<String>();
+
+        tablenames.add(RECORD_TABLE_NAME_ACTIVITY_RECOGNITION);
+
+        return tablenames;
+    }
 
     /**
      * Map detected activity types to strings

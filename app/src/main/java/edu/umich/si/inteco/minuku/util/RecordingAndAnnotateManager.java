@@ -287,27 +287,30 @@ public class RecordingAndAnnotateManager {
             String contextsourceString = separated[DatabaseNameManager.COL_INDEX_SESSION_CONTEXTSOURCES];
             String[] contextsourceArray = contextsourceString.split(Constants.CONTEXT_SOURCE_DELIMITER);
 
-            Log.d(LOG_TAG, "[get session][ testBackgroundLogging] sessions contextsource are " + contextsourceArray.toString());
+            /** 1. create sessions from the properies obtained **/
+            session = new Session(id, startTime, taskId );
 
+            session.setBatteryLife(batteryLife);
+            session.setContextSourceTypes(contextsourceArray);
+
+            /**2. get end time (or time of the last record) of the sesison**/
 
             long endTime = 0;
             //the session could be still ongoing..so we need to check where's endTime
             if (!separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME].equals("null")){
                 endTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME]);
-            }else {
+            }
+            //there 's no end time of the session, we take the time of the last record
+            else {
 
-                //there 's no end time of the session, we take the time of the last record
-                String lastRecord = DataHandler.getLastSavedRecordInSession(sessionId);
-                Log.d(LOG_TAG, "[test get session time]testgetdata the last record is " + lastRecord);
-                if (lastRecord!=null){
-                    long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
-                    Log.d(LOG_TAG, "[test get session time] testgetdata the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
-                    endTime = time;
-                }
-
+                endTime= DataHandler.getTimeOfLastSavedRecordInSession(sessionId, session.getContextSourceNames());
+                Log.d(LOG_TAG, "[test get session time] testgetdata the last record time is  " + ScheduleAndSampleManager.getTimeString(endTime));
             }
 
-            /** get annotaitons associated with the session **/
+            //set end time
+            session.setEndTime(endTime);
+
+            /** 3. get annotaitons associated with the session **/
             JSONObject annotationSetJSON = null;
             JSONArray annotateionSetJSONArray = null;
             try {
@@ -318,12 +321,6 @@ public class RecordingAndAnnotateManager {
             }
 
 
-            /** create sessions from the properies obtained **/
-            session = new Session(id, startTime, taskId );
-            session.setEndTime(endTime);
-            session.setBatteryLife(batteryLife);
-            session.setContextSourceTypes(contextsourceArray);
-
 //            Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " annotateionSetJSONArray " + annotateionSetJSONArray);
             Log.d(LOG_TAG, " testBackgroundLogging [testing load session][getSession]  testgetdata id " + id + " startTime " + startTime + " end time " + endTime + " contextsource " + session.getContextSourceNames());
 
@@ -333,8 +330,6 @@ public class RecordingAndAnnotateManager {
                 AnnotationSet annotationSet =  toAnnorationSet(annotateionSetJSONArray);
                 session.setAnnotationSet(annotationSet);
             }
-
-
         }
 
 
@@ -367,37 +362,46 @@ public class RecordingAndAnnotateManager {
         for (int i=0; i<res.size() ; i++) {
 
             String sessionStr = res.get(i);
+
+            //split each row into columns
             String[] separated = sessionStr.split(Constants.DELIMITER);
 
+            /** get properties of the session **/
             int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
-
-            if (id==RecordingAndAnnotateManager.BACKGOUND_LOGGING_SESSION_ID)
-                continue;
-
-
             int taskId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_TASK_ID]);
             long startTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_START_TIME]);
             float batteryLife = Float.parseFloat(separated[DatabaseNameManager.COL_INDEX_SESSION_BATTERY_LIFE]);
+
+            //the original contextsourceString is connected by Constants.CONTEXT_SOURCE_DELIMITER. we need to make it an array so that we can save it to
+            //a session later
+            String contextsourceString = separated[DatabaseNameManager.COL_INDEX_SESSION_CONTEXTSOURCES];
+            String[] contextsourceArray = contextsourceString.split(Constants.CONTEXT_SOURCE_DELIMITER);
+
+
+            /** 1. create sessions from the properies obtained **/
+            Session session = new Session(id, startTime, taskId );
+
+            session.setBatteryLife(batteryLife);
+            session.setContextSourceTypes(contextsourceArray);
+
+            /**2. get end time (or time of the last record) of the sesison**/
 
             long endTime = 0;
             //the session could be still ongoing..so we need to check where's endTime
             if (!separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME].equals("null")){
                 endTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME]);
-            }else {
-
-                //there 's no end time of the session, we take the time of the last record
-                String lastRecord = DataHandler.getLastSavedRecordInSession(id);
-                Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
-                if (lastRecord!=null){
-                    long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
-                    Log.d(LOG_TAG, "[test get session time] the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
-                    endTime = time;
-                }
-
+            }
+            //there 's no end time of the session, we take the time of the last record
+            else {
+                long endtime = DataHandler.getTimeOfLastSavedRecordInSession(id, session.getContextSourceNames());
+                Log.d(LOG_TAG, "[test get session time] testgetdata the last record time is  " + ScheduleAndSampleManager.getTimeString(endTime));
             }
 
+            //set end time
+            session.setEndTime(endTime);
 
-            JSONObject annotationSetJSON ;
+            /** 3. get annotaitons associated with the session **/
+            JSONObject annotationSetJSON = null;
             JSONArray annotateionSetJSONArray = null;
             try {
                 annotationSetJSON = new JSONObject(separated[DatabaseNameManager.COL_INDEX_SESSION_ANNOTATION_SET]);
@@ -406,13 +410,10 @@ public class RecordingAndAnnotateManager {
                 e.printStackTrace();
             }
 
-            Log.d(LOG_TAG, " [getRecentSessions] id " + id + " startTime" + startTime + " end time " + endTime);
+            Log.d(LOG_TAG, " testBackgroundLogging [testing load session][getSession]  testgetdata id " + id + " startTime " + startTime + " end time " + endTime + " contextsource " + session.getContextSourceNames());
 
-            Session session = new Session(id, startTime, taskId );
-            session.setEndTime(endTime);
-            session.setBatteryLife(batteryLife);
 
-            //get annotationset
+            //set annotationset if there is one
             if (annotateionSetJSONArray!=null){
                 AnnotationSet annotationSet =  toAnnorationSet(annotateionSetJSONArray);
                 session.setAnnotationSet(annotationSet);
@@ -421,7 +422,7 @@ public class RecordingAndAnnotateManager {
             sessions.add(session);
         }
 
-        Log.d(LOG_TAG, " [getRecentSessions] tje resuslt is " + res );
+        Log.d(LOG_TAG, " [getRecentSessions] tbe resuslt is " + res );
 
         return sessions;
 
@@ -447,28 +448,33 @@ public class RecordingAndAnnotateManager {
 
             int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
 
+            //we skip background recording session
             if (id==RecordingAndAnnotateManager.BACKGOUND_LOGGING_SESSION_ID)
                 continue;
 
             int taskId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_TASK_ID]);
             long startTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_START_TIME]);
             float batteryLife = Float.parseFloat(separated[DatabaseNameManager.COL_INDEX_SESSION_BATTERY_LIFE]);
+            String contextsourceString = separated[DatabaseNameManager.COL_INDEX_SESSION_CONTEXTSOURCES];
+            String[] contextsourceArray = contextsourceString.split(Constants.CONTEXT_SOURCE_DELIMITER);
+
+            /** 1. create sessions from the properies obtained **/
+            Session session = new Session(id, startTime, taskId );
+
+            session.setBatteryLife(batteryLife);
+            session.setContextSourceTypes(contextsourceArray);
+
+            /**2. get end time (or time of the last record) of the sesison**/
 
             long endTime = 0;
             //the session could be still ongoing..so we need to check where's endTime
             if (!separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME].equals("null")){
                 endTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME]);
-            }else {
-
-                //there 's no end time of the session, we take the time of the last record
-                String lastRecord = DataHandler.getLastSavedRecordInSession(id);
-                Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
-                if (lastRecord!=null){
-                    long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
-                    Log.d(LOG_TAG, "[test get session time] the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
-                    endTime = time;
-                }
-
+            }
+            //there 's no end time of the session, we take the time of the last record
+            else {
+                endTime = DataHandler.getTimeOfLastSavedRecordInSession(id, session.getContextSourceNames());
+                Log.d(LOG_TAG, "[test get session time] testgetdata the last record time is  " + ScheduleAndSampleManager.getTimeString(endTime));
             }
 
 
@@ -483,10 +489,6 @@ public class RecordingAndAnnotateManager {
 
             Log.d(LOG_TAG, " [getModifiedSessions] id " + id + " startTime" + startTime + " end time " + endTime);
 
-            Session session = new Session(id, startTime, taskId );
-            session.setEndTime(endTime);
-            session.setBatteryLife(batteryLife);
-
             //get annotationset
             if (annotateionSetJSONArray!=null){
                 AnnotationSet annotationSet =  toAnnorationSet(annotateionSetJSONArray);
@@ -495,9 +497,6 @@ public class RecordingAndAnnotateManager {
 
             sessions.add(session);
         }
-
-        // Log.d(LOG_TAG, " [getModifiedSessions] in the end there are " + sessions.size() + " sessions " );
-
 
         return sessions;
     }
@@ -517,36 +516,49 @@ public class RecordingAndAnnotateManager {
         for (int i=0; i<res.size() ; i++) {
 
             String sessionStr = res.get(i);
+
+            //split each row into columns
             String[] separated = sessionStr.split(Constants.DELIMITER);
 
+            /** get properties of the session **/
             int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
-
-            if (id==RecordingAndAnnotateManager.BACKGOUND_LOGGING_SESSION_ID)
-                continue;
-
             int taskId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_TASK_ID]);
             long startTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_START_TIME]);
             float batteryLife = Float.parseFloat(separated[DatabaseNameManager.COL_INDEX_SESSION_BATTERY_LIFE]);
+
+            //the original contextsourceString is connected by Constants.CONTEXT_SOURCE_DELIMITER. we need to make it an array so that we can save it to
+            //a session later
+            String contextsourceString = separated[DatabaseNameManager.COL_INDEX_SESSION_CONTEXTSOURCES];
+            String[] contextsourceArray = contextsourceString.split(Constants.CONTEXT_SOURCE_DELIMITER);
+
+            Log.d(LOG_TAG, "[get session][ testBackgroundLogging] sessions contextsource are " + contextsourceArray.toString());
+
+
+            /** 1. create sessions from the properies obtained **/
+            Session session = new Session(id, startTime, taskId );
+
+            session.setBatteryLife(batteryLife);
+            session.setContextSourceTypes(contextsourceArray);
+
+            /**2. get end time (or time of the last record) of the sesison**/
 
             long endTime = 0;
             //the session could be still ongoing..so we need to check where's endTime
             if (!separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME].equals("null")){
                 endTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME]);
-            }else {
+            }
+            //there 's no end time of the session, we take the time of the last record
+            else {
 
-                //there 's no end time of the session, we take the time of the last record
-                String lastRecord = DataHandler.getLastSavedRecordInSession(id);
-                Log.d(LOG_TAG, "[test get session time]the last record is " + lastRecord);
-                if (lastRecord!=null){
-                    long time = Long.parseLong(lastRecord.split(Constants.DELIMITER)[DatabaseNameManager.COL_INDEX_RECORD_TIMESTAMP_LONG] );
-                    Log.d(LOG_TAG, "[test get session time] the last record time is  " + ScheduleAndSampleManager.getTimeString(time));
-                    endTime = time;
-                }
-
+                endTime = DataHandler.getTimeOfLastSavedRecordInSession(id, session.getContextSourceNames());
+                Log.d(LOG_TAG, "[test get session time] testgetdata the last record time is  " + ScheduleAndSampleManager.getTimeString(endTime));
             }
 
+            //set end time
+            session.setEndTime(endTime);
 
-            JSONObject annotationSetJSON ;
+            /** 3. get annotaitons associated with the session **/
+            JSONObject annotationSetJSON = null;
             JSONArray annotateionSetJSONArray = null;
             try {
                 annotationSetJSON = new JSONObject(separated[DatabaseNameManager.COL_INDEX_SESSION_ANNOTATION_SET]);
@@ -555,13 +567,12 @@ public class RecordingAndAnnotateManager {
                 e.printStackTrace();
             }
 
-            Log.d(LOG_TAG, " [getAllSessions] id " + id + " startTime" + startTime + " end time " + endTime);
 
-            Session session = new Session(id, startTime, taskId );
-            session.setEndTime(endTime);
-            session.setBatteryLife(batteryLife);
+//            Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " annotateionSetJSONArray " + annotateionSetJSONArray);
+            Log.d(LOG_TAG, " testBackgroundLogging [testing load session][getSession]  testgetdata id " + id + " startTime " + startTime + " end time " + endTime + " contextsource " + session.getContextSourceNames());
 
-            //get annotationset
+
+            //set annotationset if there is one
             if (annotateionSetJSONArray!=null){
                 AnnotationSet annotationSet =  toAnnorationSet(annotateionSetJSONArray);
                 session.setAnnotationSet(annotationSet);

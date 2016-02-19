@@ -71,6 +71,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         /** when the app starts, first obtain the participant ID **/
         TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
+
+        /**
+         * after level 23 we need to request permission at run time. So Minuku currently doesn't support Android 6!
+         * http://developer.android.com/training/permissions/requesting.html
+         */
+
         Constants.DEVICE_ID = mngr.getDeviceId();
         Log.d(LOG_TAG, "[Constants.DEVICE_ID] get the synTime is " + Constants.DEVICE_ID);
 

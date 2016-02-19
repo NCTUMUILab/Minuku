@@ -194,14 +194,8 @@ public class MinukuMainService extends Service {
         // [START shared_tracker]
         AnalyticsMinuku application = (AnalyticsMinuku) getApplication();
         mTracker = application.getDefaultTracker();
-        mTracker.set("&uid",Constants.USER_ID );
+        mTracker.set("&uid", Constants.USER_ID);
         // [END shared_tracker]
-
-
-        mLocalDBHelpder = new LocalDBHelper(this, Constants.TEST_DATABASE_NAME);
-
-        //this line is required to create the table.
-        mLocalDBHelpder.getWritableDatabase();
 
         //clean up the database for renewing configurations.
         //TODO: THis IS TEMPORARILY! After we have a remote database and use it to query configurations, we should kill this line.
@@ -212,6 +206,13 @@ public class MinukuMainService extends Service {
         mTriggerManager = new TriggerManager(this);
 
         mContextManager = new ContextManager(this);
+
+
+        mLocalDBHelpder = new LocalDBHelper(this, Constants.TEST_DATABASE_NAME);
+
+        //this line is required to create the table.
+        mLocalDBHelpder.getWritableDatabase();
+
         //set up the environment for background recording
 
         mFileHelper = new FileHelper (this);
@@ -242,9 +243,6 @@ public class MinukuMainService extends Service {
         //initiate the DataHandler
         mDataHandler = new DataHandler (this);
 
-//        mBatteryHelper = new BatteryHelper(this);
-
-//        mBatteryStatusReceiver = new BatteryStatusReceiver();
 
     }
 

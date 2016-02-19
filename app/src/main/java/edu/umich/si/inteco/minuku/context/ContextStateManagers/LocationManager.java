@@ -29,12 +29,16 @@ import edu.umich.si.inteco.minuku.model.Record.LocationRecord;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class LocationManager extends ContextStateManager implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 
 	/** Tag for logging. */
     private static final String LOG_TAG = "LocationManager";
+
+    /**Table Name**/
+    public static final String RECORD_TABLE_NAME_LOCATION = "Record_Table_Location";
 
     /**constants**/
 
@@ -479,6 +483,25 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         }
 
 
+    }
+
+    /**Database table name should be defined by each ContextStateManager. So each CSM should overwrite this**/
+    public static String getDatabaseTableNameBySourceName (String sourceName) {
+        return RECORD_TABLE_NAME_LOCATION;
+    }
+
+    /**
+     * this function should return a list of database table names for its contextsource. Must implement it
+     * in order to create tables
+     * @return
+     */
+    @Override
+    public ArrayList<String> getAllDatabaseTableNames () {
+        ArrayList<String> tablenames = new ArrayList<String>();
+
+        tablenames.add(RECORD_TABLE_NAME_LOCATION);
+
+        return tablenames;
     }
 
 

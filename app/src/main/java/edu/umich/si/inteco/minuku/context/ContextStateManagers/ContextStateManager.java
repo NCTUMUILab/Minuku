@@ -79,8 +79,51 @@ public abstract class ContextStateManager {
     //record pool or clear the record pool if we save it in the public record pool
     private int mSizeOfRecordPool = 300;
 
+
+
+    /** each ContextStateManager should override this static method
+     * it adds a list of ContextSource that it will manage **/
+    protected void setUpContextSourceList(){
+        return;
+    }
+
+    /**Database table name should be defined by each ContextStateManager. So each CSM should overwrite this**/
+    public static String getDatabaseTableNameBySourceName (String sourceName) {
+        return null;
+    }
+
+    /**
+     * this function should return a list of database table names for its contextsource. Must implement it
+     * in order to create tables
+     * @return
+     */
+    public ArrayList<String> getAllDatabaseTableNames () {
+        ArrayList<String> tablenames = new ArrayList<String>();
+
+        return tablenames;
+    }
+
+    /**
+     * Allow ContextManager to requestd and remove updates
+     */
+    public void requestUpdates() {}
+
+    public void removeUpdates() {}
+
+    /**
+     * Get ContexrSourceType by SourceName
+     * @param sourceName
+     * @return
+     */
     public static int getContextSourceTypeFromName(String sourceName){return -1;};
+
+    /**
+     * Get ContexrSourceName by SourceType
+     * @param sourceType
+     * @return
+     */
     public static String getContextSourceNameFromType(int sourceType){return null;};
+
 
 
     public ContextStateManager() {
@@ -114,20 +157,6 @@ public abstract class ContextStateManager {
     /************************************** ContextSource ****************************************/
     /*******************************************************************************************/
 
-
-    /** each ContextStateManager should override this static method
-     * it adds a list of ContextSource that it will manage **/
-    protected void setUpContextSourceList(){
-        return;
-    }
-
-
-    /**
-     * Allow ContextManager to requestd and remove updates
-     */
-    public void requestUpdates() {}
-
-    public void removeUpdates() {}
 
 
     /**
@@ -865,6 +894,7 @@ public abstract class ContextStateManager {
         }
             return false;
     }
+
 
 
     public ContextSource getContextSourceBySourceName(String sourceName) {
