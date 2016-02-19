@@ -33,7 +33,9 @@ public class TelephonyStateListenner extends PhoneStateListener {
         _GeneralSignalStrength = -9999;
         _CdmaSignalStrenthLevel = -9999;
         _isGSM = false;
-        Log.d(LOG_TAG, "TestTelephony constructor " );
+        Log.d(LOG_TAG, "[test source being requested] TestTelephony constructor " );
+
+
     }
 
     @Override
@@ -41,7 +43,7 @@ public class TelephonyStateListenner extends PhoneStateListener {
     {
 
         super.onSignalStrengthsChanged(signalStrength);
-        Log.d(LOG_TAG, "TestTelephony signal strength change " );
+//        Log.d(LOG_TAG, "[test source being requested] TestTelephony signal strength change " );
 
         try{
             String ssignal = signalStrength.toString();
@@ -56,6 +58,17 @@ public class TelephonyStateListenner extends PhoneStateListener {
              **/
 
             TelephonyManager tm = (TelephonyManager)mContext.getSystemService(mContext.TELEPHONY_SERVICE);
+
+            //call state
+            PhoneStatusManager.setCallState(tm.getCallState());
+
+            //these two are rarely changde, so we don't need to get it everyt time.
+//            PhoneStatusManager.setNetworkOperatorName(tm.getNetworkOperatorName());
+//            PhoneStatusManager.setPhoneType(tm.getPhoneType());
+
+
+            Log.d(LOG_TAG, "[test source being requested] call state " + PhoneStatusManager.getCallState() +
+                    " network operator " + PhoneStatusManager.getNetworkOperatorName() + " phonetype " + PhoneStatusManager.getPhoneTypeName());
 
             int dbm = 0;
 
@@ -78,7 +91,7 @@ public class TelephonyStateListenner extends PhoneStateListener {
                 PhoneStatusManager.setGeneralSignalStrength(dbm);
 
 //                _GeneralSignalStrength = _LTESignalStrength = dbm;
-                Log.d(LOG_TAG, "TestTelephony LTE strength: " + PhoneStatusManager.getLTESignalStrength());
+//                Log.d(LOG_TAG, "[test source being requested] TestTelephony LTE strength: " + PhoneStatusManager.getLTESignalStrength());
 
             }
             else if (signalStrength.isGsm()){ //if not LTE //tell if is gsm
@@ -91,7 +104,7 @@ public class TelephonyStateListenner extends PhoneStateListener {
                     PhoneStatusManager.setGeneralSignalStrength(dbm);
 
 //                    _GeneralSignalStrength = _GsmSignalStrength = dbm;
-                   Log.d(LOG_TAG, "TestTelephony GSM strength: " + PhoneStatusManager.getGsmSignalStrength() + "asu: " + signalStrength.getGsmSignalStrength());
+                   Log.d(LOG_TAG, "[test source being requested] TestTelephony GSM strength: " + PhoneStatusManager.getGsmSignalStrength() + "asu: " + signalStrength.getGsmSignalStrength());
 
                 }
                 else{
@@ -145,7 +158,7 @@ public class TelephonyStateListenner extends PhoneStateListener {
                     _CdmaSignalStrenthLevel = (levelDbm < levelEcio) ? levelDbm : levelEcio;
 
                     PhoneStatusManager.setCdmaSignalStrenthLevel(_CdmaSignalStrenthLevel);
-                    Log.d(LOG_TAG, "TestTelephony not 3G CDMA strength: " + PhoneStatusManager.getCdmaSignalStrenthLevel());
+                    Log.d(LOG_TAG, "[test source being requested] TestTelephony not 3G CDMA strength: " + PhoneStatusManager.getCdmaSignalStrenthLevel());
 
                 } else {	//if 3G, use SNR
                     if (snr == 7 || snr == 8) _CdmaSignalStrenthLevel =4;
@@ -154,7 +167,7 @@ public class TelephonyStateListenner extends PhoneStateListener {
                     else if (snr ==1 || snr ==2) _CdmaSignalStrenthLevel =1;
 
                     PhoneStatusManager.setCdmaSignalStrenthLevel(_CdmaSignalStrenthLevel);
-                    Log.d(LOG_TAG, "TestTelephony 3G CDMA strength: " +PhoneStatusManager.getCdmaSignalStrenthLevel());
+//                    Log.d(LOG_TAG, "[test source being requested] TestTelephony 3G CDMA strength: " +PhoneStatusManager.getCdmaSignalStrenthLevel());
 
                 }
 

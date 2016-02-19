@@ -82,14 +82,14 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
         mSensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
 
         //initiate values of sensors
-        mAccele_x = mAccele_y = mAccele_z = Constants.NULL_NUMERIC_VALUE; //-9999
-        mGyroscope_x = mGyroscope_y = mGyroscope_z = Constants.NULL_NUMERIC_VALUE;
-        mGravity_x = mGravity_y = mGravity_z = Constants.NULL_NUMERIC_VALUE;
-        mMagneticField_x = mMagneticField_y = mMagneticField_z = Constants.NULL_NUMERIC_VALUE;
-        mLinearAcceleration_x = mLinearAcceleration_y = mLinearAcceleration_z = Constants.NULL_NUMERIC_VALUE;
-        mRotationVector_x_sin = mRotationVector_y_sin =  mRotationVector_z_sin = mRotationVector_cos = Constants.NULL_NUMERIC_VALUE;
-        mHeartRate = mStepCount = mStepDetect =Constants.NULL_NUMERIC_VALUE;
-        mLight = mPressure = mRelativeHumidity = mProximity = mAmbientTemperature =Constants.NULL_NUMERIC_VALUE;
+        mAccele_x = mAccele_y = mAccele_z = ContextManager.CONTEXT_SOURCE_INVALID_VALUE_FLOAT; //-9999
+        mGyroscope_x = mGyroscope_y = mGyroscope_z = ContextManager.CONTEXT_SOURCE_INVALID_VALUE_FLOAT;
+        mGravity_x = mGravity_y = mGravity_z = ContextManager.CONTEXT_SOURCE_INVALID_VALUE_FLOAT;
+        mMagneticField_x = mMagneticField_y = mMagneticField_z = ContextManager.CONTEXT_SOURCE_INVALID_VALUE_FLOAT;
+        mLinearAcceleration_x = mLinearAcceleration_y = mLinearAcceleration_z = ContextManager.CONTEXT_SOURCE_INVALID_VALUE_FLOAT;
+        mRotationVector_x_sin = mRotationVector_y_sin =  mRotationVector_z_sin = mRotationVector_cos = ContextManager.CONTEXT_SOURCE_INVALID_VALUE_FLOAT;
+        mHeartRate = mStepCount = mStepDetect =ContextManager.CONTEXT_SOURCE_INVALID_VALUE_FLOAT;
+        mLight = mPressure = mRelativeHumidity = mProximity = mAmbientTemperature =ContextManager.CONTEXT_SOURCE_INVALID_VALUE_FLOAT;
 
         //initiate registered sneosr list
         mRegisteredSensorList = new ArrayList<ContextSource>();
@@ -262,7 +262,6 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
 
             //If neither AllProbableActivities nor MostProbableActivity are requested, we should stop requesting activity information
             if (isRequested){
-                Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting informatoin because it is not needed anymore");
 
                 //TODO: check if the contextsource is currently getting update, if not, start update
                 if (!mRegisteredSensorList.contains(source)){
@@ -270,6 +269,9 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
                 }
             }
             else {
+
+                Log.d(LOG_TAG, "[updateContextSourceListRequestStatus], stop requesting informatoin because it is not needed anymore");
+
                 //TODO: check if the contextsource is currently getting update, if yes, remove update
                 if (!mRegisteredSensorList.contains(source)){
                     unRegisterSensor(source);

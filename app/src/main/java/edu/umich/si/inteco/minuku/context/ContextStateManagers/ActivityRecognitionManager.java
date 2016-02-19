@@ -354,6 +354,7 @@ public class ActivityRecognitionManager extends ContextStateManager
     /**
      * ContextStateMAnager needs to override this fundtion to implement writing a Record and save it to the LocalDataPool
      */
+    @Override
     public void saveRecordToLocalRecordPool() {
 
         /** create a Record to save timestamp, session it belongs to, and Data**/
@@ -508,6 +509,7 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     /** this function allows ConfigurationManager to adjust the configuration of each ContextSource,
      * e.g sampling rate. */
+    @Override
     public void updateContextSourceList(String source, long samplingRate){
 
         sActivityRecognitionUpdateIntervalInMilliseconds = samplingRate;

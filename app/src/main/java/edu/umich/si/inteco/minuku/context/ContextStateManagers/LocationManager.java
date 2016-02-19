@@ -230,6 +230,7 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
     /**
      * ContextStateMAnager needs to override this fundtion to implement writing a Record and save it to the LocalDataPool
      */
+    @Override
     public void saveRecordToLocalRecordPool() {
 
         /** create a Record to save timestamp, session it belongs to, and Data**/

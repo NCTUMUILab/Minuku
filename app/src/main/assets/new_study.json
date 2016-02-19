@@ -44,7 +44,7 @@
 
 			  "BackgroundLogging":{
 				"Enabled": true,
-				"Logging_tasks":"1,2,3",
+				"Logging_tasks":"1,2,3,7,8,9,10,11",
 				"Logging_rate": 5
 			  },
 
@@ -63,16 +63,28 @@
 					"Source": "Transportation"
 				  },
 				  {
-					"Id": 4,
-					"Source": "Sensor.Accelerometer"
-				  },
-				  {
-					"Id": 5,
-					"Source": "Sensor.Light"
-				  },
-				  {
 					"Id": 6,
 					"Source": "Sensor.Proximity"
+				  },
+				  {
+					"Id": 7,
+					"Source": "PhoneStatus.Connectivity"
+				  },
+				  {
+					"Id": 8,
+					"Source": "PhoneStatus.Ringer"
+				  },
+				  {
+					"Id": 9,
+					"Source": "PhoneStatus.Battery"
+				  },
+				  {
+					"Id": 10,
+					"Source": "PhoneStatus.Telephony"
+				  },
+				  {
+				  "Id": 11,
+				  "Source": "PhoneStatus.AppUsage"
 				  }
 				],
 				"Circumstances":

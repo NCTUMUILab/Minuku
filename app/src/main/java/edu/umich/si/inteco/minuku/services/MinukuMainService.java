@@ -118,11 +118,7 @@ public class MinukuMainService extends Service {
 
     private static PreferenceHelper mPreferenceHelper;
 
-    private static BatteryHelper mBatteryHelper;
-
     private static Handler mMainThread;
-
-    private static BatteryStatusReceiver mBatteryStatusReceiver;
 
     private static int mDeviceCheckingTimeCountDown = DEFAULT_DEVICE_CHECKING_COUNT ;
     private static int mDeviceLocationCheckingTimeCountDown = DEFAULT_LOCATION_CHECKING_COUNT ;
@@ -246,9 +242,9 @@ public class MinukuMainService extends Service {
         //initiate the DataHandler
         mDataHandler = new DataHandler (this);
 
-        mBatteryHelper = new BatteryHelper(this);
+//        mBatteryHelper = new BatteryHelper(this);
 
-        mBatteryStatusReceiver = new BatteryStatusReceiver();
+//        mBatteryStatusReceiver = new BatteryStatusReceiver();
 
     }
 
@@ -310,8 +306,8 @@ public class MinukuMainService extends Service {
         ScheduleAndSampleManager.cancelAllActionAlarms();
         ScheduleAndSampleManager.unregisterAlarmReceivers();
 
-        //unregister receivers
-        unregisterReceiver(mBatteryStatusReceiver);
+//        //unregister receivers
+//        unregisterReceiver(mBatteryStatusReceiver);
 
         //stop main thread
         getMainThread().removeCallbacks(mMainThreadrunnable);
@@ -325,8 +321,8 @@ public class MinukuMainService extends Service {
 
     private void registerAlarmReceivers() {
 
-        IntentFilter batteryStatus_filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(mBatteryStatusReceiver, batteryStatus_filter);
+//        IntentFilter batteryStatus_filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+//        registerReceiver(mBatteryStatusReceiver, batteryStatus_filter);
 
     }
 

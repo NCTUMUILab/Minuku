@@ -73,11 +73,12 @@ public class ContextManager {
 
 
     public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION = "ActivityRecognition";
+    public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION_PREFIX = "AR.";
     public static final String CONTEXT_SOURCE_NAME_TRANSPORTATION = "Transportation";
-    public static final String CONTEXT_SOURCE_NAME_APPLICATION_USAGE = "Applicaiton.Usage";
-    public static final String CONTEXT_SOURCE_NAME_APPLICATION_USER_ACTION = "Applicaiton.UserAction";
+    public static final String CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX = "PhoneStatus.";
+    public static final String CONTEXT_SOURCE_NAME_USER_INTERACTION_PREFIX = "UserInteraction.";
     public static final String CONTEXT_SOURCE_NAME_LOCATION = "Location";
-    public static final String CONTEXT_SOURCE_NAME_SENSOR = "Sensor";
+    public static final String CONTEXT_SOURCE_NAME_SENSOR_PREFIX = "Sensor.";
     public static final String CONTEXT_SOURCE_NAME_SENSOR_PROXIMITY = "Sensor.Proximity";
     public static final String CONTEXT_SOURCE_NAME_SENSPR_ACCELEROMETER = "Sensor.Accelerometer";
     public static final String CONTEPhoneStatusManagerXT_SOURCE_NAME_SENSPR_LIGHT = "Sensor.Light";
@@ -85,6 +86,7 @@ public class ContextManager {
 
     public static final int CONTEXT_SOURCE_INVALID_VALUE_INTEGER = -9999;
     public static final long CONTEXT_SOURCE_INVALID_VALUE_LONG_INTEGER = -9999;
+    public static final long CONTEXT_SOURCE_INVALID_VALUE_FLOAT = -9999;
     public static final String CONTEXT_SOURCE_INVALID_VALUE_STRING = "NA";
 
     /*RECORD TYPE NAME*/
@@ -372,13 +374,26 @@ public class ContextManager {
         if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
             mActivityRecognitionManager.updateContextSourceList(source, samplingRate);
         }
-        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
+        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR_PREFIX)){
             mPhoneSensorManager.updateContextSourceList(source, samplingRate);
         }
         else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
             mLocationManager.updateContextSourceList(source, samplingRate);;
 
         }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX)) {
+            mPhoneStatusManager.updateContextSourceList(source, samplingRate);
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_USER_INTERACTION_PREFIX)) {
+            mUserInteractionManager.updateContextSourceList(source, samplingRate);
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_TRANSPORTATION)) {
+            mTransportationModeManager.updateContextSourceList(source, samplingRate);
+
+        }
+
+
+
 
     }
 
@@ -386,11 +401,24 @@ public class ContextManager {
 
         if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION)){
             mActivityRecognitionManager.updateContextSourceList(source, samplingMode);
-        } else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR)){
+        }
+        else if (source.contains(ContextManager.CONTEXT_SOURCE_NAME_SENSOR_PREFIX)){
             mPhoneSensorManager.updateContextSourceList(source, samplingMode);
         }
         else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_LOCATION)) {
-            mLocationManager.updateContextSourceList(source, samplingMode);;
+            mLocationManager.updateContextSourceList(source, samplingMode);
+
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX)) {
+            mPhoneStatusManager.updateContextSourceList(source, samplingMode);
+
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_USER_INTERACTION_PREFIX)) {
+            mUserInteractionManager.updateContextSourceList(source, samplingMode);
+
+        }
+        else if (source.equals(ContextManager.CONTEXT_SOURCE_NAME_TRANSPORTATION)) {
+            mTransportationModeManager.updateContextSourceList(source, samplingMode);
 
         }
 
@@ -467,7 +495,7 @@ public class ContextManager {
             String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
 
 
-            Log.d(LOG_TAG, "[assignTasksToContextStateManager][testing logging task and requested] assign loggingtask " + loggingTask.getSource()
+            Log.d(LOG_TAG, "[test source being requested] assign loggingtask " + loggingTask.getSource()
                      + " to " +contextStateManagerName);
 
             //then we add the loggingTask to the right ContextStateManager's active Logging Task
@@ -872,8 +900,8 @@ public class ContextManager {
      */
     private void assignLoggingTask(String contextStateManagerName, LoggingTask loggingTask) {
 
-//        Log.d(LOG_TAG, " [testing logging task and requested] assign  logging task: " +
-//                loggingTask.getSource() + " to " + contextStateManagerName);
+        Log.d(LOG_TAG, " [test source being requested] assign  logging task: " +
+                loggingTask.getSource() + " to " + contextStateManagerName);
 
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
             mActivityRecognitionManager.addLoggingTask(loggingTask);
@@ -1124,13 +1152,20 @@ public class ContextManager {
         }
 
         //as long as the name of the ContextSource contain "Sensor.", the ContextStateManager is PhoneSensorManager
-        else if (source.contains("Sensor.") ) {
+        else if (source.contains(CONTEXT_SOURCE_NAME_SENSOR_PREFIX) ) {
             return CONTEXT_STATE_MANAGER_PHONE_SENSOR;
         }
 
-        else if (source.contains("AR.") ) {
+        else if (source.contains(CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION_PREFIX) ) {
             return CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION;
         }
+
+        else if (source.contains(CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX) ) {
+            return CONTEXT_STATE_MANAGER_PHONE_STATUS;
+        }
+
+
+
         return name;
     }
 

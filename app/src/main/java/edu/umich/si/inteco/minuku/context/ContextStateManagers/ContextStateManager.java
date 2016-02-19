@@ -65,6 +65,7 @@ public abstract class ContextStateManager {
     protected ArrayList<State> mStates;
     /**each contextStateManager has a list of ContextSource available for use**/
     protected ArrayList<ContextSource> mContextSourceList;
+    protected ArrayList<ContextSource> mCurrentlyRequestedContextSourceList;
     protected Record mLastSavedRecord;
     protected static int sLocalRecordPoolMaxSize = 50;
 
@@ -91,6 +92,7 @@ public abstract class ContextStateManager {
         mLoggingTasks = new ArrayList<LoggingTask>();
         mStates = new ArrayList<State>();
         mContextSourceList = new ArrayList<ContextSource>();
+        mCurrentlyRequestedContextSourceList = new ArrayList<ContextSource>();
 
         /** add ContextSources into the contextSourceList
          * do this in each ContextStateManager since each may required different access to the
@@ -134,6 +136,19 @@ public abstract class ContextStateManager {
      * @param samplingRate
      */
     public void updateContextSourceList(String source, float samplingRate){
+
+        //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
+
+        //2. update individual source by souce name .
+        return;
+    }
+
+    /**
+     * Update the Setting of ContextSourceList
+     * @param source
+     * @param samplingRate
+     */
+    public void updateContextSourceList(String source, long samplingRate){
 
         //1. use general source name to update all sources (e.g. ActivityRecognition, Sensor)
 
@@ -287,7 +302,7 @@ public abstract class ContextStateManager {
     /**
      * ContextStateMAnager needs to override this fundtion to create data content for a Record
      */
-    protected void saveRecordToLocalRecordPool (Object[] values) {
+    protected void saveRecordToLocalRecordPool () {
 
         /** store values into a Record so that we can store them in the local database **/
         Record record = new Record();
@@ -761,6 +776,18 @@ public abstract class ContextStateManager {
         return mContextSourceList;
     }
 
+    protected boolean isContextSourceRequested(ContextSource source) {
+
+        for (int i=0; i<mContextSourceList.size(); i++){
+            if (source.equals(mContextSourceList.get(i))){
+                Log.d(LOG_TAG, "isContextSourceRequested : source " + source.getName() + " is requested");
+               return source.isRequested();
+            }
+        }
+        Log.d(LOG_TAG, "isContextSourceRequested : source " + source.getName() + " is NOT requested");
+        return false;
+    }
+
     public static String getMeasureName(int measure) {
 
         if (measure == CONTEXT_SOURCE_MEASURE_LATEST_ONE) {
@@ -829,6 +856,15 @@ public abstract class ContextStateManager {
         return null;
     }
 
+    public boolean isContextSourceInCurrentRequestedList(String sourceName) {
+
+        for (int i=0; i<mCurrentlyRequestedContextSourceList.size(); i++){
+            if (mCurrentlyRequestedContextSourceList.get(i).getName().equals(sourceName)){
+                return true;
+            }
+        }
+            return false;
+    }
 
 
     public ContextSource getContextSourceBySourceName(String sourceName) {
