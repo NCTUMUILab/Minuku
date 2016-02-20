@@ -20,9 +20,8 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManage
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.UserInteractionManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
-import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.BackgroundLoggingSetting;
-import edu.umich.si.inteco.minuku.model.Circumstance;
+import edu.umich.si.inteco.minuku.model.Situation;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
@@ -132,7 +131,7 @@ public class ContextManager {
 
     public static ArrayList<Integer> RECORD_TYPE_LIST;
 
-    private static ArrayList<Circumstance> mCircumstanceList;
+    private static ArrayList<Situation> mCircumstanceList;
 
     private static ArrayList<LoggingTask> mLoggingTaskList;
 
@@ -172,7 +171,7 @@ public class ContextManager {
 
         mContextStateMangers = new ArrayList<ContextStateManager>();
 
-        mCircumstanceList = new ArrayList<Circumstance>();
+        mCircumstanceList = new ArrayList<Situation>();
 
         mLoggingTaskList = new ArrayList<LoggingTask>();
 
@@ -450,7 +449,7 @@ public class ContextManager {
         for (int i=0; i<getCircumstanceList().size(); i++){
 
             //creating StateMappingRule and add to the relevant ContextStateManagers
-            Circumstance circumstance = getCircumstanceList().get(i);
+            Situation circumstance = getCircumstanceList().get(i);
 
             //get conditions in each circumstance
             for (int j=0; j< circumstance.getConditionList().size(); j++) {
@@ -996,9 +995,9 @@ public class ContextManager {
     }
 
 
-    private static ArrayList<Circumstance> getRelatedCircumstance(State state) {
+    private static ArrayList<Situation> getRelatedCircumstance(State state) {
 
-        ArrayList<Circumstance> circumstances = new ArrayList<Circumstance>();
+        ArrayList<Situation> circumstances = new ArrayList<Situation>();
 
         //we find any circumstance that uses the state
         for (int i=0; i<getCircumstanceList().size(); i++){
@@ -1025,14 +1024,14 @@ public class ContextManager {
 
         Log.d(LOG_TAG, "[examineCircumstanceConditions]");
 
-        ArrayList<Circumstance> relatedCircumstances = getRelatedCircumstance (state);
+        ArrayList<Situation> relatedCircumstances = getRelatedCircumstance (state);
 
         Log.d(LOG_TAG, "[examineCircumstanceConditions] there are " + relatedCircumstances.size() + " circumstances monitoring the state");
 
         //for each circumstance, get all of the conditions, and check whether the condition has been met.
         for (int i=0; i < relatedCircumstances.size(); i++) {
 
-            Circumstance circumstance = relatedCircumstances.get(i);
+            Situation circumstance = relatedCircumstances.get(i);
 
             Log.d(LOG_TAG, "[examineCircumstanceConditions] now check circumstance " + circumstance.getName());
 
@@ -1060,7 +1059,7 @@ public class ContextManager {
                 //log when an circumstance is detected
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_EVENT_DETECTED,
-                        "Circumstance detected:\t" + circumstance.getId() + "\t" + circumstance.getName());
+                        "Situation detected:\t" + circumstance.getId() + "\t" + circumstance.getName());
 
                 //check the triggerlinks of the current circumstance to see if it would trigger anything.
                 Log.d(LOG_TAG, "[examineCircumstanceConditions] The circumstance " + circumstance.getId() + "  condition is satisfied, check its triggerLinks! "
@@ -1079,15 +1078,15 @@ public class ContextManager {
 
 
 
-    public static void addCircumstance(Circumstance circumstance){
+    public static void addCircumstance(Situation circumstance){
         if (mCircumstanceList ==null){
-            mCircumstanceList = new ArrayList<Circumstance>();
+            mCircumstanceList = new ArrayList<Situation>();
         }
         mCircumstanceList.add(circumstance);
     }
 
 
-    public static void removeCircumstance(Circumstance circumstance){
+    public static void removeCircumstance(Situation circumstance){
         if (mCircumstanceList !=null){
             mCircumstanceList.remove(circumstance);
         }
@@ -1100,7 +1099,7 @@ public class ContextManager {
     }
 
 
-    public static ArrayList<Circumstance> getCircumstanceList(){
+    public static ArrayList<Situation> getCircumstanceList(){
         return mCircumstanceList;
     }
 

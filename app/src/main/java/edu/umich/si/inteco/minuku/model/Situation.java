@@ -11,15 +11,15 @@ import edu.umich.si.inteco.minuku.model.actions.Action;
 import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.TriggerManager;
 
-public class Circumstance extends ProbeObject{
+public class Situation extends ProbeObject{
 	
-    private static final String LOG_TAG = "Circumstance";
+    private static final String LOG_TAG = "Situation";
 	
     private String mName;
     private String mDescription="NA";
     private ArrayList<Condition> mConditionList;
 
-    public Circumstance(String name){
+    public Situation(String name){
     	super();
     	mName = name;
     	mConditionList = new ArrayList<Condition>();
@@ -27,7 +27,7 @@ public class Circumstance extends ProbeObject{
 
     }
     
-    public Circumstance(int id, String name, int study_id){
+    public Situation(int id, String name, int study_id){
     	super();
     	_id = id;
     	mName = name;
@@ -37,7 +37,7 @@ public class Circumstance extends ProbeObject{
     }
     
     
-    public Circumstance(int id, String name, String description){
+    public Situation(int id, String name, String description){
     	super();
     	_id = id;
     	mName = name;
@@ -46,7 +46,7 @@ public class Circumstance extends ProbeObject{
     	 _class = TriggerManager.PROBE_OBJECT_CLASS_EVENT;
     }    
 
-    public Circumstance(String name, Task task){
+    public Situation(String name, Task task){
     	super();
     	mName = name;
     	mConditionList = new ArrayList<Condition>();

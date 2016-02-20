@@ -6,8 +6,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.context.EventManager;
-import edu.umich.si.inteco.minuku.model.Circumstance;
+import edu.umich.si.inteco.minuku.model.Situation;
 import edu.umich.si.inteco.minuku.model.ProbeObject;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
 import edu.umich.si.inteco.minuku.model.TriggerLink;
@@ -24,7 +23,7 @@ public class TriggerManager {
 
 
     /** ProbeObject Class**/
-    public static final String PROBE_OBJECT_CLASS_EVENT= "Circumstance";
+    public static final String PROBE_OBJECT_CLASS_EVENT= "Situation";
     public static final String PROBE_OBJECT_CLASS_ACTION= "Action";
     public static final String PROBE_OBJECT_CLASS_ACTION_CONTROL= "ActionControl";
 
@@ -90,7 +89,7 @@ public class TriggerManager {
     }
 
 
-    public static void executeTriggers(Circumstance circumstance){
+    public static void executeTriggers(Situation circumstance){
 
         for (int k=0; k< circumstance.getTriggerLinks().size(); k++){
 
@@ -145,7 +144,7 @@ public class TriggerManager {
                 //find the event as the trigger
                 for (int j = 0; j< ContextManager.getCircumstanceList().size(); j++){
 
-                    Circumstance circumstance = ContextManager.getCircumstanceList().get(j);
+                    Situation circumstance = ContextManager.getCircumstanceList().get(j);
 
                     //use the trigger id and study id to find the event ( different events in a different study may have a same event id in their own study)
                     //the eventlist in the eventMonitor stores the events in all studies. So we need to use event id and study id together to identify the correct event

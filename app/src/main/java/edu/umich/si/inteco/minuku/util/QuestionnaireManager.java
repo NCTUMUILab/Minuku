@@ -84,7 +84,7 @@ public class QuestionnaireManager {
     public static final String QUESTIONNAIRE_TYPE_ACTIVITY = "activity";
     public static final String QUESTIONNAIRE_TYPE_EMAIL = "email";
 	
-	public static final String QUESTION_TYPE_TEXT = "text";
+	public static final String QUESTION_TYPE_TEXT = "textbox";
 	public static final String QUESTION_TYPE_MULTICHOICE_ONE_ANSWER = "multichoice_one_answer";
 	public static final String QUESTION_TYPE_MULTICHOICE_MULTIPLE_ANSWER = "multichoice_multiple_answer";
     public static final String QUESTION_TYPE_DESCRIPTION = "description";

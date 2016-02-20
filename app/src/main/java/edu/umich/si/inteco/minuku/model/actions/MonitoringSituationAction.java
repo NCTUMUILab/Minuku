@@ -2,13 +2,13 @@ package edu.umich.si.inteco.minuku.model.actions;
 
 import java.util.ArrayList;
 
-public class MonitoringCircumstanceAction extends Action {
+public class MonitoringSituationAction extends Action {
 
 	
 	private int _questionnaire_id = -1;
 	private ArrayList<Integer> mMonitoredCircumstanceIds;
 	
-	public MonitoringCircumstanceAction(int id, String name, String type, String executionStyle, int study_id){
+	public MonitoringSituationAction(int id, String name, String type, String executionStyle, int study_id){
 		super(id, name, type, executionStyle, study_id);
 	}
 

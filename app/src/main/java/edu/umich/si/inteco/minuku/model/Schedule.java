@@ -20,6 +20,7 @@ public class Schedule {
 	private int mSampleDelay=-1;
 	private int mSampleDuration=-1;	
 	private String mSampleEndAt=null;
+	private String mSampleStartAt=null;
 	private int mMinInterval = -1;
 	private int mInterval = -1;
 	
@@ -141,8 +142,16 @@ public class Schedule {
 		mSampleEndAt = time_of_day;
 	}
 
-	
-	
+	public String getSampleStartAtTimeOfDay(){
+		return mSampleStartAt;
+	}
+
+	public void setSampleStartAtTimeOfDay(String time_of_day){
+		mSampleStartAt = time_of_day;
+	}
+
+
+
 	public String getFixedTimeOfDay(){
 		return mTimeOfDay;
 	} 

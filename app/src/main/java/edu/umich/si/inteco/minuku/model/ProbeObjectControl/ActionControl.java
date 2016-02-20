@@ -47,7 +47,7 @@ public class ActionControl extends ProbeObject {
 		try {
 			_launch = jsonObject.getString(ConfigurationManager.ACTION_PROPERTIES_LAUNCH);
 			
-			//if the control is triggered by an ProbeObject
+			//if the control is triggered
 			if (jsonObject.has(ConfigurationManager.ACTION_PROPERTIES_TRIGGER)){
 				
 				JSONObject triggerJSON = jsonObject.getJSONObject(ConfigurationManager.ACTION_PROPERTIES_TRIGGER);
@@ -161,21 +161,12 @@ public class ActionControl extends ProbeObject {
 		
 		
 		try {
-						
+
+			//sampling method
 			String sample_method = scheduleJSON .getString(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_METHOD);
 			
 			//instantiate the schedule object
 			schedule = new Schedule(sample_method);
-				
-			//get delay of the schedule, the default value is 0
-			int delay = 0;
-			if (scheduleJSON.has(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_DELAY)){
-				
-				delay = scheduleJSON.getInt(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_DELAY);
-			}
-			
-			Log.d(LOG_TAG, " [loadScheduleFromJSON ] examine schedules " + " is triggered " + "delay: " + delay);
-			schedule.setSampleDelay(delay);				
 
 			
 			//if the action is scheduled at a fixed time of day, there's no need to store the sampling count and the delay, and the sampling startTime and end Time
@@ -192,7 +183,24 @@ public class ActionControl extends ProbeObject {
 			
 			//the schedule is not at a specific time. Need to obtain related fields to calculate sampling startTime, endTime, count, etc. 
 			else {
-				
+
+				/**
+				 * 1. get delay of the schedule, the default value is 0. If the delay is 1, the action starts 1 second after the
+				 * scheduled time
+				 */
+
+				int delay = 0;
+				if (scheduleJSON.has(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_DELAY)){
+
+					delay = scheduleJSON.getInt(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_DELAY);
+				}
+
+				Log.d(LOG_TAG, " [loadScheduleFromJSON ] examine schedules " + " is triggered " + "delay: " + delay);
+				schedule.setSampleDelay(delay);
+
+				/**
+				 * 2. get sample count (how many samples we want to do)
+				 */
 				if (scheduleJSON.has(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_COUNT)){
 					
 					int count  = scheduleJSON.getInt(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_COUNT);				
@@ -200,45 +208,43 @@ public class ActionControl extends ProbeObject {
 
 					
 				}
-				
-				
-				
-				//2. check sampling method: fixed interval or randomly
-				
+
+				/**
+				 * 3. Sampling Method (simple one time, random, fixed interval (interval_based), random with minimum interval).
+				 */
 				//fixed interval
 				if (sample_method.equals(ScheduleAndSampleManager.SCHEDULE_SAMPLE_METHOD_SIMPLE_ONE_TIME)){
-					Log.d(LOG_TAG, " simple one time, no need to calculate sample times "); 
+					Log.d(LOG_TAG, " [loadScheduleFromJSON ] SIMPLE ONE TIME simple one time, no need to calculate sample times ");
 				}
-				
+				//interval-contingent
 				else if (sample_method.equals(ScheduleAndSampleManager.SCHEDULE_SAMPLE_METHOD_FIXED_INTERVAL) ){
-								
 					schedule.setInverval(scheduleJSON.getInt(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_INTERVAL));
-					Log.d(LOG_TAG, " need to calcualte schedule end time: fixed interval " + schedule.getInterval() ); 
+					Log.d(LOG_TAG, " [loadScheduleFromJSON ] FIXED INTERVAL need to calcualte schedule end time: fixed interval " + schedule.getInterval() );
 				}
 				//randomly choose a time
 				else if (  sample_method.equals(ScheduleAndSampleManager.SCHEDULE_SAMPLE_METHOD_RANDOM   ) ){
-									
-					Log.d(LOG_TAG, " need to calcualte schedule end time: random" ); 
+					Log.d(LOG_TAG, "[loadScheduleFromJSON ] RANDOM  need to calcualte schedule end time: random" );
 				}
 				//randomly choose a time but with a minimum interval 
 				else if (  sample_method.equals(ScheduleAndSampleManager.SCHEDULE_SAMPLE_METHOD_RANDOM_WITH_MINIMUM_INTERVAL   ) ){
 					
 					schedule.setMinInverval(scheduleJSON.getInt(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_MINIMUM_INTERVAL));
-					Log.d(LOG_TAG, " need to calcualte schedule end time: random with min interval" + schedule.getMinInterval() ); 
+					Log.d(LOG_TAG, "[loadScheduleFromJSON ] RANDOM WITH MIN INTERVAL  need to calcualte schedule end time: random with min interval" + schedule.getMinInterval() );
 				}
 
-				
-				
-				//2. check if the end time is obtained through duration or endTimeAt
-				
-				//if use the duration
+
+				/**
+				 * 4. check if the end time is obtained through duration or endTimeAt. Sometimes we want the sample no later than
+				 * the certain time
+				 */
+
+				//if we use the duration
 				if (scheduleJSON.has(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_DURATION)){
 				
 					int duration = scheduleJSON.getInt(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_DURATION);
 					schedule.setSampleDuration(duration);
-					
-					
-					Log.d(LOG_TAG, "examine schedules" + " , for action " + schedule.getActionId()
+
+					Log.d(LOG_TAG, "testRandom [loadScheduleFromJSON ] examine schedules" + " , for action " + schedule.getActionId()
 							 + " sample method " + schedule.getSampleMethod()  + " delay: "  + schedule.getSampleDelay()  + " count: "
 							 + schedule.getSampleCount() + "  duratoin: " + schedule.getSampleDuration());
 					
@@ -249,11 +255,26 @@ public class ActionControl extends ProbeObject {
 					String endAt = scheduleJSON.getString(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_END_AT);
 					schedule.setSampleEndAtTimeOfDay(endAt);		
 					
-					Log.d(LOG_TAG, "examine schedules"  + " , for action " + schedule.getActionId()
+					Log.d(LOG_TAG, "testRandom [loadScheduleFromJSON ] examine schedules"  + " , for action " + schedule.getActionId()
 							 + " sample method " + schedule.getSampleMethod()  + " delay: "  + schedule.getSampleDelay()  + " count: "
 							 + schedule.getSampleCount() + "  endAt " + schedule.getSampleEndAtTimeOfDay());
 					
-				}			
+				}
+
+				//the schedule might have a start time constraint
+				if (scheduleJSON.has(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_START_AT)){
+
+					String startAt = scheduleJSON.getString(ScheduleAndSampleManager.SCHEDULE_PROPERTIES_SAMPLE_START_AT);
+					schedule.setSampleStartAtTimeOfDay(startAt);
+
+					Log.d(LOG_TAG, "testRandom [loadScheduleFromJSON ] examine schedules"  + " , for action " + schedule.getActionId()
+							+ " sample method " + schedule.getSampleMethod()  + " delay: "  + schedule.getSampleDelay()  + " count: "
+							+ schedule.getSampleCount() + "  startAt " + schedule.getSampleStartAtTimeOfDay());
+
+				}
+
+
+
 			}
 	
 		} catch (JSONException e) {

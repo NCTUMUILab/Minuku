@@ -7,11 +7,8 @@ import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
-import edu.umich.si.inteco.minuku.model.Circumstance;
+import edu.umich.si.inteco.minuku.model.Situation;
 import edu.umich.si.inteco.minuku.model.SimpleGeofence;
-import edu.umich.si.inteco.minuku.model.Criterion;
-import edu.umich.si.inteco.minuku.util.ConditionManager;
-import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 
 public class EventManager {
 
@@ -19,7 +16,7 @@ public class EventManager {
 	
 	private static Context mContext;
 	
-	private static ArrayList<Circumstance> mCircumstanceList;
+	private static ArrayList<Situation> mCircumstanceList;
 	
 	private static ArrayList<SimpleGeofence> mMonitoredGeofences;
 
@@ -28,7 +25,7 @@ public class EventManager {
 	public EventManager(Context context){
 		
 		mContext = context;
-		mCircumstanceList = new ArrayList<Circumstance>();
+		mCircumstanceList = new ArrayList<Situation>();
 		mLocalDBHelper = new LocalDBHelper(mContext, Constants.TEST_DATABASE_NAME);
 	}
 
@@ -81,11 +78,11 @@ public class EventManager {
 	}
 */
 	
-	public static void setEventList(ArrayList<Circumstance> circumstanceList){
+	public static void setEventList(ArrayList<Situation> circumstanceList){
 		mCircumstanceList = circumstanceList;
 	}
 	
-	public static ArrayList<Circumstance> getEventList(){
+	public static ArrayList<Situation> getEventList(){
 		return mCircumstanceList;
 	}
 	
@@ -115,15 +112,15 @@ public class EventManager {
 	}
 	
 	
-	public static void addEvent(Circumstance circumstance){
+	public static void addEvent(Situation circumstance){
 		
 		if (mCircumstanceList ==null){
-			mCircumstanceList = new ArrayList<Circumstance>();
+			mCircumstanceList = new ArrayList<Situation>();
 		}
 		mCircumstanceList.add(circumstance);
 	}
 	
-	public static void removeEvent(Circumstance circumstance){
+	public static void removeEvent(Situation circumstance){
 		
 		if (mCircumstanceList !=null){
 			mCircumstanceList.remove(circumstance);
@@ -139,13 +136,13 @@ public class EventManager {
 		
 	}
 	
-	public static Circumstance getEventById(int id){
+	public static Situation getEventById(int id){
 		
 		//connect the event object with the action object..
 		
 		for (int j= 0; j< mCircumstanceList.size(); j++){
 			
-			Circumstance evt;
+			Situation evt;
 			if (mCircumstanceList.get(j).getId()==id){
 				evt = mCircumstanceList.get(j);
 				

@@ -142,63 +142,101 @@
 					}					
 				],
 
+				"Actions":[
+
+				  {
+					"Id": 1,
+					"Execution_style":"one-time",
+					"Type": "questionnaire",
+					"Name": "triggering carried item questionnaire",
+					"Questionnaire_id":1,
+					"Control":{
+					  "Start":
+					  [
+						{
+						  "Launch": "schedule",
+						  "Schedule":
+						  {
+							"Sample_method":"random_with_minimum_interval",
+							"Sample_delay": 1,
+							"Sample_min_interval":7200,
+							"Sample_count": 5,
+							"Sample_startAt": "9:00",
+							"Sample_endAt": "22:00"
+						  }
+						}
+					  ]
+
+					},
+
+					"Notification":
+					[
+					  {
+						"Launch":"when_start",
+						"Type":"normal",
+						"Title": "Questionnaire Available",
+						"Message": "Please tab to answer the questionnaire."
+					  }
+					]
+				  }
+
+
+				],
+
 				"Questionnaires":
 				[
 					{
 						"Id": 1,
-						"Title": "Where do you place your phone?",
+						"Title": "Social Capital Questionnaire",
 						"Description":"Please answer the following questions.",
 						"Type":"activity",
 						"Questions":
 						[
-							{
-								"Index": 1,
-								"Type":"textbox",
-								"Question_text": "Where are you now?"					
-							},
+
+						  {
+							"Index": 1,
+							"Type":"multichoice_one_answer",
+							"Has_other_field":true,
+							"Question_text": "Where did you just place your phone?",
+							"Option":
+							[
+							  {
+								"Option_text":"A close friends or family"
+							  },
+							  {
+								"Option_text": "An acquaintance"
+							  },
+							  {
+								"Option_text": "Someone I work with "
+							  }
+
+							]
+
+						  },
 
 							{
 								"Index": 2,
 								"Type":"multichoice_one_answer",
-								"Has_other_field":true,
-								"Question_text": "Where did you just place your phone?",	
+								"Has_other_field":false,
+								"Question_text": "Did you learn anything new from this person? (e.g., new information, new resources, new events that are going on around you)",
 								"Option":
 								[
 									{
-										"Option_text":"Desk/Table"
+										"Option_text":"Yes"
 									},
 									{
-										"Option_text": "Pocket"
-									},
-									{
-										"Option_text": "Bagpack/handbag"
-									},
-									{
-										"Option_text": "Other"
+										"Option_text": "No"
 									}
-
 								]
 
-
 							},
+						  {
+							"Index": 3,
+							"Type":"textbox",
+							"Question_text": "Where are you located right now?"
 
-							{
-								"Index": 3,
-								"Type":"multichoice_multiple_answer",
-								"Question_text": "What is/are the reason(s) that you place your phone there?",
-								"Option":
-								[
-									{
-										"Option_text":"It's easier to notice notifications."
-									},
-									{
-										"Option_text": "It's convenient to grab."
-									},
-									{
-										"Option_text": "It's less disturbing."
-									}
-								]					
-							}
+						  }
+
 
 						]
 

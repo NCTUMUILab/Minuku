@@ -172,9 +172,9 @@
 					{
 						"Id": 2,
 						"Execution_style":"repeated",
-						"Type": "monitoring_events",
+						"Type": "monitoring_situation",
 						"Name": "monitoring being home",
-						"Monitoring_events":"2",
+						"monitoring_situation":"2",
 						"Control":{
 							"Start":
 							[
@@ -200,9 +200,9 @@
 							"Duration": -1
 						},
 						"Execution_style":"one-time",
-						"Type": "monitoring_events",
+						"Type": "monitoring_situation",
 						"Name": "Monitoring being in a vehicle",
-						"Monitoring_events":"3",
+						"monitoring_situation":"3",
 						"Control":{
 							"Start":
 							[
@@ -263,9 +263,9 @@
 							"Duration": -1
 						},
 						"Execution_style":"one-time",
-						"Type": "monitoring_events",
+						"Type": "monitoring_situation",
 						"Name": "Monitoring walking",
-						"Monitoring_events":"4",
+						"monitoring_situation":"4",
 						"Control":{
 							"Start":
 							[

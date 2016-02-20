@@ -359,8 +359,8 @@ public class PhoneStatusManager extends ContextStateManager {
 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
 
-                    data.put(RECORD_DATA_PROPERTY_APPUSAGE_LATEST_USED_APP, mLastestForegroundActivity);
-                    data.put(RECORD_DATA_PROPERTY_APPUSAGE_USED_APPS_STATS_IN_RECENT_HOUR, mLastestForegroundPackage);
+                    data.put(RECORD_DATA_PROPERTY_APPUSAGE_LATEST_USED_APP, mLastestForegroundPackage);
+                    data.put(RECORD_DATA_PROPERTY_APPUSAGE_USED_APPS_STATS_IN_RECENT_HOUR, mRecentUsedAppsInLastHour);
 
                 }
                 else {
@@ -852,8 +852,8 @@ public class PhoneStatusManager extends ContextStateManager {
             curRunningForegrndActivity = taskInfo.get(0).topActivity.getClassName();
             curRunningForegrndPackNamge = taskInfo.get(0).topActivity.getPackageName();
 
-            Log.d(LOG_TAG, "test source being requested [testing app] os version " +android.os.Build.VERSION.SDK_INT + " under 21 "
-                     + curRunningForegrndActivity + " " + curRunningForegrndPackNamge );
+//            Log.d(LOG_TAG, "test source being requested [testing app] os version " +android.os.Build.VERSION.SDK_INT + " under 21 "
+//                     + curRunningForegrndActivity + " " + curRunningForegrndPackNamge );
 
             //store the running activity and its package name in the Context Extractor
             if(taskInfo!=null){
@@ -870,7 +870,7 @@ public class PhoneStatusManager extends ContextStateManager {
         mLastestForegroundActivity=curForegroundActivity;
         mLastestForegroundPackage=curForegroundPackage;
 
-        Log.d(LOG_TAG, "[setCurrentForegroundActivityAndPackage] the current running package mIs " + mLastestForegroundActivity + " and the activity mIs " + mLastestForegroundPackage);
+//        Log.d(LOG_TAG, "[setCurrentForegroundActivityAndPackage] the current running package mIs " + mLastestForegroundActivity + " and the activity mIs " + mLastestForegroundPackage);
     }
 
 
@@ -936,7 +936,7 @@ public class PhoneStatusManager extends ContextStateManager {
 
 
         int mode = mAudioManager.getMode();
-        Log.d(LOG_TAG, "[getAudioRingerUpdate] ringer mode: " + mRingerMode + " mode: " + mode);
+//        Log.d(LOG_TAG, "[getAudioRingerUpdate] ringer mode: " + mRingerMode + " mode: " + mode);
 
         mStreamVolumeMusic= mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         mStreamVolumeNotification= mAudioManager.getStreamVolume(AudioManager.STREAM_NOTIFICATION);
@@ -955,13 +955,13 @@ public class PhoneStatusManager extends ContextStateManager {
 
         mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM);
 
-        Log.d(LOG_TAG, "[test source being requested] volume:  music" + mStreamVolumeMusic
-                        + " volume: notification: " +  mStreamVolumeNotification
-                        + " volume: ring " +  mStreamVolumeRing
-                        + " volume: voicecall: " +  mStreamVolumeVoicecall
-                        + " volume: voicesystem: " +  mStreamVolumeSystem
-                        + " mode:  " +  mAudioMode
-        );
+//        Log.d(LOG_TAG, "[test source being requested] volume:  music" + mStreamVolumeMusic
+//                        + " volume: notification: " +  mStreamVolumeNotification
+//                        + " volume: ring " +  mStreamVolumeRing
+//                        + " volume: voicecall: " +  mStreamVolumeVoicecall
+//                        + " volume: voicesystem: " +  mStreamVolumeSystem
+//                        + " mode:  " +  mAudioMode
+//        );
 
     }
 

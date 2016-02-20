@@ -35,7 +35,7 @@ import edu.umich.si.inteco.minuku.model.actions.AnnotateAction;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateRecordingAction;
 import edu.umich.si.inteco.minuku.model.actions.GenerateEmailQuestionnaireAction;
 import edu.umich.si.inteco.minuku.model.actions.GeneratingQuestionnaireAction;
-import edu.umich.si.inteco.minuku.model.actions.MonitoringCircumstanceAction;
+import edu.umich.si.inteco.minuku.model.actions.MonitoringSituationAction;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;
 
 public class ActionManager {
@@ -64,7 +64,7 @@ public class ActionManager {
     public static final int USER_INITIATED_RESPONDING_TO_DAILY_REPORT = 1002;
 	
 	/***Action Type**/
-	public static final String ACTION_TYPE_MONITORING_EVENTS = "monitoring_events";
+	public static final String ACTION_TYPE_MONITORING_SITUATION = "monitoring_situation";
 	public static final String ACTION_TYPE_QUESTIONNAIRE = "questionnaire";
     public static final String ACTION_TYPE_EMAIL_QUESTIONNAIRE = "email_questionnaire";
 	public static final String ACTION_TYPE_SAVING_RECORD = "saving_record";
@@ -104,7 +104,7 @@ public class ActionManager {
 	public static final int ACTION_CONTROL_TYPE_RESUME = 5;
 
     /** ProbeObject Class**/
-    public static final String ACTION_TRIGGER_CLASS_EVENT= "Circumstance";
+    public static final String ACTION_TRIGGER_CLASS_EVENT= "Situation";
     public static final String ACTION_TRIGGER_CLASS_ACTION_STOP= "Action.Stop";
     public static final String ACTION_TRIGGER_CLASS_ACTION_START= "Action.Start";
     public static final String ACTION_TRIGGER_CLASS_ACTION_PAUSE= "Action.Pause";
@@ -205,13 +205,12 @@ public class ActionManager {
 			**/
              if (action.isContinuous()){
 
-
                 /**2. for savingRecord action or monitoring event, we first need to check whether the ContextSource has been
                  * enabled in the correspoonding ContextStateManager. If not, we will need to enable it. A ContextSource is said to be
                  * enabled if its "isRequested" is True.
                  */
 
-                if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)
+                if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_SITUATION)
                         || action.getType().equals(ActionManager.ACTION_TYPE_SAVING_RECORD)) {
 
                     //TODO: update ContextSource in the ContextSourceManager
@@ -224,22 +223,17 @@ public class ActionManager {
 
                 /** 3. Then according to whetehr it's monitoring or saving record we do different things**/
 				//if the action is to monitor events
-				if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){
+				if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_SITUATION)){
 			
 					//instantiate a monitoring action first, and then put it into the runningAction list
-					MonitoringCircumstanceAction monitoringAction = (MonitoringCircumstanceAction) action;
-					ArrayList<Integer> evtIds = monitoringAction.getMonitoredCircumstanceIds();
-					
-					//Log.d(LOG_TAG, " [ActionManager startAction] Start a new monitoring action" + monitoringAction.getId() + ", which monitor events  " + evtIds.toString());
-					
+					MonitoringSituationAction monitoringAction = (MonitoringSituationAction) action;
 					addRunningAction(monitoringAction);
 
                     //log
                     LogManager.log( LogManager.LOG_TYPE_SYSTEM_LOG,
                             LogManager.LOG_TAG_ACTION_START,
-                            "Stop Action:\t" + monitoringAction.getType() + "\t" + monitoringAction.getId() + "\t" +monitoringAction.getName());
-					
-				}
+                            "Start Action:\t" + monitoringAction.getType() + "\t" + monitoringAction.getId() + "\t" +monitoringAction.getName());
+                }
 				
 				
 				//if the action is to recording records  
@@ -275,9 +269,8 @@ public class ActionManager {
 
                     //add session to the curRecordingSession
                     RecordingAndAnnotateManager.addCurRecordingSession(session);
-					
-					//TODO: get a list of record to save and put it into the recording list. 
 
+                    //add the continuous recoridng action into the runningaction
 					addRunningAction(savingRecordAction);
 
                     //log
@@ -293,7 +286,6 @@ public class ActionManager {
 			else {
 				
 				executeAction(action);
-
 
                 //log
                 LogManager.log( LogManager.LOG_TYPE_SYSTEM_LOG,
@@ -332,12 +324,14 @@ public class ActionManager {
 					
 					GeneratingQuestionnaireAction a  = (GeneratingQuestionnaireAction) action; 
 					
-					//first create questionnaire object, then create notification. The reason is that we need to 
-					//record the generated time of the questionnaire. 
-					//The time when a user clicks on the notificaiton is defined as "attendedTime", different from the 
-					//"generatedTime"
-					
-					//1. first we insert a questionnaire in the databse with generated time, and get the id of the questionnaire
+					/**
+                     * first create questionnaire object, then create notification. The reason is that we need to
+					record the generated time of the questionnaire.
+					The time when a user clicks on the notificaiton is defined as "attendedTime", different from the
+					"generatedTime"
+					**/
+
+					/** 1. first we insert a questionnaire in the databse with a generated time, and get the id of the questionnaire**/
 					
 					
 					int study_id = action.getStudyId();
@@ -375,6 +369,7 @@ public class ActionManager {
 
 				}
 
+                //if the aciton is an email questionnaire
                 else if (action.getType().equals(ActionManager.ACTION_TYPE_EMAIL_QUESTIONNAIRE)){
 
                     GenerateEmailQuestionnaireAction generateEmailQuestionnaireAction  = (GenerateEmailQuestionnaireAction) action;
@@ -385,16 +380,10 @@ public class ActionManager {
                     Log.d(LOG_TAG,"[execute EmailQuestionnaire Action]  the email questionnaire id is " + questionnaireTemplateId);
 
 
-
                     //create an intent for starting the email composing activity
-
-
-
-
 
                     /** 1. produce email compose window  **/
                     if (QuestionnaireManager.QUESTIONNAIRE_SENT_FROM_SOURCE.equals(QuestionnaireManager.QUESTIONNAIRE_FROM_CLIENT)) {
-
 
                         Intent intent = generateEmailQuestionnaireIntent(questionnaireTemplateId);
 
@@ -489,16 +478,15 @@ public class ActionManager {
 
 				/** if the action is to monitor events, ContextMAnager will inform ContextStateManagers
                  * of relevance to convert raw data into states. **/
-				else if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){
+				else if (action.getType().equals(ActionManager.ACTION_TYPE_MONITORING_SITUATION)){
 			
-					MonitoringCircumstanceAction a = (MonitoringCircumstanceAction) action;
+					MonitoringSituationAction a = (MonitoringSituationAction) action;
 					
 					ArrayList<Integer> ids = a.getMonitoredCircumstanceIds();
 					
 					//Log.d(LOG_TAG, " [ActionManager Execute] Ready to execute monitoring action" + a.getId() + ", which monitor events  " + evt_ids.toString());
-					
 
-					//EventManager.examineEventConditions(evt_ids);
+                    //TODO: ContextManager monitors the states of ContextStateManagers.
 					
 				}
 				
@@ -672,7 +660,7 @@ public class ActionManager {
 
                     }else if (annotateRecordingAction.getMode().equals(RecordingAndAnnotateManager.ANNOTATE_MODE_AUTO)) {
 
-                        //automatically add annotations to the recording
+                        //TODO: automatically add annotations to the recording. We cna do this by guessing the lable of the activity
 
 
                     }
@@ -1060,7 +1048,7 @@ public class ActionManager {
 	 *
 	 */
 	public static void registerActionControls(){
-		Log.d(LOG_TAG, "[ registerActionControls] enter registerActionControls");
+		Log.d(LOG_TAG, "[testRandom][ registerActionControls] enter registerActionControls");
 
 		
 		for (int i=0; i<mActionControlList.size(); i++){
@@ -1068,7 +1056,7 @@ public class ActionManager {
 			Action action = mActionControlList.get(i).getAction();
 			
 					
-			Log.d(LOG_TAG, "[ registerActionControls] examine action control " + mActionControlList.get(i).getId() + mActionControlList.get(i).getType() +
+			Log.d(LOG_TAG, "[testRandom][ registerActionControls] examine action control " + mActionControlList.get(i).getId() + mActionControlList.get(i).getType() +
 					" of action " + action.getId() + " of which the type is " + action.getType() + " and the continuity is " + action.isContinuous()
 					+" the rate is " + action.getActionRate()
 					);
@@ -1077,28 +1065,16 @@ public class ActionManager {
 			//get the action control which should launch when the Probe service starts. 
 			if (mActionControlList.get(i).getLaunchMethod().equals(ActionManager.ACTION_LAUNCH_STYLE_APP_START)){
 				
-				Log.d(LOG_TAG, "[ registerActionControls] action control " + mActionControlList.get(i).getId() + 
+				Log.d(LOG_TAG, "[testRandom] [ registerActionControls] action control " + mActionControlList.get(i).getId() +
 						" needs to start at the beginning, it continuity is " + action.isContinuous());
 
-
                 startAction(mActionControlList.get(i).getAction());
-                /*
-                //if the action is contibuous, the action is put into the runningAction list instead of starting them.
-				if (action.isContinuous()){
-					//put into the runningActionList
-					mRunningActionList.add(action);					
-				}
-				else {
-					//start the action
-					startAction(mActionControlList.get(i).getAction());					
-				}
-				*/
-				
+
 			}
 			//get the actionContorl which belongs to scheduled type	
 			else if (mActionControlList.get(i).getLaunchMethod().equals(ActionManager.ACTION_LAUNCH_STYLE_SCHEDULE)){
 				
-				Log.d(LOG_TAG, "[ registerActionControls] action control " + mActionControlList.get(i).getId() + 
+				Log.d(LOG_TAG, "[testRandom][ registerActionControls] action control " + mActionControlList.get(i).getId() +
 						" needs to be scheduled: " + mActionControlList.get(i).getSchedule());
 				
 				//register the actioncontrol

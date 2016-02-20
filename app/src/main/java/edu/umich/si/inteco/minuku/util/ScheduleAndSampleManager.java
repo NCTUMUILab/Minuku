@@ -74,6 +74,7 @@ public class ScheduleAndSampleManager {
 	public static final String SCHEDULE_PROPERTIES_SAMPLE_DURATION = "Sample_duration";
 	public static final String SCHEDULE_PROPERTIES_SAMPLE_COUNT = "Sample_count";
 	public static final String SCHEDULE_PROPERTIES_SAMPLE_END_AT = "Sample_endAt";
+	public static final String SCHEDULE_PROPERTIES_SAMPLE_START_AT = "Sample_startAt";
 	public static final String SCHEDULE_PROPERTIES_FIXED_TIME_OF_DAY = "Time_of_day";
 	public static final String SCHEDULE_PROPERTIES_SAMPLE_MINIMUM_INTERVAL = "Sample_min_interval";
 	
@@ -107,7 +108,7 @@ public class ScheduleAndSampleManager {
      */
     public void registerUpdateScheduleAlarm() {
 
-        Log.d(LOG_TAG, "[test reschedule][egisterUpdateScheduleAlarm] the alarm receiver  with request code " );
+        Log.d(LOG_TAG, "[test reschedule][egisterUpdateScheduleAlarm] the alarm receiver  with request code ");
 
     }
 
@@ -192,9 +193,56 @@ public class ScheduleAndSampleManager {
         return time;
     }
 	
-	private static long getSamplingStartTime(long base, Schedule schedule){
-		
-		return (base + schedule.getSampleDelay()* Constants.MILLISECONDS_PER_SECOND);
+	private static long getSamplingStartTime(Schedule schedule){
+
+		TimeZone tz = TimeZone.getDefault();
+		Calendar cal = Calendar.getInstance(tz);
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+
+		long startTime = 0;
+
+		// if there's a start time constraint, we should generate sample time after that .
+		if (schedule.getSampleStartAtTimeOfDay() != null) {
+
+			//geneerate the time of day of the same day.
+			int t_hour = getHourOfTimeOfDay(schedule.getSampleStartAtTimeOfDay());
+			int t_minute = getMinuteOfTimeOfDay(schedule.getSampleStartAtTimeOfDay());
+
+			Log.d(LOG_TAG, "testRandom [getSamplingStartTime] the timeOfDay is : " + t_hour + " : " + t_minute);
+
+			Calendar designatedStartTime = Calendar.getInstance();
+			designatedStartTime.set(year, month - 1, day, t_hour, t_minute);
+
+			Log.d(LOG_TAG, "testRandom [getSamplingStartTime] the designatedStartTime is : " + getTimeString(designatedStartTime.getTimeInMillis()));
+
+			//if the timeOfDay has passed (i.e. the curren time  > designated time ), we used "now", which is "cal" as a start time.
+			if (cal.after(designatedStartTime)) {
+
+				// day + 1
+				startTime = cal.getTimeInMillis();
+
+				Log.d(LOG_TAG, "testRandom [getSamplingStartTime] the timeOfDay " + schedule.getSampleStartAtTimeOfDay() + " has passed, now is already " + hour
+						+ " so the rolling it, the new designated start time is now, which is: " + getTimeString(startTime));
+
+			}
+			//otherwise, we should sample starting from the star time.
+			else {
+				startTime = designatedStartTime.getTimeInMillis();
+			}
+
+
+			Log.d(LOG_TAG, "testRandom [getSamplingStartTime] the final start time should be " + getTimeString(startTime));
+
+		}
+		else {
+			startTime = cal.getTimeInMillis();
+		}
+
+		//if there's no Start Time properties, we return "now"
+		return (startTime + schedule.getSampleDelay()* Constants.MILLISECONDS_PER_SECOND);
 		
 	}
 
@@ -365,6 +413,7 @@ public class ScheduleAndSampleManager {
 		TimeZone tz = TimeZone.getDefault();		
 		Calendar cal = Calendar.getInstance(tz);
 		long now = cal.getTimeInMillis();
+
 		/***
 		 * We need to get the sample method, sample count, sample star time, and sample end time to know how to schedule
 		 * 
@@ -376,7 +425,7 @@ public class ScheduleAndSampleManager {
 		int sample_count = schedule.getSampleCount();	
 
 
-        //if the method is at fixed time of a day
+        /** 1. if the method is at fixed time of a day **/
 		if (sample_method.equals(SCHEDULE_SAMPLE_METHOD_FIXED_TIME_OF_DAY)) {
 
             String timeString = schedule.getFixedTimeOfDay();
@@ -391,23 +440,25 @@ public class ScheduleAndSampleManager {
             return SampleTimes;
 
         }
-        //if the sample method is simple one time, there's no need to generate a number of sample times
+
+
+        /** 2. if the sample method is simple one time, there's no need to generate a number of sample times**/
         else if (sample_method.equals(SCHEDULE_SAMPLE_METHOD_SIMPLE_ONE_TIME)){
 
             //because it's one time, we just add a delay to "now"
-			long samplingStartTimeInMilli =  getSamplingStartTime(now ,schedule);
-			Log.d(LOG_TAG, " [generateSampleTimes] this is simple one time action,  the one time action is at " + getTimeString(samplingStartTimeInMilli) );
+			long samplingStartTimeInMilli =  now + schedule.getSampleDelay()* Constants.MILLISECONDS_PER_SECOND;
+			Log.d(LOG_TAG, "testRandom [generateSampleTimes] this is simple one time action,  the one time action is at " + getTimeString(samplingStartTimeInMilli) );
 			
 			// if the startTime is later than the next bedTime, should abort this schedule..
 			if (samplingStartTimeInMilli > getNextBedStartTimeInMillis() ){			
-				Log.d(LOG_TAG, "[generateSampleTimes]  the start time " + getTimeString(samplingStartTimeInMilli) + " is too late, the bed time is " +  getTimeString( getNextBedStartTimeInMillis()) );
+				Log.d(LOG_TAG, "testRandom [generateSampleTimes]  the start time " + getTimeString(samplingStartTimeInMilli) + " is too late, the bed time is " +  getTimeString( getNextBedStartTimeInMillis()) );
 				return SampleTimes;
 			}
 						
 			//because there's only one time action, just add the startTime into the sampletimes. 
 			SampleTimes = new ArrayList<Long>();
 			SampleTimes.add(samplingStartTimeInMilli);
-            Log.d(LOG_TAG, "[generateSampleTimes] SampleTimes is " + SampleTimes);
+            Log.d(LOG_TAG, "testRandom [generateSampleTimes] SampleTimes is " + SampleTimes);
 
 			return SampleTimes;
 			
@@ -417,17 +468,21 @@ public class ScheduleAndSampleManager {
 		//times
 		else {
 			/** identify the sampling period **/
-			long samplingStartTimeInMilli = getSamplingStartTime(now ,schedule);
+			long samplingStartTimeInMilli = getSamplingStartTime(schedule);
 			long samplingEndTimeInMilli = getSamplingEndTime(now, schedule);	
-			
+
+			Log.d(LOG_TAG, "[testRandom] sampling from "  + getTimeString(samplingStartTimeInMilli) + "  - " + getTimeString(samplingEndTimeInMilli));
+
 			// if the startTime is later than the next bedTime, should abort this schedule..
 			if (samplingStartTimeInMilli > getNextBedStartTimeInMillis() ){			
-			//	Log.d(LOG_TAG, " the start time " + getTimeString(samplingStartTimeInMilli) + " is too late, the bed time is " +  getTimeString( getNextBedStartTimeInMillis()) );
+				Log.d(LOG_TAG, "[testRandom] the start time " + getTimeString(samplingStartTimeInMilli) + " is too late, the bed time is " +  getTimeString( getNextBedStartTimeInMillis()) );
 				return SampleTimes;
 			}
 
-			//generate the sample times 
+			/** generate the sample times **/
 			SampleTimes = calculateSampleTimes(sample_count, sample_method, samplingStartTimeInMilli, samplingEndTimeInMilli, schedule);
+			Log.d(LOG_TAG, " [testRandom] sample times are: " + SampleTimes.toString());
+
 
 			return SampleTimes;
 			
@@ -451,8 +506,7 @@ public class ScheduleAndSampleManager {
 
 		//if startTime has passed, now becomes the startTime. This is for cases where the delay might be zero. So the action should immediately
 		//happen right after the event. But the processing time may delay the startTime.
-		
-		
+
 		if (now > startTime) now=startTime;
 
 		//1. pure random
@@ -461,7 +515,7 @@ public class ScheduleAndSampleManager {
 			//start to random
 			int sample_period = (int) (endTime - startTime);			
 			
-			Log.d(LOG_TAG, " random between 0  and " + sample_period);
+			Log.d(LOG_TAG, "[testRandom] random between 0  and " + sample_period);
 
 			//generate a number of random number
 			for (int i=0; i<sample_number; i++){
@@ -469,7 +523,7 @@ public class ScheduleAndSampleManager {
 				long time = random.nextInt(sample_period) + startTime;
 				times.add(time);
 			
-				Log.d(LOG_TAG, " the random number is " + time + " : " + getTimeString(time));
+				Log.d(LOG_TAG, "[testRandom] generate a new random number is " + time + " : " + getTimeString(time));
 			}
 
 		}
@@ -499,11 +553,11 @@ public class ScheduleAndSampleManager {
 				
 				//3. random within the sub sample period
 				long time =  random.nextInt(sub_sample_period) + sub_startTime;
-				/*
-				Log.d(LOG_TAG, " semi sampling: the " + i + " sampling period is from " + getTimeString(sub_startTime) + " to " + getTimeString(sub_endTime) + 
-				" divied by " + (sample_number-i) + " each period is " + sub_sample_period + " seconds long, " + " the sampled time within the period is " + 
+
+				Log.d(LOG_TAG, "testRandom semi sampling: the " + i + " sampling period is from " + getTimeString(sub_startTime) + " to " + getTimeString(sub_endTime) +
+				" divied by " + (sample_number-i) + " each period is " + (sub_sample_period/60/1000) + " minutes long, " + " the sampled time within the period is " +
 						getTimeString(time) );
-				*/
+
 				//4. save the sampled time
 				times.add(time);
 				
@@ -511,7 +565,7 @@ public class ScheduleAndSampleManager {
 				//not too close to the previous sampled time. 
 				sub_startTime = time +  min_interval;
 				
-				//Log.d(LOG_TAG, " semi sampling: the new start time is " + getTimeString(sub_startTime));
+//				Log.d(LOG_TAG, "testRandom semi sampling: the new start time is " + getTimeString(sub_startTime));
 				
 				//6. if the next start time is later than the overall end time, stop the sampling.
 				if (sub_startTime >= sub_endTime)
@@ -534,17 +588,21 @@ public class ScheduleAndSampleManager {
 		else if(method.equals(SCHEDULE_SAMPLE_METHOD_FIXED_INTERVAL)){
 			
 			int sample_interval = schedule.getInterval();
-			int sample_period = (int) (endTime - startTime);	
+			int sample_period = (int) (endTime - startTime);
+
+			//this is a clear constraint that we should only schedule this many times.
+			int sample_count = schedule.getSampleCount();
 			
-			//Log.d(LOG_TAG, " [calculateSampleTimes] the fixed sample interval is" + sample_interval + " and the period is " + sample_period);
+			Log.d(LOG_TAG, "[testRandom] [calculateSampleTimes] the fixed sample interval is" + sample_interval + " and the period is " + sample_period);
 			
 			long next_sample_time = startTime+ sample_interval* Constants.MILLISECONDS_PER_SECOND;
 			
-			while (next_sample_time < endTime){				
+			while (next_sample_time < endTime && sample_count>0){
 				
-				Log.d(LOG_TAG, "adding sampled time " + getTimeString(next_sample_time));
+				Log.d(LOG_TAG, "[testRandom] adding sampled time " + getTimeString(next_sample_time));
 				times.add(next_sample_time);			
 				next_sample_time+=sample_interval* Constants.MILLISECONDS_PER_SECOND;
+				sample_count -=1;
 			}
 			
 		}
@@ -867,7 +925,7 @@ public class ScheduleAndSampleManager {
 
         if (ac.getSchedule()!=null){
             //schedule the alarm for the actionControl
-            Log.d(LOG_TAG, "[registerActionControl][test cancel alarm] the control " + ac.getId()  + " for " + ac.getAction().getName()+ " has schedule" );
+            Log.d(LOG_TAG, "[testRandom][registerActionControl] the control " + ac.getId()  + " for " + ac.getAction().getName()+ " has schedule" );
 
             ScheduleAndSampleManager.executeSchedule(ac);
         }
@@ -877,7 +935,7 @@ public class ScheduleAndSampleManager {
 
     public static void updateScheduledActionControls() {
 
-        Log.d(LOG_TAG, "[test reschedule][updateActionControlsSchedules] going to update all actioncontrol's schedule "  );
+        Log.d(LOG_TAG, "[testRandom] [test reschedule][updateActionControlsSchedules] going to update all actioncontrol's schedule "  );
 
         for (int i=0; i<ActionManager.getActionControlList().size(); i++){
 

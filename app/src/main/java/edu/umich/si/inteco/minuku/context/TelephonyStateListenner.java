@@ -104,7 +104,7 @@ public class TelephonyStateListenner extends PhoneStateListener {
                     PhoneStatusManager.setGeneralSignalStrength(dbm);
 
 //                    _GeneralSignalStrength = _GsmSignalStrength = dbm;
-                   Log.d(LOG_TAG, "[test source being requested] TestTelephony GSM strength: " + PhoneStatusManager.getGsmSignalStrength() + "asu: " + signalStrength.getGsmSignalStrength());
+//                   Log.d(LOG_TAG, "[test source being requested] TestTelephony GSM strength: " + PhoneStatusManager.getGsmSignalStrength() + "asu: " + signalStrength.getGsmSignalStrength());
 
                 }
                 else{

@@ -1,10 +1,7 @@
 package edu.umich.si.inteco.minuku.util;
 
 import android.content.Context;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-
-import com.google.android.gms.analytics.Tracker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,13 +12,12 @@ import java.util.ArrayList;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
-import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.data.MongoLabHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.Configuration;
 import edu.umich.si.inteco.minuku.model.Questionnaire.EmailQuestionnaireTemplate;
-import edu.umich.si.inteco.minuku.model.Circumstance;
+import edu.umich.si.inteco.minuku.model.Situation;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.model.ProbeObjectControl.ActionControl;
@@ -34,7 +30,7 @@ import edu.umich.si.inteco.minuku.model.actions.AnnotateAction;
 import edu.umich.si.inteco.minuku.model.actions.AnnotateRecordingAction;
 import edu.umich.si.inteco.minuku.model.actions.GenerateEmailQuestionnaireAction;
 import edu.umich.si.inteco.minuku.model.actions.GeneratingQuestionnaireAction;
-import edu.umich.si.inteco.minuku.model.actions.MonitoringCircumstanceAction;
+import edu.umich.si.inteco.minuku.model.actions.MonitoringSituationAction;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;
 
 public class ConfigurationManager {
@@ -113,7 +109,7 @@ public class ConfigurationManager {
 	public static final String ACTION_PROPERTIES_EXECUTION_STYLE= "Execution_style";
 	public static final String ACTION_PROPERTIES_CONTROL= "Control";
 	public static final String ACTION_PROPERTIES_CONTINUITY= "Continuity";
-	public static final String ACTION_PROPERTIES_MONITORING_EVENTS= "Monitoring_events";
+	public static final String ACTION_PROPERTIES_MONITORING_SITUATION = "Monitoring_situation";
 	public static final String ACTION_PROPERTIES_LOGGING_TASKS= "Logging_tasks";
 	public static final String ACTION_PROPERTIES_QUESTIONNAIRE_ID= "Questionnaire_id";
 	public static final String ACTION_PROPERTIES_NOTIFICATION = "Notification";
@@ -555,7 +551,7 @@ public class ConfigurationManager {
 		
 		for (int i = 0; i < circumstancesJSON.length(); i++){
 			
-			Circumstance circumstance = null;
+			Situation circumstance = null;
 			JSONObject circumstanceJSON = null;
 			
 			try {
@@ -566,7 +562,7 @@ public class ConfigurationManager {
 				String description = circumstanceJSON.getString(CONFIGURATION_PROPERTIES_DESCRIPTION);
 
 				//creat the circumstance object
-				circumstance = new Circumstance(id, name, study_id);
+				circumstance = new Situation(id, name, study_id);
 				
 				//add the conditionJSON to the circumstance
 				if (circumstanceJSON.has(CONFIGURATION_CATEGORY_CONDITIONS)){
@@ -625,7 +621,7 @@ public class ConfigurationManager {
 				controlJSON = actionJSON.getJSONObject(ACTION_PROPERTIES_CONTROL);
 				String name = actionJSON.getString(ACTION_PROPERTIES_NAME);
 				
-				Log.d(LOG_TAG, "[loadActionsFromJSON] examine action" + " action: " + action_id + " , for type " + type
+				Log.d(LOG_TAG, "[test sampling][loadActionsFromJSON] examine action" + " action: " + action_id + " , for type " + type
 						+ " execution style " + execution_style );
 				
 				
@@ -639,7 +635,7 @@ public class ConfigurationManager {
 					GeneratingQuestionnaireAction a = new GeneratingQuestionnaireAction (action_id, name, type,execution_style, study_id);
 					a.setQuestionnaireId(questionnaire_id);
 					action = a; 
-					//Log.d(LOG_TAG, " the aciton" + action.getId() + " questionnaire id:  " + a.getQuestionnaireId());
+					Log.d(LOG_TAG, "[test sampling] the aciton" + action.getId() + " questionnaire id:  " + a.getQuestionnaireId());
 					
 				}
 				//Action of email questionnaire
@@ -656,18 +652,18 @@ public class ConfigurationManager {
                 }
 				
 				////Action of monitoring circumstances. We associate circumstance ids with the action.
-				else if (type.equals(ActionManager.ACTION_TYPE_MONITORING_EVENTS)){
+				else if (type.equals(ActionManager.ACTION_TYPE_MONITORING_SITUATION)){
 					
-					String monitor_circumstance_ids = actionJSON.getString(ACTION_PROPERTIES_MONITORING_EVENTS);
-					String [] ids = monitor_circumstance_ids.split(",");
+					String monitor_situation_ids = actionJSON.getString(ACTION_PROPERTIES_MONITORING_SITUATION);
+					String [] ids = monitor_situation_ids.split(",");
 					
-					MonitoringCircumstanceAction a = new MonitoringCircumstanceAction (action_id, name, type, execution_style, study_id);
+					MonitoringSituationAction a = new MonitoringSituationAction (action_id, name, type, execution_style, study_id);
 
-					//associate circumstance ids to the monitoring action.
+					//associate situation ids to the monitoring action.
 					for (int j=0; j<ids.length; j++){
 						int id = Integer.parseInt(ids[j]);
 						a.addMonitoredCircumstance(id);
-						Log.d(LOG_TAG, " [loadActionsFromJSON] the aciton" + action.getId() + " monitors circumstance:  "  +  id);
+						Log.d(LOG_TAG, " [loadActionsFromJSON] the aciton" + action.getId() + " monitors situation  "  +  id);
 
 					}
 					
@@ -955,10 +951,12 @@ public class ConfigurationManager {
 	 */
 	public static void loadActionControlsFromJSON (JSONObject controlJSON, Action action) {
 
-		//if the action control is to start an action. Most action controls belong to this type. 
+		/** if the action control is to START an action. Most action controls belong to this type. **/
 		if (controlJSON.has(ActionManager.ACTION_CONTROL_TYPE_START_STRING)){
-			
+
+			//it's an array because there could be many ways to start an Action.
 			JSONArray startJSONArray = null;
+
 			try {
 				startJSONArray = controlJSON.getJSONArray(ActionManager.ACTION_CONTROL_TYPE_START_STRING);
 
@@ -968,17 +966,20 @@ public class ConfigurationManager {
 			}
 			
 			if (startJSONArray!=null){
-				
+
+				//load all the possible ways of starting the action
 				for (int i = 0; i < startJSONArray.length(); i++){
 					
 					JSONObject startJSONObject=null;
+
 					try {
 						startJSONObject = startJSONArray.getJSONObject(i);
+
 						//instantiate an Action Control with type "Start"
 						//set id based on the number of existing action contorl
 						int id = ActionManager.getActionControlList().size()+1;
 						
-						//create an ActionControl object 
+						//create an ActionControl object. When creating, the ActionControl will setup its own
 						ActionControl ac = new ActionControl (id, startJSONObject, ActionManager.ACTION_CONTROL_TYPE_START, action);
 						
 						//add the ActionControl object to the list
@@ -987,6 +988,7 @@ public class ConfigurationManager {
 						
 						Log.d(LOG_TAG, "[loadActionControlsFromJSON]  the start acitonControl id is " + ac.getId() + " connects to action " + ac.getAction().getId() + " " + ac.getAction().getName() +
 								" and has schedule : " + ac.getSchedule());
+
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -996,7 +998,7 @@ public class ConfigurationManager {
 			}
 			
 		}
-		//if the action control is to stop an action
+		/** if the action control is to STOP an action **/
 		if (controlJSON.has(ActionManager.ACTION_CONTROL_TYPE_STOP_STRING)) {
 			
 			JSONArray stopJSONArray;

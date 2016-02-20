@@ -51,7 +51,7 @@ private static final String LOG_TAG = "Action";
 		_class = TriggerManager.PROBE_OBJECT_CLASS_ACTION;
 	}
 	
-	//for actions that is triggered by an Circumstance
+	//for actions that is triggered by an Situation
 	public Action(int id, String type){
 		super();
 		_id = id;

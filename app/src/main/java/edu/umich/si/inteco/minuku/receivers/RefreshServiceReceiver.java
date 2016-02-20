@@ -24,7 +24,7 @@ public class RefreshServiceReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(ScheduleAndSampleManager.UPDATE_SCHEDULE_ALARM)){
             Log.d(LOG_TAG, "In UpdateScheduleAlarmReceiver");
 
-            Log.d(LOG_TAG, "[test reschedule][onReceive] the alarm receiver  with request code " + intent.getIntExtra(ScheduleAndSampleManager.ALARM_REQUEST_CODE, 0)
+            Log.d(LOG_TAG, "[testRandom] [onReceive] the alarm receiver  with request code " + intent.getIntExtra(ScheduleAndSampleManager.ALARM_REQUEST_CODE, 0)
                     + "going to update actioncontrol's schedule");
 
             ScheduleAndSampleManager.updateScheduledActionControls();
@@ -44,9 +44,9 @@ public class RefreshServiceReceiver extends BroadcastReceiver {
 
         }else if (intent.getAction().equals(ScheduleAndSampleManager.START_SERVICE_ALARM)) {
 
-            Log.d(LOG_TAG, "[UpdateScheduleAlarmReceiver ] we will start the service ");
+            Log.d(LOG_TAG, " [testRandom] [UpdateScheduleAlarmReceiver ] we will start the service ");
 
-            Log.d(LOG_TAG, "[test reschedule][onReceive] the alarm receiver  with request code " + intent.getIntExtra(ScheduleAndSampleManager.ALARM_REQUEST_CODE, 0)
+            Log.d(LOG_TAG, "[[testRandom][onReceive] the alarm receiver  with request code " + intent.getIntExtra(ScheduleAndSampleManager.ALARM_REQUEST_CODE, 0)
                     + "going to start service");
 
             LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
@@ -64,7 +64,7 @@ public class RefreshServiceReceiver extends BroadcastReceiver {
                     LogManager.LOG_TAG_ALARM_RECEIVED,
                     "Alarm Received:\t" + ScheduleAndSampleManager.ALARM_TYPE_REFRESH + "\t" + "Stop Service" + "\t" + intent.getIntExtra(ScheduleAndSampleManager.ALARM_REQUEST_CODE, 0));
 
-            Log.d(LOG_TAG, "[UpdateScheduleAlarmReceiver ] we will stop the service ");
+            Log.d(LOG_TAG, "[testRandom] [UpdateScheduleAlarmReceiver ] we will stop the service ");
 
             Intent stopintent = new Intent(context, MinukuMainService.class);
      //       context.stopService(stopintent);

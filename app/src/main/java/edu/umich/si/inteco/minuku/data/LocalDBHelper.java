@@ -291,18 +291,12 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 //		}
 
 
-
 		/**loop through ContextStateManagers to create record tables (record tables are defined in each ContextStateManager**/
 		for (int i=0; i< ContextManager.getContextStateManagerList().size(); i++){
 
 			ContextStateManager csm = ContextManager.getContextStateManagerList().get(i);
-
-			Log.d(LOG_TAG, "[test creat tables] create tables : now CSM is " + csm.getName() + " all table name size :" + csm.getAllDatabaseTableNames().size()  );
-
 			for (int j=0; j<csm.getAllDatabaseTableNames().size(); j++) {
-
 				createRecordTable(db, csm.getAllDatabaseTableNames().get(j));
-				Log.d(LOG_TAG, "[test creat tables] create tables :" + csm.getAllDatabaseTableNames().get(j));
 			}
 		}
     }

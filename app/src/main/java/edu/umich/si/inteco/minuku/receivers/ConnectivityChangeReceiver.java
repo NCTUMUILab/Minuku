@@ -51,7 +51,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver{
             for (Network network : networks) {
                 activeNetwork = conMngr.getNetworkInfo(network);
                 if (activeNetwork.getState().equals(NetworkInfo.State.CONNECTED)) {
-                    Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connected");
+//                    Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connected");
                 }
             }
         }
@@ -72,8 +72,8 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver{
 
                     for (NetworkInfo anInfo : info) {
                         if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
-                            Log.d(LOG_TAG, "[ConnectivityChangeReceiver"+
-                                    " NETWORKNAME: " + anInfo.getTypeName());
+//                            Log.d(LOG_TAG, "[ConnectivityChangeReceiver"+
+//                                    " NETWORKNAME: " + anInfo.getTypeName());
 
                         }
                     }
@@ -93,7 +93,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver{
 
                     if (isWiFi) {
 
-                        Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connect to wifi");
+//                        Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connect to wifi");
 
                         //if we only submit the data over wifh. this should be configurable
                         if (RemoteDBHelper.getSubmitDataOnlyOverWifi())
@@ -103,12 +103,13 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver{
 
                     else if (isMobile) {
 
-                        Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connect to mobile");
+//                        Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connect to mobile");
                     }
 
 
-                    Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connectivity change available? WIFI: available " + isWifiAvailable  +
-                            "  isConnected: " + isConnectedtoWifi + " Mobile: available: " + isMobileAvailable + " is connected: " + isConnectedtoMobile);
+//                    Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connectivity change available? WIFI: available " + isWifiAvailable  +
+//                            "  isConnected: " + isConnectedtoWifi + " Mobile: available: " + isMobileAvailable + " is connected: " + isConnectedtoMobile);
+
                 }
             }
 
