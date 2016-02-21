@@ -159,9 +159,9 @@
 						  {
 							"Sample_method":"random_with_minimum_interval",
 							"Sample_delay": 1,
-							"Sample_min_interval":7200,
-							"Sample_count": 5,
-							"Sample_startAt": "9:00",
+							"Sample_min_interval":3600,
+							"Sample_count": 6,
+							"Sample_startAt": "10:00",
 							"Sample_endAt": "22:00"
 						  }
 						}

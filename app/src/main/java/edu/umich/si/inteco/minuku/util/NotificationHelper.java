@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
@@ -21,6 +22,7 @@ import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
 import edu.umich.si.inteco.minuku.activities.ListRecordingActivity;
 import edu.umich.si.inteco.minuku.MainActivity;
 import edu.umich.si.inteco.minuku.activities.QuestionnaireActivity;
+import edu.umich.si.inteco.minuku.activities.RequestPermissionActivity;
 
 public class NotificationHelper {
 
@@ -46,11 +48,19 @@ public class NotificationHelper {
     public static final String NOTIFICATION_TITLE_RECORDING = "Recording data";
     public static final String NOTIFICATION_MESSAGE_RECORDING_TAP_TO_ANNOTATE = "Tap to add information";
 
+    //for permission
+    public static final String NOTIFICATION_TITLE_ASK_FOR_PERMISSION = "Asking your permission";
+    public static final String NOTIFICATION_MESSAGE_ASK_FOR_PERMISSION = "We need your permission to enable the Minuku service";
+    public static final String REQUEST_PERMISSION_NAME = "Permission";
+    public static final String REQUEST_PERMISSION_CODE = "Permission_code";
+
+
     //notification id
     public static final int NOTIFICATION_ID_QUESTIONNAIRE = 0;
     public static final int NOTIFICATION_ID_ANNOTATE = 1;
     public static final int NOTIFICATION_ID_LIST_RECORDING = 3;
     public static final int NOTIFICATION_ID_ONGOING_RECORDING_ANNOTATE_IN_PROCESS = 2;
+    public static final int NOTIFICATION_ID_REQUEST_PERMISSION = 1002;
     public static final int NOTIFICATION_ID_TEST = 1001;
 
 
@@ -89,9 +99,85 @@ public class NotificationHelper {
     }
 
 
+    //TODO: not showing notifciation
+    public static void createPermissionRequestNotificaiton(String permission, int requestCode, String title, String message) {
+
+        Log.d(LOG_TAG, "[test permission] enter createPermissionRequestNotificaiton 1");
+
+        Uri alarmSound =  defaultNotiAlarmSound;
+        long[] pattern = defaultNotiPattern;
+
+        Bundle bundle = new Bundle();
+
+        //indicate which permission
+        bundle.putString(REQUEST_PERMISSION_NAME, permission);
+        bundle.putInt(REQUEST_PERMISSION_CODE, requestCode);
+
+        Intent intent = new Intent(mContext, RequestPermissionActivity.class);
+        intent.putExtras(bundle);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        Log.d(LOG_TAG, "[test permission] enter createPermissionRequestNotificaiton 2");
+
+        PendingIntent pi =
+                PendingIntent.getActivity(
+                        mContext.getApplicationContext(),
+                        generatePendingIntentRequestCode(9),
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        //create notfication for annotateActivity
+        Notification noti=null;
+
+        //depending on the type of the noti...we set the noti id
+        int noti_id = NOTIFICATION_ID_REQUEST_PERMISSION;
+
+        Log.d(LOG_TAG, "[test permission] enter createPermissionRequestNotificaiton 3 title " + title + " message " + message);
+
+        // Create a notification builder that's compatible with platforms >= version 4
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(mContext);
+
+        // Set the title, text, and icon
+        builder.setContentTitle("mobility")
+                .setContentText( message)
+                .setSmallIcon(android.R.drawable.ic_notification_overlay)
+                        // Get the Intent that starts the Location settings panel
+                .setContentIntent(pi);
+
+        // Get an instance of the Notification Manager
+        NotificationManager notifyManager = (NotificationManager)
+                mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Build the notification and post it
+        notifyManager.notify(9997, builder.build());
+
+
+//        noti = new Notification.Builder(mContext)
+//                .setContentTitle(title)
+//                .setContentText(message)
+//                .setSmallIcon(R.drawable.ic_notification)
+//                .setVibrate(pattern)
+//                .setAutoCancel(true)
+//                .setLights(Color.BLUE, 500, 500)
+//                .setSound(alarmSound)
+//                .setContentIntent(pi).build();
+//
+//        noti.flags |= Notification.FLAG_ONGOING_EVENT;
+//        noti_id = NOTIFICATION_ID_REQUEST_PERMISSION;
+//
+//
+//        // Build the notification and post it
+//        mNotificationManager.notify(noti_id, noti);
+
+
+    }
+
+
     public static void createShowRecordingListNotification(String reviewMode, String title, String message) {
 
-        Log.d(LOG_TAG, "[createShowRecordingListNotification] ");
+        Log.d(LOG_TAG, "[createShowRecordingListNotification] 1");
 
         Uri alarmSound =  defaultNotiAlarmSound;
         long[] pattern = defaultNotiPattern;
@@ -155,6 +241,7 @@ public class NotificationHelper {
      * @param title
      * @param message
      */
+
     public static void createAnnotateNotification (int actionId, String title, String message, String type,
                                                    int sessionId, boolean startRecording, int annotateRecordingActionId) {
 

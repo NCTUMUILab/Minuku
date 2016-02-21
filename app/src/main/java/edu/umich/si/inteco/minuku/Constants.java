@@ -21,6 +21,33 @@ public class Constants {
     public static final String MAIN_ACTIVITY_TAB_RECORDINGS = "Recordings";
     public static final String MAIN_ACTIVITY_TAB_TASKS = "Profile";
 
+	/**for dangerous permission **/
+	public static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR =0 ;
+	public static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR=1;
+	public static final int MY_PERMISSIONS_REQUEST_CAMERA=2;
+	public static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS=3;
+	public static final int MY_PERMISSIONS_REQUEST_WRITE_CONTACTS=4;
+	public static final int MY_PERMISSIONS_REQUEST_GET_ACCOUNTS=5;
+	public static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION=6;
+	public static final int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION=7;
+	public static final int MY_PERMISSIONS_REQUEST_ACCESS_RECORD_AUDIO=8;
+	public static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE=9;
+	public static final int MY_PERMISSIONS_REQUEST_CALL_PHONE=10;
+	public static final int MY_PERMISSIONS_REQUEST_READ_CALL_LOG=11;
+	public static final int MY_PERMISSIONS_REQUEST_WRITE_CALL_LOG=12;
+	public static final int MY_PERMISSIONS_REQUEST_ADD_VOICEMAIL=13;
+	public static final int MY_PERMISSIONS_REQUEST_USE_SIP=14;
+	public static final int MY_PERMISSIONS_REQUEST_PROCESS_OUTGOING_CALLS=15;
+	public static final int MY_PERMISSIONS_REQUEST_BODY_SENSORS=16;
+	public static final int MY_PERMISSIONS_REQUEST_SEND_SMS=17;
+	public static final int MY_PERMISSIONS_REQUEST_RECEIVE_SMS=18;
+	public static final int MY_PERMISSIONS_REQUEST_READ_SMS=19;
+	public static final int MY_PERMISSIONS_REQUEST_RECEIVE_WAP_PUSH_SMS=20;
+	public static final int MY_PERMISSIONS_REQUEST_RECEIVE_MMS=21;
+	public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE=22;
+	public static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE=23;
+
+
 
 	/**for labeling Study**/
 	//1: participatory

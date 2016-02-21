@@ -531,8 +531,7 @@ public class ScheduleAndSampleManager {
 		//restrictd random: a subsequent time must be at a time when its interval from the previous time is larger than the minimum. e.g. 
 		//if the first generated time is 13:47, and the mininum is 1 hour, then the next time must be later than 14:47. 
 		//the purpose is to avoid too intensive actions (e.g. prompting questionnaires to a participant)
-		
-		
+
 		
 		else if  (method.equals(SCHEDULE_SAMPLE_METHOD_RANDOM_WITH_MINIMUM_INTERVAL)){
 			
@@ -554,9 +553,11 @@ public class ScheduleAndSampleManager {
 				//3. random within the sub sample period
 				long time =  random.nextInt(sub_sample_period) + sub_startTime;
 
-				Log.d(LOG_TAG, "testRandom semi sampling: the " + i + " sampling period is from " + getTimeString(sub_startTime) + " to " + getTimeString(sub_endTime) +
-				" divied by " + (sample_number-i) + " each period is " + (sub_sample_period/60/1000) + " minutes long, " + " the sampled time within the period is " +
-						getTimeString(time) );
+//				Log.d(LOG_TAG, "testRandom semi sampling: the " + i + " sampling period is from " + getTimeString(sub_startTime) + " to " + getTimeString(sub_endTime) +
+//				" divied by " + (sample_number-i) + " each period is " + (sub_sample_period/60/1000) + " minutes long, " + " the sampled time within the period is " +
+//						getTimeString(time) );
+
+				Log.d(LOG_TAG, "testRandom  the sampled time within the period is " + getTimeString(time) );
 
 				//4. save the sampled time
 				times.add(time);

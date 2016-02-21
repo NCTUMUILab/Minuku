@@ -1,10 +1,19 @@
 package edu.umich.si.inteco.minuku.services;
 
+import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -16,6 +25,7 @@ import java.util.ArrayList;
 import edu.umich.si.inteco.minuku.AnalyticsMinuku;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
@@ -27,6 +37,7 @@ import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.BatteryHelper;
 import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.FileHelper;
+import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.NotificationHelper;
 import edu.umich.si.inteco.minuku.util.PreferenceHelper;
@@ -162,32 +173,28 @@ public class MinukuMainService extends Service {
         mPreferenceHelper = new PreferenceHelper(this);
         Log.d(LOG_TAG, "going to create the probe service");
 
+        //initiate the utiliy classes
+        mNotificationHelper = new NotificationHelper(this);
+
 
         /** We're going to set the DeviceID for the phone; To not collect PII, we create a user id that hashes a combined string of
          * the timestamp and a deviceID**/
         String phoneUID = "";
-        //store device ID to Constants.Device_ID.
+
+        Log.d(LOG_TAG, "[test permission] check preference device ID " + PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA") ) ;
+
+        //we've not got a Device_ID.
         if ( PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA").equals("NA")) {
-
-            //get id of the phone
-            TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
-            phoneUID = mngr.getDeviceId();
-
-            //save device id (phone identitfiable number)
-            Constants.DEVICE_ID = phoneUID;
-
-            //combined device id, timestamp, and minuku
-            Constants.USER_ID = (Constants.MINUKU_PREFIX + (ContextManager.getCurrentTimeInMillis() + Constants.DEVICE_ID).hashCode());
-
-            //TODO: create user loggin and use that as the id.
-            // add a unixtime to it and then hash the whole string. The purpose is try to create an unidentifiable user id
-
-            PreferenceHelper.setPreferenceValue(PreferenceHelper.DEVICE_ID, Constants.DEVICE_ID);
-            PreferenceHelper.setPreferenceValue(PreferenceHelper.USER_ID, Constants.USER_ID);
+            //so get it
+            Log.d(LOG_TAG, "[test permission] we've not got a deviceID ");
+            getDeviceID();
         }
+        //we've got one. so use the stored one
         else {
+
             Constants.DEVICE_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA");
             Constants.USER_ID = PreferenceHelper.getPreferenceString(PreferenceHelper.USER_ID, "NA");
+            Log.d(LOG_TAG, "[test permission] we've got a device id " + Constants.DEVICE_ID + " user id: " + Constants.USER_ID);
         }
 
         /** Google Analytic. Use the ID to track on Google Analytic **/
@@ -226,9 +233,6 @@ public class MinukuMainService extends Service {
         //initiate the Action Manager
         mActionManager = new ActionManager(this, mContextManager);
 
-        //initiate the utiliy classes
-        mNotificationHelper = new NotificationHelper(this);
-
         //initiate the schedule Manager
         mScheduleAndAlarmManager = new ScheduleAndSampleManager(this);
 
@@ -247,6 +251,57 @@ public class MinukuMainService extends Service {
     }
 
 
+    /**
+     * after level 23 we need to request permission at run time. So Minuku currently doesn't support Android 6!
+     * http://developer.android.com/training/permissions/requesting.html
+     */
+    private void getDeviceID() {
+
+        Log.d(LOG_TAG, "[test permission] we're attempting to get deviceID ");
+
+        /** when the app starts, first obtain the participant ID **/
+        TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
+
+        //check if device ID is granted the permission
+        int permissionStatus= ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+
+        //if we did not get permission yet, we need to call a notification to ask users to give permission
+        if (permissionStatus!= PackageManager.PERMISSION_GRANTED) {
+
+            sendNotification();
+
+            NotificationHelper.createPermissionRequestNotificaiton(
+                    //permission
+                    Manifest.permission.READ_PHONE_STATE,
+                    //request code
+                    Constants.MY_PERMISSIONS_REQUEST_READ_PHONE_STATE,
+                    //title
+                    NotificationHelper.NOTIFICATION_TITLE_ASK_FOR_PERMISSION,
+                    //message
+                    NotificationHelper.NOTIFICATION_MESSAGE_ASK_FOR_PERMISSION
+                    );
+        }
+        else {
+            Constants.DEVICE_ID = mngr.getDeviceId();
+
+            //combined device id, timestamp, and minuku
+            Constants.USER_ID = (Constants.MINUKU_PREFIX + (ContextManager.getCurrentTimeInMillis() + Constants.DEVICE_ID).hashCode());
+
+            //TODO: create user loggin and use that as the id.
+            // add a unixtime to it and then hash the whole string. The purpose is try to create an unidentifiable user id
+
+            Log.d(LOG_TAG, "[test permission] get the synTime is " + Constants.DEVICE_ID);
+
+            PreferenceHelper.setPreferenceValue(PreferenceHelper.DEVICE_ID, Constants.DEVICE_ID);
+            PreferenceHelper.setPreferenceValue(PreferenceHelper.USER_ID, Constants.USER_ID);
+
+            Log.d(LOG_TAG, "[test permission] already set device ID " + PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA")) ;
+            Log.d(LOG_TAG, "[test permission] already set user ID " + PreferenceHelper.getPreferenceString(PreferenceHelper.USER_ID, "NA")) ;
+
+
+        }
+    }
+
 
 
     /**called when the service is started **/
@@ -255,6 +310,8 @@ public class MinukuMainService extends Service {
         super.onStartCommand(intent, flags, startId);
 
 //        FileHelper.readTestFile();
+
+        sendNotification();
 
         LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                 LogManager.LOG_TAG_SERVICE,
@@ -503,6 +560,9 @@ public class MinukuMainService extends Service {
     }
 */
 
+    /**for testing*/
+
+
     public static Handler getMainThread() {return mMainThread;}
 
     public static long getTimeWhenStopped() {
@@ -552,5 +612,45 @@ public class MinukuMainService extends Service {
 
     public static void setPreviousCheckpoint(Checkpoint checkpoint) {
         MinukuMainService.mPreviousCheckpoint = checkpoint;
+    }
+
+    private void sendNotification() {
+
+        // Create a notification builder that's compatible with platforms >= version 4
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this);
+
+
+        String message = "NA";
+        message = "test";
+
+        // Set the title, text, and icon
+        builder.setContentTitle("mobility")
+                .setContentText( message)
+                .setSmallIcon(android.R.drawable.ic_notification_overlay)
+                        // Get the Intent that starts the Location settings panel
+                .setContentIntent(getContentIntent());
+
+        // Get an instance of the Notification Manager
+        NotificationManager notifyManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Build the notification and post it
+        notifyManager.notify(9998, builder.build());
+    }
+
+    /**
+     * Get a content Intent for the notification
+     */
+    private PendingIntent getContentIntent() {
+
+        // Set the Intent action to open Location Settings
+        Intent activityIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+
+        // Create a PendingIntent to start an Activity
+        return PendingIntent.getService(this.getApplicationContext(),
+                576767,
+                activityIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
     }
 }

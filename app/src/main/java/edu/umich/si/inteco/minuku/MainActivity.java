@@ -4,11 +4,14 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -20,14 +23,18 @@ import edu.umich.si.inteco.minuku.Fragments.HomeFragment;
 import edu.umich.si.inteco.minuku.Fragments.ListRecordingSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.RecordSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.TaskSectionFragment;
+import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.ActionManager;
 import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
+import edu.umich.si.inteco.minuku.util.PreferenceHelper;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+
+import android.Manifest;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
@@ -69,16 +76,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         //RemoteDBHelper.syncWithRemoteDatabase();
         // Log.d(LOG_TAG, "[queryLastBackgroundLoggingSyncHourUsingPOST] get the synTime is " + lastSynhour);
 
-        /** when the app starts, first obtain the participant ID **/
-        TelephonyManager mngr = (TelephonyManager)getSystemService(this.TELEPHONY_SERVICE);
-
-        /**
-         * after level 23 we need to request permission at run time. So Minuku currently doesn't support Android 6!
-         * http://developer.android.com/training/permissions/requesting.html
-         */
-
-        Constants.DEVICE_ID = mngr.getDeviceId();
-        Log.d(LOG_TAG, "[Constants.DEVICE_ID] get the synTime is " + Constants.DEVICE_ID);
 
         /**start the contextManager service**/
         if (!MinukuMainService.isServiceRunning()){
@@ -162,7 +159,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         currentTabPos = -1;
 
     }
-
 
 
     @Override

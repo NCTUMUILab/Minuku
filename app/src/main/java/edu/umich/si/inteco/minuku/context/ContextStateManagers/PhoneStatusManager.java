@@ -581,9 +581,9 @@ public class PhoneStatusManager extends ContextStateManager {
         mPhoneSignalType = getPhoneTypeName(mTelephonyManager.getPhoneType());
         mNetworkOperatorName = mTelephonyManager.getNetworkOperatorName();
 
-        Log.d(LOG_TAG, "[test source being requested] getDeviceId " + mTelephonyManager.getDeviceId() + " NetworkOperator " + mTelephonyManager.getNetworkOperator()
-                + " NetworkOperatorName " + mTelephonyManager.getNetworkOperatorName() + " CallState " + mTelephonyManager.getCallState() + " getCellLocation " + mTelephonyManager.getCellLocation()
-                + " DataActivity " + mTelephonyManager.getDataActivity() + "  NetworkType " + mTelephonyManager.getNetworkType() + " PhoneType" + mTelephonyManager.getPhoneType());
+//        Log.d(LOG_TAG, "[test source being requested] getDeviceId " + mTelephonyManager.getDeviceId() + " NetworkOperator " + mTelephonyManager.getNetworkOperator()
+//                + " NetworkOperatorName " + mTelephonyManager.getNetworkOperatorName() + " CallState " + mTelephonyManager.getCallState() + " getCellLocation " + mTelephonyManager.getCellLocation()
+//                + " DataActivity " + mTelephonyManager.getDataActivity() + "  NetworkType " + mTelephonyManager.getNetworkType() + " PhoneType" + mTelephonyManager.getPhoneType());
     }
 
     //unregister the phonestatelistenner
