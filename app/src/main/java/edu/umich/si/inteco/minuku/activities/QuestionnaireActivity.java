@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.model.Log.ProbeLog;
 import edu.umich.si.inteco.minuku.model.Question;
+import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
 import edu.umich.si.inteco.minuku.model.Views.MinukuCheckBox;
 import edu.umich.si.inteco.minuku.model.Views.MinukuEditText;
 import edu.umich.si.inteco.minuku.model.Views.MinukuRadioGroup;
@@ -56,76 +58,140 @@ public class QuestionnaireActivity extends Activity {
 		/**1. the questionnaire is scollable, we setup the questionnaire based on the questionnaire template**/
 		ScrollView sv = QuestionnaireManager.getQuestionnaireView(this, questionnaire_id);
 
+		final LinearLayout ll = (LinearLayout)sv.getChildAt(0);
 
 		/**2 then we add listeners to the submit button to get responses **/
+		//the submit button is the last child in the linear layout
+		MinukuSubmitButton submitButton = (MinukuSubmitButton)ll.getChildAt(ll.getChildCount()-1);
 
-		/**2.1 get all the components in the questionnaire first**/
-		LinearLayout ll = (LinearLayout)sv.getChildAt(0);
+		Log.d(LOG_TAG, "[test qu] the submit button is associtated with questionnaire "  + submitButton.getQuestionnaire().getId()
+		 + submitButton.getQuestionnaire().getDescription());
 
-		//get all views in the layout
-		for (int i=0; i<ll.getChildCount(); i++) {
 
-			if (ll.getChildAt(i) instanceof MinukuTextView){
+		//add a submit button click listener to collect response from the questionnaire
+		submitButton.setOnClickListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
 
-				Log.d(LOG_TAG, "the question is " + ((TextView) ll.getChildAt(i)).getText());
-			}
+						MinukuSubmitButton button = (MinukuSubmitButton) v;
+						Questionnaire questionnaire = button.getQuestionnaire();
 
-			//QUESTION_TYPE_MULTICHOICE_ONE_ANSWER
-			else if (ll.getChildAt(i) instanceof MinukuRadioGroup){
+						//collect responses from the questions
+						Log.d(LOG_TAG, "[test qu] the submit button is associtated with questionnaire "  +questionnaire.getId()
+								+ questionnaire.getDescription() + " has " + questionnaire.getQuestionCount() + " questions");
 
-				Log.d(LOG_TAG, "the radio group has " + ((RadioGroup) ll.getChildAt(i)).getChildCount() + " buttons" );
-			}
+						//get all views in the layout
+						for (int i=0; i<ll.getChildCount(); i++) {
 
-			//QUESTION_TYPE_MULTICHOICE_MULTIPLE_ANSWER
-			else if (ll.getChildAt(i) instanceof MinukuCheckBox) {
+							if (ll.getChildAt(i) instanceof MinukuTextView){
 
-				//check if the checkbox is checked
-				MinukuCheckBox checkBox = (MinukuCheckBox)ll.getChildAt(i);
+//								Log.d(LOG_TAG, "[test qu] the question is " + ((TextView) ll.getChildAt(i)).getText());
+							}
 
-//				Log.d(LOG_TAG, "[test qu] minukucheckbox text is " + checkBox.getText() + " belong to question " +
-//						checkBox.getQuesitonIndex());
+							//QUESTION_TYPE_MULTICHOICE_ONE_ANSWER
+							else if (ll.getChildAt(i) instanceof MinukuRadioGroup){
 
-			}
+								MinukuRadioGroup radioGroup = (MinukuRadioGroup) ll.getChildAt(i);
 
-			else if (ll.getChildAt(i) instanceof MinukuEditText) {
+								int radioButtonCheckedId = radioGroup.getCheckedRadioButtonId();
 
-				//check if the checkbox is checked
-				MinukuEditText editText = (MinukuEditText)ll.getChildAt(i);
+								//get the quesiton text
+								RadioButton radioButton = (RadioButton) radioGroup.findViewById(radioButtonCheckedId);
 
-//				Log.d(LOG_TAG, "[test qu] minuku edit text is " + editText.getText() + " belong to question " +
-//						editText.getQuesitonIndex());
+								Question question = questionnaire.getQuestion(radioGroup.getQuesitonIndex());
 
-			}
+								//set response for one choice
+								if (question!=null){
+									question.setResponse(radioButton.getText().toString());
+									Log.d(LOG_TAG, "[test qu] user choose " + radioButton.getText() + " for question "
+											+ " " + radioGroup.getQuesitonIndex() + ". " + questionnaire.getQuestion(radioGroup.getQuesitonIndex()).getText()
+											+ " response : " + questionnaire.getQuestion(radioGroup.getQuesitonIndex()).getResponse());
 
-			//submit button
-			else if (ll.getChildAt(i) instanceof Button) {
 
-				MinukuSubmitButton submitButton = (MinukuSubmitButton)ll.getChildAt(i);
+								}
 
-//				Log.d(LOG_TAG, "[test qu] the submit button is associtated with questionnaire "  + submitButton.getQuestionnaire().getId()
-//				 + submitButton.getQuestionnaire().getDescription());
-
-				//add a submit button click listener to add response to the questionnaire
-				submitButton.setOnClickListener(
-						new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-
-								MinukuSubmitButton button = (MinukuSubmitButton) v;
-								//collect responses from the questions
-								Log.d(LOG_TAG, "[test qu] the submit button is associtated with questionnaire "  + button.getQuestionnaire().getId()
-										+ button.getQuestionnaire().getDescription());
 
 
 							}
-						});
 
-			}
+							//QUESTION_TYPE_MULTICHOICE_MULTIPLE_ANSWER
+							else if (ll.getChildAt(i) instanceof MinukuCheckBox) {
+
+								//check if the checkbox is checked
+								MinukuCheckBox checkBox = (MinukuCheckBox)ll.getChildAt(i);
+
+								//we only collect responses of the box being checked
+								if (checkBox.isChecked()){
+
+									Question question = questionnaire.getQuestion(checkBox.getQuesitonIndex());
+
+									if (question!=null) {
+
+										//if there's not been a response, we set response
+										if (questionnaire.getQuestion(checkBox.getQuesitonIndex()).getResponse()==null){
+											//set response for one choice
+											questionnaire.getQuestion(checkBox.getQuesitonIndex()).setResponse(checkBox.getText().toString());
+										}
+										//we append response if there's been responses
+										else {
+											questionnaire.getQuestion(checkBox.getQuesitonIndex()).appendReponse(checkBox.getText().toString());
+										}
+
+										Log.d(LOG_TAG, "[test qu] user check " + checkBox.getText() + " for question " +
+												checkBox.getQuesitonIndex() + ". " + questionnaire.getQuestion(checkBox.getQuesitonIndex()).getText()
+												+ " response : " + questionnaire.getQuestion(checkBox.getQuesitonIndex()).getResponse() );
 
 
-		}
+									}
+
+								}
 
 
+							}
+
+							else if (ll.getChildAt(i) instanceof MinukuEditText) {
+
+								MinukuEditText editText = (MinukuEditText)ll.getChildAt(i);
+
+								//we need to see whether the editText is the Other field for other types of question
+								Question question = questionnaire.getQuestion(editText.getQuesitonIndex());
+
+								if (question!=null) {
+
+									//Other field of MULTICHOICE_MULTIPLE_ANSWER
+									if (question.getType().equals(QuestionnaireManager.QUESTION_TYPE_MULTICHOICE_MULTIPLE_ANSWER)){
+
+										question.appendReponse(editText.getText().toString());
+									}
+									else if (question.getType().equals(QuestionnaireManager.QUESTION_TYPE_MULTICHOICE_ONE_ANSWER)){
+
+										question.appendReponse(editText.getText().toString());
+									}
+
+									else if (question.getType().equals(QuestionnaireManager.QUESTION_TYPE_TEXT)){
+
+										question.setResponse(editText.getText().toString());
+
+									}
+
+									Log.d(LOG_TAG, "[test qu] user type  " + editText.getText() + " for question " +
+											editText.getQuesitonIndex() + ". " + questionnaire.getQuestion(editText.getQuesitonIndex()).getText()
+											+ " response : " + question.getResponse() );
+
+								}
+
+
+							}
+
+
+						}
+
+						/**3 we save the respones to the questionnaire **/
+
+
+					}
+				});
 
 
 

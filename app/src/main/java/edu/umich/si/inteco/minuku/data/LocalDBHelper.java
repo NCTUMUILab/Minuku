@@ -949,7 +949,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 
     public static ArrayList<String> querySession(int sessionId){
 
-		Log.d(LOG_TAG, "[querySession] getsession " + sessionId);
+//		Log.d(LOG_TAG, "[querySession] getsession " + sessionId);
 
         ArrayList<String> rows = new ArrayList<String>();
 
@@ -961,7 +961,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
                     //condition with session id
                     " where " + DatabaseNameManager.COL_ID + " = " + sessionId + "";
 
-            Log.d(LOG_TAG, "[querySession] the query statement is " +sql);
+//            Log.d(LOG_TAG, "[querySession] the query statement is " +sql);
 
             Cursor cursor = db.rawQuery(sql, null);
             int columnCount = cursor.getColumnCount();

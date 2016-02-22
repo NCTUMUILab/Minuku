@@ -60,6 +60,11 @@ public class QuestionnaireManager {
 	public static final String QUESTIONNAIRE_PROPERTIES_QUESTIONS = "Questions";
     public static final String QUESTIONNAIRE_PROPERTIES_EMAIL ="Email";
 
+	public static final String QUESTION_TEXT_OTHERS = "Others";
+	public static final String QUESTION_TEXT_SUBMIT = "Submit";
+
+
+
     //for email quesitonnaire
     public static final String QUESTIONNAIRE_EMAIL_PROPERTIES_RECIPIENTS ="Recipients";
     public static final String QUESTIONNAIRE_EMAIL_PROPERTIES_CC ="CC";
@@ -344,8 +349,6 @@ public class QuestionnaireManager {
 					radioGroup.setQuesitonIndex(qu.getIndex());
 					radioGroup.setOrientation(RadioGroup.VERTICAL);
 
-//					Log.d(LOG_TAG, "[test qu] the radioGroup belongs to question " + radioGroup.getQuesitonIndex());
-
 					//create radio buttons
 					for (int j=0; j<qu.getOptions().size(); j++){
 						
@@ -354,7 +357,7 @@ public class QuestionnaireManager {
 						radioGroup.addView(radioButton);
 						
 					}
-					//add the view
+
 					ll.addView(radioGroup);
 
                     //if the question has the "other" field
@@ -366,10 +369,17 @@ public class QuestionnaireManager {
 						
 						//add other field
 						MinukuEditText editText = new MinukuEditText(context);
+						editText.setQuesitonIndex(qu.getIndex());
+//						radioGroup.addView(editText);
 						ll.addView(editText);
-						
 					}
-					
+
+					//add the view
+					Log.d(LOG_TAG, "[test qu] the radioGroup belongs to question " + radioGroup.getQuesitonIndex() +
+							" and has " + radioGroup.getChildCount() + " children");
+
+
+
 				}
 
                 /**3. if the question is the multichoice question with multiple answer (i.e. check box)**/

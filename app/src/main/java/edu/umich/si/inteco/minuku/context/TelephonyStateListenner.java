@@ -33,7 +33,7 @@ public class TelephonyStateListenner extends PhoneStateListener {
         _GeneralSignalStrength = -9999;
         _CdmaSignalStrenthLevel = -9999;
         _isGSM = false;
-        Log.d(LOG_TAG, "[test source being requested] TestTelephony constructor " );
+//        Log.d(LOG_TAG, "[test source being requested] TestTelephony constructor " );
 
 
     }
@@ -67,8 +67,8 @@ public class TelephonyStateListenner extends PhoneStateListener {
 //            PhoneStatusManager.setPhoneType(tm.getPhoneType());
 
 
-            Log.d(LOG_TAG, "[test source being requested] call state " + PhoneStatusManager.getCallState() +
-                    " network operator " + PhoneStatusManager.getNetworkOperatorName() + " phonetype " + PhoneStatusManager.getPhoneTypeName());
+//            Log.d(LOG_TAG, "[test source being requested] call state " + PhoneStatusManager.getCallState() +
+//                    " network operator " + PhoneStatusManager.getNetworkOperatorName() + " phonetype " + PhoneStatusManager.getPhoneTypeName());
 
             int dbm = 0;
 

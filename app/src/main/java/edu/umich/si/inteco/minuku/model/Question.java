@@ -57,6 +57,10 @@ public class Question {
 		this.mResponse = response;
 	}
 
+	public void appendReponse(String addedResponse) {
+		this.mResponse += ";" + addedResponse;
+	}
+
 	public String getType(){
 		return mType;
 	}

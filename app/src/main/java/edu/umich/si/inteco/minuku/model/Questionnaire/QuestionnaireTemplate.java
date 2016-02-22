@@ -33,6 +33,16 @@ public class QuestionnaireTemplate extends ProbeObject {
 	public ArrayList<Question> getQuestions(){
 		return mQuestionList;
 	}
+
+	public Question getQuestion( int index){
+
+		for (int i=0; i<mQuestionList.size(); i++){
+			if (mQuestionList.get(i).getIndex()==index)
+				return mQuestionList.get(i);
+		}
+
+		return null;
+	}
 	
 	public String getQuestionsJSON(){
 		return mQuestionJSON;
@@ -47,6 +57,10 @@ public class QuestionnaireTemplate extends ProbeObject {
 	public void setQuestions(ArrayList<Question> questions){
 		
 		mQuestionList = questions;
+	}
+
+	public int getQuestionCount(){
+		return mQuestionList.size();
 	}
 	
 	public void addQuestion(Question question) {

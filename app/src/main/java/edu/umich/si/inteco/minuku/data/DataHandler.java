@@ -118,7 +118,7 @@ public class DataHandler {
                 if (!recordpool.get(i).getSavedSessionIds().contains(session_id))
                     recordpool.get(i).getSavedSessionIds().add(session_id);
 
-                 Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] finishing saving record " + recordpool.get(i).getSource() +  " at " + i + ", mark it has been saved by " + session_id + " now it has been saved by " +  recordpool.get(i).getSavedSessionIds());
+//                 Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] finishing saving record " + recordpool.get(i).getSource() +  " at " + i + ", mark it has been saved by " + session_id + " now it has been saved by " +  recordpool.get(i).getSavedSessionIds());
 
 
             }catch (IndexOutOfBoundsException e ){
@@ -148,13 +148,13 @@ public class DataHandler {
 
                 //check if the session is currently paused, if yes, we don't consider it (because records should not be saved by a paused session)
                 if (RecordingAndAnnotateManager.isSessionPaused(runningSessionId)){
-                    Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] the session " + runningSessionId + " is paused, we do not consider it" );
+//                    Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] the session " + runningSessionId + " is paused, we do not consider it" );
                     continue;
                 }
 
                 //if we found any record that is not marked as been saved in a session, the flag is set false
                 if (!recordpool.get(i).getSavedSessionIds().contains(runningSessionId)) {
-                    Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] the record " + recordpool.get(i).getSource() + recordpool.get(i).getID() + " have not been saved by session " + runningSessionId);
+//                    Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] the record " + recordpool.get(i).getSource() + recordpool.get(i).getID() + " have not been saved by session " + runningSessionId);
                     savedByAllSessions = false;
                     break;
                 }
@@ -164,7 +164,7 @@ public class DataHandler {
 
             //if the record has been saved by all running sessions, remove the record
             if (savedByAllSessions){
-                Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] record at " + i + " has been saved by all sessions " + recordpool.get(i).getSavedSessionIds() +  " we will remove the record ");
+//                Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] record at " + i + " has been saved by all sessions " + recordpool.get(i).getSavedSessionIds() +  " we will remove the record ");
                 recordpool.remove(i);
                 //i substracts one becasue the index will shift left if we remove one element
                 i-=1;

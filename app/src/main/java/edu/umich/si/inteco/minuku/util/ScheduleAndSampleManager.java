@@ -547,30 +547,37 @@ public class ScheduleAndSampleManager {
 
 				//2. divide the period by the number of sample
 				sample_period = (int) (sub_endTime - sub_startTime);
-				
-				int sub_sample_period = sample_period/(sample_number-i);
-				
-				//3. random within the sub sample period
-				long time =  random.nextInt(sub_sample_period) + sub_startTime;
+
+				try {
+
+					int sub_sample_period = sample_period/(sample_number-i);
+
+					//3. random within the sub sample period
+					long time =  random.nextInt(sub_sample_period) + sub_startTime;
 
 //				Log.d(LOG_TAG, "testRandom semi sampling: the " + i + " sampling period is from " + getTimeString(sub_startTime) + " to " + getTimeString(sub_endTime) +
 //				" divied by " + (sample_number-i) + " each period is " + (sub_sample_period/60/1000) + " minutes long, " + " the sampled time within the period is " +
 //						getTimeString(time) );
 
-				Log.d(LOG_TAG, "testRandom  the sampled time within the period is " + getTimeString(time) );
+					Log.d(LOG_TAG, "testRandom  the sampled time within the period is " + getTimeString(time) );
 
-				//4. save the sampled time
-				times.add(time);
-				
-				//5. the next startime is the previous sample time + min interval. We do this to ensure that the next sampled time is 
-				//not too close to the previous sampled time. 
-				sub_startTime = time +  min_interval;
-				
+					//4. save the sampled time
+					times.add(time);
+
+					//5. the next startime is the previous sample time + min interval. We do this to ensure that the next sampled time is
+					//not too close to the previous sampled time.
+					sub_startTime = time +  min_interval;
+
 //				Log.d(LOG_TAG, "testRandom semi sampling: the new start time is " + getTimeString(sub_startTime));
-				
-				//6. if the next start time is later than the overall end time, stop the sampling.
-				if (sub_startTime >= sub_endTime)
-					break;				
+
+					//6. if the next start time is later than the overall end time, stop the sampling.
+					if (sub_startTime >= sub_endTime)
+						break;
+
+				}catch(Exception e){
+
+				}
+
 			}
 			
 			

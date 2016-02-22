@@ -872,7 +872,7 @@ public class RecordingAndAnnotateManager {
 
         try {
 
-            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments]testbackend] session: start time " + ScheduleAndSampleManager.getTimeString(session.getStartTime()) + " lastsync : " +   lastSyncHourTime);
+//            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments]testbackend] session: start time " + ScheduleAndSampleManager.getTimeString(session.getStartTime()) + " lastsync : " +   lastSyncHourTime);
 
             long startTime =0;
             long endTime  =0;

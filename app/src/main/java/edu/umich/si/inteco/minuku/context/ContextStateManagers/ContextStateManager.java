@@ -389,7 +389,7 @@ public abstract class ContextStateManager {
         record.setID(id);
 
         mLocalRecordPool.add(record);
-        Log.d(LOG_TAG, "[test logging]add record " + record.getSource() +record.getID() + "logged at " + record.getTimeString() + " to " + this.getName() );
+//        Log.d(LOG_TAG, "[test logging]add record " + record.getSource() +record.getID() + "logged at " + record.getTimeString() + " to " + this.getName() );
 
         /**2. check whether we should remove old record **/
         removeOutDatedRecord();

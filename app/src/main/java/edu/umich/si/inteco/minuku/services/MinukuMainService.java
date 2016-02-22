@@ -472,7 +472,7 @@ public class MinukuMainService extends Service {
                     //if the action is not paused, run the action
                     if (!action.isPaused()){
 
-                        Log.d(LOG_TAG, "[test pause resume]running continuous and non-paused actions " + action.getId() + " " + action.getName() );
+//                        Log.d(LOG_TAG, "[test pause resume]running continuous and non-paused actions " + action.getId() + " " + action.getName() );
                         ActionManager.executeAction(action);
                     }
                 }
