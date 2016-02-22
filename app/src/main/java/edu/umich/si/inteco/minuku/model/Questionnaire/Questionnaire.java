@@ -1,5 +1,7 @@
 package edu.umich.si.inteco.minuku.model.Questionnaire;
 
+import org.json.JSONArray;
+
 public class Questionnaire extends QuestionnaireTemplate {
 
 	protected int _templateId = -1;
@@ -7,6 +9,7 @@ public class Questionnaire extends QuestionnaireTemplate {
     protected long _attendedTime=-1;
     protected long _submittedTime=-1;
     protected boolean _submitted= false;
+	protected JSONArray responses;
 	
 	
 	public Questionnaire(long generated_time, int study_id, int template_id){
@@ -61,7 +64,12 @@ public class Questionnaire extends QuestionnaireTemplate {
 	public void setSubmitted(boolean flag){
 		_submitted = flag;
 	}
-	
-	
-	
+
+	public JSONArray getResponses() {
+		return responses;
+	}
+
+	public void setResponses(JSONArray responses) {
+		this.responses = responses;
+	}
 }

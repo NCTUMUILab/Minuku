@@ -12,7 +12,13 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 import edu.umich.si.inteco.minuku.context.ContextManager;
+import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Log.ProbeLog;
 import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
@@ -21,6 +27,7 @@ import edu.umich.si.inteco.minuku.model.Views.MinukuEditText;
 import edu.umich.si.inteco.minuku.model.Views.MinukuRadioGroup;
 import edu.umich.si.inteco.minuku.model.Views.MinukuSubmitButton;
 import edu.umich.si.inteco.minuku.model.Views.MinukuTextView;
+import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.QuestionnaireManager;
 
@@ -78,8 +85,8 @@ public class QuestionnaireActivity extends Activity {
 						Questionnaire questionnaire = button.getQuestionnaire();
 
 						//collect responses from the questions
-						Log.d(LOG_TAG, "[test qu] the submit button is associtated with questionnaire "  +questionnaire.getId()
-								+ questionnaire.getDescription() + " has " + questionnaire.getQuestionCount() + " questions");
+//						Log.d(LOG_TAG, "[test qu] the submit button is associtated with questionnaire "  +questionnaire.getId()
+//								+ questionnaire.getDescription() + " has " + questionnaire.getQuestionCount() + " questions");
 
 						//get all views in the layout
 						for (int i=0; i<ll.getChildCount(); i++) {
@@ -104,10 +111,10 @@ public class QuestionnaireActivity extends Activity {
 								//set response for one choice
 								if (question!=null){
 									question.setResponse(radioButton.getText().toString());
-									Log.d(LOG_TAG, "[test qu] user choose " + radioButton.getText() + " for question "
-											+ " " + radioGroup.getQuesitonIndex() + ". " + questionnaire.getQuestion(radioGroup.getQuesitonIndex()).getText()
-											+ " response : " + questionnaire.getQuestion(radioGroup.getQuesitonIndex()).getResponse());
-
+//									Log.d(LOG_TAG, "[test qu] user choose " + radioButton.getText() + " for question "
+//											+ " " + radioGroup.getQuesitonIndex() + ". " + questionnaire.getQuestion(radioGroup.getQuesitonIndex()).getText()
+//											+ " response : " + questionnaire.getQuestion(radioGroup.getQuesitonIndex()).getResponse());
+//
 
 								}
 
@@ -137,10 +144,10 @@ public class QuestionnaireActivity extends Activity {
 										else {
 											questionnaire.getQuestion(checkBox.getQuesitonIndex()).appendReponse(checkBox.getText().toString());
 										}
-
-										Log.d(LOG_TAG, "[test qu] user check " + checkBox.getText() + " for question " +
-												checkBox.getQuesitonIndex() + ". " + questionnaire.getQuestion(checkBox.getQuesitonIndex()).getText()
-												+ " response : " + questionnaire.getQuestion(checkBox.getQuesitonIndex()).getResponse() );
+//
+//										Log.d(LOG_TAG, "[test qu] user check " + checkBox.getText() + " for question " +
+//												checkBox.getQuesitonIndex() + ". " + questionnaire.getQuestion(checkBox.getQuesitonIndex()).getText()
+//												+ " response : " + questionnaire.getQuestion(checkBox.getQuesitonIndex()).getResponse() );
 
 
 									}
@@ -174,10 +181,10 @@ public class QuestionnaireActivity extends Activity {
 										question.setResponse(editText.getText().toString());
 
 									}
-
-									Log.d(LOG_TAG, "[test qu] user type  " + editText.getText() + " for question " +
-											editText.getQuesitonIndex() + ". " + questionnaire.getQuestion(editText.getQuesitonIndex()).getText()
-											+ " response : " + question.getResponse() );
+//
+//									Log.d(LOG_TAG, "[test qu] user type  " + editText.getText() + " for question " +
+//											editText.getQuesitonIndex() + ". " + questionnaire.getQuestion(editText.getQuesitonIndex()).getText()
+//											+ " response : " + question.getResponse() );
 
 								}
 
@@ -189,6 +196,34 @@ public class QuestionnaireActivity extends Activity {
 
 						/**3 we save the respones to the questionnaire **/
 
+						//save submitted time
+						questionnaire.setSubmitted(true);
+						questionnaire.setSubmittedTime(ContextManager.getCurrentTimeInMillis());
+						JSONArray responses = new JSONArray();
+
+						for (int i=0; i<questionnaire.getQuestions().size() ;i++) {
+
+							JSONObject response = new JSONObject();
+							Question question = questionnaire.getQuestions().get(i);
+//							Log.d(LOG_TAG, "test qu getting  question " + question);
+//							Log.d(LOG_TAG, "test qu getting test responses from question " + question.getIndex() + " is " + question.getResponse());
+
+							try{
+								response.put(question.getIndex()+"", question.getResponse() );
+								responses.put(response);
+							}catch(Exception e){
+								e.printStackTrace();
+							}
+						}
+
+						questionnaire.setResponses(responses);
+						Log.d(LOG_TAG, "test qu getting questionnaire response : " + questionnaire.getResponses());
+
+						//save to the db
+						LocalDBHelper.updateQuestionnaireResponseTable(questionnaire, DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME);
+
+						ArrayList<String> results = LocalDBHelper.queryQuestionnaire(questionnaire.getId());
+						Log.d(LOG_TAG, "test qu after query the qeustionnaire is  " + results);
 
 					}
 				});

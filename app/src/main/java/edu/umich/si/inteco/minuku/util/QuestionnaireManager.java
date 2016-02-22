@@ -258,12 +258,15 @@ public class QuestionnaireManager {
 		//then we set the attended time
 		long attendedTime = getCurrentTimeInMillis();
 		questionnaire.setAttendedTime(attendedTime);
-		
+		Log.d(LOG_TAG, "[test qu] the attendence time of " + questionnaire.getId() + " is " + ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()));
+
+		//update questionnaire (it's likely that user attended to a questionnaire but not responded to it)
+		LocalDBHelper.updateQuestionnaireAttendenceTable(questionnaire, DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME);
+
+
 		//then we get the template of the questionnaire so that we can create the view of the questionnaire
-		
-		
 		Log.d(LOG_TAG, "[setUpQuestionnaireView] the questionnaire " + questionnaire.getId() + " 's tempalte is "
-				 + questionnaire.getTemplateId() + ", it is attended at time " + getTimeString(attendedTime));
+				+ questionnaire.getTemplateId() + ", it is attended at time " + getTimeString(attendedTime));
 		
 		//create a scrollview for the questionnaire
 		ScrollView sv = new ScrollView(context);

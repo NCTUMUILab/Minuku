@@ -161,8 +161,8 @@
 							"Sample_delay": 1,
 							"Sample_min_interval":3600,
 							"Sample_count": 6,
-							"Sample_startAt": "10:30",
-							"Sample_endAt": "13:39"
+							"Sample_startAt": "10:00",
+							"Sample_endAt": "22:00"
 						  }
 						}
 					  ]
@@ -235,34 +235,7 @@
 							"Type":"textbox",
 							"Question_text": "Where are you located right now?"
 
-						  },
-
-						  {
-							"Index": 4,
-							"Type":"multichoice_multiple_answer",
-							"Has_other_field":true,
-							"Question_text": "Is there any trip we missed today? If yes, please list them below. In addition, for each missed trip please choose any option(s) below that applies to the trip and provide us with more context.",
-							"Option":
-							[
-							  {
-								"Option_text":"a. ."
-							  },
-							  {
-								"Option_text": "b. ."
-							  },
-							  {
-								"Option_text": "c. "
-							  },
-							  {
-								"Option_text": "d."
-							  },
-							  {
-								"Option_text": "e. "
-							  }
-							]
 						  }
-
-
 						]
 
 					}		

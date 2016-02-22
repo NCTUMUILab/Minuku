@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,12 +26,14 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationMod
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Configuration;
 import edu.umich.si.inteco.minuku.model.Criterion;
+import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.UserResponse;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
+import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
 public class LocalDBHelper extends SQLiteOpenHelper{
 
@@ -215,9 +220,10 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 				table_name + " ( "+
 				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				DatabaseNameManager.COL_STUDY_ID + " INTEGER NOT NULL, " +
-				DatabaseNameManager.COL_QUESTIONNAIRE_GENERATED_TIME+ " INTEGER, " +
-				DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME+ " INTEGER, " +
-				DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME+ " INTEGER, " +
+				DatabaseNameManager.COL_QUESTIONNAIRE_GENERATED_TIME+ " TEXT, " +
+				DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME+ " TEXT, " +
+				DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME+ " TEXT, " +
+				DatabaseNameManager.COL_QUESTIONNAIRE_IS_SUBMITTED+ " INTEGER, " +
 				DatabaseNameManager.COL_QUESTIONNAIRE_RESPONSE + " TEXT " +
 				");" ;
 
@@ -456,6 +462,121 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     }
 
 
+	public static ArrayList<String> queryQuestionnaire(int questionnaireId){
+
+//		Log.d(LOG_TAG, "[querySession] getsession " + sessionId);
+
+		ArrayList<String> rows = new ArrayList<String>();
+
+		try{
+
+			SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+			String sql = "SELECT *"  +" FROM " + DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME +
+					//condition with session id
+					" where " + DatabaseNameManager.COL_ID + " = " + questionnaireId + "";
+
+//            Log.d(LOG_TAG, "[querySession] the query statement is " +sql);
+
+			Cursor cursor = db.rawQuery(sql, null);
+			int columnCount = cursor.getColumnCount();
+			while(cursor.moveToNext()){
+				String curRow = "";
+				for (int i=0; i<columnCount; i++){
+					curRow += cursor.getString(i)+ Constants.DELIMITER;
+				}
+				rows.add(curRow);
+			}
+			cursor.close();
+
+			DatabaseManager.getInstance().closeDatabase();
+
+
+		}catch (Exception e){
+
+		}
+
+		Log.d(LOG_TAG, "[querySession] the session is " +rows);
+
+		return rows;
+
+
+	}
+
+	public static long updateQuestionnaireAttendenceTable(Questionnaire questionnaire, String table_name){
+
+		//TODO: the user should be able to specify the database because each study may have a different database.
+
+		Log.d(LOG_TAG, "test qu going to update questionnaire attendence time " + ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()) + " to questionnaire "
+		 + questionnaire.getId() + " : " + questionnaire.getDescription() );
+
+		String where = DatabaseNameManager.COL_ID + " = " +  questionnaire.getId();
+
+		long rowId=0;
+		try{
+			SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+			ContentValues values = new ContentValues();
+
+			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()) );
+			Log.d(LOG_TAG, "test qu updating questionnaire attendence time " +  ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()) );
+
+			db.update(table_name, values, where, null);
+			DatabaseManager.getInstance().closeDatabase();
+		}catch(Exception e){
+			e.printStackTrace();
+			rowId = -1;
+		}
+
+
+		//Log.d(LOG_TAG, " Inserting successfully! The " + table_name + " table now has " + rowId + " rows.");
+
+		return rowId;
+	}
+
+
+	public static long updateQuestionnaireResponseTable(Questionnaire questionnaire, String table_name){
+
+		//TODO: the user should be able to specify the database because each study may have a different database.
+
+		String where = DatabaseNameManager.COL_ID + " = " +  questionnaire.getId();
+
+		long rowId=0;
+		JSONArray responses = questionnaire.getResponses();
+//
+//		Log.d(LOG_TAG, "test qu going to update questionnaire " +questionnaire.getId() + " have " + questionnaire.getQuestions().size() + " questions" );
+//
+//		Log.d(LOG_TAG, "test qu getting responses: " + responses);
+
+		try{
+
+			SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+			ContentValues values = new ContentValues();
+
+			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getSubmittedTime()));
+			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_IS_SUBMITTED, questionnaire.isSubmitted());
+			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()));
+			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_RESPONSE, responses.toString());
+
+			Log.d(LOG_TAG, "test qu going to update questionnaire " +
+					" submitted time " + ScheduleAndSampleManager.getTimeString(questionnaire.getSubmittedTime()) + " is submitted " + questionnaire.isSubmitted() +
+					" generated time " + ScheduleAndSampleManager.getTimeString(questionnaire.getGeneratedTime()) +
+					" attendence time " +ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()) +
+					" to questionnaire  " + questionnaire.getId() + " : " + questionnaire.getDescription()  + " with response "
+					+ responses.toString());
+
+			db.update(table_name, values, where, null);
+			DatabaseManager.getInstance().closeDatabase();
+		}catch(Exception e){
+			e.printStackTrace();
+			rowId = -1;
+		}
+
+
+		//Log.d(LOG_TAG, " Inserting successfully! The " + table_name + " table now has " + rowId + " rows.");
+
+		return rowId;
+	}
+
     public long insertQuestionnaireTable(Questionnaire questionnaire, String table_name){
 
     	//TODO: the user should be able to specify the database because each study may have a different database.
@@ -465,7 +586,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
             ContentValues values = new ContentValues();
 
-            values.put(DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME, questionnaire.getSubmittedTime());
+            values.put(DatabaseNameManager.COL_QUESTIONNAIRE_GENERATED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getGeneratedTime()));
             values.put(DatabaseNameManager.COL_STUDY_ID, questionnaire.getStudyId());
 			rowId = db.insert(table_name, null, values);
             DatabaseManager.getInstance().closeDatabase();
@@ -913,6 +1034,8 @@ public class LocalDBHelper extends SQLiteOpenHelper{
         return rows;
 
     }
+
+
 
 
     //query task table

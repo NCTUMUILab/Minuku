@@ -341,16 +341,19 @@ public class ActionManager {
 					long generatedTime = getCurrentTimeInMillis();
 					
 					//the questionnaire needs to remember which template it uses, which study it belongs, and generated time
-					Questionnaire questionnaire = new Questionnaire (generatedTime, study_id, questionnaireTemplateId);				
-					
-					//we retrieve the number of the questionnaire that have been generated in the app
-					int row = (int) mLocalDBHelper.insertQuestionnaireTable(questionnaire, DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME);
-					
-					//we set the id of the questionnaire with the row number. 
-					questionnaire.setId(row);
-					QuestionnaireManager.addQuestionnaire(questionnaire);
-			
-					//the action has a notification
+					Questionnaire questionnaire = new Questionnaire (generatedTime, study_id, questionnaireTemplateId);
+
+                    //we retrieve the number of the questionnaire that have been generated in the app
+                    int row = (int) mLocalDBHelper.insertQuestionnaireTable(questionnaire, DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME);
+
+                    //we set the id of the questionnaire with the row number.
+                    questionnaire.setId(row);
+                    QuestionnaireManager.addQuestionnaire(questionnaire);
+
+                    Log.d(LOG_TAG, "[test qu] the generation time of " + questionnaire.getId() + " is " + ScheduleAndSampleManager.getTimeString(questionnaire.getGeneratedTime()));
+
+
+                    //the action has a notification
 					if (action.hasNotification()){
 
                         //exectute all notifications that need to be executed
@@ -367,7 +370,12 @@ public class ActionManager {
                         }
 					}
 
+
+
 				}
+
+
+
 
                 //if the aciton is an email questionnaire
                 else if (action.getType().equals(ActionManager.ACTION_TYPE_EMAIL_QUESTIONNAIRE)){

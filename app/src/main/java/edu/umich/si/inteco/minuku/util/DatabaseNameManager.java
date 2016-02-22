@@ -127,6 +127,7 @@ public class DatabaseNameManager {
     public static final String COL_QUESTIONNAIRE_ATTENDED_TIME = "attended_time";
     public static final String COL_QUESTIONNAIRE_GENERATED_TIME = "generated_time";
     public static final String COL_QUESTIONNAIRE_SUBMITTED_TIME = "submitted_time";
+    public static final String COL_QUESTIONNAIRE_IS_SUBMITTED = "is_submitted";
     public static final String COL_QUESTIONNAIRE_RESPONSE = "response";
     
 	
