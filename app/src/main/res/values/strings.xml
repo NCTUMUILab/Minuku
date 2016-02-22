@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="submit_button_label">Submit</string>
+
 
     <string name="app_name">Minuku</string>
     <string name="welcome">Welcom to Minuku</string>
@@ -24,6 +24,33 @@
 
 
     <!--Google Play Service -->
+
+    <!-- App package -->
+
+    <!--minuku-->
+    <string name="applicaiton_package_minuku">Submit</string>
+
+    <!--social media-->
+    <string name="applicaiton_package_facebook">Submit</string>
+    <string name="applicaiton_package_twitter">Submit</string>
+    <string name="applicaiton_package_instagram">Submit</string>
+
+
+    <!--social messenger-->
+    <string name="applicaiton_package_facebook_messenger">Submit</string>
+    <string name="applicaiton_package_line">Submit</string>
+    <string name="applicaiton_package_wechat">Submit</string>
+    <string name="applicaiton_package_whatsapp">Submit</string>
+    <string name="applicaiton_package_hangout">Submit</string>
+
+
+
+
+    <!-- Questionnaire -->
+    <string name="questionnaire_submit_button_label">Submit</string>
+    <string name="questionnaire_other_option_label">Other</string>
+
+
 
     <!-- Error strings -->
     <string name="not_connected">GoogleApiClient no yet connected. Try again.</string>

@@ -64,7 +64,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/submit_button_label"
+        android:text="@string/questionnaire_submit_button_label"
         android:id="@+id/annotationSubmitButton"
         android:layout_gravity="bottom" />
 

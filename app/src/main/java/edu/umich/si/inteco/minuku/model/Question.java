@@ -52,7 +52,11 @@ public class Question {
 	public String getResponse(){
 		return mResponse;
 	}
-	
+
+	public void setResponse(String response) {
+		this.mResponse = response;
+	}
+
 	public String getType(){
 		return mType;
 	}
@@ -95,4 +99,5 @@ public class Question {
     public void setDataJSON(JSONObject dataJSON) {
         this.mDataJSON = dataJSON;
     }
+
 }

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
+import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.model.Annotation;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
@@ -31,6 +32,11 @@ import edu.umich.si.inteco.minuku.model.Question;
 import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
 import edu.umich.si.inteco.minuku.model.Questionnaire.QuestionnaireTemplate;
 import edu.umich.si.inteco.minuku.model.Session;
+import edu.umich.si.inteco.minuku.model.Views.MinukuCheckBox;
+import edu.umich.si.inteco.minuku.model.Views.MinukuEditText;
+import edu.umich.si.inteco.minuku.model.Views.MinukuRadioGroup;
+import edu.umich.si.inteco.minuku.model.Views.MinukuSubmitButton;
+import edu.umich.si.inteco.minuku.model.Views.MinukuTextView;
 
 public class QuestionnaireManager {
 
@@ -291,7 +297,6 @@ public class QuestionnaireManager {
 			ArrayList<Question> questions = questionnaire.getQuestions();
 
 
-
             /**
              * * Iterate all the questions and set up the view for each **
              * */
@@ -302,34 +307,45 @@ public class QuestionnaireManager {
 				//Log.d(LOG_TAG, "the current question "  + i + " type is " + qu.getType() + " content: " + qu.getText());
 				
 				//the question text
-				TextView questionTextView = new TextView(context);
+				MinukuTextView questionTextView = new MinukuTextView(context);
 
-				//index of the question
-				questionTextView.setText( (i+1) + "." + qu.getText());
+				//number the question (the number is not necessarily equal to index)
+				questionTextView.setText((i + 1) + "." + qu.getText());
+				questionTextView.setQuesitonIndex(qu.getIndex());
 				questionTextView.setTextSize(18);				
-				questionTextView = (TextView) setUpQuestionLayout (questions.get(i), questionTextView);
-				
+				questionTextView = (MinukuTextView) setUpQuestionLayout (questions.get(i), questionTextView);
+
 				ll.addView(questionTextView);
 
 
-				/** set up the questionnaire view based on the type of the question **/
+				/**
+				 *
+				 * set up the questionnaire view based on the type of the question
+				 *
+				 * **/
 
 
-                /**if the question is a text field **/
+                /**1. if the question is a text field **/
 				if (qu.getType().equals(QuestionnaireManager.QUESTION_TYPE_TEXT)){
 					
-					EditText editText = new EditText(context);
+					MinukuEditText editText = new MinukuEditText(context);
+					editText.setQuesitonIndex(qu.getIndex());
+//					Log.d(LOG_TAG, "[test qu] the editext belongs to question " + editText.getQuesitonIndex());
+
 					ll.addView(editText);
 					
 				}
 
-                /**if the question is the multichoice question with one answer (i.e. radio box)**/
+                /**2. if the question is the multichoice question with one answer (i.e. radio box)**/
 				else if (qu.getType().equals(QuestionnaireManager.QUESTION_TYPE_MULTICHOICE_ONE_ANSWER)){
 				
 					//Log.d(LOG_TAG, "the current question type has "  + qu.getOptions().size() + "options");
-					RadioGroup radioGroup = new RadioGroup(context);
+					MinukuRadioGroup radioGroup = new MinukuRadioGroup(context);
+					radioGroup.setQuesitonIndex(qu.getIndex());
 					radioGroup.setOrientation(RadioGroup.VERTICAL);
-					
+
+//					Log.d(LOG_TAG, "[test qu] the radioGroup belongs to question " + radioGroup.getQuesitonIndex());
+
 					//create radio buttons
 					for (int j=0; j<qu.getOptions().size(); j++){
 						
@@ -344,48 +360,63 @@ public class QuestionnaireManager {
                     //if the question has the "other" field
 					if (qu.hasOtherField()){
 						
-						RadioButton radioButton = new RadioButton (context);		
-						radioButton.setText("Other");
-						ll.addView(radioButton);
+						RadioButton radioButton = new RadioButton (context);
+						radioButton.setText(mContext.getString(R.string.questionnaire_other_option_label));
+						radioGroup.addView(radioButton);
 						
 						//add other field
-						EditText editText = new EditText(context);
+						MinukuEditText editText = new MinukuEditText(context);
 						ll.addView(editText);
 						
 					}
 					
 				}
 
-                /**if the question is the multichoice question with multiple answer (i.e. check box)**/
+                /**3. if the question is the multichoice question with multiple answer (i.e. check box)**/
 				else if (qu.getType().equals(QuestionnaireManager.QUESTION_TYPE_MULTICHOICE_MULTIPLE_ANSWER)){
 	
-					Log.d(LOG_TAG, "the current question type has "  + qu.getOptions().size() + "options");
-					
+//					Log.d(LOG_TAG, "[test qu]the current question type is "  + qu.getOptions().size() + "options");
+
 					for (int j=0; j<qu.getOptions().size(); j++){
 						
-						CheckBox cb = new CheckBox (context);
-						cb.setText(qu.getOptions().get(j) );
+						MinukuCheckBox cb = new MinukuCheckBox (context);
+
+//						Log.d(LOG_TAG, "[test qu] the checbox belongs to question " + cb.getQuesitonIndex());
+
+						cb.setQuesitonIndex(qu.getIndex());
+						cb.setText(qu.getOptions().get(j));
+
+//						Log.d(LOG_TAG, "[test qu] the checbox belongs to question " + cb.getQuesitonIndex());
+
+
 						ll.addView(cb);
 						
 					}
 					
 					if (qu.hasOtherField()){
-						
-						CheckBox cb = new CheckBox (context);
-						cb.setText("Other");
+
+						MinukuCheckBox cb = new MinukuCheckBox (context);
+
+						cb.setQuesitonIndex(qu.getIndex());
+						cb.setText(mContext.getString(R.string.questionnaire_other_option_label));
 						ll.addView(cb);
 						
-						EditText editText = new EditText(context);
+						MinukuEditText editText = new MinukuEditText(context);
+						editText.setQuesitonIndex(qu.getIndex());
 						ll.addView(editText);
 					}
-					
+
+
+
 				}
 
 			}
 
-            /** add the view of the submit button **/
-            Button submitButton  = new Button (context);
-            submitButton.setText("Submit");
+            /** finally, add the view of the submit button **/
+            MinukuSubmitButton submitButton  = new MinukuSubmitButton (context);
+			submitButton.setQuestionnaire(questionnaire);
+            submitButton.setText(mContext.getString(R.string.questionnaire_submit_button_label));
+
             ll.addView(submitButton);
 
 
