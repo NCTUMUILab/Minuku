@@ -19,7 +19,25 @@ public class Questionnaire extends QuestionnaireTemplate {
 		_templateId = template_id;
 		
 	}
-	
+
+	public Questionnaire(int id, int study_id, int template_id){
+		super();
+		_id = id;
+		_studyId = study_id;
+		_templateId = template_id;
+
+	}
+
+	public Questionnaire(long generated_time, int id, int study_id, int template_id){
+		super();
+		_id = id;
+		_generatedTime = generated_time;
+		_studyId = study_id;
+		_templateId = template_id;
+
+	}
+
+
 	public Questionnaire(int id, String title, int study_id, String type) {
 		super(id, title, study_id, type);
 		

@@ -904,6 +904,11 @@ public class ScheduleAndSampleManager {
 		return currentTimeString;
 	}
 
+	public static String getCurrentTimeString() {
+
+		return getTimeString(getCurrentTimeInMillis());
+	}
+
     public static String getTimeString(long time,  SimpleDateFormat sdf){
 
         String currentTimeString = sdf.format(time);

@@ -114,6 +114,9 @@
             android:value="AIzaSyBPfc1MFLhCnDLG6vB3a1M-xVD2Go9zlSE" />
 
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="1e42fe294ebb705cfc7e2f24be46734d6421be19" />
     </application>
 
 </manifest>

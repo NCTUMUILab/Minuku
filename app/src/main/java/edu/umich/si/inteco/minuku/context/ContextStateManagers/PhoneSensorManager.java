@@ -56,20 +56,20 @@ public class PhoneSensorManager extends ContextStateManager implements SensorEve
     private static Context mContext;
     private static SensorManager mSensorManager ;
 
-    public static final String PHONE_SENSOR_ACCELEROMETER = "Sensor.Accelerometer";
-    public static final String PHONE_SENSOR_LINEAR_ACCELERATION = "Sensor.LinearAcceleration";
-    public static final String PHONE_SENSOR_ROTATION_VECTOR = "Sensor.RotationVector";
-    public static final String PHONE_SENSOR_GRAVITY = "Sensor.Gravity";
-    public static final String PHONE_SENSOR_GYROSCOPE = "Sensor.Gyroscope";
-    public static final String PHONE_SENSOR_LIGHT = "Sensor.Light";
-    public static final String PHONE_SENSOR_MAGNETIC_FIELD = "Sensor.MagneticField";
-    public static final String PHONE_SENSOR_PRESSURE = "Sensor.Pressure";
-    public static final String PHONE_SENSOR_PROXIMITY = "Sensor.Proximity";
-    public static final String PHONE_SENSOR_AMBIENT_TEMPERATURE = "Sensor.AmbientTemperature";
-    public static final String PHONE_SENSOR_RELATIVE_HUMIDITY = "Sensor.RelativeHumidity";
-    public static final String PHONE_SENSOR_STEP_COUNTER = "Sensor.StepCounter";
-    public static final String PHONE_SENSOR_STEP_DETECTOR = "Sensor.StepDetector";
-    public static final String PHONE_SENSOR_HEART_RATE = "Sensor.HeartRate";
+    public static final String PHONE_SENSOR_ACCELEROMETER = "Sensor-Accelerometer";
+    public static final String PHONE_SENSOR_LINEAR_ACCELERATION = "Sensor-LinearAcceleration";
+    public static final String PHONE_SENSOR_ROTATION_VECTOR = "Sensor-RotationVector";
+    public static final String PHONE_SENSOR_GRAVITY = "Sensor-Gravity";
+    public static final String PHONE_SENSOR_GYROSCOPE = "Sensor-Gyroscope";
+    public static final String PHONE_SENSOR_LIGHT = "Sensor-Light";
+    public static final String PHONE_SENSOR_MAGNETIC_FIELD = "Sensor-MagneticField";
+    public static final String PHONE_SENSOR_PRESSURE = "Sensor-Pressure";
+    public static final String PHONE_SENSOR_PROXIMITY = "Sensor-Proximity";
+    public static final String PHONE_SENSOR_AMBIENT_TEMPERATURE = "Sensor-AmbientTemperature";
+    public static final String PHONE_SENSOR_RELATIVE_HUMIDITY = "Sensor-RelativeHumidity";
+    public static final String PHONE_SENSOR_STEP_COUNTER = "Sensor-StepCounter";
+    public static final String PHONE_SENSOR_STEP_DETECTOR = "Sensor-StepDetector";
+    public static final String PHONE_SENSOR_HEART_RATE = "Sensor-HeartRate";
 
     /**Motion Sensors**/
     private static float mAccele_x, mAccele_y, mAccele_z;

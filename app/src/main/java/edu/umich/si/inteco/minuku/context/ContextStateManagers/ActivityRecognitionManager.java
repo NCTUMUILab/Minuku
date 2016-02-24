@@ -45,8 +45,8 @@ public class ActivityRecognitionManager extends ContextStateManager
     /**Properties for Record**/
     public static final String RECORD_DATA_PROPERTY_NAME = "DetectedActivities";
 
-    public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES = "AR.MostProbableActivity";
-    public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = "AR.AllProbableActivities";
+    public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES = "AR-MostProbableActivity";
+    public static final String STRING_CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES = "AR-AllProbableActivities";
 
     /**label **/
     public static final String STRING_DETECTED_ACTIVITY_IN_VEHICLE = "in_vehicle";

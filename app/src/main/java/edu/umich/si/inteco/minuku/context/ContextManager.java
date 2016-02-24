@@ -72,15 +72,12 @@ public class ContextManager {
     public static final String CONTEXT_STATE_MANAGER_USER_INTERACTION = "UserInteraction";
 
     public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION = "ActivityRecognition";
-    public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION_PREFIX = "AR.";
+    public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION_PREFIX = "AR-";
     public static final String CONTEXT_SOURCE_NAME_TRANSPORTATION = "Transportation";
-    public static final String CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX = "PhoneStatus.";
+    public static final String CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX = "PhoneStatus-";
     public static final String CONTEXT_SOURCE_NAME_USER_INTERACTION_PREFIX = "UserInteraction.";
     public static final String CONTEXT_SOURCE_NAME_LOCATION = "Location";
-    public static final String CONTEXT_SOURCE_NAME_SENSOR_PREFIX = "Sensor.";
-    public static final String CONTEXT_SOURCE_NAME_SENSOR_PROXIMITY = "Sensor.Proximity";
-    public static final String CONTEXT_SOURCE_NAME_SENSPR_ACCELEROMETER = "Sensor.Accelerometer";
-    public static final String CONTEPhoneStatusManagerXT_SOURCE_NAME_SENSPR_LIGHT = "Sensor.Light";
+    public static final String CONTEXT_SOURCE_NAME_SENSOR_PREFIX = "Sensor-";
 
 
     public static final int CONTEXT_SOURCE_INVALID_VALUE_INTEGER = -9999;
@@ -644,14 +641,12 @@ public class ContextManager {
 
     public static boolean isLoggingTaskContainedInBackGroundLogging(int id) {
 
-        Log.d(LOG_TAG, "[testing logging task and requested] find the loggingTask " + id
-                + " in BackgroundLogging ");
         //if we find the loggingTask id in the BackgroundLogging Task List, we return true.
         for (int i=0; i<getBackgroundLoggingSetting().getLoggingTasks().size() ; i++){
 
             if (id==getBackgroundLoggingSetting().getLoggingTasks().get(i))
-                Log.d(LOG_TAG, "[testing logging task and requested] the loggingTask " + id
-                        + " in FOUND in BackgroundLogging ");
+//                Log.d(LOG_TAG, "[testing logging task and requested] the loggingTask " + id
+//                        + " in FOUND in BackgroundLogging ");
                 return true;
         }
         return false;
@@ -792,8 +787,6 @@ public class ContextManager {
      */
     private void updateLoggingTasksInContextStateManager(String contextStateManagerName, LoggingTask loggingTask) {
 
-        Log.d(LOG_TAG, " [testing logging task and requested] updateLoggingTask " + loggingTask.getSource());
-
         boolean isPerformedByBackgroundLogging = false;
         boolean isPerformedByAction = false;
         boolean isRequested = false;
@@ -802,18 +795,18 @@ public class ContextManager {
         //check if the loggintask is still in a BackgroundLogging
         if (getBackgroundLoggingSetting().isEnabled() && getBackgroundLoggingSetting().getLoggingTasks().contains(loggingTask.getId())){
             isPerformedByBackgroundLogging = true;
-            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is included in BackgroundRecording " );
+//            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is included in BackgroundRecording " );
 
         }
 
         //check if the loggingtask is requested by an action
         if (mLoggingTaskByActionList.contains(loggingTask.getId())){
-            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is performed by an Action " );
+//            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is performed by an Action " );
             isPerformedByAction = true;
         }
 
         isRequested = isPerformedByAction | isPerformedByBackgroundLogging;
-        Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " should be enabled!! " );
+//        Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " should be enabled!! " );
 
 
         if (isRequested){
@@ -833,10 +826,10 @@ public class ContextManager {
      */
     private void enableLoggingTask(String contextStateManagerName, LoggingTask loggingTask) {
 
-        Log.d(LOG_TAG, " [testing logging task and requested] enable logging task: " +
-                loggingTask.getSource() + " to " + contextStateManagerName);
-
-        //to execute a logging task is to set its Enagled to True.
+//        Log.d(LOG_TAG, " [testing logging task and requested] enable logging task: " +
+//                loggingTask.getSource() + " to " + contextStateManagerName);
+//
+//        //to execute a logging task is to set its Enagled to True.
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
             mActivityRecognitionManager.updateLoggingTask(loggingTask, true);
         else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))

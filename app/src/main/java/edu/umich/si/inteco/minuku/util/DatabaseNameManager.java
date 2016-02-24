@@ -14,6 +14,7 @@ public class DatabaseNameManager {
     public static final String MONGODB_COLLECTION_ISALIVE = "isalive";
     public static final String MONGODB_COLLECTION_SESSION = "session";
     public static final String MONGODB_COLLECTION_BACKGROUNDLOGGING = "backgroundlogging";
+    public static final String MONGODB_COLLECTION_QUESTIONNAIRE = "questionnaire";
 
 
 	public static final String STUDY_TABLE_NAME = "Study_Table";
@@ -128,9 +129,18 @@ public class DatabaseNameManager {
     public static final String COL_QUESTIONNAIRE_GENERATED_TIME = "generated_time";
     public static final String COL_QUESTIONNAIRE_SUBMITTED_TIME = "submitted_time";
     public static final String COL_QUESTIONNAIRE_IS_SUBMITTED = "is_submitted";
+    public static final String COL_QUESTIONNAIRE_TEMPLATE_ID = "template_id";
     public static final String COL_QUESTIONNAIRE_RESPONSE = "response";
-    
-	
+
+    public static final int COL_INDEX_QUESTIONNAIRE_ID = 0;
+    public static final int COL_INDEX_QUESTIONNAIRE_STUDY_ID = 1;
+    public static final int COL_INDEX_QUESTIONNAIRE_TEMPLATE_ID = 2;
+    public static final int COL_INDEX_QUESTIONNAIRE_GENERATED_TIME = 3;
+    public static final int COL_INDEX_QUESTIONNAIRE_ATTENDED_TIME = 4;
+    public static final int COL_INDEX_QUESTIONNAIRE_SUBMITTED_TIME = 5;
+    public static final int COL_INDEX_QUESTIONNAIRE_IS_SUBMITTED = 6;
+    public static final int COL_INDEX_QUESTIONNAIRE_RESPONSE = 7;
+
     /**
     * Columns of SESSION Table
     * 
@@ -223,6 +233,7 @@ public class DatabaseNameManager {
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_TASK = "task";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_ANNOTATIONSET = "annotation_set";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_ID = "_id";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_STUDY_ID = "study_id";
     public static final String MONGO_DB_DOCUMENT_STUDY_CONDITION = "condition";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_DEVICE_ID = "device_id";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_USER_ID = "user_id";
@@ -232,6 +243,13 @@ public class DatabaseNameManager {
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_DATA_TYPE = "data_type";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_LAST_SYNC_SESSION_ID = "last_sync_session_id";
 
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_QUESTIONNAIRE_ID = "questionnaire_id";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_GENERATED_TIME = "generated_time";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_ATTENDED_TIME = "attended_time";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_SUBMITTED_TIME = "submitted_time";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_IS_SUBMITTED = "is_submitted";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_TEMPLATE_ID = "template_id";
+    public static final String MONGO_DB_DOCUMENT_PROPERTIES_RESPONSE = "response";
 
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_EMAIL_SUBJECT = "email_subject";
     public static final String MONGO_DB_DOCUMENT_PROPERTIES_EMAIL_CONTENT = "email_content";

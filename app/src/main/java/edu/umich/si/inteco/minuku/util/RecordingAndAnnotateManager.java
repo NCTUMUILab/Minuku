@@ -314,8 +314,10 @@ public class RecordingAndAnnotateManager {
             JSONObject annotationSetJSON = null;
             JSONArray annotateionSetJSONArray = null;
             try {
-                annotationSetJSON = new JSONObject(separated[DatabaseNameManager.COL_INDEX_SESSION_ANNOTATION_SET]);
-                annotateionSetJSONArray = annotationSetJSON.getJSONArray(ANNOTATION_PROPERTIES_ANNOTATION);
+                if (!separated[DatabaseNameManager.COL_INDEX_SESSION_ANNOTATION_SET].equals("null")){
+                    annotationSetJSON = new JSONObject(separated[DatabaseNameManager.COL_INDEX_SESSION_ANNOTATION_SET]);
+                    annotateionSetJSONArray = annotationSetJSON.getJSONArray(ANNOTATION_PROPERTIES_ANNOTATION);
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

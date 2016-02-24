@@ -220,15 +220,15 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 				table_name + " ( "+
 				DatabaseNameManager.COL_ID + " " + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 				DatabaseNameManager.COL_STUDY_ID + " INTEGER NOT NULL, " +
-				DatabaseNameManager.COL_QUESTIONNAIRE_GENERATED_TIME+ " TEXT, " +
-				DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME+ " TEXT, " +
-				DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME+ " TEXT, " +
+				DatabaseNameManager.COL_QUESTIONNAIRE_TEMPLATE_ID + " INTEGER NOT NULL, " +
+				DatabaseNameManager.COL_QUESTIONNAIRE_GENERATED_TIME+ " INTEGER NOT NULL, " +
+				DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME+ " INTEGER, " +
+				DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME+ " INTEGER, " +
 				DatabaseNameManager.COL_QUESTIONNAIRE_IS_SUBMITTED+ " INTEGER, " +
 				DatabaseNameManager.COL_QUESTIONNAIRE_RESPONSE + " TEXT " +
 				");" ;
 
 		db.execSQL(cmd);
-
 
     }
 
@@ -517,7 +517,7 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 			ContentValues values = new ContentValues();
 
-			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()) );
+			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME, questionnaire.getAttendedTime() );
 			Log.d(LOG_TAG, "test qu updating questionnaire attendence time " +  ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()) );
 
 			db.update(table_name, values, where, null);
@@ -552,9 +552,9 @@ public class LocalDBHelper extends SQLiteOpenHelper{
 			SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 			ContentValues values = new ContentValues();
 
-			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getSubmittedTime()));
+			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_SUBMITTED_TIME, questionnaire.getSubmittedTime());
 			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_IS_SUBMITTED, questionnaire.isSubmitted());
-			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()));
+			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_ATTENDED_TIME, questionnaire.getAttendedTime());
 			values.put(DatabaseNameManager.COL_QUESTIONNAIRE_RESPONSE, responses.toString());
 
 			Log.d(LOG_TAG, "test qu going to update questionnaire " +
@@ -586,8 +586,10 @@ public class LocalDBHelper extends SQLiteOpenHelper{
             SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
             ContentValues values = new ContentValues();
 
-            values.put(DatabaseNameManager.COL_QUESTIONNAIRE_GENERATED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getGeneratedTime()));
-            values.put(DatabaseNameManager.COL_STUDY_ID, questionnaire.getStudyId());
+            values.put(DatabaseNameManager.COL_QUESTIONNAIRE_GENERATED_TIME, questionnaire.getGeneratedTime());
+            values.put(DatabaseNameManager.COL_QUESTIONNAIRE_TEMPLATE_ID, questionnaire.getTemplateId());
+			values.put(DatabaseNameManager.COL_STUDY_ID, questionnaire.getStudyId());
+
 			rowId = db.insert(table_name, null, values);
             DatabaseManager.getInstance().closeDatabase();
 		}catch(Exception e){
@@ -963,6 +965,44 @@ public class LocalDBHelper extends SQLiteOpenHelper{
     	return rows;
 
     }
+
+
+	public static  ArrayList<String> queryQuestionnairesAfterId (int id) {
+
+
+		ArrayList<String> rows = new ArrayList<String>();
+
+		try{
+
+			SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+			String sql = "SELECT *"  +" FROM " + DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME +
+					" where " + DatabaseNameManager.COL_ID + " > " + id ;
+//					+
+//					" order by " + DatabaseNameManager.COL_ID;
+
+			 Log.d(LOG_TAG, "[test qu queryquestionnaire after id] the query statement is " +sql);
+
+			Cursor cursor = db.rawQuery(sql, null);
+			int columnCount = cursor.getColumnCount();
+			while(cursor.moveToNext()){
+				String curRow = "";
+				for (int i=0; i<columnCount; i++){
+					curRow += cursor.getString(i)+ Constants.DELIMITER;
+				}
+				rows.add(curRow);
+			}
+			cursor.close();
+
+			DatabaseManager.getInstance().closeDatabase();
+
+		}catch (Exception e){
+
+		}
+
+
+		return rows;
+	}
+
 
 
     public static  ArrayList<String> querySessionsBetweenTimes(long startTime, long endTime) {

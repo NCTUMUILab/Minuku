@@ -3,9 +3,6 @@ package edu.umich.si.inteco.minuku.util;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -161,23 +158,55 @@ public class QuestionnaireManager {
 
 		return null;
 	}
-	
-	public static Questionnaire getQuestionnaire(int id) {
-		
-		if (mQuestionnaireList==null)
-			Log.d(LOG_TAG, "mQuestionnaireList is null");
-		
-		for (int i=0; i<mQuestionnaireList.size(); i++){		
-			if (mQuestionnaireList.get(i).getId()==id){
-				//Log.d(LOG_TAG, "[getQuestionnaire] questionnaire " + mQuestionnaireTemplateList.get(i).getId() + " found");
-				return mQuestionnaireList.get(i);
-			}
-				
+
+
+	public static Questionnaire getQuestionnaire(int questionnaire_id) {
+
+		//TODO: this should be from the database
+
+		ArrayList<String> res = LocalDBHelper.queryQuestionnaire(questionnaire_id);
+		Questionnaire questionnaire = null;
+
+		Log.d(LOG_TAG, "[test qu] res from the database is  " +  res);
+
+		for (int i=0; i<res.size() ; i++) {
+
+
+			String questionnaireStr = res.get(i);
+
+			//split each row into columns
+			String[] separated = questionnaireStr.split(Constants.DELIMITER);
+
+			/** get properties of the session **/
+			int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_ID]);
+			int studyId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_STUDY_ID]);
+			int templateId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_TEMPLATE_ID]);
+			long generatedTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_GENERATED_TIME]);
+
+			questionnaire = new Questionnaire(generatedTime, id, studyId, templateId);
+
+			Log.d(LOG_TAG, "[test qu] creating quesitonnaire: id " + questionnaire.getId() + " study " + questionnaire.getStudyId() + " template " + questionnaire.getTemplateId()
+			 + "generated time " + generatedTime);
+
+			return questionnaire;
+
+//		if (mQuestionnaireList==null)
+//			Log.d(LOG_TAG, "mQuestionnaireList is null");
+//
+//		for (int i=0; i<mQuestionnaireList.size(); i++){
+//			if (mQuestionnaireList.get(i).getId()==id){
+//				//Log.d(LOG_TAG, "[getQuestionnaire] questionnaire " + mQuestionnaireTemplateList.get(i).getId() + " found");
+//				return mQuestionnaireList.get(i);
+//			}
+//
+//
 		}
 
-		return null;
+		return questionnaire;
 	}
-	
+
+
+
 	
 	private static void setupQuestionnaireFormat(Questionnaire questionnaire){
 		
@@ -249,20 +278,14 @@ public class QuestionnaireManager {
 		
 		//setup the parameters of the questionnaire based on its template
 		setupQuestionnaireFormat(questionnaire);
-			
-		Log.d(LOG_TAG, "[setUpQuestionnaireView] enter getQuestionnaire View" );
 		
-		
-		Log.d(LOG_TAG, "[setUpQuestionnaireView] the questionnaire " + questionnaire);
-		
-		//then we set the attended time
+		//then we set the attended time to the questionnaire, we create an actual questionnaire when the user attends to the questionnaire
 		long attendedTime = getCurrentTimeInMillis();
 		questionnaire.setAttendedTime(attendedTime);
 		Log.d(LOG_TAG, "[test qu] the attendence time of " + questionnaire.getId() + " is " + ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()));
 
 		//update questionnaire (it's likely that user attended to a questionnaire but not responded to it)
 		LocalDBHelper.updateQuestionnaireAttendenceTable(questionnaire, DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME);
-
 
 		//then we get the template of the questionnaire so that we can create the view of the questionnaire
 		Log.d(LOG_TAG, "[setUpQuestionnaireView] the questionnaire " + questionnaire.getId() + " 's tempalte is "
@@ -281,7 +304,6 @@ public class QuestionnaireManager {
 		
 		//add the view of the layout
 		sv.addView(ll);
-		
 
 		/**going to set up questionnaire view **/
 		//title
@@ -303,7 +325,6 @@ public class QuestionnaireManager {
 
             //get all the questions from the questionnarie
 			ArrayList<Question> questions = questionnaire.getQuestions();
-
 
             /**
              * * Iterate all the questions and set up the view for each **
@@ -436,7 +457,143 @@ public class QuestionnaireManager {
 		}
 		return sv;
 	}
-	
+
+
+	public static ArrayList<Questionnaire> getQuestionnairesAfterID(int lastQuestionnaireId){
+
+		ArrayList<Questionnaire> questionnaires = new ArrayList<Questionnaire>();
+
+
+		ArrayList<String> res =  mLocalDBHelper.queryQuestionnairesAfterId(lastQuestionnaireId);
+
+		Log.d(LOG_TAG, "[test qu] getQuestionnairesAfterID  res " + res);
+
+		//we start from 1 instead of 0 because the 1st session is the background recording. We will skip it.
+		for (int i=0; i<res.size() ; i++) {
+
+			String questionnaireStr = res.get(i);
+
+			//split each row into columns
+			String[] separated = questionnaireStr.split(Constants.DELIMITER);
+
+			/** get properties of the quesitonnaire **/
+			int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_ID]);
+			int studyId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_STUDY_ID]);
+			int templateId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_TEMPLATE_ID]);
+			long generatedTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_GENERATED_TIME]);
+
+
+			long attendedTime, submittedTime;
+			JSONArray repsonse = null;
+			boolean isSubmitted;
+
+			Questionnaire questionnaire = new Questionnaire(generatedTime, id, studyId, templateId);
+
+			Log.d(LOG_TAG, "[test qu] creating quesitonnaire: id " + questionnaire.getId() + " study " +
+					questionnaire.getStudyId() + " template " + questionnaire.getTemplateId());
+
+			//the following properties are not necessarily available for a quesitonnaire
+			if (!separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_ATTENDED_TIME].equals("null") ) {
+				attendedTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_ATTENDED_TIME]);
+				questionnaire.setAttendedTime(attendedTime);
+
+			}
+			if (!separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_SUBMITTED_TIME].equals("null") ) {
+				submittedTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_SUBMITTED_TIME]);
+				Log.d(LOG_TAG, "[test qu] quesitonnaire: id is submitted:  at " + submittedTime );
+				questionnaire.setSubmittedTime(submittedTime);
+			}
+			if (!separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_IS_SUBMITTED].equals("null") ) {
+				Log.d(LOG_TAG, "[test qu] quesitonnaire: id is submitted raw data:  "  + separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_IS_SUBMITTED]);
+
+				if (separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_IS_SUBMITTED].equals("1")){
+					isSubmitted = true;
+				}else
+					isSubmitted = false;
+
+				Log.d(LOG_TAG, "[test qu] quesitonnaire: id is submitted:  "  + isSubmitted);
+				questionnaire.setSubmitted(isSubmitted);
+			}
+			if (!separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_RESPONSE].equals("null") ) {
+				try {
+					repsonse = new JSONArray(separated[DatabaseNameManager.COL_INDEX_QUESTIONNAIRE_RESPONSE]);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				questionnaire.setResponses(repsonse);
+			}
+
+
+
+			questionnaires.add(questionnaire);
+		}
+
+		return questionnaires;
+
+	}
+
+
+
+
+	public static ArrayList<JSONObject> getQuestionnaireDocuments(int lastQuestionnaireId) {
+
+		ArrayList<JSONObject> documents = new ArrayList<JSONObject>();
+
+		/** query questionnaires of which the id is later than the lastQuestionnaireId **/
+		ArrayList<Questionnaire> questionnaires = getQuestionnairesAfterID(lastQuestionnaireId);
+
+		for (int i=0; i<questionnaires.size(); i++){
+
+			//for each questionnaire we create a JSON document
+			Questionnaire questionnaire = questionnaires.get(i);
+			JSONObject document = new JSONObject();
+
+			//TODO: create json object
+			SimpleDateFormat sdf_id = new SimpleDateFormat(Constants.DATE_FORMAT_FOR_ID);
+			try {
+				document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ID, Constants.USER_ID +"-"+ScheduleAndSampleManager.getTimeString(questionnaire.getGeneratedTime(), sdf_id) );
+				document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_QUESTIONNAIRE_ID, questionnaire.getId() );
+				document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_GENERATED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getGeneratedTime()));
+				document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_TEMPLATE_ID, questionnaire.getTemplateId() );
+				document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_STUDY_ID,questionnaire.getStudyId());
+				document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_IS_SUBMITTED, questionnaire.isSubmitted() );
+
+
+				if (questionnaire.getAttendedTime()!=-1){
+					document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ATTENDED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getAttendedTime()) );
+				}else {
+					document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_ATTENDED_TIME, "NA" );
+				}
+
+				if (questionnaire.getSubmittedTime()!=-1){
+					document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SUBMITTED_TIME, ScheduleAndSampleManager.getTimeString(questionnaire.getSubmittedTime()) );
+				}else {
+					document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_SUBMITTED_TIME, "NA" );
+				}
+
+				if (questionnaire.getResponses()!=null){
+					document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_RESPONSE, questionnaire.getResponses() );
+				}else {
+					document.put(DatabaseNameManager.MONGO_DB_DOCUMENT_PROPERTIES_RESPONSE, "NA" );
+				}
+
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
+
+			documents.add(document);
+			Log.d(LOG_TAG, "[test qu] the document for questionnaire "  + questionnaire.getId() + " is " + document);
+
+		}
+
+		return  documents;
+
+	}
+
+
+
+
 	private static View setUpQuestionLayout(Question question, View view){
 		
 

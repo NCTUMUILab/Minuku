@@ -1241,6 +1241,9 @@ public class ConfigurationManager {
 					questionnaireTemplate.setDescription(description);					
 				}
 
+				//save to database
+
+
                 //if the questionnaire is through email
 				if (type.equals(QuestionnaireManager.QUESTIONNAIRE_TYPE_EMAIL)) {
 

@@ -17,6 +17,8 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.ndk.CrashlyticsNdk;
 import edu.umich.si.inteco.minuku.Fragments.CheckinSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.DailyJournalSectionFragment;
 import edu.umich.si.inteco.minuku.Fragments.HomeFragment;
@@ -35,6 +37,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import android.Manifest;
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
@@ -65,6 +68,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
         setContentView(R.layout.activity_main);
 
         /**For Google Analytic**/

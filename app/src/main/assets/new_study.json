@@ -64,27 +64,27 @@
 				  },
 				  {
 					"Id": 6,
-					"Source": "Sensor.Proximity"
+					"Source": "Sensor-Proximity"
 				  },
 				  {
 					"Id": 7,
-					"Source": "PhoneStatus.Connectivity"
+					"Source": "PhoneStatus-Connectivity"
 				  },
 				  {
 					"Id": 8,
-					"Source": "PhoneStatus.Ringer"
+					"Source": "PhoneStatus-Ringer"
 				  },
 				  {
 					"Id": 9,
-					"Source": "PhoneStatus.Battery"
+					"Source": "PhoneStatus-Battery"
 				  },
 				  {
 					"Id": 10,
-					"Source": "PhoneStatus.Telephony"
+					"Source": "PhoneStatus-Telephony"
 				  },
 				  {
 				  "Id": 11,
-				  "Source": "PhoneStatus.AppUsage"
+				  "Source": "PhoneStatus-AppUsage"
 				  }
 				],
 				"Circumstances":
@@ -98,7 +98,7 @@
 						[
 							{
 							  	"State":"Use Phone",
-							  	"Source": "AR.MostProbableActivity",
+							  	"Source": "AR-MostProbableActivity",
 								"Value_Criteria": [
 									{
 										"TargetValue": "tilting"
@@ -114,32 +114,82 @@
 							}						
 						]
 					},
-					{
-						"Id": 2,
-						"Task_id": 1,
-						"Name": "No attention on the phone",
-						"Description":"NA",
-						"Conditions":
-						[ 
-							{
-
-							  	"State": "Phone Still for a period",
-							  	"Source": "AR.MostProbableActivity",
-								"Value_Criteria": [
-									{
-										"TargetValue": "still"
-									}
-								],					
-								"Time_Criteria": [
-									{
-										"Measure": "duration",
-										"Relationship": ">", 
-										"TargetValue": 30 
-									}
-								]
-							} 
+				  {
+					"Id": 2,
+					"Task_id": 1,
+					"Name": "No attention on the phone",
+					"Description": "NA",
+					"Conditions": [
+					  {
+						"State": "Phone Still for a period",
+						"Source": "AR-MostProbableActivity",
+						"Value_Criteria": [
+						  {
+							"TargetValue": "still"
+						  }
+						],
+						"Time_Criteria": [
+						  {
+							"Measure": "duration",
+							"Relationship": ">",
+							"TargetValue": 30
+						  }
 						]
-					}					
+					  }
+					]
+				  },
+				  {
+					"Id": 3,
+					"Task_id": 1,
+					"Name": "Using Facebook",
+					"Description":"NA",
+					"Conditions":
+					[
+					  {
+
+						"State": "Use Facdbook",
+						"Source": "PhoneStatus-AppUsage",
+						"Value_Criteria": [
+						  {
+							"TargetValue": "Facebook"
+						  }
+						],
+						"Time_Criteria": [
+						  {
+							"Measure": "duration",
+							"Relationship": ">",
+							"TargetValue": 5
+						  }
+						]
+					  }
+					]
+				  },
+				  {
+					"Id": 4,
+					"Task_id": 1,
+					"Name": "In Office",
+					"Description":"NA",
+					"Conditions":
+					[
+					  {
+
+						"State": "Use Facdbook",
+						"Source": "Location",
+						"Value_Criteria": [
+						  {
+							"TargetValue": "42.280708, -83.740031"
+						  }
+						],
+						"Time_Criteria": [
+						  {
+							"Measure": "duration",
+							"Relationship": ">",
+							"TargetValue": 2
+						  }
+						]
+					  }
+					]
+				  }
 				],
 
 				"Actions":[

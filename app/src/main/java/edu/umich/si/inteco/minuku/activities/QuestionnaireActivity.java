@@ -222,8 +222,11 @@ public class QuestionnaireActivity extends Activity {
 						//save to the db
 						LocalDBHelper.updateQuestionnaireResponseTable(questionnaire, DatabaseNameManager.QUESTIONNAIRE_TABLE_NAME);
 
-						ArrayList<String> results = LocalDBHelper.queryQuestionnaire(questionnaire.getId());
-						Log.d(LOG_TAG, "test qu after query the qeustionnaire is  " + results);
+						//after answering the questionnaire, finish the app.
+						finish();
+
+//						ArrayList<String> results = LocalDBHelper.queryQuestionnaire(questionnaire.getId());
+//						Log.d(LOG_TAG, "test qu after query the qeustionnaire is  " + results);
 
 					}
 				});

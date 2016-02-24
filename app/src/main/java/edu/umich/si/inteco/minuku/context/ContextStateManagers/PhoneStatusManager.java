@@ -104,11 +104,11 @@ public class PhoneStatusManager extends ContextStateManager {
     public static final int CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY = 3;
     public static final int CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY = 4;
 
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE = "PhoneStatus.AppUsage";
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER = "PhoneStatus.Ringer";
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY = "PhoneStatus.Battery";
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY = "PhoneStatus.Telephony";
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY = "PhoneStatus.Connectivity";
+    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE = "PhoneStatus-AppUsage";
+    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER = "PhoneStatus-Ringer";
+    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY = "PhoneStatus-Battery";
+    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY = "PhoneStatus-Telephony";
+    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY = "PhoneStatus-Connectivity";
 
     public static final String SOURCE_TYPE_APP_STRING ="app" ;
 
@@ -454,7 +454,7 @@ public class PhoneStatusManager extends ContextStateManager {
         /*** Set data to Record **/
         record.setData(data);
 
-        Log.d(LOG_TAG, "[test save records] the data of " + sourceName + " is " + record.getData());
+//        Log.d(LOG_TAG, "[test save records] the data of " + sourceName + " is " + record.getData());
 
 
         /** Save Record**/
@@ -806,9 +806,9 @@ public class PhoneStatusManager extends ContextStateManager {
                     mLastestForegroundPackage = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
                     mLastestForegroundPackageTime = ScheduleAndSampleManager.getTimeString(mySortedMap.get(mySortedMap.lastKey()).getLastTimeUsed());
 
-                    Log.d(LOG_TAG, "test save records "  +mySortedMap.get(mySortedMap.lastKey()).getPackageName() + " time " +
-                            ScheduleAndSampleManager.getTimeString( mySortedMap.get(mySortedMap.lastKey()).getLastTimeUsed())
-                    + " mRecentUsedAppsInLastHour " + mRecentUsedAppsInLastHour);
+//                    Log.d(LOG_TAG, "test save records "  +mySortedMap.get(mySortedMap.lastKey()).getPackageName() + " time " +
+//                            ScheduleAndSampleManager.getTimeString( mySortedMap.get(mySortedMap.lastKey()).getLastTimeUsed())
+//                    + " mRecentUsedAppsInLastHour " + mRecentUsedAppsInLastHour);
                 }
 
 
