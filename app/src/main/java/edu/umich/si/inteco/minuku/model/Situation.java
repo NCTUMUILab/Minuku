@@ -13,7 +13,6 @@ public class Situation extends ProbeObject{
     private String mName;
     private String mDescription="NA";
     private ArrayList<Condition> mConditionList;
-	private String mConditionStr = null;   // e.g. "2",  "2 and 4"
 
     public Situation(String name){
     	super();
@@ -83,15 +82,6 @@ public class Situation extends ProbeObject{
     	mConditionList = ConditionList;
     }
 
-	public void setConditionStr(String string){
-		mConditionStr = string;
-	}
-
-	public String getConditionStr() {
-
-		return mConditionStr;
-	}
-    
     public ArrayList<Condition> getConditionList(){
     	return mConditionList;
     }

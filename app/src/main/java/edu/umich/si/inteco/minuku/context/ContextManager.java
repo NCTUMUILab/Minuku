@@ -27,7 +27,6 @@ import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
-import edu.umich.si.inteco.minuku.model.Criteria.StateValueCriterion;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.TriggerManager;
@@ -453,10 +452,6 @@ public class ContextManager {
             Situation situation = getSituationList().get(i);
 
 
-            /**2  Use Situation conditons list to know which state mapping is used **/
-
-
-
            /**3  get those statemapping rules from the mStateMappingRuleList, and then associate condition with those states **/
 
 
@@ -478,7 +473,7 @@ public class ContextManager {
 //                ArrayList<StateValueCriterion> criteria = condition.getStateValueCriteria();
 //
 //                //If the criteria are met, it changes the state to the value
-//                String stateValue = condition.getStateValue();
+//                String stateValue = condition.getStateTargetValue();
 //
 //                //we get the source type from the ContextStateManager
 //                int sourceType = getSourceTypeFromName(contextStateManagerName, condition.getSource());
@@ -1065,9 +1060,9 @@ public class ContextManager {
                 for (int j=0 ; j<conditions.size(); j++){
                     Condition condition = conditions.get(j);
                     //the final pass is true only when all the conditions are true.
-                    pass = pass & state.getValue().equals(condition.getStateValue());
+                    pass = pass & state.getValue().equals(condition.getStateTargetValue());
                     Log.d(LOG_TAG, "[examineCircumstanceConditions] now the sitaution's condition:  " +condition.getStateName() +
-                    "-" +condition.getStateValue() + " pasS: " + pass);
+                    "-" +condition.getStateTargetValue() + " pasS: " + pass);
 
                 }
 

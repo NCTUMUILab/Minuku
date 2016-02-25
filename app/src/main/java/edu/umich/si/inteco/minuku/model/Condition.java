@@ -55,6 +55,11 @@ public class Condition {
 	public void setStateName (String name) {
 		mStateName = name;
 	}
+
+	public void setStateTargetValue(String value) {
+		mStateValue = value;
+	}
+
 	public JSONObject getCriterionJSON() {
 		return mCriterionJSON;
 	}
@@ -63,7 +68,7 @@ public class Condition {
 		return mSourceString;
 	}
 
-	public String getStateValue() {
+	public String getStateTargetValue() {
 		return mStateValue;
 	}
 	

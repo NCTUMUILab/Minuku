@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
@@ -535,6 +536,7 @@ public class ConfigurationManager {
 				/** A stateMapping consists of a set of value crteria and time criteria, which when are met, create a state of the source **/
 				JSONObject stateMappingJSON = stateMappingJSONArray.getJSONObject(i);
 
+				int id = stateMappingJSON.getInt(CONFIGURATION_PROPERTIES_ID);
 				String stateValue = stateMappingJSON.getString(CONDITION_PROPERTIES_STATE);
 				String source = stateMappingJSON.getString(CONDITION_PROPERTIES_SOURCE);
 
@@ -607,7 +609,9 @@ public class ConfigurationManager {
 
 
 				//add criteria to the stateMappingRule
-				StateMappingRule stateMappingRule = new StateMappingRule(contextStateManagerName, sourceType, critera, stateValue);
+				StateMappingRule stateMappingRule = new StateMappingRule(id, contextStateManagerName, sourceType, critera, stateValue);
+
+
 
 				/** 2. Read TimeCriteria for Condition, if there's one  **/
 				if (stateMappingJSON.has(CONDITION_PROPERTIES_TIME_CRITERION)){
@@ -718,14 +722,45 @@ public class ConfigurationManager {
 				situation = new Situation(id, name, study_id);
 				situation.setDescription(description);
 
-				//There could be multiple conditions. So it is a JSONArray
-				String conditionStr = situationJSON.getString(CONFIGURATION_CATEGORY_CONDITIONS);
+				ArrayList<Condition> conditions = new ArrayList<Condition>();
 
-				//get all the numbers in the condition description (e.g. "2", "2 and 4")
-				//this string describes when a situation will be detected. We
-				situation.setConditionStr(conditionStr);
+				String conditionStr  = situationJSON.getString(CONFIGURATION_CATEGORY_CONDITIONS);
 
-				Log.d(LOG_TAG, "[test SMR] sitution " + situation.getName() + " conditionstr: " + conditionStr);
+				String [] ids = conditionStr.split(",");
+
+				//associate situation ids to the monitoring action.
+				for (int j=0; j<ids.length; j++){
+
+
+					int statemappingId = Integer.parseInt(ids[j]);
+
+					Log.d(LOG_TAG, "[test SMR] sitution " + situation.getName() + " trying to find condition for mapping rule " + statemappingId);
+
+					for (int k=0; k<ContextManager.getContextStateManagerList().size(); k++) {
+
+						StateMappingRule rule= ContextManager.getStateMappingRuleList().get(k);
+						//find the statemappingrule so taht we can see which state the condition should be monitoring
+						if (rule.getId()==statemappingId){
+							//find the statemapping rule
+
+							Condition condition = new Condition();
+							condition.setStateName(rule.getName());
+							condition.setSourceType(rule.getSource());
+							condition.setStateTargetValue(rule.getStateValue());
+
+							conditions.add(condition);
+							Log.d(LOG_TAG, "[test SMR] situation  " + situation.getName() +
+									" add condition " + condition.getStateName()  + " source " + condition.getSourceType()
+							  + " " + condition.getStateTargetValue());
+
+
+						}
+
+					}
+				}
+
+
+				Log.d(LOG_TAG, "[test SMR] sitution " + situation.getName() + " has  " + conditions.size() + " conditions ");
 
 
 			} catch (JSONException e1) {

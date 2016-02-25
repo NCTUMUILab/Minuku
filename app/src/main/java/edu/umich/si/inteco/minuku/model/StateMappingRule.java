@@ -33,10 +33,12 @@ public class StateMappingRule {
 
     }
 
-    public StateMappingRule(String contextStateManagerName,
+    public StateMappingRule(int id,
+                            String contextStateManagerName,
                             int source,
                             ArrayList<StateValueCriterion> valueCriteria,
                             String stateValue) {
+        mId = id;
         mContextStateManagerName = contextStateManagerName;
         mValueCriteria = valueCriteria;
         mStateValue =  stateValue;
@@ -83,6 +85,8 @@ public class StateMappingRule {
         }
         return s;
     }
+
+    public int getId() {return mId;};
 
     public String getName() {
         return mName;

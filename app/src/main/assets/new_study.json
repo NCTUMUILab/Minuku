@@ -214,7 +214,7 @@
 						"Id": 3,
 						"Name": "At Home",
 						"Description":"NA",
-						"Conditions":"2 and 4"
+						"Conditions":"2,4"
 				  }				 
 				],
 
