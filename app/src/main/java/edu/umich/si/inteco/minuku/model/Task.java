@@ -2,6 +2,9 @@ package edu.umich.si.inteco.minuku.model;
 
 import java.util.ArrayList;
 
+import edu.umich.si.inteco.minuku.model.Session;
+import edu.umich.si.inteco.minuku.model.Situation;
+
 
 public class Task {
 	

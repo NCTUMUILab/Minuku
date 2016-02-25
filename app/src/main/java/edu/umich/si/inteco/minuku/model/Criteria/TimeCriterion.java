@@ -1,11 +1,9 @@
-package edu.umich.si.inteco.minuku.model;
-
-import edu.umich.si.inteco.minuku.util.ConditionManager;
+package edu.umich.si.inteco.minuku.model.Criteria;
 
 /**
  * Created by Armuro on 10/28/15.
  */
-public class TimeCriterion extends Criterion{
+public class TimeCriterion extends Criterion {
 
 
     //require something to take place in the last certain amount of time
@@ -33,7 +31,7 @@ public class TimeCriterion extends Criterion{
     }
 */
 
-    public TimeCriterion(int measure, int relationship, float targetValue){
+    public TimeCriterion(String measure, String relationship, float targetValue){
         super(measure, relationship, targetValue);
     }
 

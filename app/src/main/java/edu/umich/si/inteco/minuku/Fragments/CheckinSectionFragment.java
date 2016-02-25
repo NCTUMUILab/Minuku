@@ -17,14 +17,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.activities.AnnotateActivity;
 import edu.umich.si.inteco.minuku.context.ContextManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
-import edu.umich.si.inteco.minuku.context.MobilityManager;
 import edu.umich.si.inteco.minuku.model.Checkpoint;
 import edu.umich.si.inteco.minuku.model.Task;
 import edu.umich.si.inteco.minuku.model.actions.SavingRecordAction;

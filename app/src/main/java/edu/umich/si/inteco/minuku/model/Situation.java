@@ -2,13 +2,8 @@ package edu.umich.si.inteco.minuku.model;
 
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
-import edu.umich.si.inteco.minuku.model.actions.Action;
-import edu.umich.si.inteco.minuku.util.ConditionManager;
 import edu.umich.si.inteco.minuku.util.TriggerManager;
 
 public class Situation extends ProbeObject{
@@ -18,6 +13,7 @@ public class Situation extends ProbeObject{
     private String mName;
     private String mDescription="NA";
     private ArrayList<Condition> mConditionList;
+	private String mConditionStr = null;   // e.g. "2",  "2 and 4"
 
     public Situation(String name){
     	super();
@@ -86,6 +82,15 @@ public class Situation extends ProbeObject{
     public void setConditionList(ArrayList<Condition> ConditionList ){
     	mConditionList = ConditionList;
     }
+
+	public void setConditionStr(String string){
+		mConditionStr = string;
+	}
+
+	public String getConditionStr() {
+
+		return mConditionStr;
+	}
     
     public ArrayList<Condition> getConditionList(){
     	return mConditionList;

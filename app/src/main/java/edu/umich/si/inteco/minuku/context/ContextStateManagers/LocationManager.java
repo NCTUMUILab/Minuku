@@ -66,6 +66,13 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
     private static long sUpdateIntervalInMilliSeconds = UPDATE_INTERVAL_IN_MILLISECONDS;
 
     public static final String STRING_CONTEXT_SOURCE_LOCATION = "Location";
+    public static final String STRING_CONTEXT_SOURCE_GEOFENCE = "Geofence";
+
+    /**for situation monitoring**/
+    public static final String CONTEXT_SOURCE_MEASURE_GEOFENCE = "Geofence";
+    public static final String CONTEXT_SOURCE_MEASURE_CURRENT_DISTANCE_FROM_LOCAITON = "CurDistFromLoc";
+
+    public static final String CONTEXT_SOURCE_CRITERIA_LOCAITON = "Loc";
 
 
     /**Properties for Record**/
@@ -79,6 +86,7 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
     public static final String RECORD_DATA_PROPERTY_EXTRAS = "Extras";
 
     public static final int CONTEXT_SOURCE_LOCATION = 0;
+    public static final int CONTEXT_SOURCE_GEOFENCE = 1;
 
     /** KeepAlive **/
     protected int KEEPALIVE_MINUTE = 5;
@@ -143,8 +151,6 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
     /** each ContextStateManager should override this static method
      * it adds a list of ContextSource that it will manage **/
     protected void setUpContextSourceList(){
-
-        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager. mContextSource:  " + mContextSourceList);
 
         boolean isAvailable;
 
@@ -506,12 +512,31 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
 
     public static int getContextSourceTypeFromName(String sourceName) {
-        return -1;
+
+        switch (sourceName){
+
+            case STRING_CONTEXT_SOURCE_LOCATION:
+                return CONTEXT_SOURCE_LOCATION;
+            case STRING_CONTEXT_SOURCE_GEOFENCE:
+                return CONTEXT_SOURCE_GEOFENCE;
+            //the default is most probable activities
+            default:
+                return CONTEXT_SOURCE_LOCATION;
+        }
     }
 
     public static String getContextSourceNameFromType(int sourceType) {
 
-        return "NA";
+        switch (sourceType){
+
+            case CONTEXT_SOURCE_LOCATION:
+                return STRING_CONTEXT_SOURCE_LOCATION;
+            case CONTEXT_SOURCE_GEOFENCE:
+                return STRING_CONTEXT_SOURCE_GEOFENCE;
+            default:
+                return STRING_CONTEXT_SOURCE_LOCATION;
+
+        }
     }
 
 }

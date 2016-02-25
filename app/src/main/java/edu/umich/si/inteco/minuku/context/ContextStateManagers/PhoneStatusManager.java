@@ -34,7 +34,6 @@ import java.util.TreeMap;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
 import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
@@ -104,11 +103,11 @@ public class PhoneStatusManager extends ContextStateManager {
     public static final int CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY = 3;
     public static final int CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY = 4;
 
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE = "PhoneStatus-AppUsage";
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER = "PhoneStatus-Ringer";
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY = "PhoneStatus-Battery";
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY = "PhoneStatus-Telephony";
-    public static final String CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY = "PhoneStatus-Connectivity";
+    public static final String STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE = "PhoneStatus-AppUsage";
+    public static final String STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER = "PhoneStatus-Ringer";
+    public static final String STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY = "PhoneStatus-Battery";
+    public static final String STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY = "PhoneStatus-Telephony";
+    public static final String STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY = "PhoneStatus-Connectivity";
 
     public static final String SOURCE_TYPE_APP_STRING ="app" ;
 
@@ -276,7 +275,7 @@ public class PhoneStatusManager extends ContextStateManager {
         //app usage
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE,
+                        STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE,
                         CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE,
                         true,
                         mainThreadUpdateFrequencyInMilliseconds));
@@ -284,7 +283,7 @@ public class PhoneStatusManager extends ContextStateManager {
         //ringer
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER,
+                        STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER,
                         CONTEXT_SOURCE_PHONE_STATUS_RINGER,
                         true,
                         mainThreadUpdateFrequencyInMilliseconds));
@@ -292,21 +291,21 @@ public class PhoneStatusManager extends ContextStateManager {
         //battery. the update is pushed by the batterystatusreceiver. so there's no frequency update
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY,
+                        STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY,
                         CONTEXT_SOURCE_PHONE_STATUS_BATTERY,
                         true));
 
         //telephony.  the update is pushed by the phone telephnony listener. so there's no frequency update
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY,
+                        STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY,
                         CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY,
                         true));
 
         //connectivity
         mContextSourceList.add(
                 new ContextSource(
-                        CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY,
+                        STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY,
                         CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY,
                         true,
                         mainThreadUpdateFrequencyInMilliseconds));
@@ -351,7 +350,7 @@ public class PhoneStatusManager extends ContextStateManager {
         JSONObject data = new JSONObject();
         JSONArray array = new JSONArray();
 
-        if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE)) {
+        if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE)) {
 
             try {
 
@@ -377,7 +376,7 @@ public class PhoneStatusManager extends ContextStateManager {
 
         }
 
-        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER)) {
+        else if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER)) {
 
             try {
                 data.put(RECORD_DATA_PROPERTY_RINGER_MODE, mRingerMode);
@@ -394,7 +393,7 @@ public class PhoneStatusManager extends ContextStateManager {
 
         }
 
-        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY)) {
+        else if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY)) {
 
             try {
 
@@ -418,7 +417,7 @@ public class PhoneStatusManager extends ContextStateManager {
             }
         }
 
-        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY)){
+        else if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY)){
 
             try {
                 data.put(RECORD_DATA_PROPERTY_CONNECTIVITY_NETWORK_TYPE, mNetworkType);
@@ -435,7 +434,7 @@ public class PhoneStatusManager extends ContextStateManager {
 
         }
 
-        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY)) {
+        else if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY)) {
 
             try {
 
@@ -509,21 +508,21 @@ public class PhoneStatusManager extends ContextStateManager {
 
         mCurrentlyRequestedContextSourceList.add(source);
 
-        if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE)) {
+        if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE)) {
             //we need to check whether we have permission to get app usage.
             requestAppUsageUpdate();
         }
-        else if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY)) {
+        else if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY)) {
             requestBatteryUpdate();
             //todo: get battery update
         }
-        else if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY)) {
+        else if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY)) {
             //we don't do anything because connectivity sources are pull instead of push
         }
-        else if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER)) {
+        else if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER)) {
             //we don't do anything because connectivity sources are pull instead of push
         }
-        else if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY)) {
+        else if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY)) {
             requestTelephonyUpdate();
         }
 
@@ -538,20 +537,20 @@ public class PhoneStatusManager extends ContextStateManager {
 
         mCurrentlyRequestedContextSourceList.remove(source);
 
-        if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE)) {
+        if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE)) {
             //we don't do anything because connectivity sources are pull instead of push
         }
-        else if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY)) {
+        else if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY)) {
             removeBatteryUpdate();
 
         }
-        else if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY)) {
+        else if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY)) {
             //we don't do anything because connectivity sources are pull instead of push
         }
-        else if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER)) {
+        else if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER)) {
             //we don't do anything because connectivity sources are pull instead of push
         }
-        else if (source.getName().equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY)) {
+        else if (source.getName().equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY)) {
             removeTelephonyUpdate();
         }
 
@@ -634,12 +633,12 @@ public class PhoneStatusManager extends ContextStateManager {
             public void run() {
 
 
-                Log.d(LOG_TAG, "[test source being requested] app: " + isContextSourceInCurrentRequestedList(CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE)
-                 +  " connectivity " + isContextSourceInCurrentRequestedList(CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY)
-                +  " ringer " + isContextSourceInCurrentRequestedList(CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER ));
+                Log.d(LOG_TAG, "[test source being requested] app: " + isContextSourceInCurrentRequestedList(STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE)
+                 +  " connectivity " + isContextSourceInCurrentRequestedList(STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY)
+                +  " ringer " + isContextSourceInCurrentRequestedList(STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER ));
 
                 //get app usage update
-                if(isContextSourceInCurrentRequestedList(CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE)){
+                if(isContextSourceInCurrentRequestedList(STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE)){
 
                     //get screen data
                     getScreenStatus();
@@ -648,38 +647,38 @@ public class PhoneStatusManager extends ContextStateManager {
                     getAppUsageUpdate();
 
                     //save
-                    saveRecordToLocalRecordPool(CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE);
+                    saveRecordToLocalRecordPool(STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE);
                 }
 
                 //get network update
-                if(isContextSourceInCurrentRequestedList(CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY)){
+                if(isContextSourceInCurrentRequestedList(STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY)){
                     getNetworkConnectivityUpdate();
 
                     //save
-                    saveRecordToLocalRecordPool(CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY);
+                    saveRecordToLocalRecordPool(STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY);
                 }
 
                 //get ringer update
-                if(isContextSourceInCurrentRequestedList(CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER)) {
+                if(isContextSourceInCurrentRequestedList(STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER)) {
                     getAudioRingerUpdate();
 
                     //save
-                    saveRecordToLocalRecordPool(CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER);
+                    saveRecordToLocalRecordPool(STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER);
                 }
 
 
-                if (isContextSourceInCurrentRequestedList(CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY)) {
+                if (isContextSourceInCurrentRequestedList(STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY)) {
 
                     //we don't save telephony records every time we get a change because if updates too frequently
-                    saveRecordToLocalRecordPool(CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY);
+                    saveRecordToLocalRecordPool(STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY);
 
                 }
 
 
-                if (isContextSourceInCurrentRequestedList(CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY)) {
+                if (isContextSourceInCurrentRequestedList(STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY)) {
 
                     //we don't save battery records every time we get a change because if updates too frequently
-                    saveRecordToLocalRecordPool(CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY);
+                    saveRecordToLocalRecordPool(STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY);
 
                 }
 
@@ -753,7 +752,7 @@ public class PhoneStatusManager extends ContextStateManager {
 
         }
 
-        Log.d(LOG_TAG, "test source being requested [testing app] SCREEN:  " + mScreenStatus );
+        Log.d(LOG_TAG, "test source being requested [testing app] SCREEN:  " + mScreenStatus);
     }
 
 
@@ -872,33 +871,7 @@ public class PhoneStatusManager extends ContextStateManager {
 
 //        Log.d(LOG_TAG, "[setCurrentForegroundActivityAndPackage] the current running package mIs " + mLastestForegroundActivity + " and the activity mIs " + mLastestForegroundPackage);
     }
-
-
-    //TODO: complete the source type table
-    public static int getContextSourceTypeFromName(String sourceName) {
-
-        switch (sourceName){
-
-            case SOURCE_TYPE_APP_STRING:
-                return SOURCE_TYPE_APP;
-            default:
-                return -1;
-        }
-    }
-
-    public static String getContextSourceNameFromType(int sourceType) {
-
-        switch (sourceType){
-
-            case SOURCE_TYPE_APP:
-                return SOURCE_TYPE_APP_STRING;
-            default:
-                return "NA";
-
-        }
-    }
-
-
+    
 
     public void updateStateValues() {
 
@@ -1217,15 +1190,15 @@ public class PhoneStatusManager extends ContextStateManager {
     /**Database table name should be defined by each ContextStateManager. So each CSM should overwrite this**/
     public static String getDatabaseTableNameBySourceName (String sourceName) {
 
-        if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_BATTERY))
+        if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY))
             return RECORD_TABLE_NAME_BATTERY;
-        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_APPUSAGE))
+        else if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE))
             return RECORD_TABLE_NAME_APPUSAGE;
-        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_CONNECTIVITY))
+        else if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY))
             return RECORD_TABLE_NAME_CONNECTIVITY;
-        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_TELEPHONY))
+        else if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY))
             return RECORD_TABLE_NAME_TELEPHONY;
-        else if (sourceName.equals(CONTEXT_SOURCE_STRING_PHONE_STATUS_RINGER))
+        else if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER))
             return RECORD_TABLE_NAME_RINGER;
         else
             return null;
@@ -1263,6 +1236,49 @@ public class PhoneStatusManager extends ContextStateManager {
             return PHONE_SIGNAL_TYPE_SIP;
         else
             return ContextManager.CONTEXT_SOURCE_INVALID_VALUE_STRING;
+    }
+
+
+
+    public static int getContextSourceTypeFromName(String sourceName) {
+
+        switch (sourceName){
+
+            case STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE:
+                return CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE;
+            case STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY:
+                return CONTEXT_SOURCE_PHONE_STATUS_BATTERY;
+            case STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY:
+                return CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY;
+            case STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER:
+                return CONTEXT_SOURCE_PHONE_STATUS_RINGER;
+            case STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY:
+                return CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY;
+            
+            //the default is most probable activities
+            default:
+                return -1;
+        }
+    }
+
+    public static String getContextSourceNameFromType(int sourceType) {
+
+        switch (sourceType){
+
+            case CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE:
+                return STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE;
+            case CONTEXT_SOURCE_PHONE_STATUS_BATTERY:
+                return STRING_CONTEXT_SOURCE_PHONE_STATUS_BATTERY;
+            case CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY:
+                return STRING_CONTEXT_SOURCE_PHONE_STATUS_CONNECTIVITY;
+            case CONTEXT_SOURCE_PHONE_STATUS_RINGER:
+                return STRING_CONTEXT_SOURCE_PHONE_STATUS_RINGER;
+            case CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY:
+                return STRING_CONTEXT_SOURCE_PHONE_STATUS_TELEPHONY;
+            default:
+                return null;
+
+        }
     }
 
 }

@@ -27,7 +27,7 @@ import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
-import edu.umich.si.inteco.minuku.model.StateValueCriterion;
+import edu.umich.si.inteco.minuku.model.Criteria.StateValueCriterion;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.TriggerManager;
@@ -128,7 +128,9 @@ public class ContextManager {
 
     public static ArrayList<Integer> RECORD_TYPE_LIST;
 
-    private static ArrayList<Situation> mCircumstanceList;
+    private static ArrayList<Situation> mSituationList;
+
+    private static ArrayList<StateMappingRule> mStateMappingRuleList;
 
     private static ArrayList<LoggingTask> mLoggingTaskList;
 
@@ -168,7 +170,9 @@ public class ContextManager {
 
         mContextStateMangers = new ArrayList<ContextStateManager>();
 
-        mCircumstanceList = new ArrayList<Situation>();
+        mSituationList = new ArrayList<Situation>();
+
+        mStateMappingRuleList  = new ArrayList<StateMappingRule>();
 
         mLoggingTaskList = new ArrayList<LoggingTask>();
 
@@ -437,58 +441,75 @@ public class ContextManager {
      */
     public void assignTasksToContextStateManager() {
 
-        Log.d(LOG_TAG, "[assignTasksToContextStateManager] ");
-
-        Log.d(LOG_TAG, "[assignTasksToContextStateManager] circumstance:  " + getCircumstanceList().size()
+        Log.d(LOG_TAG, "[test situation] situation:  " + getSituationList().size()
          + " loggingTaskssize " + mLoggingTaskList.size());
 
-        /**1. assign monitoring task to contextStateManagers **/
-        for (int i=0; i<getCircumstanceList().size(); i++){
+        /**
+         * 1. assign monitoring task to contextStateManagers
+         * **/
+        for (int i=0; i< getSituationList().size(); i++){
 
             //creating StateMappingRule and add to the relevant ContextStateManagers
-            Situation circumstance = getCircumstanceList().get(i);
-
-            //get conditions in each circumstance
-            for (int j=0; j< circumstance.getConditionList().size(); j++) {
-
-                Condition condition = circumstance.getConditionList().get(j);
-
-                //for each condition, we need to know which ContextStateManager will need to generate a state
-                // for that condition.
-                String contextStateManagerName = getContextStateManagerName(condition.getSource());
-
-                //we give contextStateManager a list of criteria for each state.
-                ArrayList<StateValueCriterion> criteria = condition.getStateValueCriteria();
-
-                //If the criteria are met, it changes the state to the value
-                String stateValue = condition.getStateValue();
-
-                Log.d(LOG_TAG, "[assignTasksToContextStateManager] condition for " + contextStateManagerName
-                        + " source: " + condition.getSource() );
-
-                int sourceType = getSourceTypeFromName(contextStateManagerName, condition.getSource());
-
-                //condition originall saves string of source, becuase it is specified by users. We need to
-                //find the corresponding source type.
-                Log.d(LOG_TAG, "[assignTasksToContextStateManager] condition for " + contextStateManagerName
-                        + " source: " + condition.getSource() + " soucetype: " +
-                        getSourceTypeFromName(contextStateManagerName, condition.getSource()));
-
-                //generate a sateMappingRule for the ContextStateManager to use to monitor the state
-                StateMappingRule rule = new StateMappingRule(contextStateManagerName, sourceType, criteria, stateValue);
+            Situation situation = getSituationList().get(i);
 
 
-                //then we update condition so that it remembers source types in the future.
-                condition.setSourceType(sourceType);
-                //it also remembers which state is monitors.
-                condition.setStateName(rule.getName());
+            /**2  Use Situation conditons list to know which state mapping is used **/
 
-                Log.d(LOG_TAG, "[assignTasksToContextStateManager] adding a rule:" +
-                        "the rule is: " + rule.toString() + " is for " + contextStateManagerName);
 
-                assignMonitoringTasks(contextStateManagerName, rule);
 
-            }
+           /**3  get those statemapping rules from the mStateMappingRuleList, and then associate condition with those states **/
+
+
+
+           /**4 assign contextStateManager the statemappingrule **/
+
+
+
+//            //get conditions in each situation
+//            for (int j=0; j< situation.getConditionList().size(); j++) {
+//
+//                Condition condition = situation.getConditionList().get(j);
+//
+//                //for each condition, we need to know which ContextStateManager will need to generate a state
+//                // for that condition.
+//                String contextStateManagerName = getContextStateManagerName(condition.getSource());
+//
+//                //we give contextStateManager a list of criteria for each state.
+//                ArrayList<StateValueCriterion> criteria = condition.getStateValueCriteria();
+//
+//                //If the criteria are met, it changes the state to the value
+//                String stateValue = condition.getStateValue();
+//
+//                //we get the source type from the ContextStateManager
+//                int sourceType = getSourceTypeFromName(contextStateManagerName, condition.getSource());
+//
+//                //condition originally saves string of source, because it is specified by users. We need to
+//                //find the corresponding source type in Int.
+//                Log.d(LOG_TAG, "[test situation] condition for " + contextStateManagerName
+//                        + " source: " + condition.getSource() + " soucetype: " +
+//                        getSourceTypeFromName(contextStateManagerName, condition.getSource())
+//                        + " if met, the state value is " + stateValue );
+//
+//                Log.d(LOG_TAG, "[test situation]  criteria " + condition.getStateValueCriteria().toString());
+//                Log.d(LOG_TAG, "[test situation]  time criteria " + condition.getTimeCriteria().toString());
+//
+//
+//                //generate a sateMappingRule for the ContextStateManager to use to monitor the state
+//                StateMappingRule rule = new StateMappingRule(contextStateManagerName, sourceType, criteria, stateValue);
+//
+//
+//                //then we update condition so that it remembers source types and state name in the future.
+//                condition.setSourceType(sourceType);
+//                //it also remembers which state is monitors.
+//                condition.setStateName(rule.getName());
+//
+//                Log.d(LOG_TAG, "[test situation] adding a rule:" +
+//                        "the rule is: " + rule.toString() + " is for " + contextStateManagerName + " the name is " + rule.getName()
+//                 + " and the statename is " + condition.getStateName() );
+//
+//                assignMonitoringSituationTask(contextStateManagerName, rule);
+//
+//            }
 
         }
 
@@ -795,18 +816,18 @@ public class ContextManager {
         //check if the loggintask is still in a BackgroundLogging
         if (getBackgroundLoggingSetting().isEnabled() && getBackgroundLoggingSetting().getLoggingTasks().contains(loggingTask.getId())){
             isPerformedByBackgroundLogging = true;
-//            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is included in BackgroundRecording " );
+           Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is included in BackgroundRecording " );
 
         }
 
         //check if the loggingtask is requested by an action
         if (mLoggingTaskByActionList.contains(loggingTask.getId())){
-//            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is performed by an Action " );
+            Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " is performed by an Action " );
             isPerformedByAction = true;
         }
 
         isRequested = isPerformedByAction | isPerformedByBackgroundLogging;
-//        Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " should be enabled!! " );
+        Log.d(LOG_TAG, " [testing logging task and requested] " + loggingTask.getSource() + " should be enabled!! " );
 
 
         if (isRequested){
@@ -826,8 +847,8 @@ public class ContextManager {
      */
     private void enableLoggingTask(String contextStateManagerName, LoggingTask loggingTask) {
 
-//        Log.d(LOG_TAG, " [testing logging task and requested] enable logging task: " +
-//                loggingTask.getSource() + " to " + contextStateManagerName);
+        Log.d(LOG_TAG, " [testing logging task and requested] enable logging task: " +
+                loggingTask.getSource() + " to " + contextStateManagerName);
 //
 //        //to execute a logging task is to set its Enagled to True.
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
@@ -976,62 +997,68 @@ public class ContextManager {
      * ContextMAnager assigns  the task to the right contextStateManagers
      * @param contextStateManagerName
      */
-    private void assignMonitoringTasks(String contextStateManagerName, StateMappingRule rule) {
+    private void assignMonitoringSituationTask(String contextStateManagerName, StateMappingRule rule) {
 
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
             mActivityRecognitionManager.addStateMappingRule(rule);
         else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_STATUS))
             mPhoneStatusManager.addStateMappingRule(rule);
-
-        //TODO: add more contextStateManager
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_LOCATION))
+            mLocationManager.addStateMappingRule(rule);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_PHONE_SENSOR))
+            mPhoneSensorManager.addStateMappingRule(rule);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_TRANSPORTATION))
+            mTransportationModeManager.addStateMappingRule(rule);
+        else if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_USER_INTERACTION))
+            mUserInteractionManager.addStateMappingRule(rule);
 
     }
 
 
-    private static ArrayList<Situation> getRelatedCircumstance(State state) {
+    private static ArrayList<Situation> getRelatedSituation(State state) {
 
-        ArrayList<Situation> circumstances = new ArrayList<Situation>();
+        ArrayList<Situation> situations = new ArrayList<Situation>();
 
-        //we find any circumstance that uses the state
-        for (int i=0; i<getCircumstanceList().size(); i++){
-            if (getCircumstanceList().get(i).isUsingState(state)){
-                //we find any condition in the circumstance using the state, so we add that circumstance.
-                circumstances.add(getCircumstanceList().get(i));
+        //we find any situation that uses the state
+        for (int i=0; i< getSituationList().size(); i++){
+            if (getSituationList().get(i).isUsingState(state)){
+                //we find any condition in the situation using the state, so we add that situation.
+                situations.add(getSituationList().get(i));
             }
         }
 
-        //at the end we returns a list of circumstances that involve using the state.
-        return circumstances;
+        //at the end we returns a list of situations that involve using the state.
+        return situations;
 
     }
 
     /**
      * This function receives notifications from ContextSTateManager about a value change of a state,
-     * It then examines any circumstances of which conditions involve using the value of the state, and determines whether a
-     * specified circumstance has occurred.
+     * It then examines any sitautions of which conditions involve using the value of the state, and determines whether a
+     * specified sitaution has occurred.
      * @param state
      */
-    public static void examineCircumstances(State state) {
+    public static void examineSituations(State state) {
 
         /**get any conditions that use the state. **/
 
         Log.d(LOG_TAG, "[examineCircumstanceConditions]");
 
-        ArrayList<Situation> relatedCircumstances = getRelatedCircumstance (state);
+        ArrayList<Situation> relatedCircumstances = getRelatedSituation(state);
 
-        Log.d(LOG_TAG, "[examineCircumstanceConditions] there are " + relatedCircumstances.size() + " circumstances monitoring the state");
+        Log.d(LOG_TAG, "[examineCircumstanceConditions] there are " + relatedCircumstances.size() + " sitautions monitoring the state");
 
-        //for each circumstance, get all of the conditions, and check whether the condition has been met.
+        //for each sitaution, get all of the conditions, and check whether the condition has been met.
         for (int i=0; i < relatedCircumstances.size(); i++) {
 
-            Situation circumstance = relatedCircumstances.get(i);
+            Situation sitaution = relatedCircumstances.get(i);
 
-            Log.d(LOG_TAG, "[examineCircumstanceConditions] now check circumstance " + circumstance.getName());
+            Log.d(LOG_TAG, "[examineCircumstanceConditions] now check sitaution " + sitaution.getName());
 
-            /** an circumstance contains a set of conditions. An circumstance occurs only when all conditions are met **/
+            /** an sitaution contains a set of conditions. An sitaution occurs only when all conditions are met **/
             boolean pass = true;
 
-            ArrayList<Condition> conditions = circumstance.getConditionList();
+            ArrayList<Condition> conditions = sitaution.getConditionList();
 
             //we use "&" operation for all condition. As long as there is one false for one condition
             //pass is false.
@@ -1039,28 +1066,28 @@ public class ContextManager {
                     Condition condition = conditions.get(j);
                     //the final pass is true only when all the conditions are true.
                     pass = pass & state.getValue().equals(condition.getStateValue());
-                    Log.d(LOG_TAG, "[examineCircumstanceConditions] now the circumstance's condition:  " +condition.getStateName() +
+                    Log.d(LOG_TAG, "[examineCircumstanceConditions] now the sitaution's condition:  " +condition.getStateName() +
                     "-" +condition.getStateValue() + " pasS: " + pass);
 
                 }
 
-            /** for any circumstance for which the conditions are true, we let TriggerManager to see which action/action control to trigger.**/
+            /** for any sitaution for which the conditions are true, we let TriggerManager to see which action/action control to trigger.**/
 
-            //if the conditions of the circumstance is satisfied.
+            //if the conditions of the sitaution is satisfied.
             if (pass) {
 
-                //log when an circumstance is detected
+                //log when an sitaution is detected
                 LogManager.log(LogManager.LOG_TYPE_SYSTEM_LOG,
                         LogManager.LOG_TAG_EVENT_DETECTED,
-                        "Situation detected:\t" + circumstance.getId() + "\t" + circumstance.getName());
+                        "Situation detected:\t" + sitaution.getId() + "\t" + sitaution.getName());
 
-                //check the triggerlinks of the current circumstance to see if it would trigger anything.
-                Log.d(LOG_TAG, "[examineCircumstanceConditions] The circumstance " + circumstance.getId() + "  condition is satisfied, check its triggerLinks! "
-                        + " the circumstance has " + circumstance.getTriggerLinks().size() + " triggerlinks ");
+                //check the triggerlinks of the current sitaution to see if it would trigger anything.
+                Log.d(LOG_TAG, "[examineCircumstanceConditions] The sitaution " + sitaution.getId() + "  condition is satisfied, check its triggerLinks! "
+                        + " the sitaution has " + sitaution.getTriggerLinks().size() + " triggerlinks ");
 
-                //the circumstance will trigger something, we call TriggerManager to manage its trigger.
-                if (circumstance.getTriggerLinks().size() > 0) {
-                    TriggerManager.executeTriggers(circumstance.getTriggerLinks());
+                //the sitaution will trigger something, we call TriggerManager to manage its trigger.
+                if (sitaution.getTriggerLinks().size() > 0) {
+                    TriggerManager.executeTriggers(sitaution.getTriggerLinks());
                 }
             }
 
@@ -1070,30 +1097,33 @@ public class ContextManager {
     }
 
 
-
-    public static void addCircumstance(Situation circumstance){
-        if (mCircumstanceList ==null){
-            mCircumstanceList = new ArrayList<Situation>();
+    public static void addSituation(Situation situation){
+        if (mSituationList ==null){
+            mSituationList = new ArrayList<Situation>();
         }
-        mCircumstanceList.add(circumstance);
+        mSituationList.add(situation);
     }
 
 
-    public static void removeCircumstance(Situation circumstance){
-        if (mCircumstanceList !=null){
-            mCircumstanceList.remove(circumstance);
+    public static void removeSituation(Situation sitaution){
+        if (mSituationList !=null){
+            mSituationList.remove(sitaution);
         }
     }
 
-    public static void removeCircumstance(int index){
-        if (mCircumstanceList !=null){
-            mCircumstanceList.remove(index);
+    public static void removeSituation(int index){
+        if (mSituationList !=null){
+            mSituationList.remove(index);
         }
     }
 
 
-    public static ArrayList<Situation> getCircumstanceList(){
-        return mCircumstanceList;
+    public static ArrayList<StateMappingRule> getStateMappingRuleList(){return mStateMappingRuleList;}
+
+    public static void addStateMappingRule (StateMappingRule stateMappingRule) {mStateMappingRuleList.add(stateMappingRule);};
+
+    public static ArrayList<Situation> getSituationList(){
+        return mSituationList;
     }
 
     /**
@@ -1139,7 +1169,7 @@ public class ContextManager {
     }
 
 
-    private static String getContextStateManagerName(String source) {
+    public static String getContextStateManagerName(String source) {
 
         String name = null;
 
@@ -1165,6 +1195,9 @@ public class ContextManager {
 
         else if (source.contains(CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX) ) {
             return CONTEXT_STATE_MANAGER_PHONE_STATUS;
+        }
+        else if (source.contains(CONTEXT_SOURCE_NAME_USER_INTERACTION_PREFIX) ) {
+            return CONTEXT_STATE_MANAGER_USER_INTERACTION;
         }
 
 

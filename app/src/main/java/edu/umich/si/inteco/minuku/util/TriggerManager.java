@@ -142,9 +142,9 @@ public class TriggerManager {
             if ( trigger_class.equals(PROBE_OBJECT_CLASS_EVENT)   ){
 
                 //find the event as the trigger
-                for (int j = 0; j< ContextManager.getCircumstanceList().size(); j++){
+                for (int j = 0; j< ContextManager.getSituationList().size(); j++){
 
-                    Situation circumstance = ContextManager.getCircumstanceList().get(j);
+                    Situation circumstance = ContextManager.getSituationList().get(j);
 
                     //use the trigger id and study id to find the event ( different events in a different study may have a same event id in their own study)
                     //the eventlist in the eventMonitor stores the events in all studies. So we need to use event id and study id together to identify the correct event

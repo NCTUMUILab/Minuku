@@ -93,8 +93,6 @@ public class GeofenceManager implements ConnectionCallbacks, OnConnectionFailedL
 
 
 
-
-
     }
 
     protected synchronized void buildGoogleApiClient() {

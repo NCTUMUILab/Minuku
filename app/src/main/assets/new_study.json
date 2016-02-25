@@ -33,13 +33,122 @@
 
 			  ],
 
+			  "ContextSourceState":
+			  [
+
+				{
+					"Id":1,
+				  	"State":"Use Phone",
+				  	"Source": "AR-MostProbableActivity",
+					"Value_Criteria": [
+						{
+							"Measure":"LatestValue",
+							"Relationship":"Equal",
+							"TargetValue": "tilting"
+						}
+					],				
+					"Time_Criteria": [
+						{
+							"Measure": "recency",
+							"Relationship": "<=", 
+							"TargetValue": 5 
+						}
+					]
+				},
+				{
+					"Id":2,
+					"State": "Phone Still for a period",
+					"Source": "AR-MostProbableActivity",
+					"Value_Criteria": [
+					  {
+					  	"Measure":"LatestValue",
+					  	"Relationship":"Equal",
+						"TargetValue": "still"
+					  }
+					],
+					"Time_Criteria": [
+					  {
+						"Measure": "duration",
+						"Relationship": ">",
+						"TargetValue": 30
+					  }
+					]
+				},
+			  	{
+			  		"Id":3,
+					"State": "Use Facdbook",
+					"Source": "PhoneStatus-AppUsage",
+					"Value_Criteria": [
+					  {
+					  	"Measure":"LatestValue",
+					  	"Relationship":"Equal",
+						"TargetValue": "Facebook"
+					  }
+					],
+					"Time_Criteria": [
+					  {
+						"Measure": "duration",
+						"Relationship": ">",
+						"TargetValue": 2
+					  }
+					]
+				},
+				{
+					"Id":4,
+					"State": "At Home",
+					"Source": "Location",
+					"Value_Criteria": [
+					  {
+					  	"Measure":"CurDistFromLoc",
+					  	"Params":
+					  	[
+					  		"42.294134, -83.701227"
+					  	],
+					  	"Relationship": "<=",
+						"TargetValue": 100
+					  }
+					],
+					"Time_Criteria": [
+					  {
+						"Measure": "duration",
+						"Relationship": ">",
+						"TargetValue": 2
+					  }
+					]
+				},
+				{
+					"Id":5,
+					"State": "Office",
+					"Source": "Location",
+					"Value_Criteria": [
+					  {
+					  	"Measure":"CurDistFromLoc",
+					  	"Params":
+					  	[
+					  		"42.280708, -83.740031"
+					  	],
+					  	"Relationship": "<=",
+						"TargetValue": 100
+					  }
+					],
+					"Time_Criteria": [
+					  {
+						"Measure": "duration",
+						"Relationship": ">",
+						"TargetValue": 2
+					  }
+					]
+				  }
+			  ],
+
+			 
 			  "Backend":
 			  {
 				"Service": "MongoLab",
 				"Database_type":"NoSQL",
 				"Database_name":"testing",
 				"Server_url":"https://api.mongolab.com/api/1/databases/",
-				"Server_api":"3z6I1uChYEVs0DKMBF_d-B_lUsRIlsmf"
+				"Server_api":"FWFpLv7XFkbNeOnescJOFntgCrnHOiQR"
 			  },
 
 			  "BackgroundLogging":{
@@ -83,113 +192,30 @@
 					"Source": "PhoneStatus-Telephony"
 				  },
 				  {
-				  "Id": 11,
-				  "Source": "PhoneStatus-AppUsage"
+					"Id": 11,
+					"Source": "PhoneStatus-AppUsage"
 				  }
 				],
-				"Circumstances":
+				"Situations":
 				[
-					{
+				  {
 						"Id": 1,
-						"Task_id": 1,
-						"Name": "Using the phone at NQ",
+						"Name": "No attention on the phone",
+						"Description": "NA",
+						"Conditions":"2"
+				  },
+				  {
+						"Id": 2,
+						"Name": "Using Facebook",
 						"Description":"NA",
-						"Conditions":
-						[
-							{
-							  	"State":"Use Phone",
-							  	"Source": "AR-MostProbableActivity",
-								"Value_Criteria": [
-									{
-										"TargetValue": "tilting"
-									}
-								],				
-								"Time_Criteria": [
-									{
-										"Measure": "recency",
-										"Relationship": "<=", 
-										"TargetValue": 5 
-									}
-								]
-							}						
-						]
-					},
-				  {
-					"Id": 2,
-					"Task_id": 1,
-					"Name": "No attention on the phone",
-					"Description": "NA",
-					"Conditions": [
-					  {
-						"State": "Phone Still for a period",
-						"Source": "AR-MostProbableActivity",
-						"Value_Criteria": [
-						  {
-							"TargetValue": "still"
-						  }
-						],
-						"Time_Criteria": [
-						  {
-							"Measure": "duration",
-							"Relationship": ">",
-							"TargetValue": 30
-						  }
-						]
-					  }
-					]
+						"Conditions":"3"
 				  },
 				  {
-					"Id": 3,
-					"Task_id": 1,
-					"Name": "Using Facebook",
-					"Description":"NA",
-					"Conditions":
-					[
-					  {
-
-						"State": "Use Facdbook",
-						"Source": "PhoneStatus-AppUsage",
-						"Value_Criteria": [
-						  {
-							"TargetValue": "Facebook"
-						  }
-						],
-						"Time_Criteria": [
-						  {
-							"Measure": "duration",
-							"Relationship": ">",
-							"TargetValue": 5
-						  }
-						]
-					  }
-					]
-				  },
-				  {
-					"Id": 4,
-					"Task_id": 1,
-					"Name": "In Office",
-					"Description":"NA",
-					"Conditions":
-					[
-					  {
-
-						"State": "Use Facdbook",
-						"Source": "Location",
-						"Value_Criteria": [
-						  {
-							"TargetValue": "42.280708, -83.740031"
-						  }
-						],
-						"Time_Criteria": [
-						  {
-							"Measure": "duration",
-							"Relationship": ">",
-							"TargetValue": 2
-						  }
-						]
-					  }
-					]
-				  }
+						"Id": 3,
+						"Name": "At Home",
+						"Description":"NA",
+						"Conditions":"2 and 4"
+				  }				 
 				],
 
 				"Actions":[

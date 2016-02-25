@@ -1,13 +1,11 @@
 package edu.umich.si.inteco.minuku.model;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
+import edu.umich.si.inteco.minuku.model.Criteria.StateValueCriterion;
+import edu.umich.si.inteco.minuku.model.Criteria.TimeCriterion;
 
 /**
  * Created by Armuro on 10/9/15.
@@ -27,8 +25,9 @@ public class StateMappingRule {
 
     private String mStateValue;
 
-    private ArrayList<StateValueCriterion> mCriteria;
+    private ArrayList<StateValueCriterion> mValueCriteria;
 
+    private ArrayList<TimeCriterion> mTimeCriteria;
 
     public StateMappingRule() {
 
@@ -36,23 +35,38 @@ public class StateMappingRule {
 
     public StateMappingRule(String contextStateManagerName,
                             int source,
-                            ArrayList<StateValueCriterion> criteria,
+                            ArrayList<StateValueCriterion> valueCriteria,
                             String stateValue) {
         mContextStateManagerName = contextStateManagerName;
+        mValueCriteria = valueCriteria;
         mStateValue =  stateValue;
-        mCriteria = criteria;
         mSource  = source;
 
+        //the name is "source + statevalue + criteria". we make is quite complex so that the rule name will not repeat.
         setName();
     }
 
 
     public ArrayList<StateValueCriterion> getCriteria() {
-        return mCriteria;
+        return mValueCriteria;
     }
 
-    public void setCriteria(ArrayList<StateValueCriterion> criteria) {
-        this.mCriteria = criteria;
+
+    public void setTimeCriteria(ArrayList<TimeCriterion> criteria) {
+        this.mTimeCriteria = criteria;
+    }
+
+    public void addTimeCriterion(TimeCriterion criterion){
+
+        if (mTimeCriteria==null) {
+            mTimeCriteria = new ArrayList<TimeCriterion>();
+        }
+        mTimeCriteria.add(criterion);
+    }
+
+
+    public void setValueCriteria(ArrayList<StateValueCriterion> criteria) {
+        this.mValueCriteria = criteria;
     }
 
     public void setSource(int source) {
@@ -61,9 +75,9 @@ public class StateMappingRule {
 
     private String getCriteriaString() {
         String s = "";
-        for (int i=0; i<mCriteria.size(); i++){
-            s += mCriteria.toString();
-            if (i<mCriteria.size()-1){
+        for (int i=0; i< mValueCriteria.size(); i++){
+            s += mValueCriteria.toString();
+            if (i< mValueCriteria.size()-1){
                 s+= Constants.DELIMITER;
             }
         }
@@ -84,8 +98,8 @@ public class StateMappingRule {
 
     private void setName() {
         mName = ContextManager.getSourceNameFromType(mContextStateManagerName, mSource)
-                + mStateValue
-                +getCriteriaString();
+                + "-"+mStateValue
+                + getCriteriaString();
     }
 
     public int getSource() {
@@ -98,7 +112,7 @@ public class StateMappingRule {
                 ", mName='" + mName + '\'' +
                 ", mSource='" + ContextManager.getSourceNameFromType(mContextStateManagerName, mSource) + '\'' +
                 ", mStateValue='" + mStateValue + '\'' +
-                ", mCriteria='" + getCriteriaString() + '\'' +
+                ", mValueCriteria='" + getCriteriaString() + '\'' +
                 '}';
     }
 }

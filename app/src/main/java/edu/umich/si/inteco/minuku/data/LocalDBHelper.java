@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,16 +16,10 @@ import java.util.TimeZone;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.ActivityRecognitionManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.ContextStateManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.LocationManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.model.AnnotationSet;
 import edu.umich.si.inteco.minuku.model.Configuration;
-import edu.umich.si.inteco.minuku.model.Criterion;
-import edu.umich.si.inteco.minuku.model.Question;
+import edu.umich.si.inteco.minuku.model.Criteria.Criterion;
 import edu.umich.si.inteco.minuku.model.Questionnaire.Questionnaire;
 import edu.umich.si.inteco.minuku.model.Session;
 import edu.umich.si.inteco.minuku.model.Task;

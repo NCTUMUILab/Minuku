@@ -127,8 +127,6 @@ public class ActivityRecognitionManager extends ContextStateManager
     @Override
     protected void setUpContextSourceList(){
 
-        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager. mContextSource:  " + mContextSourceList);
-
         boolean isAvailable;
 
         // Google Play Service is available after api level 15
@@ -259,12 +257,15 @@ public class ActivityRecognitionManager extends ContextStateManager
     private void stopActivityRecognitionUpdates() {
 
         //request activity recognition update
-        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(
-                mGoogleApiClient,                     //GoogleApiClient client
-                mActivityRecognitionPendingIntent);                      //callbackIntent
+        if (ActivityRecognition.ActivityRecognitionApi!=null){
+            ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(
+                    mGoogleApiClient,                     //GoogleApiClient client
+                    mActivityRecognitionPendingIntent);                      //callbackIntent
 
-        //Cancel the PendingIntent.
-        mActivityRecognitionPendingIntent.cancel();
+            //Cancel the PendingIntent.
+            mActivityRecognitionPendingIntent.cancel();
+        }
+
     }
 
     //this function handles the actual activity request
@@ -281,10 +282,12 @@ public class ActivityRecognitionManager extends ContextStateManager
         mActivityRecognitionPendingIntent = createRequestPendingIntent();
 
         //request activity recognition update
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
-                mGoogleApiClient,                    //GoogleApiClient client
-                ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL,//detectionIntervalMillis
-                mActivityRecognitionPendingIntent);   //callbackIntent
+        if (ActivityRecognition.ActivityRecognitionApi!=null){
+            ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
+                    mGoogleApiClient,                    //GoogleApiClient client
+                    ACTIVITY_RECOGNITION_DEFAULT_UPDATE_INTERVAL,//detectionIntervalMillis
+                    mActivityRecognitionPendingIntent);   //callbackIntent
+        }
 
     }
 
@@ -466,7 +469,7 @@ public class ActivityRecognitionManager extends ContextStateManager
      * @return
      */
     @Override
-    protected boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, String targetValue){
 
         Log.d(LOG_TAG, "examine statemappingrule, in examineStateRule. Going to test source: " + sourceType
                 + " measure : " + measure + " relationship " + relationship + " targevalue " + targetValue
@@ -476,21 +479,21 @@ public class ActivityRecognitionManager extends ContextStateManager
         //1 first we need to get the right source based on the sourcetype.
         //so that we know where the get the source value.
         //
-        if (sourceType==CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES){
+        if (sourceType== CONTEXT_SOURCE_ACTIVITY_RECOGNITION_ALL_PROBABLE_ACTIVITIES){
 
 
-            if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
+            if (measure.equals(CONTEXT_SOURCE_MEASURE_LATEST_ONE)){
 
             }
         }
 
-        else if (sourceType==CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES){
+        else if (sourceType== CONTEXT_SOURCE_ACTIVITY_RECOGNITION_MOST_PROBABLE_ACTIVITIES){
 
             String sourceValue=null;
 
             /**get source value according to the measure type**/
             //if the measure is "latest value", get the latest saved data**/
-            if (measure==CONTEXT_SOURCE_MEASURE_LATEST_ONE){
+            if (measure.equals(CONTEXT_SOURCE_MEASURE_LATEST_ONE)){
                 sourceValue= getActivityNameFromType(getMostProbableActivity().getType());
             }
 
@@ -564,6 +567,35 @@ public class ActivityRecognitionManager extends ContextStateManager
 
     }
 
+    /**
+     * This function takes a ContextSource and examines whether it will used by a loggingTask
+     * @param contextSource
+     * @return
+     */
+    @Override
+    protected boolean isRequestedByActiveLoggingTasks(ContextSource contextSource) {
+
+        for (int i=0; i<mLoggingTasks.size(); i++) {
+//
+//            Log.d(LOG_TAG, "[testing logging task and requested] isRequestedByActiveLoggingTasks " +
+//                    "checking ContextSource " + contextSource.getName() + " with logging task" +
+//                    mLoggingTasks.get(i).getSource());
+//
+            Log.d(LOG_TAG, "[testing logging task and requested] comparing " +
+                    "ContextSourceName " + contextSource.getName() + " with source in LoggingTask Name" +
+                    mLoggingTasks.get(i).getSource());
+
+            //find the logging task containing the contextsource and see if the loggingTask is enabled
+            if (CONTEXT_SOURCE_ACTIVITY_RECOGNITION.equals(mLoggingTasks.get(i).getSource())
+                    &&  mLoggingTasks.get(i).isEnabled() ){
+                Log.d(LOG_TAG, "[testing logging task and requested] the ContextSource " + contextSource.getName() +
+                        " indeed is requested by the logging task" );
+
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static int getContextSourceTypeFromName(String sourceName) {
 

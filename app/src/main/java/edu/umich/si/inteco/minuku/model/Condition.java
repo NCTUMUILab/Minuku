@@ -4,6 +4,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import edu.umich.si.inteco.minuku.model.Criteria.StateValueCriterion;
+import edu.umich.si.inteco.minuku.model.Criteria.TimeCriterion;
+
 public class Condition {
 
 	/** Tag for logging. */
@@ -11,12 +14,12 @@ public class Condition {
 
 	private int _id;
 	//Name is provided by ContextStateManager
+
+	// a condition means a State (specified through a StateName) is with the StateValue.
 	protected String mStateName;
-	//determined in the configuration file
 	protected String mSourceString;
-	//determined in the configuration file
 	protected String mStateValue;
-	protected JSONObject mCriterion;
+	protected JSONObject mCriterionJSON;
     protected ArrayList<StateValueCriterion> mValueCriteria;
 	protected ArrayList<TimeCriterion> mTimeCriteria;
 	protected int mSourceType;
@@ -25,6 +28,11 @@ public class Condition {
     public Condition (){
     	
     }
+
+	public Condition(String source, String value) {
+		mSourceString = source;
+		mStateValue  =value;
+	}
 
 	public Condition(String source, String value, ArrayList<StateValueCriterion> valueCriteria) {
 		mSourceString = source;
@@ -47,8 +55,8 @@ public class Condition {
 	public void setStateName (String name) {
 		mStateName = name;
 	}
-	public JSONObject getCriterion() {
-		return mCriterion;
+	public JSONObject getCriterionJSON() {
+		return mCriterionJSON;
 	}
 
 	public String getSource() {
@@ -65,6 +73,10 @@ public class Condition {
 
 	public ArrayList<StateValueCriterion> getStateValueCriteria(){
 		return mValueCriteria;
+	}
+
+	public void setValueCriteria(ArrayList<StateValueCriterion> valueCriteria) {
+		mValueCriteria = valueCriteria;
 	}
 
 	public void setTimeCriteria(ArrayList<TimeCriterion> timeCriteria) {

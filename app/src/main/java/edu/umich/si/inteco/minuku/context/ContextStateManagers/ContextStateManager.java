@@ -1,14 +1,9 @@
 package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
-import android.content.Context;
-import android.hardware.Sensor;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
@@ -18,7 +13,7 @@ import edu.umich.si.inteco.minuku.model.ContextSource;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.State;
 import edu.umich.si.inteco.minuku.model.StateMappingRule;
-import edu.umich.si.inteco.minuku.model.StateValueCriterion;
+import edu.umich.si.inteco.minuku.model.Criteria.StateValueCriterion;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 
 
@@ -27,33 +22,25 @@ public abstract class ContextStateManager {
     /** Tag for logging. */
     private static final String LOG_TAG = "ContextStateManager";
 
+
+    /**ContextSourceType**/
+    //Each ContextStateMangager should a define source type and its corresponding string
+    public static final int CONTEXT_SOURCE_XYZ = 0;
+    public static final String STRING_CONTEXT_SOURCE_XYZ = "XYZ";
+
     /* context measure **/
-    public static final int CONTEXT_SOURCE_MEASURE_LATEST_ONE = 0;
-    public static final int CONTEXT_SOURCE_MEASURE_AVERAGE = 1;
-
-    public static final String CONTEXT_SOURCE_MEASURE_LATEST_ONE_STRING = "Latest";
-    public static final String CONTEXT_SOURCE_MEASURE_AVERAGE_STRING = "Average";
-
+    public static final String CONTEXT_SOURCE_MEASURE_LATEST_ONE = "LatestValue";
+    public static final String CONTEXT_SOURCE_MEASURE_MEAN = "MeanValue";
+    
     /* relationship **/
-    public static final int STATE_MAPPING_RELATIONSHIP_EQUAL = 0;
-    public static final int STATE_MAPPING_RELATIONSHIP_NOT_EQUAL = 1;
-    public static final int STATE_MAPPING_RELATIONSHIP_LARGER = 2;
-    public static final int STATE_MAPPING_RELATIONSHIP_SMALLER = 3;
-    public static final int STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL = 4;
-    public static final int STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL = 5;
-    public static final int STATE_MAPPING_RELATIONSHIP_BETWEEN = 6;
-    public static final int STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN = 7;
-
-
-    /* relationship **/
-    public static final String STATE_MAPPING_RELATIONSHIP_EQUAL_STRING = "Equal";
-    public static final String STATE_MAPPING_RELATIONSHIP_NOT_EQUAL_STRING = "Not_Equal";
-    public static final String STATE_MAPPING_RELATIONSHIP_LARGER_STRING = "Larger";
-    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_STRING = "Smaller";
-    public static final String STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL_STRING = "LargerEqual";
-    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL_STRING = "SmallerEqual";
-    public static final String STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING = "Between";
-    public static final String STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING = "Contain";
+    public static final String STATE_MAPPING_RELATIONSHIP_EQUAL = "Equal";
+    public static final String STATE_MAPPING_RELATIONSHIP_NOT_EQUAL = "Not_Equal";
+    public static final String STATE_MAPPING_RELATIONSHIP_LARGER = "Larger";
+    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER = "Smaller";
+    public static final String STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL = "LargerEqual";
+    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL = "SmallerEqual";
+    public static final String STATE_MAPPING_RELATIONSHIP_BETWEEN = "Between";
+    public static final String STATE_MAPPING_RELATIONSHIP_CONTAIN = "Contain";
 
 
     protected String mName;
@@ -203,6 +190,7 @@ public abstract class ContextStateManager {
 
         boolean isRequested = false;
 
+        //update each contextsource
         for (int i=0; i<mContextSourceList.size(); i++){
             mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(mContextSourceList.get(i)));
             Log.d(LOG_TAG, "[updateContextSourceListRequestStatus] check saving data the contextsource " + mContextSourceList.get(i).getName() + " requested: " + mContextSourceList.get(i).isRequested());
@@ -280,13 +268,13 @@ public abstract class ContextStateManager {
      */
     public void updateLoggingTask(LoggingTask loggingTask, boolean enabled ) {
 
-//        Log.d(LOG_TAG, " [testing logging task and requested] update the status of loggingTask " + loggingTask + " to " + enabled);
+        Log.d(LOG_TAG, " [testing logging task and requested] update the status of loggingTask " + loggingTask + " to " + enabled);
 
         for (int i=0; i<mLoggingTasks.size(); i++){
             //if we find the logging task
             if (loggingTask.equals(mLoggingTasks.get(i))){
                 mLoggingTasks.get(i).setEnabled(enabled);
-                Log.d(LOG_TAG, " [testing logging task and requested] the loggingTask " + loggingTask + " is updated to " + mLoggingTasks.get(i).isEnabled());
+                Log.d(LOG_TAG, " [testing logging task and requested] the loggingTask " + loggingTask.getSource() + " is updated to " + mLoggingTasks.get(i).isEnabled());
             }
         }
 
@@ -414,7 +402,7 @@ public abstract class ContextStateManager {
      * examine the conditions of the events related to the state **/
     public void stateChanged(State state){
         Log.d(LOG_TAG, "[stateChanged] state " + state.getName() + " is changed");
-                ContextManager.examineCircumstances(state);
+                ContextManager.examineSituations(state);
     };
 
 
@@ -443,12 +431,12 @@ public abstract class ContextStateManager {
      * @param targetValue
      * @return
      */
-    protected boolean examineStateRule(int sourceType, int measure, int relationship, String targetValue){
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, String targetValue){
         boolean pass = false;
         return pass;
     }
 
-    protected boolean examineStateRule(int sourceType, int measure, int relationship, float targetValue){
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, float targetValue){
         boolean pass = false;
         return pass;
     }
@@ -492,18 +480,16 @@ public abstract class ContextStateManager {
             for (int j=0; j<criteria.size(); j++){
 
                 //1. get the targer value and relaionship
-                int relationship = criteria.get(j).getRelationship();
-                int measure = criteria.get(j).getMeasureType();
+                String relationship = criteria.get(j).getRelationship();
+                String measure = criteria.get(j).getMeasure();
 
                 //get values depending on whether the target value is a string or a float number
-                if (criteria.get(j).isTargetString()){
-                    String targetValue = criteria.get(j).getTargetStringValue();
-                    pass = examineStateRule(sourceType, measure, relationship, targetValue);
+                if (criteria.get(j).getTargetValue() instanceof String){
+                    pass = examineStateRule(sourceType, measure, relationship, (String)criteria.get(j).getTargetValue());
                 }
                 //the target value is a number
                 else {
-                    float targetValue = criteria.get(j).getTargetFloatValue();
-                    pass = examineStateRule(sourceType, measure, relationship, targetValue);
+                    pass = examineStateRule(sourceType, measure, relationship, (Float)criteria.get(j).getTargetValue());
                 }
 
                 /** examine criterion specified in the SateMappingRule **/
@@ -721,7 +707,7 @@ public abstract class ContextStateManager {
         StateMappingRule translatedRule = translateStateMappingRule(rule);
 
         mStateMappingRules.add(translatedRule);
-        //Log.d(LOG_TAG, "[testing stateMappingRule] adding rule: " + rule.toString() + " to " + getName());
+        Log.d(LOG_TAG, "[test situation] adding rule: " + rule.toString() + " to " + getName());
 
         //for each time we add a state, we update the list of State.
         updateMonitoredState(rule);
@@ -752,7 +738,7 @@ public abstract class ContextStateManager {
      * @param targetValue
      * @return
      */
-    protected static boolean satisfyCriterion(String value, int relationship, String targetValue ){
+    protected static boolean satisfyCriterion(String value, String relationship, String targetValue ){
 
         boolean pass=false;
 
@@ -762,8 +748,8 @@ public abstract class ContextStateManager {
         else if (relationship==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL){
             if (!value.equals(targetValue)) pass = true;
         }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN){
-            if (value.equals(targetValue)) pass = true;
+        else if (relationship==STATE_MAPPING_RELATIONSHIP_CONTAIN){
+            if (value.contains(targetValue)) pass = true;
         }
 
         Log.d(LOG_TAG, "[examine statemappingrule] comparing value " + value +" and targetvalue " + targetValue + " rel: " + relationship  + " pass: " + pass) ;
@@ -772,7 +758,7 @@ public abstract class ContextStateManager {
 
     }
 
-    protected static boolean satisfyCriterion(float value, int relationship, float targetValue ) {
+    protected static boolean satisfyCriterion(float value, String relationship, float targetValue ) {
 
         boolean pass=false;
 
@@ -817,26 +803,6 @@ public abstract class ContextStateManager {
         return false;
     }
 
-    public static String getMeasureName(int measure) {
-
-        if (measure == CONTEXT_SOURCE_MEASURE_LATEST_ONE) {
-            return CONTEXT_SOURCE_MEASURE_LATEST_ONE_STRING;
-        } else if (measure == CONTEXT_SOURCE_MEASURE_AVERAGE) {
-            return CONTEXT_SOURCE_MEASURE_AVERAGE_STRING;
-        } else
-            return null;
-    }
-
-    public static int getMeasure(String measureName) {
-
-        if (measureName.equals(CONTEXT_SOURCE_MEASURE_LATEST_ONE_STRING)) {
-            return CONTEXT_SOURCE_MEASURE_LATEST_ONE;
-        } else if (measureName.equals(CONTEXT_SOURCE_MEASURE_AVERAGE_STRING)) {
-            return CONTEXT_SOURCE_MEASURE_AVERAGE;
-        } else
-            return -1;
-    }
-
 
     public long getKeepalive() {
         return sKeepalive;
@@ -846,35 +812,35 @@ public abstract class ContextStateManager {
         this.sKeepalive = keepalive;
     }
 
-    public static int getRelationship(String  relationshipName) {
-
-        if (relationshipName==STATE_MAPPING_RELATIONSHIP_EQUAL_STRING){
-            return STATE_MAPPING_RELATIONSHIP_EQUAL;
-        }
-        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL_STRING){
-            return STATE_MAPPING_RELATIONSHIP_NOT_EQUAL;
-        }
-        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_LARGER_STRING){
-            return STATE_MAPPING_RELATIONSHIP_LARGER;
-        }
-        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_SMALLER_STRING){
-            return STATE_MAPPING_RELATIONSHIP_SMALLER;
-        }
-        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL_STRING){
-            return STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL;
-        }
-        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL_STRING){
-            return STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL;
-        }
-        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING){
-            return STATE_MAPPING_RELATIONSHIP_BETWEEN;
-        }
-        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING){
-            return STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN;
-        }
-        else
-            return -1;
-    }
+//    public static int getRelationship(String  relationshipName) {
+//
+//        if (relationshipName==STATE_MAPPING_RELATIONSHIP_EQUAL_STRING){
+//            return STATE_MAPPING_RELATIONSHIP_EQUAL;
+//        }
+//        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL_STRING){
+//            return STATE_MAPPING_RELATIONSHIP_NOT_EQUAL;
+//        }
+//        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_LARGER_STRING){
+//            return STATE_MAPPING_RELATIONSHIP_LARGER;
+//        }
+//        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_SMALLER_STRING){
+//            return STATE_MAPPING_RELATIONSHIP_SMALLER;
+//        }
+//        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL_STRING){
+//            return STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL;
+//        }
+//        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL_STRING){
+//            return STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL;
+//        }
+//        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING){
+//            return STATE_MAPPING_RELATIONSHIP_BETWEEN;
+//        }
+//        else if (relationshipName==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING){
+//            return STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN;
+//        }
+//        else
+//            return -1;
+//    }
 
     public ContextSource getContextSourceBySourceId(int sourceId) {
 
@@ -906,34 +872,5 @@ public abstract class ContextStateManager {
         return null;
     }
 
-    public static String getRelationshipName(int relationship) {
-
-        if (relationship==STATE_MAPPING_RELATIONSHIP_EQUAL){
-            return STATE_MAPPING_RELATIONSHIP_EQUAL_STRING;
-        }
-        else if (relationship ==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL){
-            return STATE_MAPPING_RELATIONSHIP_NOT_EQUAL_STRING;
-        }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER){
-            return STATE_MAPPING_RELATIONSHIP_LARGER_STRING;
-        }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_SMALLER){
-            return STATE_MAPPING_RELATIONSHIP_SMALLER_STRING;
-        }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL){
-            return STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL_STRING;
-        }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL){
-            return STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL_STRING;
-        }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_BETWEEN){
-            return STATE_MAPPING_RELATIONSHIP_BETWEEN_STRING;
-        }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN){
-            return STATE_MAPPING_RELATIONSHIP_STRING_CONTAIN_STRING;
-        }
-        else
-            return null;
-    }
 
 }

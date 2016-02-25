@@ -122,8 +122,6 @@ public class TransportationModeManager extends ContextStateManager {
      * it adds a list of ContextSource that it will manage **/
     protected void setUpContextSourceList(){
 
-        Log.d(LOG_TAG, "setUpContextSourceList in ActivityRecognitionManager. mContextSource:  " + mContextSourceList);
-
         boolean isAvailable;
 
         // Google Play Service is available after api level 15
@@ -896,5 +894,6 @@ public class TransportationModeManager extends ContextStateManager {
     public static void updateStateValues() {
 
     }
+
 
 }
