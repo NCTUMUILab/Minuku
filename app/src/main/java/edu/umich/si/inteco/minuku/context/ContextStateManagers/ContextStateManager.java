@@ -30,15 +30,18 @@ public abstract class ContextStateManager {
 
     /* context measure **/
     public static final String CONTEXT_SOURCE_MEASURE_LATEST_ONE = "LatestValue";
+    public static final String CONTEXT_SOURCE_MEASURE_MOST_FREQUENT_VALUE = "MostFrequentValue";
     public static final String CONTEXT_SOURCE_MEASURE_MEAN = "MeanValue";
-    
+
     /* relationship **/
     public static final String STATE_MAPPING_RELATIONSHIP_EQUAL = "Equal";
+    public static final String STATE_MAPPING_RELATIONSHIP_NUMBER_EQUAL = "=";
     public static final String STATE_MAPPING_RELATIONSHIP_NOT_EQUAL = "Not_Equal";
-    public static final String STATE_MAPPING_RELATIONSHIP_LARGER = "Larger";
-    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER = "Smaller";
-    public static final String STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL = "LargerEqual";
-    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL = "SmallerEqual";
+    public static final String STATE_MAPPING_RELATIONSHIP_NUMBER_NOT_EQUAL = "<>";
+    public static final String STATE_MAPPING_RELATIONSHIP_LARGER = ">";
+    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER = "<";
+    public static final String STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL = ">=";
+    public static final String STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL = "<=";
     public static final String STATE_MAPPING_RELATIONSHIP_BETWEEN = "Between";
     public static final String STATE_MAPPING_RELATIONSHIP_CONTAIN = "Contain";
 
@@ -300,7 +303,7 @@ public abstract class ContextStateManager {
                 ContextManager.getPublicRecordPool().add(mLocalRecordPool.get(i));
                 //after the record has been copied, we need to mark it "copie", so that we won't copied again
                 record.setIsCopiedToPublicPool(true);
-//                Log.d(LOG_TAG, this.getName() + "[test logging] copying record " + record.getSource() + ":" + record.getID()  + " : " + record.getTimeString() + " to public pool" );
+//                Log.d(LOG_TAG, this.getName() + "[test logging] copying record " + record.getSourceType() + ":" + record.getID()  + " : " + record.getTimeString() + " to public pool" );
                 count ++;
             }
         }
@@ -377,7 +380,7 @@ public abstract class ContextStateManager {
         record.setID(id);
 
         mLocalRecordPool.add(record);
-//        Log.d(LOG_TAG, "[test logging]add record " + record.getSource() +record.getID() + "logged at " + record.getTimeString() + " to " + this.getName() );
+//        Log.d(LOG_TAG, "[test logging]add record " + record.getSourceType() +record.getID() + "logged at " + record.getTimeString() + " to " + this.getName() );
 
         /**2. check whether we should remove old record **/
         removeOutDatedRecord();
@@ -401,7 +404,7 @@ public abstract class ContextStateManager {
     /** if the value of the state is changed, we inform ContextManager about the change so that it can
      * examine the conditions of the events related to the state **/
     public void stateChanged(State state){
-        Log.d(LOG_TAG, "[stateChanged] state " + state.getName() + " is changed");
+        Log.d(LOG_TAG, "test SMR [stateChanged] state " + state.getName() + " is changed");
                 ContextManager.examineSituations(state);
     };
 
@@ -419,11 +422,11 @@ public abstract class ContextStateManager {
         State state = new State(rule);
         //we add the state into the StateList
         mStates.add(state);
-        Log.d(LOG_TAG, "[testing stateMappingRule] creating state: " + state.getName() + " current value: " + state.getValue());
+        Log.d(LOG_TAG, "[test SMR] creating state: " + state.getName() + "  current value: " + state.getValue());
     }
 
     /**
-     * these two functions should be implemented in a ContextStateManager. It examines StateMappingRule with the
+     * these functions should be implemented in a ContextStateManager. It examines StateMappingRule with the
      * data and returns a boolean pass.
      * @param sourceType
      * @param measure
@@ -431,13 +434,57 @@ public abstract class ContextStateManager {
      * @param targetValue
      * @return
      */
-    protected boolean examineStateRule(int sourceType, String measure, String relationship, String targetValue){
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, String targetValue, ArrayList<String> params ){
         boolean pass = false;
+        String sourceValue=null;
+        if (sourceValue != null) {
+
+            pass = satisfyCriterion(sourceValue, relationship, targetValue);
+//                Log.d(LOG_TAG, "examine statemappingrule, get measure "
+//                        + getContextSourceNameFromType(sourceType) + " and get value : " +  sourceValue +
+//                        "now examine target value : " + targetValue + " so the pass is : " + pass);
+
+        }
         return pass;
     }
 
-    protected boolean examineStateRule(int sourceType, String measure, String relationship, float targetValue){
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, float targetValue,  ArrayList<String> params ){
         boolean pass = false;
+        float sourceValue=-1;
+        if (sourceValue != -1) {
+
+            pass = satisfyCriterion(sourceValue, relationship, targetValue);
+//                Log.d(LOG_TAG, "examine statemappingrule, get measure "
+//                        + getContextSourceNameFromType(sourceType) + " and get value : " +  sourceValue +
+//                        "now examine target value : " + targetValue + " so the pass is : " + pass);
+
+        }
+        return pass;
+    }
+
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, int targetValue,  ArrayList<String> params ){
+        boolean pass = false;
+        int sourceValue=-1;
+        if (sourceValue != -1) {
+
+            pass = satisfyCriterion(sourceValue, relationship, targetValue);
+//                Log.d(LOG_TAG, "examine statemappingrule, get measure "
+//                        + getContextSourceNameFromType(sourceType) + " and get value : " +  sourceValue +
+//                        "now examine target value : " + targetValue + " so the pass is : " + pass);
+
+        }
+        return pass;
+    }
+
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, boolean targetValue,  ArrayList<String> params ){
+        boolean pass = false;
+
+//            pass = satisfyCriterion(sourceValue, relationship, targetValue);
+//                Log.d(LOG_TAG, "examine statemappingrule, get measure "
+//                        + getContextSourceNameFromType(sourceType) + " and get value : " +  sourceValue +
+//                        "now examine target value : " + targetValue + " so the pass is : " + pass);
+
+//        }
         return pass;
     }
 
@@ -447,6 +494,7 @@ public abstract class ContextStateManager {
 
 
     /**
+     * We should call this function at place before we save the records to the local pool
      * updateStates()
      * ContextStateManager check the value for each countextual source and determine whether to
      * change the value of the state for every 5 seconds When a ContextStateManager check the values and update states
@@ -456,7 +504,9 @@ public abstract class ContextStateManager {
 
         /** 1. we first make sure whether the sourceType is being monitored. If not, we don't need to update
          //the state values. We call isStateMonitored(int SourceType) to do the examination. **/
-        //Log.d(LOG_TAG, "examine statemappingrule, the state is being monitored: " + isStateMonitored(sourceType));
+
+        Log.d(LOG_TAG, "test SMR examine statemappingrule, the state is being monitored: " + isStateMonitored(sourceType));
+
         if (!isStateMonitored(sourceType)) {
             return;
         }
@@ -470,7 +520,11 @@ public abstract class ContextStateManager {
 
             //get the rule based on the source type. We don't examine all MappingRule, but only the rule
             //that are related to the source.
+
             StateMappingRule rule = relevantStateMappingRules.get(i);
+
+            Log.d(LOG_TAG, "test SMR app, examine statemappingrule " + rule.getName() );
+
             boolean pass= false;
 
             //each rule can have more than one criterion, where each criterion has a measure,
@@ -483,17 +537,42 @@ public abstract class ContextStateManager {
                 String relationship = criteria.get(j).getRelationship();
                 String measure = criteria.get(j).getMeasure();
 
+                Log.d(LOG_TAG, "test SMR app, examine statemappingrule " + relationship + " " + measure
+                 + criteria.get(j).getTargetValue() );
+
+
+                //some rules have additional parameters (e.g. latlng for location)
+                ArrayList<String> params = criteria.get(j).getParameters();
+
                 //get values depending on whether the target value is a string or a float number
                 if (criteria.get(j).getTargetValue() instanceof String){
-                    pass = examineStateRule(sourceType, measure, relationship, (String)criteria.get(j).getTargetValue());
+                    Log.d(LOG_TAG, "test SMR app examine statemappingrule, Going to test source: " + sourceType + " : " + rule.getSource()
+                                    + " measure : " + measure + " relationship " + relationship + " targevalue " + (String)criteria.get(j).getTargetValue()
+
+                    );
+                    pass = examineStateRule(sourceType, measure, relationship, (String)criteria.get(j).getTargetValue() ,params);
                 }
                 //the target value is a number
-                else {
-                    pass = examineStateRule(sourceType, measure, relationship, (Float)criteria.get(j).getTargetValue());
+                else if (criteria.get(j).getTargetValue() instanceof Float) {
+
+//                    Log.d(LOG_TAG, "test SMR examine statemappingrule, Going to test source: " + sourceType + " : " + rule.getSource()
+//                                    + " measure : " + measure + " relationship " + relationship + " targevalue " + (Integer)criteria.get(j).getTargetValue()
+//                    );
+                    pass = examineStateRule(sourceType, measure, relationship, (Float) criteria.get(j).getTargetValue(), params);
+                }
+
+                //the target value is a number
+                else if (criteria.get(j).getTargetValue() instanceof Integer) {
+
+//                    Log.d(LOG_TAG, "test SMR examine statemappingrule, Going to test source: " + sourceType + " : " + rule.getSource()
+//                                    + " measure : " + measure + " relationship " + relationship + " targevalue " + (Integer)criteria.get(j).getTargetValue()
+//                    );
+//                    pass = examineStateRule(sourceType, measure, relationship, (Integer) criteria.get(j).getTargetValue(), params);
+//
                 }
 
                 /** examine criterion specified in the SateMappingRule **/
-                Log.d(LOG_TAG, "examine statemappingrule, after the examination the criterion is " + pass);
+                Log.d(LOG_TAG, "test SMR examine statemappingrule, after the examination the criterion is " + pass);
 
             }
 
@@ -520,7 +599,7 @@ public abstract class ContextStateManager {
 
                         getStateList().get(j).setValue(stateValue);
 
-                        Log.d(LOG_TAG, "examine statemappingrule, the state " + getStateList().get(j).getName() + " value change to " + getStateList().get(j).getValue());
+                        Log.d(LOG_TAG, "test SMR examine statemappingrule, the state " + getStateList().get(j).getName() + " value change to " + getStateList().get(j).getValue());
 
                     }
 
@@ -546,7 +625,7 @@ public abstract class ContextStateManager {
 
         for (int i=0; i<mStateMappingRules.size(); i++){
 
-            if (contextSource.getSourceId()==mStateMappingRules.get(i).getSource()){
+            if (contextSource.getSourceId()==mStateMappingRules.get(i).getSourceType()){
                 return true;
             }
         }
@@ -565,11 +644,11 @@ public abstract class ContextStateManager {
 //
 //            Log.d(LOG_TAG, "[testing logging task and requested] isRequestedByActiveLoggingTasks " +
 //                    "checking ContextSource " + contextSource.getName() + " with logging task" +
-//                    mLoggingTasks.get(i).getSource());
+//                    mLoggingTasks.get(i).getSourceType());
 //
 //            Log.d(LOG_TAG, "[testing logging task and requested] comparing " +
 //                    "ContextSourceName " + contextSource.getName() + " with source in LoggingTask Name" +
-//                    mLoggingTasks.get(i).getSource());
+//                    mLoggingTasks.get(i).getSourceType());
 
             //find the logging task containing the contextsource and see if the loggingTask is enabled
             if (contextSource.getName().equals( mLoggingTasks.get(i).getSource() )
@@ -598,11 +677,11 @@ public abstract class ContextStateManager {
 //        //find the logging Task and see if that's in backgroundLogging
 //        for (int i=0; i<mLoggingTasks.size(); i++) {
 //
-//            Log.d(LOG_TAG, "[testing logging task and requested] checking loggingTask" +   mLoggingTasks.get(i).getSource());
+//            Log.d(LOG_TAG, "[testing logging task and requested] checking loggingTask" +   mLoggingTasks.get(i).getSourceType());
 //
 //            //find the loggingtask containing the contextsource
-//            if (contextSource.getName().equals( mLoggingTasks.get(i).getSource() )){
-//                Log.d(LOG_TAG, "[testing logging task and requested] find the loggingTask " + mLoggingTasks.get(i).getSource()
+//            if (contextSource.getName().equals( mLoggingTasks.get(i).getSourceType() )){
+//                Log.d(LOG_TAG, "[testing logging task and requested] find the loggingTask " + mLoggingTasks.get(i).getSourceType()
 //                 + mLoggingTasks.get(i).getId());
 //
 //                //find if that's in BackgroundLogging (using id)
@@ -631,7 +710,7 @@ public abstract class ContextStateManager {
             State state = getStateList().get(i);
 
             //find any state that uses the source and that state is currently enabled.
-            if (state.getMappingRule().getSource()==sourceType && state.isEnabled()){
+            if (state.getMappingRule().getSourceType()==sourceType && state.isEnabled()){
                 Log.d(LOG_TAG, "examine statemappingrule: state " + state.getName() + " is monitored");
                 return true;
             }
@@ -680,7 +759,7 @@ public abstract class ContextStateManager {
             StateMappingRule rule = getStateMappingRules().get(i);
 
             //find any state that uses the source and that state is currently enabled.
-            if (rule.getSource()==sourceType){
+            if (rule.getSourceType()==sourceType){
                rules.add(rule);
             }
         }
@@ -707,7 +786,9 @@ public abstract class ContextStateManager {
         StateMappingRule translatedRule = translateStateMappingRule(rule);
 
         mStateMappingRules.add(translatedRule);
-        Log.d(LOG_TAG, "[test situation] adding rule: " + rule.toString() + " to " + getName());
+        Log.d(LOG_TAG, "[test SMR] adding rule: " + rule.toString() + " to " + getName()
+         + " the criteria is " + rule.getCriteria()
+         + " the time criteria is " + rule.getTimeCriteria());
 
         //for each time we add a state, we update the list of State.
         updateMonitoredState(rule);
@@ -742,17 +823,19 @@ public abstract class ContextStateManager {
 
         boolean pass=false;
 
-        if (relationship==STATE_MAPPING_RELATIONSHIP_EQUAL){
+
+
+        if (relationship.equals(STATE_MAPPING_RELATIONSHIP_EQUAL)){
             if (value.equals(targetValue)) pass = true;
         }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL){
+        else if (relationship.equals(STATE_MAPPING_RELATIONSHIP_NOT_EQUAL)){
             if (!value.equals(targetValue)) pass = true;
         }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_CONTAIN){
+        else if (relationship.equals(STATE_MAPPING_RELATIONSHIP_CONTAIN)){
             if (value.contains(targetValue)) pass = true;
         }
 
-        Log.d(LOG_TAG, "[examine statemappingrule] comparing value " + value +" and targetvalue " + targetValue + " rel: " + relationship  + " pass: " + pass) ;
+        Log.d(LOG_TAG, "test smr app [examine statemappingrule] comparing value " + value +" and targetvalue " + targetValue + " rel: " + relationship  + " pass: " + pass) ;
 
         return pass;
 
@@ -760,28 +843,47 @@ public abstract class ContextStateManager {
 
     protected static boolean satisfyCriterion(float value, String relationship, float targetValue ) {
 
+//        Log.d(LOG_TAG, " test smr locaiton [examine statemappingrule]" );
+
         boolean pass=false;
 
-        if (relationship== STATE_MAPPING_RELATIONSHIP_EQUAL){
+        if (relationship.equals(STATE_MAPPING_RELATIONSHIP_NUMBER_EQUAL)){
             if (value==targetValue) pass = true;
-        }else if (relationship==STATE_MAPPING_RELATIONSHIP_NOT_EQUAL){
+        }else if (relationship.equals(STATE_MAPPING_RELATIONSHIP_NUMBER_NOT_EQUAL)){
             if (value!=targetValue)  pass = true;
         }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER){
+        else if (relationship.equals(STATE_MAPPING_RELATIONSHIP_LARGER)){
             if (value>targetValue) pass = true;
         }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL){
+        else if (relationship.equals(STATE_MAPPING_RELATIONSHIP_LARGER_AND_EQUAL)){
             if (value>=targetValue) pass = true;
         }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_SMALLER){
+        else if (relationship.equals(STATE_MAPPING_RELATIONSHIP_SMALLER)){
             if (value<targetValue) pass = true;
         }
-        else if (relationship==STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL){
+        else if (relationship.equals(STATE_MAPPING_RELATIONSHIP_SMALLER_AND_EQUAL)){
             if (value<=targetValue) pass = true;
         }
 
 
-        Log.d(LOG_TAG, "satisfyCriterion] comparing value " + value +" and targetvalue " + targetValue + " relship: " + relationship  + " pass: " + pass) ;
+        Log.d(LOG_TAG, "test smr locaiton  comparing value " + value +" and targetvalue " + targetValue + " relship: " + relationship  + " pass: " + pass) ;
+
+        return pass;
+
+    }
+
+
+    protected static boolean satisfyCriterion(boolean value, String relationship, boolean targetValue ) {
+
+//        Log.d(LOG_TAG, " test smr locaiton [examine statemappingrule]" );
+
+        boolean pass=false;
+
+        if (relationship.equals(STATE_MAPPING_RELATIONSHIP_NUMBER_EQUAL)){
+            if (value==targetValue) pass = true;
+        }
+
+        Log.d(LOG_TAG, "test smr locaiton  comparing value " + value +" and targetvalue " + targetValue + " relship: " + relationship  + " pass: " + pass) ;
 
         return pass;
 

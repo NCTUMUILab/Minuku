@@ -35,28 +35,8 @@
 
 			  "ContextSourceState":
 			  [
-
 				{
 					"Id":1,
-				  	"State":"Use Phone",
-				  	"Source": "AR-MostProbableActivity",
-					"Value_Criteria": [
-						{
-							"Measure":"LatestValue",
-							"Relationship":"Equal",
-							"TargetValue": "tilting"
-						}
-					],				
-					"Time_Criteria": [
-						{
-							"Measure": "recency",
-							"Relationship": "<=", 
-							"TargetValue": 5 
-						}
-					]
-				},
-				{
-					"Id":2,
 					"State": "Phone Still for a period",
 					"Source": "AR-MostProbableActivity",
 					"Value_Criteria": [
@@ -75,26 +55,26 @@
 					]
 				},
 			  	{
-			  		"Id":3,
-					"State": "Use Facdbook",
-					"Source": "PhoneStatus-AppUsage",
-					"Value_Criteria": [
-					  {
-					  	"Measure":"LatestValue",
-					  	"Relationship":"Equal",
-						"TargetValue": "Facebook"
-					  }
-					],
-					"Time_Criteria": [
-					  {
-						"Measure": "duration",
-						"Relationship": ">",
-						"TargetValue": 2
-					  }
-					]
+				  "Id":2,
+				  "State": "Use Facdbook",
+				  "Source": "PhoneStatus-AppUsage",
+				  "Value_Criteria": [
+					{
+					  "Measure":"LatestUsedApp",
+					  "Relationship":"Equal",
+					  "TargetValue": "Facebook"
+					}
+				  ],
+				  "Time_Criteria": [
+					{
+					  "Measure": "duration",
+					  "Relationship": ">",
+					  "TargetValue": 2
+					}
+				  ]
 				},
 				{
-					"Id":4,
+					"Id":3,
 					"State": "At Home",
 					"Source": "Location",
 					"Value_Criteria": [
@@ -102,7 +82,7 @@
 					  	"Measure":"CurDistFromLoc",
 					  	"Params":
 					  	[
-					  		"42.294134, -83.701227"
+					  		"42.293820,-83.701918"
 					  	],
 					  	"Relationship": "<=",
 						"TargetValue": 100
@@ -116,19 +96,15 @@
 					  }
 					]
 				},
-				{
-					"Id":5,
-					"State": "Office",
-					"Source": "Location",
+				  {
+			  		"Id":4,
+					"State": "Charging",
+					"Source": "PhoneStatus-Battery",
 					"Value_Criteria": [
 					  {
-					  	"Measure":"CurDistFromLoc",
-					  	"Params":
-					  	[
-					  		"42.280708, -83.740031"
-					  	],
-					  	"Relationship": "<=",
-						"TargetValue": 100
+					  	"Measure":"ChargingState",
+					  	"Relationship":"Equal",
+						"TargetValue": "USB Charging"
 					  }
 					],
 					"Time_Criteria": [
@@ -138,7 +114,7 @@
 						"TargetValue": 2
 					  }
 					]
-				  }
+				}
 			  ],
 
 			 
@@ -153,7 +129,7 @@
 
 			  "BackgroundLogging":{
 				"Enabled": true,
-				"Logging_tasks":"1,2,3,7,8,9,10,11",
+				"Logging_tasks":"1,2,3,7,10,11",
 				"Logging_rate": 5
 			  },
 
@@ -198,24 +174,19 @@
 				],
 				"Situations":
 				[
+
 				  {
 						"Id": 1,
-						"Name": "No attention on the phone",
-						"Description": "NA",
+						"Name": "Using Facebook",
+						"Description":"NA",
 						"Conditions":"2"
 				  },
 				  {
-						"Id": 2,
-						"Name": "Using Facebook",
-						"Description":"NA",
-						"Conditions":"3"
-				  },
-				  {
 						"Id": 3,
-						"Name": "At Home",
+						"Name": "At Home and charge phone",
 						"Description":"NA",
-						"Conditions":"2,4"
-				  }				 
+						"Conditions":"3,4"
+				  }
 				],
 
 				"Actions":[
@@ -225,7 +196,7 @@
 					"Execution_style":"one-time",
 					"Type": "questionnaire",
 					"Name": "triggering carried item questionnaire",
-					"Questionnaire_id":1,
+					"Questionnaire_id":2,
 					"Control":{
 					  "Start":
 					  [
@@ -238,7 +209,7 @@
 							"Sample_min_interval":3600,
 							"Sample_count": 6,
 							"Sample_startAt": "10:00",
-							"Sample_endAt": "22:00"
+							"Sample_endAt": "14:50"
 						  }
 						}
 					  ]
@@ -263,7 +234,7 @@
 				[
 					{
 						"Id": 1,
-						"Title": "Social Capital Questionnaire",
+						"Title": "Example Questionnaire",
 						"Description":"Please answer the following questions.",
 						"Type":"activity",
 						"Questions":
@@ -314,7 +285,64 @@
 						  }
 						]
 
-					}		
+					}	,
+
+				  {
+					"Id": 2,
+					"Title": "Where do you place your phone?",
+					"Description":"Please answer the following questions.",
+					"Type":"activity",
+					"Questions":
+					[
+					  {
+						"Index": 1,
+						"Type":"textbox",
+						"Question_text": "Where are you now?"
+					  },
+
+					  {
+						"Index": 2,
+						"Type":"multichoice_one_answer",
+						"Has_other_field":true,
+						"Question_text": "Where did you just place your phone?",
+						"Option":
+						[
+						  {
+							"Option_text":"Desk/Table"
+						  },
+						  {
+							"Option_text": "Pocket"
+						  },
+						  {
+							"Option_text": "Bagpack/handbag"
+						  }
+
+						]
+
+
+					  },
+
+					  {
+						"Index": 3,
+						"Type":"multichoice_multiple_answer",
+						"Question_text": "What is/are the reason(s) that you place your phone there?",
+						"Option":
+						[
+						  {
+							"Option_text":"It's easier to notice notifications."
+						  },
+						  {
+							"Option_text": "It's convenient to grab."
+						  },
+						  {
+							"Option_text": "It's less disturbing."
+						  }
+						]
+					  }
+
+					]
+
+				  }
 
 				]
 

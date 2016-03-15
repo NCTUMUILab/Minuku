@@ -15,6 +15,7 @@ import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -390,6 +391,10 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
                 mCurrentLocation.getLongitude() + " , " +
                 mCurrentLocation.getAccuracy());
 
+
+        //update state value
+        updateStateValues(CONTEXT_SOURCE_LOCATION);
+
         //if location is requested, save location
         boolean isRequested = checkRequestStatusOfContextSource(STRING_CONTEXT_SOURCE_LOCATION);
 
@@ -405,6 +410,85 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
     }
 
+    /**
+     * This function examines StateMappingRule with the data and returns a boolean pass.
+     * @param sourceType
+     * @param measure
+     * @param relationship
+     * @param targetValue
+     * @return
+     */
+    @Override
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, int targetValue,  ArrayList<String> params){
+
+//        Log.d(LOG_TAG, "test smr location examine statemappingrule in location manager" );
+
+        boolean pass = false;
+        /** 1 first we need to get the right source based on the sourcetype**/
+        //so that we know where the get the source value.
+        if (sourceType== CONTEXT_SOURCE_LOCATION){
+
+            float sourceValue = -1;
+
+            /**2 get source value according to the measure type**/
+            //if the measure is "latest value", get the latest saved data**/
+            if (measure.equals(CONTEXT_SOURCE_MEASURE_LATEST_ONE)){
+                //this doesn't really make sense to location. LatLng almost can't be the same
+            }
+            /** for location we have this special measure: current distance from location **/
+            else if (measure.equals(CONTEXT_SOURCE_MEASURE_CURRENT_DISTANCE_FROM_LOCAITON)){
+
+                float distance = -1;
+
+                //target location should be the first parameter
+                if (params!=null && params.size()>0){
+                    String location = params.get(0);
+//                    Log.d(LOG_TAG, "test smr locaiton examine statemappingrule, get location " + location);
+
+                    String [] strings = location.split(",");
+                    double lat = Double.parseDouble(strings[0]);
+                    double lng = Double.parseDouble(strings[1]);
+
+                    Location destination = new Location("destination");
+                    destination.setLatitude(lat);
+                    destination.setLongitude(lng);
+
+                    distance = mCurrentLocation.distanceTo(destination);
+
+//                    Log.d(LOG_TAG, "test smr locaiton calcualting distance between  " + destination.toString() +  " and current location " +
+//                    mCurrentLocation.toString() + " the distance is " + distance);
+
+                    sourceValue = distance;
+
+                }
+
+
+            }
+
+
+
+            /** examine the criterion after we get the source value**/
+            if (sourceValue != -1) {
+
+                pass = satisfyCriterion(sourceValue, relationship, targetValue);
+//                Log.d(LOG_TAG, "test smr examine statemappingrule, get measure "
+//                        + getContextSourceNameFromType(sourceType) + " and get value : " +  sourceValue +
+//                        "now examine target value : " + targetValue + " so the pass is : " + pass);
+
+            }
+
+        }
+
+        //geofence
+        else if (sourceType== CONTEXT_SOURCE_GEOFENCE){
+
+
+
+        }
+
+        return  pass;
+
+    }
 
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {

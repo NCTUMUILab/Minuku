@@ -469,11 +469,8 @@ public class ActivityRecognitionManager extends ContextStateManager
      * @return
      */
     @Override
-    protected boolean examineStateRule(int sourceType, String measure, String relationship, String targetValue){
+    protected boolean examineStateRule(int sourceType, String measure, String relationship, String targetValue,  ArrayList<String> params){
 
-        Log.d(LOG_TAG, "examine statemappingrule, in examineStateRule. Going to test source: " + sourceType
-                + " measure : " + measure + " relationship " + relationship + " targevalue " + targetValue
-        );
 
         boolean pass = false;
         //1 first we need to get the right source based on the sourcetype.
@@ -501,9 +498,9 @@ public class ActivityRecognitionManager extends ContextStateManager
             if (sourceValue != null) {
 
                 pass = satisfyCriterion(sourceValue, relationship, targetValue);
-                Log.d(LOG_TAG, "examine statemappingrule, get measure "
-                        + getContextSourceNameFromType(sourceType) + " and get value : " +  sourceValue +
-                        "now examine target value : " + targetValue + " so the pass is : " + pass);
+//                Log.d(LOG_TAG, "test smr examine statemappingrule, get measure "
+//                        + getContextSourceNameFromType(sourceType) + " and get value : " +  sourceValue +
+//                        "now examine target value : " + targetValue + " so the pass is : " + pass);
 
             }
 
@@ -579,7 +576,7 @@ public class ActivityRecognitionManager extends ContextStateManager
 //
 //            Log.d(LOG_TAG, "[testing logging task and requested] isRequestedByActiveLoggingTasks " +
 //                    "checking ContextSource " + contextSource.getName() + " with logging task" +
-//                    mLoggingTasks.get(i).getSource());
+//                    mLoggingTasks.get(i).getSourceType());
 //
             Log.d(LOG_TAG, "[testing logging task and requested] comparing " +
                     "ContextSourceName " + contextSource.getName() + " with source in LoggingTask Name" +

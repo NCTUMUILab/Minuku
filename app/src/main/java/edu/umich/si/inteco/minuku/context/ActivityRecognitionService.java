@@ -51,7 +51,6 @@ public class ActivityRecognitionService extends IntentService {
 		// If the activity recognition intent contains an activity update, get the update
 		if (ActivityRecognitionResult.hasResult(intent)) {
 
-			try{
                 //get the result from Google Play Service
 				ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 
@@ -60,7 +59,7 @@ public class ActivityRecognitionService extends IntentService {
 
                 //store the returned most probable activity (with confidence level)
                 mMostProbableActivity = result.getMostProbableActivity();
-//                Log.d(LOG_TAG, "[test ActivityRecognition] " +   mMostProbableActivity.toString());
+                Log.d(LOG_TAG, "[test ActivityRecognition] " +   mMostProbableActivity.toString());
 
                 //Toast.makeText(this, "the detected activity is " + mMostProbableActivity + ": " + mProbableActivities, Toast.LENGTH_SHORT).show();
 
@@ -96,9 +95,7 @@ public class ActivityRecognitionService extends IntentService {
                 }
                 	
                 
-			}catch (Exception e){
-        		Log.e(LOG_TAG, "Got error when requesting activity ");
-        	}
+
 		}
 	}
 

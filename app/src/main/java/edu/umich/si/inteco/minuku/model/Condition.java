@@ -23,6 +23,7 @@ public class Condition {
     protected ArrayList<StateValueCriterion> mValueCriteria;
 	protected ArrayList<TimeCriterion> mTimeCriteria;
 	protected int mSourceType;
+	protected StateMappingRule mStateMappingRule;
 
     
     public Condition (){
@@ -40,12 +41,24 @@ public class Condition {
 		mValueCriteria = valueCriteria;
 	}
 
+	public void setStateMappingRule (StateMappingRule rule){
+		mStateMappingRule = rule;
+	}
+
+	public StateMappingRule getStateMappingRule () {
+		return mStateMappingRule;
+	}
+
 	public int getSourceType() {
 		return mSourceType;
 	}
 
 	public void setSourceType(int sourceType) {
 		this.mSourceType =sourceType;
+	}
+
+	public void setSource(String source) {
+		this.mSourceString = source;
 	}
 
 	public String getStateName() {

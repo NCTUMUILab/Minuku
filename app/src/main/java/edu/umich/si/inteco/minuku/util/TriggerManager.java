@@ -56,7 +56,7 @@ public class TriggerManager {
 
     public static void executeTrigger(TriggerLink tl) {
 
-        Log.d(LOG_TAG, "[executeTrigger] examineTransportation the triggerdlinks's trigger is " + tl.getTriggerClass() + " " +
+        Log.d(LOG_TAG, "test SMR situ [executeTrigger] examineTransportation the triggerdlinks's trigger is " + tl.getTriggerClass() + " " +
                 tl.getTrigger().getId() + " and it triggers object " + tl.getTriggeredProbeObject().getProbeObjectClass() + " " + tl.getTriggeredProbeObject().getId() + " , of which the class is "
                 + tl.getTriggeredProbeObject().getProbeObjectClass());
 

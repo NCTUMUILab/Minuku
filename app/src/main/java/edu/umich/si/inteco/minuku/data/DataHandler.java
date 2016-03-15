@@ -3,6 +3,7 @@ package edu.umich.si.inteco.minuku.data;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.hardware.Sensor;
+import android.os.Build;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
@@ -21,10 +22,13 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneSensorManage
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.PhoneStatusManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.UserInteractionManager;
+import edu.umich.si.inteco.minuku.context.MobilityManager;
+import edu.umich.si.inteco.minuku.model.LoggingTask;
 import edu.umich.si.inteco.minuku.model.Record.ActivityRecognitionRecord;
 import edu.umich.si.inteco.minuku.model.Record.Record;
 import edu.umich.si.inteco.minuku.services.MinukuMainService;
 import edu.umich.si.inteco.minuku.util.DatabaseNameManager;
+import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.RecordingAndAnnotateManager;
 import edu.umich.si.inteco.minuku.util.ScheduleAndSampleManager;
 
@@ -57,10 +61,82 @@ public class DataHandler {
 
 
     /**
-     * based on the source of the Record we determine which table the record should be inserted into
-     * @param source
-     * @return
+     * based on the logging task list, determine what to write into the log
+     * @param loggingTaskArrayList
      */
+    public static void SaveRecordsToFileSystem(ArrayList<LoggingTask> loggingTaskArrayList) {
+
+        //TODO: according to the logging taks, log data to file system
+        for (int i=0; i<loggingTaskArrayList.size(); i++){
+
+            LoggingTask loggingTask = loggingTaskArrayList.get(i);
+
+            //the filename of the log should be the source name
+
+
+
+        }
+
+
+        /**** for travel diary study **/
+        String travelHistoryMessage="NA";
+
+                /*we create a travel log here*/
+        if (ActivityRecognitionManager.getProbableActivities()!=null &&
+                LocationManager.getCurrentLocation()!=null ){
+            travelHistoryMessage= MobilityManager.getMobility() + "\t" +
+                    TransportationModeManager.getConfirmedActvitiyString() + "\t" +
+                    "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
+                    ActivityRecognitionManager.getProbableActivities().toString() + "\t" +
+                    LocationManager.getCurrentLocation().getLatitude() + "," +
+                    LocationManager.getCurrentLocation().getLongitude() + "," +
+                    LocationManager.getCurrentLocation().getAccuracy();
+        }
+
+        //create travel history file
+        LogManager.log(LogManager.LOG_TYPE_TRAVEL_LOG,
+                LogManager.LOG_TAG_TRAVEL_HISTORY,
+                //content of the log
+                travelHistoryMessage
+        );
+
+
+
+        /**** logging  app usage **/
+        String appUsageMessage = "NA";
+
+        if (PhoneStatusManager.getLatestForegroundPackage()!=null && PhoneStatusManager.getScreenStatus()!=null ){
+
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+
+                Log.d(LOG_TAG, "test loggin app usage >5 ");
+                appUsageMessage = PhoneStatusManager.getScreenStatus() + "\t" +
+                        PhoneStatusManager.getLatestForegroundPackage()  + "\t" +
+                        PhoneStatusManager.getLatestForegroundPackageTime()  + "\t" +
+                        PhoneStatusManager.getRecentUsedAppsInLastHour() ;
+            }
+            else {
+
+                Log.d(LOG_TAG, "test loggin app usage  < 5: ");
+                appUsageMessage = PhoneStatusManager.getScreenStatus() + "\t" +
+                        PhoneStatusManager.getLatestForegroundPackage()  + "\t" +
+                        PhoneStatusManager.getLatestForegroundActivity();
+            }
+
+            Log.d(LOG_TAG, "test loggin app usage 4: ");
+            LogManager.log(LogManager.LOG_TYPE_APP_USAGE_LOG,
+                    LogManager.LOG_TAG_APP_USAGE,
+                    //content of the log
+                    appUsageMessage
+            );
+
+
+        }
+
+
+
+
+    }
 
 	 
 	/**
@@ -118,7 +194,7 @@ public class DataHandler {
                 if (!recordpool.get(i).getSavedSessionIds().contains(session_id))
                     recordpool.get(i).getSavedSessionIds().add(session_id);
 
-//                 Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] finishing saving record " + recordpool.get(i).getSource() +  " at " + i + ", mark it has been saved by " + session_id + " now it has been saved by " +  recordpool.get(i).getSavedSessionIds());
+//                 Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] finishing saving record " + recordpool.get(i).getSourceType() +  " at " + i + ", mark it has been saved by " + session_id + " now it has been saved by " +  recordpool.get(i).getSavedSessionIds());
 
 
             }catch (IndexOutOfBoundsException e ){
@@ -154,7 +230,7 @@ public class DataHandler {
 
                 //if we found any record that is not marked as been saved in a session, the flag is set false
                 if (!recordpool.get(i).getSavedSessionIds().contains(runningSessionId)) {
-//                    Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] the record " + recordpool.get(i).getSource() + recordpool.get(i).getID() + " have not been saved by session " + runningSessionId);
+//                    Log.d(LOG_TAG, "[SaveRecordsToLocalDatabase] the record " + recordpool.get(i).getSourceType() + recordpool.get(i).getID() + " have not been saved by session " + runningSessionId);
                     savedByAllSessions = false;
                     break;
                 }

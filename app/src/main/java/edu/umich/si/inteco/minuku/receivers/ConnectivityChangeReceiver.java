@@ -38,7 +38,7 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connectivity change");
+        Log.d(LOG_TAG, "[ConnectivityChangeReceiver]syncWithRemoteDatabase connectivity change");
 
         ConnectivityManager conMngr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
 
@@ -46,14 +46,31 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver{
 
             Network[] networks = conMngr.getAllNetworks();
 
-            NetworkInfo activeNetwork = conMngr.getActiveNetworkInfo();
+            NetworkInfo activeNetwork;
+
+            boolean isWifi = false;
 
             for (Network network : networks) {
                 activeNetwork = conMngr.getNetworkInfo(network);
-                if (activeNetwork.getState().equals(NetworkInfo.State.CONNECTED)) {
-//                    Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connected");
+
+                if (activeNetwork.getType()==ConnectivityManager.TYPE_WIFI){
+                    isWifi = activeNetwork.isConnected();
+
+                    if (isWifi){
+
+                        Log.d(LOG_TAG, "[ConnectivityChangeReceiver]syncWithRemoteDatabase connect to wifi");
+
+                        //if we only submit the data over wifh. this should be configurable
+                        if (RemoteDBHelper.getSubmitDataOnlyOverWifi()){
+                            Log.d(LOG_TAG, "[ConnectivityChangeReceiver]syncWithRemoteDatabase only submit over wifi");
+                            RemoteDBHelper.syncWithRemoteDatabase();
+
+                        }
+                    }
                 }
             }
+
+
         }
 
         else{
@@ -87,17 +104,20 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver{
                             activeNetworkMobile.isConnected();
 
 
-
                     boolean isWifiAvailable = activeNetworkWifi.isAvailable();
                     boolean isMobileAvailable = activeNetworkMobile.isAvailable();
 
                     if (isWiFi) {
 
-//                        Log.d(LOG_TAG, "[ConnectivityChangeReceiver] connect to wifi");
+                        Log.d(LOG_TAG, "[ConnectivityChangeReceiver]syncWithRemoteDatabase connect to wifi");
 
                         //if we only submit the data over wifh. this should be configurable
-                        if (RemoteDBHelper.getSubmitDataOnlyOverWifi())
+                        if (RemoteDBHelper.getSubmitDataOnlyOverWifi()){
+                            Log.d(LOG_TAG, "[ConnectivityChangeReceiver]syncWithRemoteDatabase only submit over wifi");
                             RemoteDBHelper.syncWithRemoteDatabase();
+
+                        }
+
 
                     }
 

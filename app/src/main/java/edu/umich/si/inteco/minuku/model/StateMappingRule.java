@@ -21,7 +21,9 @@ public class StateMappingRule {
 
     private String mContextStateManagerName;
 
-    private int mSource;
+    private int mSourceType;
+
+    private String mSource;
 
     private String mStateValue;
 
@@ -35,14 +37,16 @@ public class StateMappingRule {
 
     public StateMappingRule(int id,
                             String contextStateManagerName,
-                            int source,
+                            int sourcetype,
+                            String source,
                             ArrayList<StateValueCriterion> valueCriteria,
                             String stateValue) {
         mId = id;
         mContextStateManagerName = contextStateManagerName;
         mValueCriteria = valueCriteria;
         mStateValue =  stateValue;
-        mSource  = source;
+        mSourceType = sourcetype;
+        mSource = source;
 
         //the name is "source + statevalue + criteria". we make is quite complex so that the rule name will not repeat.
         setName();
@@ -53,6 +57,9 @@ public class StateMappingRule {
         return mValueCriteria;
     }
 
+    public ArrayList<TimeCriterion> getTimeCriteria() {
+        return mTimeCriteria;
+    }
 
     public void setTimeCriteria(ArrayList<TimeCriterion> criteria) {
         this.mTimeCriteria = criteria;
@@ -71,9 +78,12 @@ public class StateMappingRule {
         this.mValueCriteria = criteria;
     }
 
-    public void setSource(int source) {
-        this.mSource = source;
+    public void setSourceType(int source) {
+        this.mSourceType = source;
     }
+
+    public void setSource(String source) {this.mSource = source;};
+
 
     private String getCriteriaString() {
         String s = "";
@@ -96,25 +106,28 @@ public class StateMappingRule {
         return mStateValue;
     }
 
+    public String getSource() {return mSource;};
+
     public void setmStateValue(String stateValue) {
         this.mStateValue = stateValue;
     }
 
     private void setName() {
-        mName = ContextManager.getSourceNameFromType(mContextStateManagerName, mSource)
+        mName = ContextManager.getSourceNameFromType(mContextStateManagerName, mSourceType)
+                + "-" + mSource
                 + "-"+mStateValue
                 + getCriteriaString();
     }
 
-    public int getSource() {
-        return mSource;
+    public int getSourceType() {
+        return mSourceType;
     }
 
     @Override
     public String toString() {
         return "StateMappingRule{" +
                 ", mName='" + mName + '\'' +
-                ", mSource='" + ContextManager.getSourceNameFromType(mContextStateManagerName, mSource) + '\'' +
+                ", mSourceType='" + ContextManager.getSourceNameFromType(mContextStateManagerName, mSourceType) + '\'' +
                 ", mStateValue='" + mStateValue + '\'' +
                 ", mValueCriteria='" + getCriteriaString() + '\'' +
                 '}';

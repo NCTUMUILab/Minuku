@@ -20,11 +20,13 @@ public class LogManager {
     public static final String LOG_TYPE_SYSTEM_LOG = "System-Log";
     public static final String LOG_TYPE_USER_ACTION_LOG = "User-Action-Log";
     public static final String LOG_TYPE_TRAVEL_LOG = "User-Travel-Log";
+    public static final String LOG_TYPE_APP_USAGE_LOG = "User-AppUsage-Log";
     public static final String LOG_TYPE_CHECKPOINT_LOG = "User-Checkpoint-Log";
     public static final String LOG_TYPE_BETWEEN_CHECKPOINTS_LOG = "User-BetweenCheckpoints-Log";
     public static final String LOG_TYPE_FILE_UPLOAD_LOG = "Server-Communication-Log";
 
     public static final String LOG_TAG_TRAVEL_HISTORY = "TRAVEL";
+    public static final String LOG_TAG_APP_USAGE = "USAGE";
 	public static final String LOG_TAG_ACTIVITY_RECOGNITION = "AR";
     public static final String LOG_TAG_PROBE_TRANSPORTATION = "PROBETR";
     public static final String LOG_TAG_GEO_FENCE = "GF";

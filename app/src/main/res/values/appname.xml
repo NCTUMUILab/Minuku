@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="app">
+        <item>Facebook:com.facebook.katana</item>
+        <item>Line:jp.naver.line.android</item>
+        <item>Wechat:com.tencent.mm</item>
+        <item>Minuku:edu.umich.si.inteco.minuku</item>
+
+    </string-array>
+
+
+</resources>

@@ -28,23 +28,31 @@
     <!-- App package -->
 
     <!--minuku-->
-    <string name="applicaiton_package_minuku">Submit</string>
+    <string name="applicaiton_package_minuku">edu.umich.si.inteco.minuku</string>
+
+    <!--launcher-->
+    <string name="applicaiton_package_launcher">com.sec.android.app.launcher</string>
+
+    <!--app store-->
+    <string name="applicaiton_package_google_play_store">com.android.vending</string>
 
     <!--social media-->
-    <string name="applicaiton_package_facebook">Submit</string>
+    <string name="applicaiton_package_facebook">com.facebook.katana</string>
     <string name="applicaiton_package_twitter">Submit</string>
     <string name="applicaiton_package_instagram">Submit</string>
 
+    <!--media-->
+    <string name="applicaiton_package_youtube">com.google.android.youtube</string>
 
     <!--social messenger-->
-    <string name="applicaiton_package_facebook_messenger">Submit</string>
-    <string name="applicaiton_package_line">Submit</string>
-    <string name="applicaiton_package_wechat">Submit</string>
-    <string name="applicaiton_package_whatsapp">Submit</string>
-    <string name="applicaiton_package_hangout">Submit</string>
+    <string name="applicaiton_package_facebook_messenger">com.facebook.orca</string>
+    <string name="applicaiton_package_line">jp.naver.line.android</string>
+    <string name="applicaiton_package_wechat">com.tencent.mm</string>
+    <string name="applicaiton_package_whatsapp">com.whatsapp</string>
+    <string name="applicaiton_package_hangout">com.google.android.talk</string>
 
-
-
+    <!--email -->
+    <string name="applicaiton_package_gmail">com.google.android.gm</string>
 
     <!-- Questionnaire -->
     <string name="questionnaire_submit_button_label">Submit</string>

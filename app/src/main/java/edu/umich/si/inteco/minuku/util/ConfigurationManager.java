@@ -609,7 +609,7 @@ public class ConfigurationManager {
 
 
 				//add criteria to the stateMappingRule
-				StateMappingRule stateMappingRule = new StateMappingRule(id, contextStateManagerName, sourceType, critera, stateValue);
+				StateMappingRule stateMappingRule = new StateMappingRule(id, contextStateManagerName, sourceType, source, critera, stateValue);
 
 
 
@@ -731,12 +731,11 @@ public class ConfigurationManager {
 				//associate situation ids to the monitoring action.
 				for (int j=0; j<ids.length; j++){
 
-
 					int statemappingId = Integer.parseInt(ids[j]);
 
 					Log.d(LOG_TAG, "[test SMR] sitution " + situation.getName() + " trying to find condition for mapping rule " + statemappingId);
 
-					for (int k=0; k<ContextManager.getContextStateManagerList().size(); k++) {
+					for (int k=0; k<ContextManager.getStateMappingRuleList().size(); k++) {
 
 						StateMappingRule rule= ContextManager.getStateMappingRuleList().get(k);
 						//find the statemappingrule so taht we can see which state the condition should be monitoring
@@ -745,22 +744,22 @@ public class ConfigurationManager {
 
 							Condition condition = new Condition();
 							condition.setStateName(rule.getName());
-							condition.setSourceType(rule.getSource());
+							condition.setSourceType(rule.getSourceType());
+							condition.setSource(rule.getSource());
 							condition.setStateTargetValue(rule.getStateValue());
+							condition.setStateMappingRule(rule);
 
 							conditions.add(condition);
-							Log.d(LOG_TAG, "[test SMR] situation  " + situation.getName() +
-									" add condition " + condition.getStateName()  + " source " + condition.getSourceType()
-							  + " " + condition.getStateTargetValue());
-
+//							Log.d(LOG_TAG, "[test SMR] situation  " + situation.getName() +
+//									" add condition " + condition.getStateName()  + " source " + condition.getSourceType()
+//							  + " " + condition.getStateTargetValue());
 
 						}
 
 					}
 				}
 
-
-				Log.d(LOG_TAG, "[test SMR] sitution " + situation.getName() + " has  " + conditions.size() + " conditions ");
+				situation.setConditionList(conditions);
 
 
 			} catch (JSONException e1) {

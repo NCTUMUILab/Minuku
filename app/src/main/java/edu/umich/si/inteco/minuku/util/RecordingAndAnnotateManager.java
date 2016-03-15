@@ -669,7 +669,7 @@ public class RecordingAndAnnotateManager {
             session.addContextSourceType(contextsource);
 
 //            Log.d(LOG_TAG, "[setupBackgroundRecordingEnvironment]testBackgroundLogging the backgroundrecording contain logging task " +
-//                            ContextManager.getLoggingTask(id) + " with the source: " + ContextManager.getLoggingTask(id).getSource()
+//                            ContextManager.getLoggingTask(id) + " with the source: " + ContextManager.getLoggingTask(id).getSourceType()
 //                    + " and add to session ");
 
         }
@@ -874,7 +874,7 @@ public class RecordingAndAnnotateManager {
 
         try {
 
-//            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments]testbackend] session: start time " + ScheduleAndSampleManager.getTimeString(session.getStartTime()) + " lastsync : " +   lastSyncHourTime);
+            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments]testbackend] session: start time " + ScheduleAndSampleManager.getTimeString(session.getStartTime()) + " lastsync : " +   lastSyncHourTime);
 
             long startTime =0;
             long endTime  =0;
@@ -882,7 +882,7 @@ public class RecordingAndAnnotateManager {
             //there's no backgrounding documents existing in the server
             if (lastSyncHourTime==0) {
 
-//            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] from be beginning " );
+            Log.d (LOG_TAG, "[getBackgroundRecordingDocuments][testgetdata] from be beginning " );
                 startTime = session.getStartTime();
                 //produce hour time
 
@@ -918,7 +918,7 @@ public class RecordingAndAnnotateManager {
             while (endTime <now) {
 
                 JSONObject document= getBackgroundRecordingDocument(startTime, endTime);
-//                Log.d(LOG_TAG, "[getBackgroundRecordingDocuments][testbackend] get document" + document.toString());
+                Log.d(LOG_TAG, "[getBackgroundRecordingDocuments][testbackend] get document" + document.toString());
                 documents.add(document);
                 startTime = endTime;
                 endTime += Constants.MILLISECONDS_PER_HOUR;

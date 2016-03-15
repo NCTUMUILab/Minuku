@@ -47,6 +47,14 @@ public class ContextManager {
     //flag of whether BackgroundRecording is enabled
     protected static boolean sIsBackgroundLoggingEnabled = false;
 
+
+    //flag to control whether the data will be saved to a local databases
+    protected static boolean sIsSavingDataToLocalDatabase = true;
+
+    //flat to control whether the data will be saved to log
+    protected static boolean sIsSavingDataToFileSystem = true;
+
+
     //mContext is MinukuService
 	private Context mContext;
 
@@ -440,7 +448,7 @@ public class ContextManager {
      */
     public void assignTasksToContextStateManager() {
 
-        Log.d(LOG_TAG, "[test situation] situation:  " + getSituationList().size()
+        Log.d(LOG_TAG, "[test SMR] situation:  " + getSituationList().size()
          + " loggingTaskssize " + mLoggingTaskList.size());
 
         /**
@@ -451,60 +459,24 @@ public class ContextManager {
             //creating StateMappingRule and add to the relevant ContextStateManagers
             Situation situation = getSituationList().get(i);
 
+            Log.d(LOG_TAG, "[test SMR] situation:  has "  + situation.getConditionList().size() + " conditions");
 
-           /**3  get those statemapping rules from the mStateMappingRuleList, and then associate condition with those states **/
+           /**find the statemappingrule and assign to contextStateManager the **/
+            //get conditions in each situation
+            for (int j=0; j< situation.getConditionList().size(); j++) {
 
+                Condition condition = situation.getConditionList().get(j);
 
+                //for each condition, we need to know which ContextStateManager will need to generate a state
+                // for that condition.
 
-           /**4 assign contextStateManager the statemappingrule **/
+                Log.d(LOG_TAG, "[test SMR] find contextStatemanger: condition  " + condition.getSource() );
 
+                String contextStateManagerName = getContextStateManagerName(condition.getSource());
 
+                assignMonitoringSituationTask(contextStateManagerName, condition.getStateMappingRule());
 
-//            //get conditions in each situation
-//            for (int j=0; j< situation.getConditionList().size(); j++) {
-//
-//                Condition condition = situation.getConditionList().get(j);
-//
-//                //for each condition, we need to know which ContextStateManager will need to generate a state
-//                // for that condition.
-//                String contextStateManagerName = getContextStateManagerName(condition.getSource());
-//
-//                //we give contextStateManager a list of criteria for each state.
-//                ArrayList<StateValueCriterion> criteria = condition.getStateValueCriteria();
-//
-//                //If the criteria are met, it changes the state to the value
-//                String stateValue = condition.getStateTargetValue();
-//
-//                //we get the source type from the ContextStateManager
-//                int sourceType = getSourceTypeFromName(contextStateManagerName, condition.getSource());
-//
-//                //condition originally saves string of source, because it is specified by users. We need to
-//                //find the corresponding source type in Int.
-//                Log.d(LOG_TAG, "[test situation] condition for " + contextStateManagerName
-//                        + " source: " + condition.getSource() + " soucetype: " +
-//                        getSourceTypeFromName(contextStateManagerName, condition.getSource())
-//                        + " if met, the state value is " + stateValue );
-//
-//                Log.d(LOG_TAG, "[test situation]  criteria " + condition.getStateValueCriteria().toString());
-//                Log.d(LOG_TAG, "[test situation]  time criteria " + condition.getTimeCriteria().toString());
-//
-//
-//                //generate a sateMappingRule for the ContextStateManager to use to monitor the state
-//                StateMappingRule rule = new StateMappingRule(contextStateManagerName, sourceType, criteria, stateValue);
-//
-//
-//                //then we update condition so that it remembers source types and state name in the future.
-//                condition.setSourceType(sourceType);
-//                //it also remembers which state is monitors.
-//                condition.setStateName(rule.getName());
-//
-//                Log.d(LOG_TAG, "[test situation] adding a rule:" +
-//                        "the rule is: " + rule.toString() + " is for " + contextStateManagerName + " the name is " + rule.getName()
-//                 + " and the statename is " + condition.getStateName() );
-//
-//                assignMonitoringSituationTask(contextStateManagerName, rule);
-//
-//            }
+            }
 
         }
 
@@ -581,9 +553,26 @@ public class ContextManager {
                  **/
 
 
+                /**1.
+                 * The first task is to update transportation mode. Transporation Manager will use the latet activity label
+                 * saved in the ActivityRecognitionManager to infer the user's current transportation mode
+                 * **/
+                ActivityRecognitionRecord record = (ActivityRecognitionRecord) mActivityRecognitionManager.getLastSavedRecord();
+
+                if (record!=null){
+                    mTransportationModeManager.examineTransportation(record);
+                    Log.d(LOG_TAG, "[examineTransportation] transoprtatopn: " + TransportationModeManager.getConfirmedActvitiyString());
+
+                }
+
+                /**2. The second  task is to update Mobility of the user after the transportationModeManager generate a transportation label,
+                 * The mobility information, is also used to control the frequency of location udpate to save battery life**/
+                MobilityManager.updateMobility();
+
+
 
                 /**
-                 * 1. The first task of ContextManager is to execute BackgroundLogging if it is enabled.
+                 * 3. The third task of ContextManager is to execute BackgroundLogging if it is enabled.
                  */
 
                 //Recording is one of the types of actions that users need to put into the configuration.
@@ -595,51 +584,18 @@ public class ContextManager {
                     //we skip starting action and directly save Records to the DB
                     copyRecordFromLocalRecordPoolToPublicRecordPool(loggingTaskIds);
 
-                    //save data from publie record pool to database
-                    DataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
-                }
+                    //save data from publie record pool to database and/or file system, based on the configuration
+                    if (sIsSavingDataToLocalDatabase)
+                        DataHandler.SaveRecordsToLocalDatabase(ContextManager.getPublicRecordPool(), Constants.BACKGOUND_RECORDING_SESSION_ID);
 
-                /**2.
-                 * The second task is to update transportation mode. Transporation Manager will use the latet activity label
-                 * saved in the ActivityRecognitionManager to infer the user's current transportation mode
-                 * **/
-                ActivityRecognitionRecord record = (ActivityRecognitionRecord) mActivityRecognitionManager.getLastSavedRecord();
+                    if(sIsSavingDataToLocalDatabase){
+                        DataHandler.SaveRecordsToFileSystem(mLoggingTaskList);
+                    }
 
-                if (record!=null){
-                    mTransportationModeManager.examineTransportation(record);
-                    Log.d(LOG_TAG, "[examineTransportation] transoprtatopn: " + TransportationModeManager.getConfirmedActvitiyString());
+
 
                 }
 
-                /**3. The third task is to update Mobility of the user after the transportationModeManager generate a transportation label,
-                 * The mobility information, is also used to control the frequency of location udpate to save battery life**/
-                MobilityManager.updateMobility();
-
-
-                /************************************** For Traveling Study *****************************
-                 * The third task is to update Mobility of the user after the transportationModeManager generate a transportation label,
-                 * The mobility information, is also used to control the frequency of location udpate to save battery life**/
-
-                String travelHistoryMessage="NA";
-
-                /*we create a travel log here*/
-                if (ActivityRecognitionManager.getProbableActivities()!=null &&
-                        LocationManager.getCurrentLocation()!=null ){
-                    travelHistoryMessage= MobilityManager.getMobility() + "\t" +
-                            TransportationModeManager.getConfirmedActvitiyString() + "\t" +
-                            "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
-                            ActivityRecognitionManager.getProbableActivities().toString() + "\t" +
-                            LocationManager.getCurrentLocation().getLatitude() + "," +
-                            LocationManager.getCurrentLocation().getLongitude() + "," +
-                            LocationManager.getCurrentLocation().getAccuracy();
-                }
-
-                //create travel history file
-                LogManager.log(LogManager.LOG_TYPE_TRAVEL_LOG,
-                        LogManager.LOG_TAG_TRAVEL_HISTORY,
-                        //content of the log
-                        travelHistoryMessage
-                );
 
             }catch (IllegalArgumentException e){
                 //Log.e(LOG_TAG, "Could not unregister receiver " + e.getMessage()+"");
@@ -700,7 +656,7 @@ public class ContextManager {
             //find the contextStateManager responsible for the loggingTask because we need to copy record from that localRecordPool to the Public Record Pool
             String contextStateManagerName = getContextStateManagerName(loggingTask.getSource());
 
-//            Log.d (LOG_TAG, "[testBackgroundLogging] copy data for contextsource:  " + loggingTask.getSource() + " from " + contextStateManagerName);
+//            Log.d (LOG_TAG, "[testBackgroundLogging] copy data for contextsource:  " + loggingTask.getSourceType() + " from " + contextStateManagerName);
 
 
             //after finding the ContextStateManager, we copy the Record from the LocalRecordPool of that ContextStatManager to the PublicRecordPool
@@ -717,7 +673,7 @@ public class ContextManager {
      */
     private static void copyRecordFromLocalRecordPoolToPublicRecordPool(String contextStateManagerName, LoggingTask loggingTask) {
 
-//        Log.d(LOG_TAG, "testBackgroundLogging testing saving records moving records in " + contextStateManagerName + " for logging tasks " + loggingTask.getSource());
+//        Log.d(LOG_TAG, "testBackgroundLogging testing saving records moving records in " + contextStateManagerName + " for logging tasks " + loggingTask.getSourceType());
 
         //1.
         if (contextStateManagerName.equals(CONTEXT_STATE_MANAGER_ACTIVITY_RECOGNITION))
@@ -1037,18 +993,18 @@ public class ContextManager {
 
         /**get any conditions that use the state. **/
 
-        Log.d(LOG_TAG, "[examineCircumstanceConditions]");
+        Log.d(LOG_TAG, "test SMR situ [examineCircumstanceConditions]");
 
-        ArrayList<Situation> relatedCircumstances = getRelatedSituation(state);
+        ArrayList<Situation> relatedSituations = getRelatedSituation(state);
 
-        Log.d(LOG_TAG, "[examineCircumstanceConditions] there are " + relatedCircumstances.size() + " sitautions monitoring the state");
+        Log.d(LOG_TAG, "test SMR situ [examineCircumstanceConditions] there are " + relatedSituations.size() + " sitautions monitoring the state");
 
         //for each sitaution, get all of the conditions, and check whether the condition has been met.
-        for (int i=0; i < relatedCircumstances.size(); i++) {
+        for (int i=0; i < relatedSituations.size(); i++) {
 
-            Situation sitaution = relatedCircumstances.get(i);
+            Situation sitaution = relatedSituations.get(i);
 
-            Log.d(LOG_TAG, "[examineCircumstanceConditions] now check sitaution " + sitaution.getName());
+            Log.d(LOG_TAG, "test SMR situ [examineCircumstanceConditions] now check sitaution " + sitaution.getName());
 
             /** an sitaution contains a set of conditions. An sitaution occurs only when all conditions are met **/
             boolean pass = true;
@@ -1061,7 +1017,7 @@ public class ContextManager {
                     Condition condition = conditions.get(j);
                     //the final pass is true only when all the conditions are true.
                     pass = pass & state.getValue().equals(condition.getStateTargetValue());
-                    Log.d(LOG_TAG, "[examineCircumstanceConditions] now the sitaution's condition:  " +condition.getStateName() +
+                    Log.d(LOG_TAG, "test SMR situ [examineCircumstanceConditions] now the sitaution's condition:  " +condition.getStateName() +
                     "-" +condition.getStateTargetValue() + " pasS: " + pass);
 
                 }
@@ -1077,7 +1033,7 @@ public class ContextManager {
                         "Situation detected:\t" + sitaution.getId() + "\t" + sitaution.getName());
 
                 //check the triggerlinks of the current sitaution to see if it would trigger anything.
-                Log.d(LOG_TAG, "[examineCircumstanceConditions] The sitaution " + sitaution.getId() + "  condition is satisfied, check its triggerLinks! "
+                Log.d(LOG_TAG, "test SMR situ [examineCircumstanceConditions] The sitaution " + sitaution.getId() + "  condition is satisfied, check its triggerLinks! "
                         + " the sitaution has " + sitaution.getTriggerLinks().size() + " triggerlinks ");
 
                 //the sitaution will trigger something, we call TriggerManager to manage its trigger.

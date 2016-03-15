@@ -53,7 +53,8 @@ public class TaskSectionFragment extends Fragment{
                     TaskManager.getTaskList()
             );
 
-            taskListView.setAdapter(adapter);
+            if (taskListView!=null)
+                taskListView.setAdapter(adapter);
         }
 
 
