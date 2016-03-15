@@ -1109,9 +1109,10 @@ public class PhoneStatusManager extends ContextStateManager {
                 SortedMap<Long, UsageStats> mySortedMap = new TreeMap<Long, UsageStats>();
                 for (UsageStats usageStats : appList) {
                     mySortedMap.put(usageStats.getLastTimeUsed(), usageStats);
-                    Log.d(LOG_TAG, "test app:  " + ScheduleAndSampleManager.getTimeString(usageStats.getLastTimeUsed()) +
-                            " usage stats " + usageStats.getPackageName() + " total time in foreground " + usageStats.getTotalTimeInForeground()/60000
-                    + " between " + ScheduleAndSampleManager.getTimeString(usageStats.getFirstTimeStamp()) + " and " + ScheduleAndSampleManager.getTimeString(usageStats.getLastTimeStamp()));
+//                    Log.d(LOG_TAG, "test app:  " + ScheduleAndSampleManager.getTimeString(usageStats.getLastTimeUsed()) +
+//                            " usage stats " + usageStats.getPackageName() + " total time in foreground " + usageStats.getTotalTimeInForeground()/60000
+//                    + " between " + ScheduleAndSampleManager.getTimeString(usageStats.getFirstTimeStamp()) + " and " + ScheduleAndSampleManager.getTimeString(usageStats.getLastTimeStamp()));
+//
                 }
 
 
@@ -1121,8 +1122,8 @@ public class PhoneStatusManager extends ContextStateManager {
                     mLastestForegroundPackage = mySortedMap.get(mySortedMap.lastKey()).getPackageName();
                     mLastestForegroundPackageTime = ScheduleAndSampleManager.getTimeString(mySortedMap.get(mySortedMap.lastKey()).getLastTimeUsed());
 
-                    Log.d(LOG_TAG, "test app "  +  mLastestForegroundPackage + " time " +
-                            mLastestForegroundPackageTime);
+//                    Log.d(LOG_TAG, "test app "  +  mLastestForegroundPackage + " time " +
+//                            mLastestForegroundPackageTime);
                 }
 
 
@@ -1166,8 +1167,8 @@ public class PhoneStatusManager extends ContextStateManager {
             curRunningForegrndActivity = taskInfo.get(0).topActivity.getClassName();
             curRunningForegrndPackNamge = taskInfo.get(0).topActivity.getPackageName();
 
-            Log.d(LOG_TAG, "test app os version " +android.os.Build.VERSION.SDK_INT + " under 21 "
-                     + curRunningForegrndActivity + " " + curRunningForegrndPackNamge );
+//            Log.d(LOG_TAG, "test app os version " +android.os.Build.VERSION.SDK_INT + " under 21 "
+//                     + curRunningForegrndActivity + " " + curRunningForegrndPackNamge );
 
             //store the running activity and its package name in the Context Extractor
             if(taskInfo!=null){

@@ -80,6 +80,15 @@
             android:exported="true" >
         </service>
 
+
+        <service android:name=".services.MinukuAccessibilityService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
+
+
         <!-- Boot Complete Receiver -->
 
         <receiver

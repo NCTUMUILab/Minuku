@@ -1,17 +1,37 @@
 package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
 import android.content.Context;
+import android.content.Intent;
+
+import edu.umich.si.inteco.minuku.services.MinukuAccessibilityService;
 
 public class UserInteractionManager extends ContextStateManager {
 
 	private Context mContext;
+	private static final String LOG_TAG = "UserInteractionManager";
 
+	//we should change this based on whether any context source related to it is requested
+	private static boolean isEnablingAccessibilityServiceNeeded = true;
 
 	public UserInteractionManager(Context context) {
 		super();
 		mContext = context;
+
+		//TODO: call this in updating requested context source list
+		activateAccessibilityService();
+
+
 	}
 
+
+
+
+	private void activateAccessibilityService() {
+
+		Intent i = new Intent(mContext, MinukuAccessibilityService.class);
+		mContext.startService(i);
+
+	}
 
 	public static void updateStateValues() {
 
