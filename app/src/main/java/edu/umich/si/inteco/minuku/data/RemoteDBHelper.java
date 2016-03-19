@@ -1223,7 +1223,7 @@ public class RemoteDBHelper {
 
     public static String postJSON (String address, String json, String dataType, String lastSyncTime) {
 
-        Log.d(LOG_TAG, "[postJSON] post data to " + address);
+        Log.d(LOG_TAG, "[postJSON] testbackend post data to " + address);
 
         LogManager.log(LogManager.LOG_TYPE_FILE_UPLOAD_LOG, "POSTJSON", json );
 
@@ -1234,7 +1234,7 @@ public class RemoteDBHelper {
 
             URL url = new URL(address);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            Log.d(LOG_TAG, "[postJSON] connecting to " + address);
+            Log.d(LOG_TAG, "[postJSON] testbackend connecting to " + address);
 
             if (url.getProtocol().toLowerCase().equals("https")) {
                 Log.d(LOG_TAG, "[postJSON] [using https]");

@@ -49,52 +49,58 @@ public class ActivityRecognitionService extends IntentService {
 		// TODO Auto-generated method stub
 		
 		// If the activity recognition intent contains an activity update, get the update
-		if (ActivityRecognitionResult.hasResult(intent)) {
+		if (ActivityRecognitionResult.hasResult(intent) ) {
 
-                //get the result from Google Play Service
-				ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
+            //get the result from Google Play Service
+            ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 
-                //store the returned list of probable acitvities (with confidence level)
-                mProbableActivities = result.getProbableActivities();
 
-                //store the returned most probable activity (with confidence level)
-                mMostProbableActivity = result.getMostProbableActivity();
-                Log.d(LOG_TAG, "[test ActivityRecognition] " +   mMostProbableActivity.toString());
+            //store the returned list of probable acitvities (with confidence level)
+            mProbableActivities = result.getProbableActivities();
 
-                //Toast.makeText(this, "the detected activity is " + mMostProbableActivity + ": " + mProbableActivities, Toast.LENGTH_SHORT).show();
+            //store the returned most probable activity (with confidence level)
+            mMostProbableActivity = result.getMostProbableActivity();
+            Log.d(LOG_TAG, "[test ActivityRecognition] " +   mMostProbableActivity.toString());
 
-                /** save activity labels and detection time to ActivityRecognition Manager **/
+            //Toast.makeText(this, "the detected activity is " + mMostProbableActivity + ": " + mProbableActivities, Toast.LENGTH_SHORT).show();
 
-                //we don't save this when we playback activity traces from file
-                //instead, we let ContextManager to feed activity
+            /** save activity labels and detection time to ActivityRecognition Manager **/
 
-                //after we get activity information from Google's Play service, we update the activity information
-                //in ActitivityRecognition Manager
+            //we don't save this when we playback activity traces from file
+            //instead, we let ContextManager to feed activity
 
-                mActivityRecognitionManager.setActivities(mProbableActivities, mMostProbableActivity);
-                mActivityRecognitionManager.setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
+            //after we get activity information from Google's Play service, we update the activity information
+            //in ActitivityRecognition Manager
 
-                if (Constants.isTestingActivity) {
-                	sendNotification();
-                	
-                	//logging the activity information..
-                    String message = "";
+            try{
+                if (mProbableActivities!=null && mMostProbableActivity!=null) {
+                    mActivityRecognitionManager.setActivities(mProbableActivities, mMostProbableActivity);
+                    mActivityRecognitionManager.setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
-                    for (int i=0; i<mProbableActivities.size(); i++){
-                        message += ActivityRecognitionManager.getActivityNameFromType(mProbableActivities.get(i).getType()) + ":" + mProbableActivities.get(i).getConfidence();
-                        if (i<mProbableActivities.size()-1){
-                            message+= ";;";
+                    if (Constants.isTestingActivity) {
+//                    sendNotification();
+
+                        //logging the activity information..
+                        String message = "";
+
+                        for (int i=0; i<mProbableActivities.size(); i++){
+                            message += ActivityRecognitionManager.getActivityNameFromType(mProbableActivities.get(i).getType()) + ":" + mProbableActivities.get(i).getConfidence();
+                            if (i<mProbableActivities.size()-1){
+                                message+= ";;";
+                            }
                         }
+
+                        LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
+                                LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
+                                message);
+
+
                     }
-
-                    LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
-                            LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
-                            message);
-
-
                 }
-                	
-                
+            }
+            catch(Exception e){
+                Log.e(LOG_TAG, e.getLocalizedMessage());
+            }
 
 		}
 	}

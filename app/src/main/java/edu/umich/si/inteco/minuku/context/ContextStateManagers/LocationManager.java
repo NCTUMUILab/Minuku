@@ -404,9 +404,9 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
 
 
         //TODO: we remove this after we don't need tthis anymore,
-        Toast.makeText(mContext, mCurrentLocation.getLatitude() + " , " + mCurrentLocation.getLongitude()
-                        + " , " + mCurrentLocation.getAccuracy(),
-                Toast.LENGTH_SHORT).show();
+//        Toast.makeText(mContext, mCurrentLocation.getLatitude() + " , " + mCurrentLocation.getLongitude()
+//                        + " , " + mCurrentLocation.getAccuracy(),
+//                Toast.LENGTH_SHORT).show();
 
     }
 

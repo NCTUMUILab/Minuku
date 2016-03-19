@@ -82,7 +82,7 @@ public class ContextManager {
     public static final String CONTEXT_SOURCE_NAME_ACTIVITY_RECOGNITION_PREFIX = "AR-";
     public static final String CONTEXT_SOURCE_NAME_TRANSPORTATION = "Transportation";
     public static final String CONTEXT_SOURCE_NAME_PHONE_STATUS_PREFIX = "PhoneStatus-";
-    public static final String CONTEXT_SOURCE_NAME_USER_INTERACTION_PREFIX = "UserInteraction.";
+    public static final String CONTEXT_SOURCE_NAME_USER_INTERACTION_PREFIX = "UserInteraction-";
     public static final String CONTEXT_SOURCE_NAME_LOCATION = "Location";
     public static final String CONTEXT_SOURCE_NAME_SENSOR_PREFIX = "Sensor-";
 
@@ -218,6 +218,7 @@ public class ContextManager {
         mContextStateMangers.add(mTransportationModeManager);
         mContextStateMangers.add(mPhoneSensorManager);
         mContextStateMangers.add(mPhoneStatusManager);
+        mContextStateMangers.add(mUserInteractionManager);
 
 
         Log.d(LOG_TAG, "test creat tables after add csms");
@@ -1117,6 +1118,11 @@ public class ContextManager {
 
     public static ActivityRecognitionManager getActivityRecognitionManager() {
         return mActivityRecognitionManager;
+    }
+
+
+    public static UserInteractionManager getUserInteractionManager() {
+        return mUserInteractionManager;
     }
 
 

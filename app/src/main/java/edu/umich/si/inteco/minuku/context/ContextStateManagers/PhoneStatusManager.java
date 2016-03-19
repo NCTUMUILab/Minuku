@@ -387,7 +387,6 @@ public class PhoneStatusManager extends ContextStateManager {
         /** create data in a JSON Object. Each CotnextSource will have different formats.
          * So we need each ContextSourceMAnager to implement this part**/
         JSONObject data = new JSONObject();
-        JSONArray array = new JSONArray();
 
         if (sourceName.equals(STRING_CONTEXT_SOURCE_PHONE_STATUS_APPUSAGE)) {
 
@@ -511,8 +510,8 @@ public class PhoneStatusManager extends ContextStateManager {
             ContextSource source = mContextSourceList.get(i);
 
             mContextSourceList.get(i).setIsRequested(updateContextSourceRequestStatus(source));
-            Log.d(LOG_TAG, "[[test source being requested]] check saving data the contextsource "
-                    + source.getName() + " requested: " + source.isRequested());
+//            Log.d(LOG_TAG, "[[test source being requested]] check saving data the contextsource "
+//                    + source.getName() + " requested: " + source.isRequested());
 
             isRequested = mContextSourceList.get(i).isRequested();
 
@@ -520,7 +519,7 @@ public class PhoneStatusManager extends ContextStateManager {
             if (isRequested){
 
                 if (!mCurrentlyRequestedContextSourceList.contains(source)){
-                    Log.d(LOG_TAG, "[[test source being requested]], start requesting informatoin");
+//                    Log.d(LOG_TAG, "[[test source being requested]], start requesting informatoin");
                     requestUpdate(source);
                 }
 
@@ -529,7 +528,7 @@ public class PhoneStatusManager extends ContextStateManager {
                 //TODO: check if the contextsource is currently getting update, if yes, remove update
 
                 if (mCurrentlyRequestedContextSourceList.contains(source)){
-                    Log.d(LOG_TAG, "[[test source being requested]], stop requesting informatoin because it is not needed anymore");
+//                    Log.d(LOG_TAG, "[[test source being requested]], stop requesting informatoin because it is not needed anymore");
                     removeUpdate(source);
                 }
 
@@ -544,7 +543,7 @@ public class PhoneStatusManager extends ContextStateManager {
      */
     private void requestUpdate(ContextSource source) {
 
-        Log.d(LOG_TAG, "[[test source being requested]], requestUpdate " + source.getName());
+//        Log.d(LOG_TAG, "[[test source being requested]], requestUpdate " + source.getName());
 
         mCurrentlyRequestedContextSourceList.add(source);
 
@@ -627,7 +626,7 @@ public class PhoneStatusManager extends ContextStateManager {
 
     //unregister the phonestatelistenner
     private void removeTelephonyUpdate() {
-        Log.d(LOG_TAG, "[test source being requested] getDeviceId");
+//        Log.d(LOG_TAG, "[test source being requested] getDeviceId");
         mTelephonyManager.listen(mTelephonyStateListener, PhoneStateListener.LISTEN_NONE);
     }
 
@@ -1037,10 +1036,10 @@ public class PhoneStatusManager extends ContextStateManager {
                         android.os.Process.myUid(), mContext.getPackageName());
 
                 granted = mode == AppOpsManager.MODE_ALLOWED;
-                Log.d(LOG_TAG, "[test source being requested]checkApplicationUsageAccess mode mIs : " + mode + " granted: " + granted);
+//                Log.d(LOG_TAG, "[test source being requested]checkApplicationUsageAccess mode mIs : " + mode + " granted: " + granted);
 
             } catch (PackageManager.NameNotFoundException e) {
-                Log.d(LOG_TAG, "[testing app]checkApplicationUsageAccess somthing mIs wrong");
+//                Log.d(LOG_TAG, "[testing app]checkApplicationUsageAccess somthing mIs wrong");
             }
         }
         return granted;
@@ -1068,13 +1067,13 @@ public class PhoneStatusManager extends ContextStateManager {
 
         }
 
-        Log.d(LOG_TAG, "test source being requested [testing app] SCREEN:  " + mScreenStatus);
+//        Log.d(LOG_TAG, "test source being requested [testing app] SCREEN:  " + mScreenStatus);
     }
 
 
     protected void getAppUsageUpdate() {
 
-        Log.d(LOG_TAG, "test source being requested [testing app]: getAppUsageUpdate");
+//        Log.d(LOG_TAG, "test source being requested [testing app]: getAppUsageUpdate");
         String currentApp = "NA";
 
         /**

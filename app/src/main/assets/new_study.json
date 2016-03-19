@@ -129,7 +129,7 @@
 
 			  "BackgroundLogging":{
 				"Enabled": true,
-				"Logging_tasks":"1,2,3,7,10,11",
+				"Logging_tasks":"1,2,3,7,10,11,12",
 				"Logging_rate": 5
 			  },
 
@@ -170,6 +170,10 @@
 				  {
 					"Id": 11,
 					"Source": "PhoneStatus-AppUsage"
+				  },
+				  {
+					"Id": 12,
+					"Source": "UserInteraction-InAppAction"
 				  }
 				],
 				"Situations":
@@ -196,7 +200,7 @@
 					"Execution_style":"one-time",
 					"Type": "questionnaire",
 					"Name": "triggering carried item questionnaire",
-					"Questionnaire_id":2,
+					"Questionnaire_id":1,
 					"Control":{
 					  "Start":
 					  [
@@ -209,7 +213,7 @@
 							"Sample_min_interval":3600,
 							"Sample_count": 6,
 							"Sample_startAt": "10:00",
-							"Sample_endAt": "14:50"
+							"Sample_endAt": "22:00"
 						  }
 						}
 					  ]

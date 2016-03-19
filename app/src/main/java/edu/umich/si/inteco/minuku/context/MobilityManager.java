@@ -95,7 +95,7 @@ public class MobilityManager {
 
 
         //test mobility: send notification
-        sendNotification();
+//        sendNotification();
 
         //we need to adjust the location update frequency when we see a different mobility
         if (!preMobility.equals("NA") && !preMobility.equals(mobility)) {

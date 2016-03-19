@@ -226,7 +226,7 @@ public abstract class ContextStateManager {
         boolean isMonitored = isStateMonitored(contextSource.getSourceId());
         boolean isRequested = isLoggingInAction | isMonitored ;
 
-        Log.d(LOG_TAG, "[testing logging task and requested][updateContextSourceListRequestStatus] " +
+        Log.d(LOG_TAG, "[test source being requested][updateContextSourceListRequestStatus] " +
                 "the contextSource " + contextSource.getName() +
                 " ActionLogging " + isLoggingInAction + " monitored : " + isMonitored + " isRequested: " + isRequested);
 

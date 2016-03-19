@@ -20,6 +20,7 @@ public class PreferenceHelper {
     public static final String USER_ID = PACKAGE_NAME+ ".USER_ID";
     public static final String SCHEDULE_REQUEST_CODE = PACKAGE_NAME+".REQUEST_CODE";
     public static final String DATABASE_LAST_SEVER_SYNC_TIME = PACKAGE_NAME+ ".LAST_SERVER_SYNC_TIME";
+    public static final String USER_INTERACTION_IN_APP_USE_REQUESTED = PACKAGE_NAME+ ".LAST_SERVER_SYNC_TIME";
 
     /***
      * Shared preference for storing context related information
