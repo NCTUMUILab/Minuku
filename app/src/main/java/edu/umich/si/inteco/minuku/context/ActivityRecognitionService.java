@@ -77,25 +77,25 @@ public class ActivityRecognitionService extends IntentService {
                     mActivityRecognitionManager.setActivities(mProbableActivities, mMostProbableActivity);
                     mActivityRecognitionManager.setLatestDetectionTime(ContextManager.getCurrentTimeInMillis());
 
-                    if (Constants.isTestingActivity) {
-//                    sendNotification();
-
-                        //logging the activity information..
-                        String message = "";
-
-                        for (int i=0; i<mProbableActivities.size(); i++){
-                            message += ActivityRecognitionManager.getActivityNameFromType(mProbableActivities.get(i).getType()) + ":" + mProbableActivities.get(i).getConfidence();
-                            if (i<mProbableActivities.size()-1){
-                                message+= ";;";
-                            }
-                        }
-
-                        LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
-                                LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
-                                message);
-
-
-                    }
+//                    if (Constants.isTestingActivity) {
+////                    sendNotification();
+//
+//                        //logging the activity information..
+//                        String message = "";
+//
+//                        for (int i=0; i<mProbableActivities.size(); i++){
+//                            message += ActivityRecognitionManager.getActivityNameFromType(mProbableActivities.get(i).getType()) + ":" + mProbableActivities.get(i).getConfidence();
+//                            if (i<mProbableActivities.size()-1){
+//                                message+= ";;";
+//                            }
+//                        }
+//
+//                        LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
+//                                LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
+//                                message);
+//
+//
+//                    }
                 }
             }
             catch(Exception e){

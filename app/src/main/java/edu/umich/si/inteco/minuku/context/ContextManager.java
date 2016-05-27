@@ -22,6 +22,7 @@ import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationMod
 import edu.umich.si.inteco.minuku.context.ContextStateManagers.UserInteractionManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.model.BackgroundLoggingSetting;
+import edu.umich.si.inteco.minuku.model.Record.LocationRecord;
 import edu.umich.si.inteco.minuku.model.Situation;
 import edu.umich.si.inteco.minuku.model.Condition;
 import edu.umich.si.inteco.minuku.model.LoggingTask;
@@ -559,13 +560,50 @@ public class ContextManager {
                  * The first task is to update transportation mode. Transporation Manager will use the latet activity label
                  * saved in the ActivityRecognitionManager to infer the user's current transportation mode
                  * **/
-                ActivityRecognitionRecord record = (ActivityRecognitionRecord) mActivityRecognitionManager.getLastSavedRecord();
 
-                if (record!=null){
-                    mTransportationModeManager.examineTransportation(record);
-                    Log.d(LOG_TAG, "[examineTransportation] transoprtatopn: " + TransportationModeManager.getConfirmedActvitiyString());
+                //logging the activity information using its latest activity information. Also log with location
+                String message = "";
+
+
+                if (mActivityRecognitionManager.getLastSavedRecord()!=null && mLocationManager.getLastSavedRecord()!=null ){
+
+                    ActivityRecognitionRecord record = (ActivityRecognitionRecord) mActivityRecognitionManager.getLastSavedRecord();
+
+
+                    //append activity string
+                    for (int i=0; i<record.getProbableActivities().size(); i++){
+                        message += ActivityRecognitionManager.getActivityNameFromType(record.getProbableActivities().get(i).getType()) + ":" + record.getProbableActivities().get(i).getConfidence();
+                        if (i<record.getProbableActivities().size()-1){
+                            message+= ";;";
+                        }
+                    }
+
+                    Log.d(LOG_TAG, "[testactivitylog] activity " + record.getProbableActivities());
+
+                    //append location data
+                    LocationRecord locationRecord = (LocationRecord) mLocationManager.getLastSavedRecord();
+                    //append location data
+                    message += "\t" + locationRecord.getLat() + ";" + locationRecord.getLng() + ";" + locationRecord.getAccuracy();
+
+                    Log.d(LOG_TAG, "[testactivitylog] location" + locationRecord.getLat() + " , " + locationRecord.getLng());
+
+                    Log.d(LOG_TAG, "[testactivitylog] message" + message);
+
+                    //log activity recognition
+                    LogManager.log(LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
+                            LogManager.LOG_TAG_ACTIVITY_RECOGNITION,
+                            message);
+
+
+                    if (record!=null){
+                        mTransportationModeManager.examineTransportation(record);
+                        Log.d(LOG_TAG, "[testactivitylog] transoprtatopn: " + TransportationModeManager.getConfirmedActvitiyString());
+
+                    }
 
                 }
+
+
 
                 /**2. The second  task is to update Mobility of the user after the transportationModeManager generate a transportation label,
                  * The mobility information, is also used to control the frequency of location udpate to save battery life**/
