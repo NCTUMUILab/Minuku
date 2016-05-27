@@ -196,6 +196,7 @@ public class CheckinSectionFragment extends Fragment{
                     MinukuMainService.setCentralChrometerRunning(true);
                     MinukuMainService.setCentralChrometerPaused(false);
 
+                    //change the text of the button to checkpoint
                     checkinButton.setText(getString(R.string.checkin_btn));
 
 
@@ -239,11 +240,9 @@ public class CheckinSectionFragment extends Fragment{
                             "User Click:\t" + "startRecording" + "\t" + "RecordingTab");
 
 
-                    //TODO: request location udpate after hitting the start button
-                    //ContextExtractor.getLocationManager().requestLocationUpdate();
-
-
                 }
+
+
 
                 //if the button is checkin, add check point times
                 else if (checkinButton.getText().toString().equals(getString(R.string.checkin_btn))) {
@@ -277,14 +276,33 @@ public class CheckinSectionFragment extends Fragment{
                     /***2. create checkpoint and log data of the two checkpoints **/
 
                 try{
+//                    Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
+//                    String betweenCheckpointContentMessage =
+//                            ScheduleAndSampleManager.getTimeString(previousCheckpoint.getTimestamp()) + "\t" +
+//                                    previousCheckpoint.getTimestamp() + "\t" +
+//                                    ScheduleAndSampleManager.getTimeString(curCheckpoint.getTimestamp()) + "\t" +
+//                                    curCheckpoint.getTimestamp()+ "\t" +
+//                                    previousCheckpoint.getLocation().toString() + "\t" +
+//                                    curCheckpoint.getLocation().toString();
+
                     Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
+                    
                     String betweenCheckpointContentMessage =
                             ScheduleAndSampleManager.getTimeString(previousCheckpoint.getTimestamp()) + "\t" +
-                                    previousCheckpoint.getTimestamp() + "\t" +
                                     ScheduleAndSampleManager.getTimeString(curCheckpoint.getTimestamp()) + "\t" +
-                                    curCheckpoint.getTimestamp()+ "\t" +
-                                    previousCheckpoint.getLocation().toString() + "\t" +
-                                    curCheckpoint.getLocation().toString();
+                                    "Ground Truth";
+
+
+
+                    //for each checkpoint, generate a "previous checkpoint time transportation - current checkpoint time  ground truth"
+                    LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
+                            LogManager.LOG_TAG_USER_CHECKIN,
+                            betweenCheckpointContentMessage);
+
+                    Log.d(LOG_TAG, "check checkpoint message" + betweenCheckpointContentMessage);
+
+
+
                 }catch(Exception e){
 
                     }
@@ -302,25 +320,25 @@ public class CheckinSectionFragment extends Fragment{
 
 
 //                /*we create check in log whenever the button is pressed, regardless is is START or CHECK IN**/
-
-                try {
-                    String checkpointContentMessage=
-
-                            LocationManager.getCurrentLocation().getLatitude() + "," +
-                                    LocationManager.getCurrentLocation().getLongitude() + "," +
-                                    LocationManager.getCurrentLocation().getAccuracy() + "\t" +
-                                    TransportationModeManager.getConfirmedActvitiyString() + "\t" +
-                                    "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
-                                    ActivityRecognitionManager.getProbableActivities().toString() + "\t" ;
-
-                    /**for generate check-point file**/
-                    LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
-                            LogManager.LOG_TAG_USER_CHECKIN,
-                            checkpointContentMessage);
-                }catch(Exception e){
-
-                }
-
+//
+//                try {
+//                    String checkpointContentMessage=
+//
+//                            LocationManager.getCurrentLocation().getLatitude() + "," +
+//                                    LocationManager.getCurrentLocation().getLongitude() + "," +
+//                                    LocationManager.getCurrentLocation().getAccuracy() + "\t" +
+//                                    TransportationModeManager.getConfirmedActvitiyString() + "\t" +
+//                                    "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
+//                                    ActivityRecognitionManager.getProbableActivities().toString() + "\t" ;
+//
+//                    /**for generate check-point file**/
+//                    LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
+//                            LogManager.LOG_TAG_USER_CHECKIN,
+//                            checkpointContentMessage);
+//                }catch(Exception e){
+//
+//                }
+//
 
 
                 //Log user action
@@ -395,55 +413,69 @@ public class CheckinSectionFragment extends Fragment{
                 Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
 
                 try {
+//                    String betweenCheckpointContentMessage =
+//                            ScheduleAndSampleManager.getTimeString(previousCheckpoint.getTimestamp()) + "\t" +
+//                                    previousCheckpoint.getTimestamp() + "\t" +
+//                                    ScheduleAndSampleManager.getTimeString(curCheckpoint.getTimestamp()) + "\t" +
+//                                    curCheckpoint.getTimestamp()+ "\t" +
+//                                    previousCheckpoint.getLocation().toString() + "\t" +
+//                                    curCheckpoint.getLocation().toString();
+//
+//                    Log.d(LOG_TAG, "betweencheckpoint: " + betweenCheckpointContentMessage);
+//
+//                    /**for generate between check-point file**/
+//                    LogManager.log(LogManager.LOG_TYPE_BETWEEN_CHECKPOINTS_LOG,
+//                            LogManager.LOG_TAG_USER_CHECKIN,
+//                            betweenCheckpointContentMessage);
+
                     String betweenCheckpointContentMessage =
                             ScheduleAndSampleManager.getTimeString(previousCheckpoint.getTimestamp()) + "\t" +
-                                    previousCheckpoint.getTimestamp() + "\t" +
                                     ScheduleAndSampleManager.getTimeString(curCheckpoint.getTimestamp()) + "\t" +
-                                    curCheckpoint.getTimestamp()+ "\t" +
-                                    previousCheckpoint.getLocation().toString() + "\t" +
-                                    curCheckpoint.getLocation().toString();
+                                    "Ground Truth";
 
-                    Log.d(LOG_TAG, "betweencheckpoint: " + betweenCheckpointContentMessage);
 
-                    /**for generate between check-point file**/
-                    LogManager.log(LogManager.LOG_TYPE_BETWEEN_CHECKPOINTS_LOG,
+
+                    //for each checkpoint, generate a "previous checkpoint time transportation - current checkpoint time  ground truth"
+                    LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
                             LogManager.LOG_TAG_USER_CHECKIN,
                             betweenCheckpointContentMessage);
+
+
                 }catch(Exception e){
 
                 }
 
 
 
-                //after we log, we make replace Minuku's previousCheckpoint with the curCheckpoint
-                MinukuMainService.setPreviousCheckpoint(curCheckpoint);
-
-
-                /*we create check in log whenever the button is pressed, regardless is is START or CHECK IN**/
-                String checkinContentMessage="NA";
-
-
-                if (ActivityRecognitionManager.getProbableActivities()!=null &&
-                        LocationManager.getCurrentLocation()!=null ){
-
-                    try {
-                        checkinContentMessage=
-                                LocationManager.getCurrentLocation().getLatitude() + "," +
-                                        LocationManager.getCurrentLocation().getLongitude() + "," +
-                                        LocationManager.getCurrentLocation().getAccuracy() + "\t" +
-                                        TransportationModeManager.getConfirmedActvitiyString() + "\t" +
-                                        "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
-                                        ActivityRecognitionManager.getProbableActivities().toString() + "\t" ;
-
-                        LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
-                                LogManager.LOG_TAG_USER_CHECKIN,
-                                checkinContentMessage);
-
-                    }catch(Exception e){
-
-                    }
-
-                }
+//                //after we log, we make replace Minuku's previousCheckpoint with the curCheckpoint
+//                MinukuMainService.setPreviousCheckpoint(curCheckpoint);
+//
+//
+//                /*we create check in log whenever the button is pressed, regardless is is START or CHECK IN**/
+//                String checkinContentMessage="NA";
+//
+//
+//                if (ActivityRecognitionManager.getProbableActivities()!=null &&
+//                        LocationManager.getCurrentLocation()!=null ){
+//
+//                    try {
+//                        checkinContentMessage=
+//                                LocationManager.getCurrentLocation().getLatitude() + "," +
+//                                        LocationManager.getCurrentLocation().getLongitude() + "," +
+//                                        LocationManager.getCurrentLocation().getAccuracy() + "\t" +
+//                                        TransportationModeManager.getConfirmedActvitiyString() + "\t" +
+//                                        "FSM:" + TransportationModeManager.getCurrentStateString() + "\t" +
+//                                        ActivityRecognitionManager.getProbableActivities().toString() + "\t" ;
+//
+//                        LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
+//                                LogManager.LOG_TAG_USER_CHECKIN,
+//                                checkinContentMessage);
+//
+//                    }catch(Exception e){
+//
+//                    }
+//
+//                }
 
 
 
