@@ -512,7 +512,7 @@ public class RecordingAndAnnotateManager {
         ArrayList<String> res =  mLocalDBHelper.querySessions();
 
 
-        Log.d(LOG_TAG, " [getAllSessions] tje resuslt is " + res );
+//        Log.d(LOG_TAG, " [getAllSessions] tje resuslt is " + res );
 
         //we start from 1 instead of 0 because the 1st session is the background recording. We will skip it.
         for (int i=0; i<res.size() ; i++) {
@@ -522,68 +522,77 @@ public class RecordingAndAnnotateManager {
             //split each row into columns
             String[] separated = sessionStr.split(Constants.DELIMITER);
 
-            /** get properties of the session **/
-            int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
-            int taskId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_TASK_ID]);
-            long startTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_START_TIME]);
-            float batteryLife = Float.parseFloat(separated[DatabaseNameManager.COL_INDEX_SESSION_BATTERY_LIFE]);
-
-            //the original contextsourceString is connected by Constants.CONTEXT_SOURCE_DELIMITER. we need to make it an array so that we can save it to
-            //a session later
-            String contextsourceString = separated[DatabaseNameManager.COL_INDEX_SESSION_CONTEXTSOURCES];
-            String[] contextsourceArray = contextsourceString.split(Constants.CONTEXT_SOURCE_DELIMITER);
-
-            Log.d(LOG_TAG, "[get session][ testBackgroundLogging] sessions contextsource are " + contextsourceArray.toString());
+            Log.d(LOG_TAG, "the " + i + " row "  +  res.get(i));
 
 
-            /** 1. create sessions from the properies obtained **/
-            Session session = new Session(id, startTime, taskId );
+            //a session should have nine fields. if not, that session is broken
+            if (separated.length ==9) {
 
-            session.setBatteryLife(batteryLife);
-            session.setContextSourceTypes(contextsourceArray);
+                /** get properties of the session **/
+                int id = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_ID]);
+                int taskId = Integer.parseInt(separated[DatabaseNameManager.COL_INDEX_SESSION_TASK_ID]);
+                long startTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_START_TIME]);
+                float batteryLife = Float.parseFloat(separated[DatabaseNameManager.COL_INDEX_SESSION_BATTERY_LIFE]);
 
-            /**2. get end time (or time of the last record) of the sesison**/
+                //the original contextsourceString is connected by Constants.CONTEXT_SOURCE_DELIMITER. we need to make it an array so that we can save it to
+                //a session later
+                String contextsourceString = separated[DatabaseNameManager.COL_INDEX_SESSION_CONTEXTSOURCES];
+                String[] contextsourceArray = contextsourceString.split(Constants.CONTEXT_SOURCE_DELIMITER);
 
-            long endTime = 0;
-            //the session could be still ongoing..so we need to check where's endTime
-            if (!separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME].equals("null")){
-                endTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME]);
+//            Log.d(LOG_TAG, "[get session][ testBackgroundLogging] sessions contextsource are " + contextsourceArray.toString());
+
+
+                /** 1. create sessions from the properies obtained **/
+                Session session = new Session(id, startTime, taskId );
+
+                session.setBatteryLife(batteryLife);
+                session.setContextSourceTypes(contextsourceArray);
+
+                /**2. get end time (or time of the last record) of the sesison**/
+
+                long endTime = 0;
+                //the session could be still ongoing..so we need to check where's endTime
+                if (!separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME].equals("null")){
+                    endTime = Long.parseLong(separated[DatabaseNameManager.COL_INDEX_SESSION_END_TIME]);
+                    Log.d(LOG_TAG, "[get session][ testBackgroundLogging] session end time is  " + endTime);
+                }
+                //there 's no end time of the session, we take the time of the last record
+                else {
+
+                    endTime = DataHandler.getTimeOfLastSavedRecordInSession(id, session.getContextSourceNames());
+                    Log.d(LOG_TAG, "[get session][ testBackgroundLogging] session end time is  " + ScheduleAndSampleManager.getTimeString(endTime));
+                }
+
+                //set end time
+                session.setEndTime(endTime);
+
+                /** 3. get annotaitons associated with the session **/
+                JSONObject annotationSetJSON = null;
+                JSONArray annotateionSetJSONArray = null;
+
+                try {
+                    annotationSetJSON = new JSONObject(separated[DatabaseNameManager.COL_INDEX_SESSION_ANNOTATION_SET]);
+                    annotateionSetJSONArray = annotationSetJSON.getJSONArray(ANNOTATION_PROPERTIES_ANNOTATION);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //set annotationset if there is one
+                if (annotateionSetJSONArray!=null){
+                    AnnotationSet annotationSet =  toAnnorationSet(annotateionSetJSONArray);
+                    session.setAnnotationSet(annotationSet);
+                }
+
+                //            Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " annotateionSetJSONArray " + annotateionSetJSONArray);
+                Log.d(LOG_TAG, " testBackgroundLogging [testing load session][getAllSessions]  testgetdata id " + id + " startTime " + startTime + " end time " + endTime + " contextsource " + session.getContextSourceNames());
+
+
+                sessions.add(session);
             }
-            //there 's no end time of the session, we take the time of the last record
-            else {
 
-                endTime = DataHandler.getTimeOfLastSavedRecordInSession(id, session.getContextSourceNames());
-                Log.d(LOG_TAG, "[test get session time] testgetdata the last record time is  " + ScheduleAndSampleManager.getTimeString(endTime));
-            }
-
-            //set end time
-            session.setEndTime(endTime);
-
-            /** 3. get annotaitons associated with the session **/
-            JSONObject annotationSetJSON = null;
-            JSONArray annotateionSetJSONArray = null;
-            try {
-                annotationSetJSON = new JSONObject(separated[DatabaseNameManager.COL_INDEX_SESSION_ANNOTATION_SET]);
-                annotateionSetJSONArray = annotationSetJSON.getJSONArray(ANNOTATION_PROPERTIES_ANNOTATION);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-//            Log.d(LOG_TAG, " [testing load session][getSession] id " + id + " startTime " + startTime + " end time " + endTime + " annotateionSetJSONArray " + annotateionSetJSONArray);
-            Log.d(LOG_TAG, " testBackgroundLogging [testing load session][getSession]  testgetdata id " + id + " startTime " + startTime + " end time " + endTime + " contextsource " + session.getContextSourceNames());
-
-
-            //set annotationset if there is one
-            if (annotateionSetJSONArray!=null){
-                AnnotationSet annotationSet =  toAnnorationSet(annotateionSetJSONArray);
-                session.setAnnotationSet(annotationSet);
-            }
-
-            sessions.add(session);
         }
 
-       // Log.d(LOG_TAG, " [getAllSessions] in the end there are " + sessions.size() + " sessions " );
+        Log.d(LOG_TAG, " [getAllSessions] in the end there are " + sessions.size() + " sessions " );
 
 
         return sessions;

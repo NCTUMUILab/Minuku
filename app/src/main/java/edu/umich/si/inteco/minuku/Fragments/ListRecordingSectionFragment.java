@@ -64,7 +64,16 @@ public class ListRecordingSectionFragment extends Fragment {
     public static void refreshRecordingList() {
 
         Log.d(LOG_TAG, "[refreshRecordingList] the review mode is " + mReviewMode);
-       mSessions = getRecordedSessions();
+
+        if (getRecordedSessions()==null){
+            Log.d(LOG_TAG, "[showRecordingList] there is no recording");
+            mSessions = new ArrayList<Session>();
+        }
+        else {
+            Log.d(LOG_TAG, "[showRecordingList] there are session recordings");
+            mSessions = getRecordedSessions();
+        }
+
 
         if (mListRecordingAdapter!=null) {
             mListRecordingAdapter.notifyDataSetChanged();
@@ -85,31 +94,26 @@ public class ListRecordingSectionFragment extends Fragment {
 
     private static ArrayList<Session> getRecordedSessions() {
         ArrayList<Session> sessions =null;
-        try {
 
-            //review all recoridngs
-            if (mReviewMode.equals(RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_ALL)) {
-                //sessions = RecordingAndAnnotateManager.getCurRecordingSessions();
+        //review all recoridngs
+        if (mReviewMode.equals(RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_ALL)) {
+            //sessions = RecordingAndAnnotateManager.getCurRecordingSessions();
 
-                sessions = RecordingAndAnnotateManager.getAllSessions();
+            Log.d(LOG_TAG, "[showRecordingList][show all sessions]");
 
-                Log.d(LOG_TAG, "[showRecordingList][show all sessions]  there are " + sessions.size() + " sessions");
+            sessions = RecordingAndAnnotateManager.getAllSessions();
 
-            }
-            else if (mReviewMode.equals(RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_RECENT)) {
+            Log.d(LOG_TAG, "[showRecordingList][show all sessions]  there are " + sessions.size() + " sessions");
 
-                sessions = RecordingAndAnnotateManager.getRecentSessions();
-
-                Log.d(LOG_TAG, "[showRecordingList][show recent sessions] there are " + sessions.size() + " sessions");
-            }
-            else{
-                sessions = new ArrayList<Session>();
-            }
-            //assign to mSession
-            mSessions = sessions;
-        } catch (Exception  e) {
-            e.printStackTrace();
         }
+        else if (mReviewMode.equals(RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_RECENT)) {
+
+            sessions = RecordingAndAnnotateManager.getRecentSessions();
+
+            Log.d(LOG_TAG, "[showRecordingList][show recent sessions] there are " + sessions.size() + " sessions");
+        }
+        //assign to mSession
+        mSessions = sessions;
 
         return sessions;
     }
@@ -120,11 +124,17 @@ public class ListRecordingSectionFragment extends Fragment {
 
         mRecordingListView = (ListView)rootView.findViewById(R.id.recording_list);
 
-        Log.d(LOG_TAG, "[showRecordingList] the review mode is " + mReviewMode);
-        Log.d(LOG_TAG, "[showRecordingList] the mRecordingListView mode is " + mRecordingListView);
 
-        sessions = getRecordedSessions();
-        mSessions = sessions;
+        if (getRecordedSessions()==null){
+            Log.d(LOG_TAG, "[showRecordingList] there is no recording");
+            mSessions = new ArrayList<Session>();
+        }
+        else {
+            Log.d(LOG_TAG, "[showRecordingList] there are session recordings");
+            mSessions = getRecordedSessions();
+        }
+
+
         mListRecordingAdapter = new RecordingListAdapter(
                 mInflater.getContext(),
                 R.id.recording_list,
@@ -134,23 +144,25 @@ public class ListRecordingSectionFragment extends Fragment {
         Log.d(LOG_TAG, "[showRecordingList] the mListRecordingAdapter is " +  mListRecordingAdapter);
 
         if (mRecordingListView!=null) {
-            mRecordingListView.setAdapter(mListRecordingAdapter);
+            if (mListRecordingAdapter!=null && mListRecordingAdapter.getCount()>0){
+                mRecordingListView.setAdapter(mListRecordingAdapter);
 
-            mRecordingListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                mRecordingListView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
-                    Log.d(LOG_TAG, "[onItemSelected] position " + position + " is clicked");
+                        Log.d(LOG_TAG, "[onItemSelected] position " + position + " is clicked");
 
-                    //Log user action
-                    LogManager.log(LogManager.LOG_TYPE_USER_ACTION_LOG,
-                            LogManager.LOG_TAG_USER_CLICKING,
-                            "User Click:\t" + "session" + mSessions.get(position).getId() + "\t" + "ListRecordingActivity");
+                        //Log user action
+                        LogManager.log(LogManager.LOG_TYPE_USER_ACTION_LOG,
+                                LogManager.LOG_TAG_USER_CLICKING,
+                                "User Click:\t" + "session" + mSessions.get(position).getId() + "\t" + "ListRecordingActivity");
 
-                    startAnnotateActivity(position);
+                        startAnnotateActivity(position);
 
-                }
-            });
+                    }
+                });
+            }
         }
 
 

@@ -82,7 +82,7 @@ public class Constants {
     public static final String WEB_SERVICE_URL_POST_FILES = "https://inteco.cloudapp.net:5001/postlog";
 
 
-    public static String CURRENT_STUDY_CONDITION = NORMAL_CONDITION;
+    public static String CURRENT_STUDY_CONDITION = HYRBID_LABELING_CONDITION;
 
 	//this is the id for the labling study.
 	public static final int LABELING_STUDY_ID = 1;
@@ -100,7 +100,7 @@ public class Constants {
 	public static String USER_ID = "NA";
 
 	//action alarm
-	public static final String ACTION_ALARM = "edu.umich.si.inteco.captureprobe.actionAlarm";
+	public static final String ACTION_ALARM = "edu.umich.si.inteco.minuku.actionAlarm";
   //  public static final String INTENT_ACTION_CONNECTIVITY_CHANGE = "edu.umich.si.inteco.captureprobe.intent.action.connectivityChange";
 
 
@@ -135,7 +135,7 @@ public class Constants {
 
 	/**File Path **/
 
-	public static String PACKAGE_DIRECTORY_PATH = "/Android/data/edu.umich.si.inteco.minuku.app/";
+	public static String PACKAGE_DIRECTORY_PATH = "/Android/data/edu.umich.si.inteco.minuku/";
     public static String PACKAGE_DIRECTORY_NARRATIVE_PATH = "/Android/data/com.narrative.main/cache/";
 
 

@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
 
 import edu.umich.si.inteco.minuku.Constants;
@@ -205,7 +204,7 @@ public class ConfigurationManager {
 
 
             //TODO: uncomment this: for testing purpose we need to comment out this so that we can alwasy load configuration from the file
-//            PreferenceHelper.setPreferenceValue(PreferenceHelper.CONFIGURATIONS, configurationsStr);
+//            PreferenceHelper.setPreferenceBooleanValue(PreferenceHelper.CONFIGURATIONS, configurationsStr);
         }
 
 
@@ -275,7 +274,7 @@ public class ConfigurationManager {
                 boolean stopServiceDuringMidNight = content.getBoolean(ConfigurationManager.SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT);
                 Log.d(LOG_TAG, "stop service at night is" + stopServiceDuringMidNight);
 				//write into the preference
-				PreferenceHelper.setPreferenceValue(ConfigurationManager.SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT, stopServiceDuringMidNight);
+				PreferenceHelper.setPreferenceBooleanValue(ConfigurationManager.SERVICE_SETTING_STOP_SERVICE_DURING_MIDNIGHT, stopServiceDuringMidNight);
 
             }
         } catch (JSONException e) {

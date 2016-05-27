@@ -1,10 +1,16 @@
 package edu.umich.si.inteco.minuku.context.ContextStateManagers;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -32,6 +38,7 @@ import edu.umich.si.inteco.minuku.model.Record.Record;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
 
 public class LocationManager extends ContextStateManager implements ConnectionCallbacks, OnConnectionFailedListener, LocationListener{
 
@@ -175,6 +182,8 @@ public class LocationManager extends ContextStateManager implements ConnectionCa
         return;
 
     }
+
+
 
     /**
      * Start the activity recognition update request process by

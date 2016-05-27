@@ -129,7 +129,7 @@
 
 			  "BackgroundLogging":{
 				"Enabled": true,
-				"Logging_tasks":"1,2,3,7,10,11,12",
+				"Logging_tasks":"1,2,3,7,10,11",
 				"Logging_rate": 5
 			  },
 

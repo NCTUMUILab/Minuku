@@ -2,10 +2,15 @@ package edu.umich.si.inteco.minuku;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -37,6 +42,14 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import android.Manifest;
+import android.view.View;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
@@ -51,6 +64,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public static final int PAGE_POSITION_RECORDING = 0;
     public static final int PAGE_POSITION_TASKS = 1;
     public static final int PAGE_POSITION_DAILY_JOURMAL = 2;
+
+    // Permission related variables
+    String[] PERMISSIONS = {Manifest.permission.READ_CONTACTS, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_SMS, Manifest.permission.CAMERA};
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+    protected static final int FINE_LOCATION = 100;
+    protected  static final int CAMERA = 101;
+    private static final int REQUEST_WRITE_STORAGE = 102;
 
     private static String mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_ALL;
     private static String mLaunchTab = Constants.MAIN_ACTIVITY_TAB_RECORD;
@@ -81,6 +101,12 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         // Log.d(LOG_TAG, "[queryLastBackgroundLoggingSyncHourUsingPOST] get the synTime is " + lastSynhour);
 
 
+        //permissions
+        if(checkAndRequestPermissions()) {
+            // carry on the normal flow, as the case of  permissions  granted.
+        }
+
+
         /**start the contextManager service**/
         if (!MinukuMainService.isServiceRunning()){
             Log.d(LOG_TAG, "[test service running]  going start the probe service isServiceRunning:" + MinukuMainService.isServiceRunning());
@@ -107,7 +133,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (ViewPager) findViewById(R.id.main_layout);
         mViewPager.setAdapter(mAppSectionsPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -163,6 +189,119 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         currentTabPos = -1;
 
     }
+
+
+    private  boolean checkAndRequestPermissions() {
+
+        int permissionReadExternalStorage = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+        int permissionWriteExternalStorage = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        if (permissionLocation != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (permissionReadExternalStorage != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (permissionWriteExternalStorage != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
+            return false;
+        }
+        return true;
+    }
+
+//    public static boolean hasPermissions(Context context, String... permissions) {
+//        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+//            for (String permission : permissions) {
+//                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        Log.d(LOG_TAG, "[permission test]Permission callback called-------");
+        switch (requestCode) {
+            case REQUEST_ID_MULTIPLE_PERMISSIONS: {
+
+                Map<String, Integer> perms = new HashMap<>();
+
+                // Initialize the map with both permissions
+                perms.put(Manifest.permission.READ_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.WRITE_EXTERNAL_STORAGE, PackageManager.PERMISSION_GRANTED);
+
+                // Fill with actual results from user
+                if (grantResults.length > 0) {
+                    for (int i = 0; i < permissions.length; i++)
+                        perms.put(permissions[i], grantResults[i]);
+                    // Check for both permissions
+                    if (perms.get(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                            && perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                            && perms.get(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                            ) {
+                        Log.d(LOG_TAG, "[permission test]all permission granted");
+                        // process the normal flow
+                        //else any one or both the permissions are not granted
+                    } else {
+                        Log.d(LOG_TAG, "[permission test]Some permissions are not granted ask again ");
+                        //permission is denied (this is the first time, when "never ask again" is not checked) so ask again explaining the usage of permission
+//                        // shouldShowRequestPermissionRationale will return true
+                        //show the dialog or snackbar saying its necessary and try again otherwise proceed with setup.
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                                || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                            showDialogOK("all Permission required for this app",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            switch (which) {
+                                                case DialogInterface.BUTTON_POSITIVE:
+                                                    checkAndRequestPermissions();
+                                                    break;
+                                                case DialogInterface.BUTTON_NEGATIVE:
+                                                    // proceed with logic by disabling the related features or quit the app.
+                                                    break;
+                                            }
+                                        }
+                                    });
+                        }
+                        //permission is denied (and never ask again is  checked)
+                        //shouldShowRequestPermissionRationale will return false
+                        else {
+                            Toast.makeText(this, "Go to settings and enable permissions", Toast.LENGTH_LONG)
+                                    .show();
+                            //                            //proceed with logic by disabling the related features or quit the app.
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void showDialogOK(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", okListener)
+                .create()
+                .show();
+    }
+
 
 
     @Override
@@ -225,6 +364,99 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
 
     }
+
+//    public void requestAllPermissions() {
+//        View mLayout = findViewById(R.id.main_layout);
+//
+//        /**permission for location **/
+//        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+//
+//                Log.i("MainActivity",
+//                        "Displaying location permission rationale to provide additional context.");
+//
+//                Snackbar.make(mLayout, R.string.permission_location_rationale,
+//                        Snackbar.LENGTH_INDEFINITE)
+//                        .setAction(R.string.ok, new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                ActivityCompat.requestPermissions(MainActivity.this,
+//                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                                        FINE_LOCATION);
+//                            }
+//                        })
+//                        .show();
+//            } else {
+//                // Location permission has not been granted yet. Request it directly.
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                        FINE_LOCATION);
+//            }
+//
+//        }
+//
+//        /**permission for camera **/
+//        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.CAMERA)) {
+//
+//                Log.i("MainActivity",
+//                        "Displaying camera permission rationale to provide additional context.");
+//
+//                Snackbar.make(mLayout, R.string.permission_camera_rationale,
+//                        Snackbar.LENGTH_INDEFINITE)
+//                        .setAction(R.string.ok, new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                ActivityCompat.requestPermissions(MainActivity.this,
+//                                        new String[]{Manifest.permission.CAMERA},
+//                                        CAMERA);
+//                            }
+//                        })
+//                        .show();
+//            } else {
+//
+//                // Location permission has not been granted yet. Request it directly.
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.CAMERA},
+//                        CAMERA);
+//            }
+//        }
+//
+//
+//        /**permission for writing external drive **/
+//        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//
+//                Log.i("MainActivity",
+//                        "Displaying external permission rationale to provide additional context.");
+//
+//                Snackbar.make(mLayout, R.string.permission_write_exterinal_storage_rationale,
+//                        Snackbar.LENGTH_INDEFINITE)
+//                        .setAction(R.string.ok, new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                ActivityCompat.requestPermissions(MainActivity.this,
+//                                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                                        REQUEST_WRITE_STORAGE);
+//                            }
+//                        })
+//                        .show();
+//            } else {
+//
+//                // permission has not been granted yet. Request it directly.
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                        REQUEST_WRITE_STORAGE);
+//            }
+//        }
+//    }
 
 
     @Override
@@ -333,7 +565,22 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
                         return listRecordingSectionFragment;
                     }
+                    else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.HYRBID_LABELING_CONDITION)){
+                        mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_ALL;
+                        ListRecordingSectionFragment listRecordingSectionFragment = new ListRecordingSectionFragment();
+                        listRecordingSectionFragment.setReviewMode(mReviewMode);
+                        listRecordingSectionFragment.setRetainInstance(true);
 
+                        return listRecordingSectionFragment;
+                    }
+                    else if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.IN_STIU_LABELING_CONDITION)){
+                        mReviewMode = RecordingAndAnnotateManager.ANNOTATE_REVIEW_RECORDING_ALL;
+                        ListRecordingSectionFragment listRecordingSectionFragment = new ListRecordingSectionFragment();
+                        listRecordingSectionFragment.setReviewMode(mReviewMode);
+                        listRecordingSectionFragment.setRetainInstance(true);
+
+                        return listRecordingSectionFragment;
+                    }
                     else {
 
                         TaskSectionFragment taskSectionFragment = new TaskSectionFragment();
@@ -342,26 +589,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     }
 
                 case 2:
-                    if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
-
-                        DailyJournalSectionFragment dailyJournalSectionFragment = new DailyJournalSectionFragment();
-                        dailyJournalSectionFragment.setRetainInstance(true);
-                        return dailyJournalSectionFragment;
-                    }
-                    else {
-                        TaskSectionFragment taskSectionFragment = new TaskSectionFragment();
-                        taskSectionFragment.setRetainInstance(true);
-                        return taskSectionFragment;
-                    }
-
-                case 3:
-                    if (Constants.CURRENT_STUDY_CONDITION.equals(Constants.PARTICIPATORY_LABELING_CONDITION)){
-
-                        Log.d(LOG_TAG, "enter task fragment");
-                        TaskSectionFragment taskSectionFragment = new TaskSectionFragment();
-                        taskSectionFragment.setRetainInstance(true);
-                        return taskSectionFragment;
-                    }
+                    DailyJournalSectionFragment dailyJournalSectionFragment = new DailyJournalSectionFragment();
+                    dailyJournalSectionFragment.setRetainInstance(true);
+                    return dailyJournalSectionFragment;
 
                 default:
                     TaskSectionFragment taskSectionFragment1 = new TaskSectionFragment();

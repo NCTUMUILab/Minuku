@@ -99,7 +99,7 @@ public class ActivityRecognitionService extends IntentService {
                 }
             }
             catch(Exception e){
-                Log.e(LOG_TAG, e.getLocalizedMessage());
+                //
             }
 
 		}

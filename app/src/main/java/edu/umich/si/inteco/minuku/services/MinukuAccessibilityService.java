@@ -394,7 +394,7 @@ public class MinukuAccessibilityService extends AccessibilityService {
         this.isInAppActionRequested = isInAppActionRequested;
 
         //also set to preference. because OnServiceConnected is called before the ContextMAnager when the phone restarts.
-        PreferenceHelper.setPreferenceValue(PreferenceHelper.USER_INTERACTION_IN_APP_USE_REQUESTED, isInAppActionRequested);
+        PreferenceHelper.setPreferenceBooleanValue(PreferenceHelper.USER_INTERACTION_IN_APP_USE_REQUESTED, isInAppActionRequested);
 
         Log.d(LOG_TAG, "test accessibility  preference set to " +
                 PreferenceHelper.getPreferenceBoolean(PreferenceHelper.USER_INTERACTION_IN_APP_USE_REQUESTED, false));

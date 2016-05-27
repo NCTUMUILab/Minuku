@@ -6,12 +6,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -25,19 +23,15 @@ import java.util.ArrayList;
 import edu.umich.si.inteco.minuku.AnalyticsMinuku;
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.context.ContextStateManagers.TransportationModeManager;
 import edu.umich.si.inteco.minuku.context.EventManager;
 import edu.umich.si.inteco.minuku.data.DataHandler;
 import edu.umich.si.inteco.minuku.data.LocalDBHelper;
 import edu.umich.si.inteco.minuku.data.RemoteDBHelper;
 import edu.umich.si.inteco.minuku.model.Checkpoint;
 import edu.umich.si.inteco.minuku.model.actions.Action;
-import edu.umich.si.inteco.minuku.receivers.BatteryStatusReceiver;
 import edu.umich.si.inteco.minuku.util.ActionManager;
-import edu.umich.si.inteco.minuku.util.BatteryHelper;
 import edu.umich.si.inteco.minuku.util.ConfigurationManager;
 import edu.umich.si.inteco.minuku.util.FileHelper;
-import edu.umich.si.inteco.minuku.util.GooglePlayServiceUtil;
 import edu.umich.si.inteco.minuku.util.LogManager;
 import edu.umich.si.inteco.minuku.util.NotificationHelper;
 import edu.umich.si.inteco.minuku.util.PreferenceHelper;
@@ -292,8 +286,8 @@ public class MinukuMainService extends Service {
 
             Log.d(LOG_TAG, "[test permission] get the synTime is " + Constants.DEVICE_ID);
 
-            PreferenceHelper.setPreferenceValue(PreferenceHelper.DEVICE_ID, Constants.DEVICE_ID);
-            PreferenceHelper.setPreferenceValue(PreferenceHelper.USER_ID, Constants.USER_ID);
+            PreferenceHelper.setPreferenceStringValue(PreferenceHelper.DEVICE_ID, Constants.DEVICE_ID);
+            PreferenceHelper.setPreferenceStringValue(PreferenceHelper.USER_ID, Constants.USER_ID);
 
             Log.d(LOG_TAG, "[test permission] already set device ID " + PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA")) ;
             Log.d(LOG_TAG, "[test permission] already set user ID " + PreferenceHelper.getPreferenceString(PreferenceHelper.USER_ID, "NA")) ;

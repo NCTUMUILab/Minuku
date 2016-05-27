@@ -666,8 +666,6 @@ public class QuestionnaireManager {
 
                 String targetData = dataJSON.getString(QUESTION_PROPERTIES_DATA);
 
-                ArrayList<String> tableAndColumnNames = new ArrayList<String>();
-
                 //Log.d(LOG_TAG, "[getDataFromDatabase] we need to get data" );
 
                 if (targetData.equals("Session")) {

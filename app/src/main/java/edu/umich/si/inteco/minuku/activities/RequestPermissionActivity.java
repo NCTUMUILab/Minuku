@@ -5,14 +5,12 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import edu.umich.si.inteco.minuku.Constants;
 import edu.umich.si.inteco.minuku.R;
 import edu.umich.si.inteco.minuku.context.ContextManager;
-import edu.umich.si.inteco.minuku.model.Notification;
 import edu.umich.si.inteco.minuku.util.NotificationHelper;
 import edu.umich.si.inteco.minuku.util.PreferenceHelper;
 
@@ -123,8 +121,8 @@ public class RequestPermissionActivity extends Activity {
 
         Log.d(LOG_TAG, "[test permission] RequestPermission get the synTime is " + Constants.DEVICE_ID);
 
-        PreferenceHelper.setPreferenceValue(PreferenceHelper.DEVICE_ID, Constants.DEVICE_ID);
-        PreferenceHelper.setPreferenceValue(PreferenceHelper.USER_ID, Constants.USER_ID);
+        PreferenceHelper.setPreferenceStringValue(PreferenceHelper.DEVICE_ID, Constants.DEVICE_ID);
+        PreferenceHelper.setPreferenceStringValue(PreferenceHelper.USER_ID, Constants.USER_ID);
 
         Log.d(LOG_TAG, "[test permission] RequestPermission already set device ID " + PreferenceHelper.getPreferenceString(PreferenceHelper.DEVICE_ID, "NA")) ;
         Log.d(LOG_TAG, "[test permission] RequestPermission already set user ID " + PreferenceHelper.getPreferenceString(PreferenceHelper.USER_ID, "NA")) ;

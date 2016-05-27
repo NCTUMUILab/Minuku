@@ -20,7 +20,7 @@ public class PreferenceHelper {
     public static final String USER_ID = PACKAGE_NAME+ ".USER_ID";
     public static final String SCHEDULE_REQUEST_CODE = PACKAGE_NAME+".REQUEST_CODE";
     public static final String DATABASE_LAST_SEVER_SYNC_TIME = PACKAGE_NAME+ ".LAST_SERVER_SYNC_TIME";
-    public static final String USER_INTERACTION_IN_APP_USE_REQUESTED = PACKAGE_NAME+ ".LAST_SERVER_SYNC_TIME";
+    public static final String USER_INTERACTION_IN_APP_USE_REQUESTED = PACKAGE_NAME+ ".USER_INTERACTION_IN_APP_USER";
 
     /***
      * Shared preference for storing context related information
@@ -35,9 +35,9 @@ public class PreferenceHelper {
         this.mContext = context;
     }
 
-    public static void setPreferenceValue (String property, String value) {
+    public static void setPreferenceStringValue(String property, String value) {
 
-        Log.d(LOG_TAG, "[setPreferenceValue] saving " + value + " to " + property);
+        Log.d(LOG_TAG, "[setPreferenceBooleanValue] saving " + value + " to " + property);
 
         if (getPreference()!=null) {
             SharedPreferences.Editor editor = getPreference().edit();
@@ -47,9 +47,9 @@ public class PreferenceHelper {
 
     }
 
-    public static void setPreferenceValue (String property, boolean value) {
+    public static void setPreferenceBooleanValue(String property, boolean value) {
 
-        Log.d(LOG_TAG, "[setPreferenceValue] saving " + value + " to " + property);
+        Log.d(LOG_TAG, "[setPreferenceBooleanValue] saving " + value + " to " + property);
 
         if (getPreference()!=null) {
             SharedPreferences.Editor editor = getPreference().edit();
@@ -59,9 +59,9 @@ public class PreferenceHelper {
 
     }
 
-    public static void setPreferenceValue (String property, long value) {
+    public static void setPreferenceLongValue(String property, long value) {
 
-        Log.d(LOG_TAG, "[setPreferenceValue] saving " + value + " to " + property);
+        Log.d(LOG_TAG, "[setPreferenceBooleanValue] saving " + value + " to " + property);
 
         if (getPreference()!=null) {
             SharedPreferences.Editor editor = getPreference().edit();
@@ -73,7 +73,7 @@ public class PreferenceHelper {
 
     public static long getPreferenceLong (String property, long defaultValue) {
 
-        Log.d(LOG_TAG, "[setPreferenceValue] getting values from " +  property);
+        Log.d(LOG_TAG, "[setPreferenceLongValue] getting values from " +  property);
 
 
         if (getPreference()!=null) {
@@ -85,7 +85,7 @@ public class PreferenceHelper {
 
     public static String getPreferenceString (String property, String defaultValue) {
 
-        Log.d(LOG_TAG, "[setPreferenceValue] getting values from " +  property);
+        Log.d(LOG_TAG, "[setPreferenceBooleanValue] getting values from " +  property);
 
 
         if (getPreference()!=null) {

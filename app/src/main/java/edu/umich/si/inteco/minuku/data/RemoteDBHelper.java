@@ -213,8 +213,6 @@ public class RemoteDBHelper {
                     queryRemoteDB(DATA_TYPE_BACKGROUND_LOGGING);
 
 
-
-
                 setLastSeverSyncTime(now);
             }
     }
@@ -1532,7 +1530,7 @@ public class RemoteDBHelper {
     }
 
     public static void setLastSeverSyncTime(long lastSessionUpdateTime) {
-        PreferenceHelper.setPreferenceValue(PreferenceHelper.DATABASE_LAST_SEVER_SYNC_TIME, lastSessionUpdateTime);
+        PreferenceHelper.setPreferenceLongValue(PreferenceHelper.DATABASE_LAST_SEVER_SYNC_TIME, lastSessionUpdateTime);
     }
 
 

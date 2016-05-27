@@ -58,6 +58,12 @@
     <string name="questionnaire_submit_button_label">Submit</string>
     <string name="questionnaire_other_option_label">Other</string>
 
+    <!--Permission -->
+    <string name="permission_location_rationale">The app needs location for context</string>
+    <string name="permission_camera_rationale">The app needs camera for context</string>
+    <string name="permission_write_exterinal_storage_rationale">The app needs to write logs to your memory</string>
+    <string name="ok">OK</string>
+
 
 
     <!-- Error strings -->

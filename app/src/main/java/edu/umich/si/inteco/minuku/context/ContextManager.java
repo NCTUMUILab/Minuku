@@ -3,6 +3,7 @@ package edu.umich.si.inteco.minuku.context;
 import android.content.Context;
 import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -936,6 +937,17 @@ public class ContextManager {
         }
 
         return null;
+    }
+
+    public static ArrayList<Integer> getLoggingTasks() {
+
+
+        ArrayList<Integer> loggingTasks = new ArrayList<>();
+        for (int i=0; i<mLoggingTaskList.size();i++) {
+            loggingTasks.add(mLoggingTaskList.get(i).getId());
+        }
+
+        return loggingTasks;
     }
 
 
