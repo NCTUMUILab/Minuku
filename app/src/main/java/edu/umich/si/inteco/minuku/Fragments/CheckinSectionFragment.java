@@ -170,6 +170,8 @@ public class CheckinSectionFragment extends Fragment{
                 Log.d(LOG_TAG, "[checkin]" + checkinButton.getText().toString());
 
 
+
+
                 /***create checkpoint object**/
                 Checkpoint curCheckpoint = new Checkpoint(
                         LocationManager.getCurrentLocation(),
@@ -182,6 +184,28 @@ public class CheckinSectionFragment extends Fragment{
 
                 //When the button is shown "START" we start the stopwatch
                 if (checkinButton.getText().toString().equals(getString(R.string.start_btn))){
+
+
+                    //we need to generate a line when the Start button is clicked. This line indicates
+                    //the period between the last stop and the current start, which is an inactivity period
+
+                    //if there exists a previous checkpoint (which should be a STOP before this START)
+                    if (MinukuMainService.getPreviousCheckpoint()!=null){
+                        Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
+
+                        String betweenCheckpointContentMessage =
+                                ScheduleAndSampleManager.getTimeString(previousCheckpoint.getTimestamp()) + "\t" +
+                                        ScheduleAndSampleManager.getTimeString(curCheckpoint.getTimestamp()) + "\t" +
+                                        "Ground Truth";
+
+                        //for each checkpoint, generate a "previous checkpoint time transportation - current checkpoint time  ground truth"
+                        LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
+                                LogManager.LOG_TAG_USER_CHECKIN,
+                                betweenCheckpointContentMessage);
+
+                    }
+
+
 
                     //the first checkpoint (when clicking on the START button) should be set as the previous checkpoint
                     MinukuMainService.setPreviousCheckpoint(curCheckpoint);
@@ -286,7 +310,7 @@ public class CheckinSectionFragment extends Fragment{
 //                                    curCheckpoint.getLocation().toString();
 
                     Checkpoint previousCheckpoint = MinukuMainService.getPreviousCheckpoint();
-                    
+
                     String betweenCheckpointContentMessage =
                             ScheduleAndSampleManager.getTimeString(previousCheckpoint.getTimestamp()) + "\t" +
                                     ScheduleAndSampleManager.getTimeString(curCheckpoint.getTimestamp()) + "\t" +
@@ -305,7 +329,7 @@ public class CheckinSectionFragment extends Fragment{
 
                 }catch(Exception e){
 
-                    }
+                }
 
 
 
@@ -439,6 +463,10 @@ public class CheckinSectionFragment extends Fragment{
                     LogManager.log(LogManager.LOG_TYPE_CHECKPOINT_LOG,
                             LogManager.LOG_TAG_USER_CHECKIN,
                             betweenCheckpointContentMessage);
+
+
+                    //after we log, we make replace Minuku's previousCheckpoint with the curCheckpoint
+                    MinukuMainService.setPreviousCheckpoint(curCheckpoint);
 
 
                 }catch(Exception e){
